@@ -1,12 +1,9 @@
-import {
-  PRIVATE_SUPABASE_SERVICE_KEY,
-  PUBLIC_SUPABASE_URL,
-} from "@/lib/config";
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "@/lib/config";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
-  return createServerClient(PUBLIC_SUPABASE_URL, PRIVATE_SUPABASE_SERVICE_KEY, {
+  return createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value;
@@ -15,16 +12,14 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
         try {
           cookieStore.set({ name, value, ...options });
         } catch (error) {
-          // we can get here when in a server component, and it is
-          // fine as long as we also have supabase middleware in place
+          // Server component - handled by middleware
         }
       },
       remove(name: string, options: CookieOptions) {
         try {
           cookieStore.set({ name, value: "", ...options });
         } catch (error) {
-          // we can get here when in a server component, and it is
-          // fine as long as we also have supabase middleware in place
+          // Server component - handled by middleware
         }
       },
     },
