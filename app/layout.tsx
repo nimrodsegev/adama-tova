@@ -6,9 +6,8 @@ import Navbar from "@/lib/components/Navbar";
 import Footer from "@/lib/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Digital Product Jam Starter Kit",
-  description:
-    "A starter kit for wiritng code in the Digital Product Jam course.",
+  title: "Adama Tova",
+  description: "Activity registration and management for Adama Tova",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -31,7 +30,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           href="/icons/icon-192.png"
         />
         <link rel="manifest" href="/manifest.json" />
-        <script src="https://accounts.google.com/gsi/client" async></script>
+        {/* Google Sign-In Script */}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>
       <body>
         <Navbar />
