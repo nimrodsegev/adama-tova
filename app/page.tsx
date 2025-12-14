@@ -8,7 +8,7 @@ export default function Home() {
         <h2>Welcome to the Product Jam Starter Kit</h2>
 
         {/* Link to your actual Home Page */}
-        <div style={{ margin: "20px 0" }}>
+        <div style={{ margin: "20px 5px" }}>
           <Link
             href="/screens/HomePage"
             style={{
@@ -20,7 +20,7 @@ export default function Home() {
               fontWeight: 500,
             }}
           >
-            Go to Home Page
+            עמוד הבית
           </Link>
           <Link
             href="/screens/WeeklyBoardPage"
@@ -35,6 +35,20 @@ export default function Home() {
             }}
           >
             לוח שבועי
+          </Link>
+          <Link
+            href="/screens/NotificationsPage"
+            style={{
+              padding: "10px 16px",
+              backgroundColor: "#ff9800",
+              color: "#fff",
+              borderRadius: "8px",
+              textDecoration: "none",
+              fontWeight: 500,
+              marginLeft: "10px",
+            }}
+          >
+            הודעות ועדכונים
           </Link>
         </div>
 
