@@ -34,31 +34,38 @@ export default function HomePage() {
     },
   ];
 
+  // Updated notification structure to match NotificationCard
   const notifications = [
     {
       id: 1,
       message: "המפגש של מחר ב-10:00 עבר לחדר 205",
       type: "warning" as const,
-      timestamp: "לפני 5 דקות",
+      timestamp: new Date(Date.now() - 5 * 60 * 1000),
+      isRead: false,
+      category: "שינויים במפגשים",
     },
     {
       id: 2,
       message: "נוספת סדנה חדשה - פיתוח ממשקי משתמש מודרניים",
       type: "info" as const,
-      timestamp: "לפני שעה",
+      timestamp: new Date(Date.now() - 60 * 60 * 1000),
+      isRead: false,
+      category: "מפגשים חדשים",
     },
     {
       id: 3,
       message: "הרשמתך לסדנה אושרה בהצלחה!",
       type: "success" as const,
-      timestamp: "לפני 2 שעות",
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      isRead: false,
+      category: "אישורים",
     },
   ];
 
   return (
     <main style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
       <HomeHeader userName="נדב" />
-      <NotificationSection notifications={notifications} />
+      <NotificationSection notifications={notifications} maxDisplay={3} />
       <MeetingSection meetings={upcomingMeetings} />
       <PossibleMeetingsSection meetings={possibleMeetings} />
     </main>
