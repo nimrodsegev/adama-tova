@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from 'next/cache';
 import styles from "./page.module.css";
 import GoogleLoginButton from "./GoogleLoginButton";
 
@@ -14,7 +15,7 @@ export default async function Login({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user) return <div className={styles.loginForm}>hello {user.email}</div>;
+  if (user) return redirect("/");
 
   const signIn = async (formData: FormData) => {
     "use server";
@@ -29,6 +30,7 @@ export default async function Login({
     if (error) {
       return redirect("/login?message=Could not authenticate user");
     }
+    revalidatePath('/', 'layout');
     return redirect("/");
   };
 
@@ -49,6 +51,7 @@ export default async function Login({
     if (error) {
       return redirect("/login?message=Could not authenticate user");
     }
+    revalidatePath('/', 'layout');
     return redirect("/login?message=Check email to continue sign in process");
   };
 

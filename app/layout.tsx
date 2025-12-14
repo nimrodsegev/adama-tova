@@ -4,39 +4,45 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Navbar from "@/lib/components/Navbar";
 import Footer from "@/lib/components/Footer";
+import { UserProvider } from "@/app/contexts/UserContext";
+
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Adama Tova",
   description: "Activity registration and management for Adama Tova",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // 🔑 SERVER: get user from Supabase cookie
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html>
       <head>
-        {/* Browser Favicon */}
         <link rel="icon" href="/icons/favicon.png" />
-        {/* Apple Icon */}
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/icons/icon-180.png"
-        />
-        {/* Android Icon */}
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="192x192"
-          href="/icons/icon-192.png"
-        />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
         <link rel="manifest" href="/manifest.json" />
-        {/* Google Sign-In Script */}
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://accounts.google.com/gsi/client" async defer />
       </head>
       <body>
-        <Navbar />
-        <div>{children}</div>
-        <Footer />
+        {/* 👇 hydrate client with server user */}
+        <UserProvider initialUser={user}>
+          <Navbar />
+          <div>{children}</div>
+          <Footer />
+        </UserProvider>
       </body>
     </html>
   );
