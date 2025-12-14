@@ -1,83 +1,86 @@
-import { createClient } from "@/lib/supabase/server";
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { revalidatePath } from 'next/cache';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { authService } from '@/app/services/authService';
 import styles from "./page.module.css";
 import GoogleLoginButton from "./GoogleLoginButton";
 
-export default async function Login({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) return redirect("/");
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const signIn = async (formData: FormData) => {
-    "use server";
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await authService.signIn(email, password);
+      router.refresh(); // Force immediate refresh
+      router.replace('/');
+    } catch (err: any) {
+      setError(err.message || 'Could not authenticate user');
+    } finally {
+      setLoading(false);
     }
-    revalidatePath('/', 'layout');
-    return redirect("/");
   };
 
-  const signUp = async (formData: FormData) => {
-    "use server";
-    const origin = headers().get("origin");
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${origin}/auth/callback`,
-      },
-    });
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await authService.signUp(email, password);
+      setError('Check email to continue sign in process');
+    } catch (err: any) {
+      setError(err.message || 'Could not authenticate user');
+    } finally {
+      setLoading(false);
     }
-    revalidatePath('/', 'layout');
-    return redirect("/login?message=Check email to continue sign in process");
   };
 
   return (
     <div className="content">
-      <form className={styles.loginForm} action={signIn}>
+      <form className={styles.loginForm} onSubmit={handleSignIn}>
         <label htmlFor="email">
-          Email <input name="email" placeholder="you@example.com" required />
+          Email{' '}
+          <input
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </label>
 
         <label htmlFor="password">
-          Password{" "}
+          Password{' '}
           <input
             type="password"
             name="password"
             placeholder="••••••••"
             autoComplete="on"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </label>
 
-        <button>Log In</button>
-        <button formAction={signUp}>Sign Up</button>
-        {searchParams?.message && (
-          <p className={styles.errorMessage}>{searchParams.message}</p>
-        )}
+        <button type="submit" disabled={loading}>
+          {loading ? 'Loading...' : 'Log In'}
+        </button>
+        <button type="button" onClick={handleSignUp} disabled={loading}>
+          Sign Up
+        </button>
+
+        {error && <p className={styles.errorMessage}>{error}</p>}
+        
         <GoogleLoginButton />
       </form>
     </div>
