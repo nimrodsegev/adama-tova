@@ -1,4 +1,5 @@
 import HomeHeader from "@/lib/components/Home/HomeHeader";
+import NotificationSection from "@/lib/components/Home/NotificationSection";
 import MeetingSection from "@/lib/components/Home/MeetingSection";
 import PossibleMeetingsSection from "@/lib/components/Home/PossibleMeetingsSection";
 
@@ -33,9 +34,31 @@ export default function HomePage() {
     },
   ];
 
+  const notifications = [
+    {
+      id: 1,
+      message: "המפגש של מחר ב-10:00 עבר לחדר 205",
+      type: "warning" as const,
+      timestamp: "לפני 5 דקות",
+    },
+    {
+      id: 2,
+      message: "נוספת סדנה חדשה - פיתוח ממשקי משתמש מודרניים",
+      type: "info" as const,
+      timestamp: "לפני שעה",
+    },
+    {
+      id: 3,
+      message: "הרשמתך לסדנה אושרה בהצלחה!",
+      type: "success" as const,
+      timestamp: "לפני 2 שעות",
+    },
+  ];
+
   return (
     <main style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
       <HomeHeader userName="נדב" />
+      <NotificationSection notifications={notifications} />
       <MeetingSection meetings={upcomingMeetings} />
       <PossibleMeetingsSection meetings={possibleMeetings} />
     </main>

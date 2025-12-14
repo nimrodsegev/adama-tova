@@ -19,18 +19,20 @@ export default function MeetingCard({
         padding: "16px",
         width: "250px",
         backgroundColor: "#fff",
-        marginLeft: "16px",
-        direction: "ltr",
+        marginRight: "16px",
+        direction: "rtl",
       }}
     >
-      <h3 style={{ marginBottom: "8px" }}>{title}</h3>
-      <p>
+      <h3 style={{ marginBottom: "8px", textAlign: "right" }}>{title}</h3>
+      <p style={{ textAlign: "right" }}>
         <strong>זמן:</strong> {time}
       </p>
-      <p>
+      <p style={{ textAlign: "right" }}>
         <strong>מיקום:</strong> {location}
       </p>
-      <p style={{ marginTop: "8px" }}>{description}</p>
+      <p style={{ marginTop: "8px", textAlign: "right" }}>
+        <strong>תיאור:</strong> {description}
+      </p>
     </div>
   );
 }
