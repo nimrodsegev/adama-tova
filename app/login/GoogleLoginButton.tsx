@@ -2,6 +2,7 @@
 
 import { NEXT_PUBLIC_GOOGLE_CLIENT_ID } from "@/lib/config";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 declare global {
@@ -20,6 +21,7 @@ declare global {
 const GoogleLoginButton = () => {
   const buttonRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
     const handleSignInWithGoogle = async (response: any) => {
@@ -28,7 +30,12 @@ const GoogleLoginButton = () => {
         provider: "google",
         token: response.credential,
       });
-      location.reload();
+      
+      if (!error) {
+        // Use router instead of location.reload()
+        router.refresh();
+        router.replace('/');
+      }
     };
 
     const initializeGoogle = () => {
@@ -62,10 +69,8 @@ const GoogleLoginButton = () => {
       }, 100);
       return () => clearInterval(checkGoogle);
     }
-  }, [supabase.auth]);
+  }, [supabase.auth, router]);
 
-  // You can customize the button here:
-  // https://developers.google.com/identity/gsi/web/tools/configurator
   return <div ref={buttonRef} />;
 };
 
