@@ -16,8 +16,10 @@ export default function PossibleMeetingsSection({
   meetings,
 }: PossibleMeetingsSectionProps) {
   return (
-    <section style={{ direction: "ltr", marginTop: "32px" }}>
-      <h2>מפגשים אפשריים שאתה יכול להצטרף אליהם</h2>
+    <section style={{ direction: "rtl", marginTop: "32px" }}>
+      <h2 style={{ textAlign: "right" }}>
+        מפגשים אפשריים שאתה יכול להצטרף אליהם
+      </h2>
       <div
         style={{
           display: "flex",

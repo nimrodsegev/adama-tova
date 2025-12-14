@@ -4,10 +4,19 @@ type HomeHeaderProps = {
 
 export default function HomeHeader({ userName }: HomeHeaderProps) {
   return (
-    <header style={{ marginBottom: "32px", direction: "ltr" }}>
-      <p style={{ fontSize: "28px", marginBottom: "8px" }}>שלום, {userName}</p>
-      <p style={{ fontSize: "18px", color: "#555" }}>
-        ברוך שובך! הנה מה שמחכה לך הלאה.
+    <header
+      style={{
+        marginBottom: "32px",
+        direction: "rtl",
+        backgroundColor: "transparent",
+        padding: 0,
+        border: "none",
+      }}
+    >
+      <p style={{ fontSize: "28px", marginBottom: "0px", textAlign: "right" }}>
+        <strong>שלום {userName},</strong>
+        <br />
+        הנה מה שמחכה לך
       </p>
     </header>
   );

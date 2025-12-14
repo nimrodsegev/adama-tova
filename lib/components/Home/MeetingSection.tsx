@@ -14,8 +14,8 @@ type MeetingsSectionProps = {
 
 export default function MeetingSection({ meetings }: MeetingsSectionProps) {
   return (
-    <section style={{ direction: "ltr", marginTop: "32px" }}>
-      <h2>המפגשים הבאים שלך</h2>
+    <section style={{ direction: "rtl", marginTop: "32px" }}>
+      <h2 style={{ textAlign: "right" }}>המפגשים הבאים שלך</h2>
       <div
         style={{
           display: "flex",
