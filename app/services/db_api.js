@@ -92,10 +92,21 @@ export const apiActivities = {
             max_participants: activityData.max_participants,
             status: activityData.status,
             category: activityData.category,
+            location: activityData.location,
+            instructor: activityData.instructor,
           },
         ])
         .select()
         .single()
+    );
+  },
+  async getByDate(dateString) {
+    return safeRequest(
+      supabase
+        .from("activities")
+        .select("*")
+        .eq("date", dateString)
+        .order("start_time", { ascending: true }) // Shows 09:00 before 14:00
     );
   },
 };

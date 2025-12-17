@@ -1,108 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import WeeklyHeader from "@/lib/components/WeeklyBoard/WeeklyHeader";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
 import MeetingCard from "@/lib/components/Home/MeetingCard";
-
-type Meeting = {
-  title: string;
-  time: string;
-  location: string;
-  description: string;
-};
-
-// Mock data generator based on date
-const generateMeetingsForDate = (date: Date): Meeting[] => {
-  const dayOfWeek = date.getDay();
-  const seed = date.getDate() + date.getMonth();
-
-  // Different meetings based on day of week
-  const meetingTemplates: Record<number, Meeting[]> = {
-    0: [
-      // Sunday
-      {
-        title: "פגישת צוות",
-        time: "09:00",
-        location: "חדר ישיבות A",
-        description: "סנכרון שבועי",
-      },
-      {
-        title: "סקירת פרויקט",
-        time: "14:00",
-        location: "זום",
-        description: "עדכון התקדמות",
-      },
-    ],
-    1: [
-      // Monday
-      {
-        title: "הרצאה",
-        time: "10:00",
-        location: "אולם 101",
-        description: "טכנולוגיות חדשות",
-      },
-    ],
-    2: [
-      // Tuesday
-      {
-        title: "סדנת עיצוב",
-        time: "11:00",
-        location: "סטודיו",
-        description: "עבודה על UI/UX",
-      },
-      {
-        title: "שיחת קפה",
-        time: "16:00",
-        location: "בית קפה",
-        description: "נטוורקינג",
-      },
-    ],
-    3: [
-      // Wednesday
-      {
-        title: "פגישת לקוחות",
-        time: "13:00",
-        location: "משרד",
-        description: "הצגת אב טיפוס",
-      },
-    ],
-    4: [
-      // Thursday
-      {
-        title: "סיעור מוחות",
-        time: "10:30",
-        location: "חדר יצירתיות",
-        description: "רעיונות חדשים",
-      },
-      {
-        title: "סקירת קוד",
-        time: "15:00",
-        location: "זום",
-        description: "Code review",
-      },
-    ],
-    5: [
-      // Friday
-      {
-        title: "מפגש חברתי",
-        time: "12:00",
-        location: "גן",
-        description: "פעילות צוות",
-      },
-    ],
-    6: [], // Saturday
-  };
-
-  return meetingTemplates[dayOfWeek] || [];
-};
+import { apiActivities } from "@/app/services/db_api"; // וודא שהנתיב לקובץ ה-API נכון
 
 export default function WeeklyBoardPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
 
-  // Calculate the selected date based on week and day
-  const getSelectedDate = () => {
+  // State לאחסון הסדנאות שיגיעו מה-DB
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // חישוב התאריך הנבחר מתוך האינדקס והשבוע הנוכחי
+  const getSelectedDateObject = () => {
     const weekStart = new Date(currentDate);
     weekStart.setDate(currentDate.getDate() - currentDate.getDay());
     const selected = new Date(weekStart);
@@ -110,8 +23,34 @@ export default function WeeklyBoardPage() {
     return selected;
   };
 
-  const selectedDate = getSelectedDate();
-  const meetings = generateMeetingsForDate(selectedDate);
+  const selectedDateObj = getSelectedDateObject();
+
+  // פונקציה לשליפת הנתונים מה-DB
+  const fetchActivities = async () => {
+    setLoading(true);
+
+    // המרת התאריך לפורמט YYYY-MM-DD שמתאים לפונקציה getByDate
+    const year = selectedDateObj.getFullYear();
+    const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDateObj.getDate()).padStart(2, "0");
+    const dateString = `${year}-${month}-${day}`;
+
+    // שימוש בפונקציה ששלחת
+    const [data, error] = await apiActivities.getByDate(dateString);
+
+    if (error) {
+      console.error("Error fetching activities:", error);
+      setActivities([]);
+    } else {
+      setActivities(data || []);
+    }
+    setLoading(false);
+  };
+
+  // בכל פעם שמשנים יום או שבוע - נשלף נתונים חדשים
+  useEffect(() => {
+    fetchActivities();
+  }, [selectedDayIndex, currentDate]);
 
   const handleWeekChange = (offset: number) => {
     const newDate = new Date(currentDate);
@@ -130,7 +69,7 @@ export default function WeeklyBoardPage() {
         direction: "rtl",
       }}
     >
-      <WeeklyHeader currentDate={selectedDate} />
+      <WeeklyHeader currentDate={selectedDateObj} />
       <WeekNavigation
         currentWeekStart={currentDate}
         onWeekChange={handleWeekChange}
@@ -143,9 +82,13 @@ export default function WeeklyBoardPage() {
 
       <section style={{ marginTop: "32px" }}>
         <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>
-          מפגשים ליום {dayLetters[selectedDayIndex]}
+          מפגשים ליום {dayLetters[selectedDayIndex]} ('
+          {selectedDateObj.toLocaleDateString("he-IL")}')
         </h2>
-        {meetings.length > 0 ? (
+
+        {loading ? (
+          <p>טוען נתונים מהשרת...</p>
+        ) : activities.length > 0 ? (
           <div
             style={{
               display: "flex",
@@ -154,19 +97,19 @@ export default function WeeklyBoardPage() {
               flexWrap: "wrap",
             }}
           >
-            {meetings.map((meeting, index) => (
+            {activities.map((activity) => (
               <MeetingCard
-                key={index}
-                title={meeting.title}
-                time={meeting.time}
-                location={meeting.location}
-                description={meeting.description}
+                key={activity.id}
+                title={activity.title}
+                time={`${activity.start_time} - ${activity.end_time}`}
+                location={activity.category} // כאן אתה יכול להחליף למיקום אם קיים ב-DB
+                description={activity.description}
               />
             ))}
           </div>
         ) : (
           <p style={{ color: "#888", fontSize: "18px" }}>
-            אין מפגשים מתוכננים ליום זה
+            אין סדנאות רשומות ליום זה.
           </p>
         )}
       </section>
