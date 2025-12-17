@@ -1,3 +1,9 @@
+/**
+ * LOGIN PAGE
+ * Handles email/password login and signup, plus Google OAuth.
+ * After signup, redirects to /complete-profile for quiz.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -36,7 +42,8 @@ export default function Login() {
 
     try {
       await authService.signUp(email, password);
-      setError('Check email to continue sign in process');
+      // Redirect to quiz page to complete profile
+      router.push('/complete-profile');
     } catch (err: any) {
       setError(err.message || 'Could not authenticate user');
     } finally {
