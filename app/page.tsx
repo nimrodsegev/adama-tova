@@ -6,11 +6,10 @@ export default function Home() {
     <main>
       <div>
         <h2>Welcome to the Product Jam Starter Kit</h2>
-
-        {/* Link to your actual Home Page */}
+        {/* Link to User and Admin Dashboards */}
         <div style={{ margin: "20px 5px" }}>
           <Link
-            href="/screens/HomePage"
+            href="/UserScreens"
             style={{
               padding: "10px 16px",
               backgroundColor: "#0070f3",
@@ -20,10 +19,10 @@ export default function Home() {
               fontWeight: 500,
             }}
           >
-            עמוד הבית
+            User Dashboard
           </Link>
           <Link
-            href="/screens/WeeklyBoardPage"
+            href="/adminScreens"
             style={{
               padding: "10px 16px",
               backgroundColor: "#28a745",
@@ -34,38 +33,9 @@ export default function Home() {
               marginLeft: "10px",
             }}
           >
-            לוח שבועי
-          </Link>
-          <Link
-            href="/screens/NotificationsPage"
-            style={{
-              padding: "10px 16px",
-              backgroundColor: "#ff9800",
-              color: "#fff",
-              borderRadius: "8px",
-              textDecoration: "none",
-              fontWeight: 500,
-              marginLeft: "10px",
-            }}
-          >
-            הודעות ועדכונים
-          </Link>
-          <Link
-            href="/screens/AddActivityPage"
-            style={{
-              padding: "10px 16px",
-              backgroundColor: "#dc3545",
-              color: "#fff",
-              borderRadius: "8px",
-              textDecoration: "none",
-              fontWeight: 500,
-              marginLeft: "10px",
-            }}
-          >
-            הוסף פעילות (מנהל)
+            Admin Dashboard
           </Link>
         </div>
-
         <Image
           src="/huji.svg"
           alt="HUJI Logo"
