@@ -109,11 +109,80 @@ export const apiActivities = {
         .order("start_time", { ascending: true }) // Shows 09:00 before 14:00
     );
   },
+  async getParticipants(activityId) {
+    return safeRequest(
+      supabase
+        .from("registrations")
+        .select(`
+          if_confirmed,
+          wait_list_place,
+          users (
+            id,
+            full_name,
+            email,
+            phone
+          )
+        `)
+        .eq("activity_id", activityId)
+    );
+  },
 };
 
 // ==========================================================
 // 2. REGISTRATIONS FUNCTIONS
 // ==========================================================
+export const apiRegistrations = {
+  /**
+   * REGISTER USER TO ACTIVITY
+   * Automatically handles "Confirmed" vs "Waitlist" logic.
+   */
+  async registerUserToActivity(userId, activityId) {
+    // 1. Check if already registered
+    const { data: existing } = await supabase
+      .from("registrations")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("activity_id", activityId)
+      .single();
+
+    if (existing) {
+      return [null, "User is already registered for this activity."];
+    }
+
+    // 2. Get Activity Details (Max participants & current counts)
+    const { data: activity, error: actError } = await supabase
+      .from("activities")
+      .select("max_participants, registrations(if_confirmed)")
+      .eq("id", activityId)
+      .single();
+
+    if (actError) return [null, "Activity not found."];
+
+    // 3. Calculate Capacity
+    const maxParticipants = activity.max_participants || Infinity;
+    const currentConfirmed = activity.registrations.filter(r => r.if_confirmed).length;
+    const currentWaitlist = activity.registrations.filter(r => !r.if_confirmed).length;
+
+    const isFull = currentConfirmed >= maxParticipants;
+
+    // 4. Insert Registration
+    return safeRequest(
+      supabase
+        .from("registrations")
+        .insert([
+          {
+            user_id: userId,
+            activity_id: activityId,
+            if_confirmed: !isFull, // True if space exists, False if full
+            wait_list_place: isFull ? currentWaitlist + 1 : 0, // 0 if confirmed, else next number
+            created_at: new Date().toISOString()
+          },
+        ])
+        .select()
+        .single()
+    );
+  }
+};
 
 // ==========================================================
 // 3. NOTIFICATIONS FUNCTIONS
@@ -281,6 +350,22 @@ export const apiUser = {
     }
 
     return [{ id: randId, email, password }, null];
+  },
+  async checkIfAdmin(userId) {
+    const { data, error } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error("Check Admin Error:", error.message);
+      return [false, error.message]; // Default to false on error
+    }
+
+    // Assumes your enum or text string is exactly 'admin'
+    const isAdmin = data?.role === 'admin'; 
+    return [isAdmin, null];
   },
   async createUserFromAuth(user) {
     return safeRequest(
