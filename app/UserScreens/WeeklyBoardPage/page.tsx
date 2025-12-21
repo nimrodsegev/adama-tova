@@ -82,8 +82,8 @@ export default function WeeklyBoardPage() {
 
       <section style={{ marginTop: "32px" }}>
         <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>
-          מפגשים ליום {dayLetters[selectedDayIndex]} ('
-          {selectedDateObj.toLocaleDateString("he-IL")}')
+          מפגשים ליום {dayLetters[selectedDayIndex]} (&apos;
+          {selectedDateObj.toLocaleDateString("he-IL")}&apos;)
         </h2>
 
         {loading ? (
