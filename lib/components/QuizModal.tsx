@@ -100,7 +100,7 @@ export default function QuizModal({ userId, userEmail }: QuizModalProps) {
       });
 
       router.refresh();
-      router.replace('/');
+      router.replace('/UserScreens');
     } catch (err: any) {
       setError(err.message || 'שגיאה בשמירת הפרטים');
     } finally {
