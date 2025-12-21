@@ -43,15 +43,6 @@ export default function WeeklyBoardPage() {
     const [actData, actError] = await apiActivities.getByDate(dateString);
     if (actError) console.error("Error fetching activities:", actError);
     else setActivities(actData || []);
-
-    // B. Fetch User's Registrations (Only if logged in)
-    if (user) {
-      const [regIds, regError] = await apiRegistrations.getUserRegistrationIds(user.id);
-      if (!regError && regIds) {
-        setMyRegistrationIds(regIds);
-      }
-    }
-
     setLoading(false);
   };
 
