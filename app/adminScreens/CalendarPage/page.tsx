@@ -1,20 +1,22 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // 👈 1. Import Router
 import WeeklyHeader from "@/lib/components/WeeklyBoard/WeeklyHeader";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
 import MeetingCard from "@/lib/components/Home/MeetingCard";
-import { apiActivities } from "@/app/services/db_api"; // וודא שהנתיב לקובץ ה-API נכון
+import { apiActivities } from "@/app/services/db_api"; 
 
-export default function WeeklyBoardPage() {
+export default function AdminWeeklyBoardPage() {
+  const router = useRouter(); // 👈 2. Initialize Router
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
-
-  // State לאחסון הסדנאות שיגיעו מה-DB
+  
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // חישוב התאריך הנבחר מתוך האינדקס והשבוע הנוכחי
   const getSelectedDateObject = () => {
     const weekStart = new Date(currentDate);
     weekStart.setDate(currentDate.getDate() - currentDate.getDay());
@@ -25,17 +27,14 @@ export default function WeeklyBoardPage() {
 
   const selectedDateObj = getSelectedDateObject();
 
-  // פונקציה לשליפת הנתונים מה-DB
+  // --- Fetch Data ---
   const fetchActivities = async () => {
     setLoading(true);
-
-    // המרת התאריך לפורמט YYYY-MM-DD שמתאים לפונקציה getByDate
     const year = selectedDateObj.getFullYear();
     const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
     const day = String(selectedDateObj.getDate()).padStart(2, "0");
     const dateString = `${year}-${month}-${day}`;
 
-    // שימוש בפונקציה ששלחת
     const [data, error] = await apiActivities.getByDate(dateString);
 
     if (error) {
@@ -47,11 +46,32 @@ export default function WeeklyBoardPage() {
     setLoading(false);
   };
 
-  // בכל פעם שמשנים יום או שבוע - נשלף נתונים חדשים
   useEffect(() => {
     fetchActivities();
   }, [selectedDayIndex, currentDate]);
 
+  // --- 🗑️ DELETE ACTIVITY ---
+  const handleDelete = async (activityId: string) => {
+    if (!confirm("האם אתה בטוח שברצונך למחוק פעילות זו?")) return;
+
+    setActionLoading(activityId);
+    const [_, error] = await apiActivities.delete(activityId);
+
+    if (error) {
+      alert("שגיאה במחיקה: " + error);
+    } else {
+      setActivities((prev) => prev.filter((a) => a.id !== activityId));
+    }
+    setActionLoading(null);
+  };
+
+  // --- ✏️ EDIT ACTIVITY (Updated) ---
+  const handleEdit = (activity: any) => {
+    // 👇 3. Navigate to your new Edit Page with the ID in the URL
+    router.push(`/adminScreens/EditActivityPage?id=${activity.id}`);
+  };
+
+  // --- Navigation ---
   const handleWeekChange = (offset: number) => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + offset * 7);
@@ -82,7 +102,7 @@ export default function WeeklyBoardPage() {
 
       <section style={{ marginTop: "32px" }}>
         <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>
-          מפגשים ליום {dayLetters[selectedDayIndex]} (&apos;
+           ניהול מפגשים - {dayLetters[selectedDayIndex]} (&apos;
           {selectedDateObj.toLocaleDateString("he-IL")}&apos;)
         </h2>
 
@@ -97,15 +117,57 @@ export default function WeeklyBoardPage() {
               flexWrap: "wrap",
             }}
           >
-            {activities.map((activity) => (
-              <MeetingCard
-                key={activity.id}
-                title={activity.title}
-                time={`${activity.start_time} - ${activity.end_time}`}
-                location={activity.category} // כאן אתה יכול להחליף למיקום אם קיים ב-DB
-                description={activity.description}
-              />
-            ))}
+            {activities.map((activity) => {
+               const isLoadingThis = actionLoading === activity.id;
+
+               return (
+                <div key={activity.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <MeetingCard
+                    title={activity.title}
+                    time={`${activity.start_time} - ${activity.end_time}`}
+                    location={activity.category}
+                    description={activity.description}
+                  />
+
+                  {/* ADMIN CONTROLS */}
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button 
+                      onClick={() => handleEdit(activity)}
+                      disabled={isLoadingThis}
+                      style={{
+                        flex: 1,
+                        padding: "8px",
+                        backgroundColor: "#0070f3", // Blue
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        opacity: isLoadingThis ? 0.5 : 1
+                      }}
+                    >
+                      ✏️ ערוך
+                    </button>
+
+                    <button 
+                      onClick={() => handleDelete(activity.id)}
+                      disabled={isLoadingThis}
+                      style={{
+                        flex: 1,
+                        padding: "8px",
+                        backgroundColor: "#dc3545", // Red
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        opacity: isLoadingThis ? 0.5 : 1
+                      }}
+                    >
+                      {isLoadingThis ? "..." : "🗑️ מחק"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <p style={{ color: "#888", fontSize: "18px" }}>

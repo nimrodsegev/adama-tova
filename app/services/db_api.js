@@ -126,6 +126,70 @@ export const apiActivities = {
         .eq("activity_id", activityId)
     );
   },
+  async update(activityId, updates) {
+    return safeRequest(
+      supabase
+        .from('activities')
+        .update(updates)
+        .eq('id', activityId)
+        .select()
+    );
+  },
+  async delete(activityId) {
+    // --- STEP 1: Fetch Info (Title & Participants) ---
+    const { data: activity, error: fetchError } = await supabase
+      .from('activities')
+      .select('title, registrations(user_id)')
+      .eq('id', activityId)
+      .single();
+
+    if (fetchError) {
+      return [null, "Could not find activity details to process deletion."];
+    }
+
+    const { title, registrations } = activity;
+
+    // --- STEP 2: Notify Participants ---
+    if (registrations && registrations.length > 0) {
+      console.log(`Notify ${registrations.length} users about cancellation...`);
+      
+      const alerts = registrations.map(reg => ({
+        user_id: reg.user_id,
+        title: "Activity Cancelled ⚠️",
+        message: `The activity "${title}" has been cancelled by the instructor.`,
+        is_read: false,
+        created_at: new Date().toISOString()
+      }));
+
+      // Batch insert notifications
+      const { error: notifError } = await supabase
+        .from('notifications')
+        .insert(alerts);
+
+      if (notifError) console.error("Warning: Failed to send cancellation alerts", notifError);
+    }
+
+    // --- STEP 3: Delete Activity ---
+    // Note: If your DB Foreign Keys are set to 'ON DELETE CASCADE', this single line 
+    // deletes the activity AND the registrations automatically. 
+    // If not, this might fail unless we manually delete registrations first.
+    // We will attempt the delete directly:
+    return safeRequest(
+      supabase
+        .from('activities')
+        .delete()
+        .eq('id', activityId)
+    );
+  },
+  async getById(id) {
+    return safeRequest(
+      supabase
+        .from('activities')
+        .select('*')
+        .eq('id', id)
+        .single()
+    );
+  },
 };
 
 // ==========================================================
@@ -181,7 +245,30 @@ export const apiRegistrations = {
         .select()
         .single()
     );
-  }
+  },
+  async cancelRegistration(userId, activityId) {
+    return safeRequest(
+      supabase
+        .from('registrations')
+        .delete()
+        .eq('user_id', userId)
+        .eq('activity_id', activityId)
+    );
+  },
+  async getUserRegistrationIds(userId) {
+    const { data, error } = await supabase
+      .from('registrations')
+      .select('activity_id')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error("Error fetching user registrations:", error.message);
+      return [[], error.message];
+    }
+    
+    // Returns array like: ['uuid-1', 'uuid-2']
+    return [data.map(r => r.activity_id), null];
+  },
 };
 
 // ==========================================================
@@ -256,6 +343,23 @@ export const apiNotifications = {
         .eq("is_read", false) // Only update ones that are currently unread
     );
   },
+  async markAsUnread(notificationId) {
+    return safeRequest(
+      supabase
+        .from('notifications')
+        .update({ is_read: false })
+        .eq('id', notificationId)
+    );
+  },
+
+  async delete(notificationId) {
+    return safeRequest(
+      supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId)
+    );
+  },
 
   /**
    * SEND NOTIFICATION (System Use)
@@ -274,32 +378,21 @@ export const apiNotifications = {
       ])
     );
   },
-
-  /**
-   * REAL-TIME LISTENER
-   * Call this in your main App component to listen for incoming alerts.
-   * @param {string} userId - Who are we listening for?
-   * @param {function} onNewNotification - Callback function to run when data arrives.
-   * @returns {object} subscription - The subscription object (call .unsubscribe() on cleanup).
-   */
   subscribe(userId, onNewNotification) {
     return supabase
-      .channel("public:notifications")
+      .channel('public:notifications')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`, // Only listen for MY notifications
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`
         },
-        (payload) => {
-          console.log("New Notification Received!", payload.new);
-          onNewNotification(payload.new);
-        }
+        (payload) => onNewNotification(payload.new)
       )
       .subscribe();
-  },
+  }
 };
 
 // ==========================================================
