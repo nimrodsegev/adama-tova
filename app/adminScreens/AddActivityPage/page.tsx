@@ -15,6 +15,8 @@ export default function AddActivityPage() {
     max_participants: "",
     status: "open" as ActivityStatus,
     category: "Art" as ActivityCategory,
+    instructor: "",
+    location: "",
   });
 
   const [submitStatus, setSubmitStatus] = useState<
@@ -46,6 +48,8 @@ export default function AddActivityPage() {
       max_participants: parseInt(formData.max_participants),
       status: formData.status,
       category: formData.category,
+      instructor: formData.instructor,
+      location: formData.location,
     };
 
     try {
@@ -73,6 +77,8 @@ export default function AddActivityPage() {
           max_participants: "",
           status: "open",
           category: "Art",
+          instructor: "",
+          location: "",
         });
         setSubmitStatus("idle");
       }, 2000);
@@ -146,7 +152,70 @@ export default function AddActivityPage() {
             placeholder="לדוגמה: סדנת ציור"
           />
         </div>
-
+        {/* Instructor */}
+        <div>
+          <label
+            htmlFor="instructor"
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold",
+              textAlign: "right",
+            }}
+          >
+            שם המנחה *
+          </label>
+          <input
+            type="text"
+            id="instructor"
+            name="instructor"
+            value={formData.instructor}
+            onChange={handleChange}
+            required
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              border: "2px solid #ccc",
+              fontSize: "16px",
+              textAlign: "right",
+              direction: "rtl",
+            }}
+            placeholder="לדוגמה: יוסי לוי"
+          />
+        </div>
+        {/* Location */}
+        <div>
+          <label
+            htmlFor="location"
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold",
+              textAlign: "right",
+            }}
+          >
+            מיקום הפעילות *
+          </label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              border: "2px solid #ccc",
+              fontSize: "16px",
+              textAlign: "right",
+              direction: "rtl",
+            }}
+            placeholder="לדוגמה: במרחה החיצוני"
+          />
+        </div>
         {/* Date */}
         <div>
           <label
