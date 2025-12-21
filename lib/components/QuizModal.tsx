@@ -91,7 +91,7 @@ export default function QuizModal({ userId, userEmail }: QuizModalProps) {
     setError('');
 
     try {
-      await userService.completeProfile(userId, {
+      await userService.completeProfile(userId, userEmail, {
         full_name: fullName.trim(),
         phone: cleanPhone,
         circle: circle || undefined,
