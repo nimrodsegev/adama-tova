@@ -9,21 +9,28 @@ import { createClient } from '@/lib/supabase/client';
 
 export const userService = {
   // Save quiz answers and create user profile
-  async completeProfile(userId: string, profileData: {
-    full_name: string;
-    phone: string;
-    circle?: string;
-    interests?: string[];
-    free_text?: string;
-  }) {
+  async completeProfile(
+    userId: string,
+    userEmail: string,
+    profileData: {
+      full_name: string;
+      phone: string;
+      circle?: string;
+      interests?: string[];
+      free_text?: string;
+    }
+  ) {
     const supabase = createClient();
     
     const { data, error } = await supabase
       .from('users')
       .upsert({
         id: userId,
+        email: userEmail,           // ✅ Add email
+        role: 'participant',        // ✅ Set role to participant
         full_name: profileData.full_name,
         phone: profileData.phone,
+        notifications_enabled: true, // Default to true
         quiz: {
           circle: profileData.circle || null,
           interests: profileData.interests || [],
@@ -49,4 +56,18 @@ export const userService = {
     if (error) return false;
     return data?.quiz?.completed_at != null;
   },
+
+  // Get full user profile from users table
+async getFullProfile(userId: string) {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  
+  if (error) return null;
+  return data;
+},
 };
