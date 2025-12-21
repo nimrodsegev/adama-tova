@@ -1,9 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NotificationsHeader from "@/lib/components/Notifications/NotificationsHeader";
 import NotificationsFilters from "@/lib/components/Notifications/NotificationsFilters";
 import NotificationsBody from "@/lib/components/Notifications/NotificationsBody";
+import { useUser } from "@/app/contexts/UserContext"; // 👈 Import User Context
+import { apiNotifications, supabase } from "@/app/services/db_api"; // 👈 Import API
 
+// Matches your UI component's expected type
 type Notification = {
   id: number;
   message: string;
@@ -13,90 +16,91 @@ type Notification = {
   category: string;
 };
 
-// Mock data - Will be replaced with Supabase fetch
-// Future: import { fetchNotifications } from "@/lib/api/notifications";
-const initialNotifications: Notification[] = [
-  {
-    id: 1,
-    message: "המפגש של מחר ב-10:00 עבר לחדר 205",
-    type: "warning",
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
-    isRead: false,
-    category: "שינויים במפגשים",
-  },
-  {
-    id: 2,
-    message: "נוספת סדנה חדשה - פיתוח ממשקי משתמש מודרניים",
-    type: "info",
-    timestamp: new Date(Date.now() - 60 * 60 * 1000),
-    isRead: false,
-    category: "מפגשים חדשים",
-  },
-  {
-    id: 3,
-    message: "הרשמתך לסדנה אושרה בהצלחה!",
-    type: "success",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    isRead: true,
-    category: "אישורים",
-  },
-  {
-    id: 4,
-    message: "נא לעדכן את פרטי הפרופיל שלך",
-    type: "info",
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    isRead: false,
-    category: "פרופיל",
-  },
-  {
-    id: 5,
-    message: "המפגש 'סקירת קוד' בוטל",
-    type: "error",
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    isRead: true,
-    category: "ביטולים",
-  },
-  {
-    id: 6,
-    message: "תזכורת: מפגש צוות מחר בשעה 09:00",
-    type: "info",
-    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    isRead: true,
-    category: "תזכורות",
-  },
-];
-
 export default function NotificationsPage() {
-  // Future: const { data: notifications, loading } = useSupabase('notifications');
-  const [notifications, setNotifications] =
-    useState<Notification[]>(initialNotifications);
+  const { user } = useUser(); // Get current user
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  const [loading, setLoading] = useState(true);
 
-  // Future: These will be API calls to Supabase
-  const markAsRead = (id: number) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-    // Future: await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+  // --- HELPER: Map DB Data to UI Type ---
+  // This converts the raw DB row into the format your components expect
+  const mapDbToUi = (dbRecord: any): Notification => {
+    let type: "info" | "warning" | "success" | "error" = "info";
+    
+    // 🔍 Auto-detect type based on keywords
+    const text = (dbRecord.title + " " + dbRecord.message).toLowerCase();
+
+    if (text.includes("cancel") || text.includes("בוטל") || text.includes("ביטול")) {
+      type = "error"; // 🔴 Makes it red
+    } else if (text.includes("warning") || text.includes("שינוי")) {
+      type = "warning"; // 🟡 Makes it yellow
+    } else if (text.includes("success") || text.includes("אושרה")) {
+      type = "success"; // 🟢 Makes it green
+    }
+
+    return {
+      id: dbRecord.id,
+      message: dbRecord.message,
+      type: type,
+      timestamp: new Date(dbRecord.created_at),
+      isRead: dbRecord.is_read,
+      category: dbRecord.title || "הודעה מערכת", // Use Title as Category
+    };
   };
 
-  const markAsUnread = (id: number) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, isRead: false } : n))
-    );
-    // Future: await supabase.from('notifications').update({ is_read: false }).eq('id', id);
+  // --- 1. Fetch Data ---
+  useEffect(() => {
+    if (!user) return;
+
+    const loadData = async () => {
+      setLoading(true);
+      const [data, error] = await apiNotifications.getList(user.id, 50); // Fetch last 50
+      if (data) {
+        setNotifications(data.map(mapDbToUi));
+      }
+      setLoading(false);
+    };
+
+    loadData();
+
+    // --- 2. Real-time Subscription ---
+    // This makes the "Activity Cancelled" pop up instantly!
+    const subscription = apiNotifications.subscribe(user.id, (newRawNotif: any) => {
+       const newUiNotif = mapDbToUi(newRawNotif);
+       setNotifications((prev) => [newUiNotif, ...prev]);
+    });
+
+    // Cleanup
+    return () => { supabase.removeChannel(subscription); };
+
+  }, [user]);
+
+  // --- Actions ---
+
+  const markAsRead = async (id: number) => {
+    // Optimistic Update (Update UI immediately)
+    setNotifications(prev => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+    // API Call
+    await apiNotifications.markAsRead(id);
   };
 
-  const deleteNotification = (id: number) => {
-    setNotifications(notifications.filter((n) => n.id !== id));
-    // Future: await supabase.from('notifications').delete().eq('id', id);
+  const markAsUnread = async (id: number) => {
+    setNotifications(prev => prev.map((n) => (n.id === id ? { ...n, isRead: false } : n)));
+    await apiNotifications.markAsUnread(id);
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
-    // Future: await supabase.from('notifications').update({ is_read: true }).eq('user_id', userId);
+  const deleteNotification = async (id: number) => {
+    setNotifications(prev => prev.filter((n) => n.id !== id));
+    await apiNotifications.delete(id);
   };
 
+  const markAllAsRead = async () => {
+    if (!user) return;
+    setNotifications(prev => prev.map((n) => ({ ...n, isRead: true })));
+    await apiNotifications.markAllAsRead(user.id);
+  };
+
+  // --- Filtering ---
   const filteredNotifications = notifications.filter((n) => {
     if (filter === "unread") return !n.isRead;
     if (filter === "read") return n.isRead;
@@ -104,6 +108,8 @@ export default function NotificationsPage() {
   });
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  if (!user) return <div style={{ padding: 40, textAlign: 'center' }}>אנא התחבר כדי לצפות בהודעות</div>;
 
   return (
     <main
@@ -125,12 +131,16 @@ export default function NotificationsPage() {
         onMarkAllAsRead={markAllAsRead}
       />
 
-      <NotificationsBody
-        notifications={filteredNotifications}
-        onMarkAsRead={markAsRead}
-        onMarkAsUnread={markAsUnread}
-        onDelete={deleteNotification}
-      />
+      {loading ? (
+        <p style={{textAlign: 'center', marginTop: 20}}>טוען הודעות...</p>
+      ) : (
+        <NotificationsBody
+          notifications={filteredNotifications}
+          onMarkAsRead={markAsRead}
+          onMarkAsUnread={markAsUnread}
+          onDelete={deleteNotification}
+        />
+      )}
     </main>
   );
 }
