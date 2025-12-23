@@ -5,8 +5,8 @@ import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
 import MeetingCard from "@/lib/components/Home/MeetingCard";
 // 👇 1. Import User Context & Registration API
-import { useUser } from "@/app/contexts/UserContext"; 
-import { apiActivities, apiRegistrations } from "@/app/services/db_api"; 
+import { useUser } from "@/app/contexts/UserContext";
+import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 
 export default function WeeklyBoardPage() {
   const { user } = useUser(); // Get current user
@@ -49,33 +49,6 @@ export default function WeeklyBoardPage() {
   useEffect(() => {
     fetchData();
   }, [selectedDayIndex, currentDate, user]); // Re-run if date changes or user logs in
-
-  // --- Handle Register / Cancel ---
-  const handleToggleRegistration = async (activityId: string) => {
-    if (!user) return alert("עליך להתחבר כדי להירשם.");
-    
-    setActionLoading(activityId); // Show loading on this button
-
-    const isRegistered = myRegistrationIds.includes(activityId);
-
-    if (isRegistered) {
-      // ❌ CANCEL
-      const [_, error] = await apiRegistrations.cancelRegistration(user.id, activityId);
-      if (error) alert("שגיאה בביטול: " + error);
-      else {
-        setMyRegistrationIds(prev => prev.filter(id => id !== activityId));
-      }
-    } else {
-      // ✅ REGISTER
-      const [res, error] = await apiRegistrations.registerUserToActivity(user.id, activityId);
-      if (error) alert("שגיאה בהרשמה: " + error);
-      else {
-        setMyRegistrationIds(prev => [...prev, activityId]);
-        if (res?.message) alert(res.message);
-      }
-    }
-    setActionLoading(null); // Stop loading
-  };
 
   // --- Navigation Handlers ---
   const handleWeekChange = (offset: number) => {
@@ -129,36 +102,21 @@ export default function WeeklyBoardPage() {
               const isLoadingThis = actionLoading === activity.id;
 
               return (
-                <div key={activity.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div
+                  key={activity.id}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
                   <MeetingCard
+                    id={activity.id}
                     title={activity.title}
                     time={`${activity.start_time} - ${activity.end_time}`}
                     location={activity.category}
                     description={activity.description}
                   />
-                  
-                  {/* 👇 The Action Button */}
-                  <button
-                    onClick={() => handleToggleRegistration(activity.id)}
-                    disabled={isLoadingThis}
-                    style={{
-                      padding: "8px",
-                      borderRadius: "8px",
-                      border: "none",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                      color: "white",
-                      transition: "0.2s",
-                      backgroundColor: isRegistered ? "#ff4d4f" : "#28a745", // Red for cancel, Green for join
-                      opacity: isLoadingThis ? 0.7 : 1
-                    }}
-                  >
-                    {isLoadingThis 
-                      ? "מעדכן..." 
-                      : isRegistered 
-                        ? "בטל הרשמה ✕" 
-                        : "הירשם לפעילות ✓"}
-                  </button>
                 </div>
               );
             })}

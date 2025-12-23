@@ -1,4 +1,9 @@
+"use client";
+
+import Link from "next/link";
+
 type MeetingCardProps = {
+  id: string;
   title: string;
   time: string;
   location: string;
@@ -6,6 +11,7 @@ type MeetingCardProps = {
 };
 
 export default function MeetingCard({
+  id,
   title,
   time,
   location,
@@ -33,6 +39,31 @@ export default function MeetingCard({
       <p style={{ marginTop: "8px", textAlign: "right" }}>
         <strong>תיאור:</strong> {description}
       </p>
+
+      {/* כפתור ראה עוד */}
+      <Link
+        href={`/UserScreens/ActivityDetailsPage?id=${id}`}
+        style={{
+          display: "block",
+          marginTop: "12px",
+          padding: "10px",
+          backgroundColor: "#3b82f6",
+          color: "white",
+          textAlign: "center",
+          borderRadius: "8px",
+          textDecoration: "none",
+          fontWeight: "600",
+          transition: "background-color 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#2563eb";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "#3b82f6";
+        }}
+      >
+        ראה עוד →
+      </Link>
     </div>
   );
 }
