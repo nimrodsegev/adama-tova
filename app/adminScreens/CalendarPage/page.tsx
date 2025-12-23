@@ -50,28 +50,6 @@ export default function AdminWeeklyBoardPage() {
     fetchActivities();
   }, [selectedDayIndex, currentDate]);
 
-  // --- 🗑️ DELETE ACTIVITY ---
-  const handleDelete = async (activityId: string) => {
-    if (!confirm("האם אתה בטוח שברצונך למחוק פעילות זו?")) return;
-
-    setActionLoading(activityId);
-    const [_, error] = await apiActivities.delete(activityId);
-
-    if (error) {
-      alert("שגיאה במחיקה: " + error);
-    } else {
-      setActivities((prev) => prev.filter((a) => a.id !== activityId));
-    }
-    setActionLoading(null);
-  };
-
-  // --- ✏️ EDIT ACTIVITY (Updated) ---
-  const handleEdit = (activity: any) => {
-    // 👇 3. Navigate to your new Edit Page with the ID in the URL
-    router.push(`/adminScreens/EditActivityPage?id=${activity.id}`);
-  };
-
-  // --- Navigation ---
   const handleWeekChange = (offset: number) => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + offset * 7);
