@@ -514,6 +514,43 @@ export const apiUser = {
 
     return [{ id: randId, email, password }, null];
   },
+  // Add this inside the apiUser object
+  
+  /**
+   * CREATE NEW ADMIN
+   */
+  async createAdmin(email, password, fullName, phone) { // 👈 Added phone parameter
+    // 1. Sign Up the new user (Auth)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName, phone: phone } // Save metadata to Auth user as well
+      }
+    });
+
+    if (authError) return [null, authError.message];
+    
+    const newUserId = authData.user?.id;
+    if (!newUserId) return [null, "Auth succeeded but no ID returned."];
+
+    // 2. Insert into 'users' table with ADMIN role
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert([{ 
+        id: newUserId, 
+        full_name: fullName, 
+        email: email,
+        phone: phone, // 👈 Save phone to DB
+        role: 'admin' 
+      }]);
+
+    if (profileError) {
+      return [null, "User created, but database insert failed: " + profileError.message];
+    }
+
+    return [{ id: newUserId, email }, null];
+  },
   async checkIfAdmin(userId) {
     const { data, error } = await supabase
       .from("users")
