@@ -52,6 +52,32 @@ export const apiActivities = {
         .order("date", { ascending: true })
     );
   },
+  async getByUserPreferences(userId) {
+    // 1. Get User's Interests from the 'quiz' JSON column
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('quiz')
+      .eq('id', userId)
+      .single();
+
+    // Check if user exists and has interests
+    if (userError || !user || !user.quiz || !user.quiz.interests || user.quiz.interests.length === 0) {
+      console.log("No interests found for user.");
+      return [[], null]; // Return empty list if no interests found
+    }
+
+    const userInterests = user.quiz.interests; // Example: ["Music", "Technology"]
+
+    // 2. Fetch Activities matching those categories
+    return safeRequest(
+      supabase
+        .from('activities')
+        .select('*')
+        .in('category', userInterests) // 👈 Magic line: Checks if category is inside the array
+        .gte('date', new Date().toISOString()) // Optional: Only show future events
+        .order('date', { ascending: true })
+    );
+  },
 
   // GET a single activity by ID
   async getById(id) {
@@ -218,6 +244,23 @@ export const apiActivities = {
       supabase.from("activities").delete().eq("id", activityId)
     );
   },
+  /**
+   * GET PARTICIPANTS (Sorted: Confirmed first, then Waitlist by time)
+   */
+  async getParticipants(activityId) {
+    return safeRequest(
+      supabase
+        .from("registrations")
+        .select(`
+          if_confirmed,
+          created_at,
+          users ( full_name, email, phone )
+        `)
+        .eq("activity_id", activityId)
+        .order("if_confirmed", { ascending: false }) // True (Confirmed) first
+        .order("created_at", { ascending: true })    // Then by time
+    );
+  },
   async getById(id) {
     return safeRequest(
       supabase.from("activities").select("*").eq("id", id).single()
@@ -292,47 +335,61 @@ export const apiActivities = {
 
 export const apiRegistrations = {
   /**
-   * REGISTER (Strict Capacity Limit)
-   * Returns an error if the activity is full.
+   * 🔍 CHECK STATUS
+   * Returns 'confirmed', 'waitlist', or null
+   */
+  async getRegistrationStatus(userId, activityId) {
+    const { data } = await supabase
+      .from("registrations")
+      .select("if_confirmed")
+      .eq("user_id", userId)
+      .eq("activity_id", activityId)
+      .single();
+
+    if (!data) return [null, null]; // Not registered
+    return [data.if_confirmed ? 'confirmed' : 'waitlist', null];
+  },
+
+  /**
+   * 📝 REGISTER (Smart Waitlist Logic)
    */
   async registerUserToActivity(userId, activityId) {
     // 1. Check if already registered
     const { data: existing } = await supabase
       .from("registrations")
-      .select("id")
+      .select("id, if_confirmed")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
       .single();
 
-    if (existing)
-      return [null, "User is already registered for this activity."];
+    if (existing) {
+      const status = existing.if_confirmed ? "confirmed" : "waitlist";
+      return [null, `User is already ${status}`];
+    }
 
-    // 2. Fetch Capacity Data
-    const { data: activity, error: actError } = await supabase
+    // 2. Fetch Capacity
+    const { data: activity } = await supabase
       .from("activities")
-      .select("max_participants, current_participants")
+      .select("title, max_participants, current_participants")
       .eq("id", activityId)
       .single();
 
-    if (actError) return [null, "Activity not found."];
+    if (!activity) return [null, "Activity not found."];
 
     const current = activity.current_participants || 0;
     const max = activity.max_participants || 0;
+    const isFull = current >= max;
 
-    // 3. 🛑 STRICT CHECK: Stop if full
-    if (current >= max) {
-      return [null, "Registration failed: This activity is full."];
-    }
-
-    // 4. Insert Registration (Since we checked capacity, it is always Confirmed)
+    // 3. Register User
+    // If Full -> if_confirmed: false (Waitlist)
     const { data: newReg, error: regError } = await supabase
       .from("registrations")
       .insert([
         {
           user_id: userId,
           activity_id: activityId,
-          if_confirmed: true, // Always true because we checked space above
-          created_at: new Date().toISOString(),
+          if_confirmed: !isFull, 
+          created_at: new Date().toISOString()
         },
       ])
       .select()
@@ -350,27 +407,27 @@ export const apiRegistrations = {
   },
 
   /**
-   * CANCEL (With Counter Decrement)
+   * ❌ CANCEL (Auto-Promote Next Person)
    */
   async cancelRegistration(userId, activityId) {
-    // 1. Check registration to see if we need to decrement
-    const { data: registration } = await supabase
+    // 1. Check who is cancelling
+    const { data: leavingUser } = await supabase
       .from("registrations")
       .select("if_confirmed")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
       .single();
 
-    if (!registration) return [null, "Registration not found"];
+    if (!leavingUser) return [null, "Registration not found"];
 
-    // 2. Delete
-    const { error: deleteError } = await supabase
+    // 2. Delete the registration
+    const { error: delError } = await supabase
       .from("registrations")
       .delete()
       .eq("user_id", userId)
       .eq("activity_id", activityId);
 
-    if (deleteError) return [null, deleteError.message];
+    if (delError) return [null, delError.message];
 
     // 3. Decrement Counter (Only if they were confirmed)
     if (registration.if_confirmed) {

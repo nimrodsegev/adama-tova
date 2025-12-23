@@ -1,4 +1,6 @@
 import "@/styles/global.css";
+import './fonts.css';
+
 
 import type { Metadata } from "next";
 import type { ReactNode } from "react";

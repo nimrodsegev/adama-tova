@@ -3,7 +3,7 @@ import { useState } from "react";
 import { apiActivities } from "@/app/services/db_api";
 
 type ActivityStatus = "open" | "closed" | "cancelled";
-type ActivityCategory = "Art" | "sport" | "Cooking" | "Music";
+type ActivityCategory = "Art" | "Yoga" | "Meditation" | "Writing" | "Crafts" | "Mindfulness";
 
 export default function AddActivityPage() {
   const [formData, setFormData] = useState({
@@ -344,9 +344,11 @@ export default function AddActivityPage() {
             }}
           >
             <option value="Art">אמנות</option>
-            <option value="Sport">ספורט</option>
-            <option value="Cooking">בישול</option>
-            <option value="Music">מוזיקה</option>
+            <option value="Yoga">יוגה</option>
+            <option value="Meditation">מדיטציה</option>
+            <option value="Writing">כתיבה</option>
+            <option value="Crafts">יצירה</option>
+            <option value="Mindfulness">מיידנפולנס</option>
           </select>
         </div>
 

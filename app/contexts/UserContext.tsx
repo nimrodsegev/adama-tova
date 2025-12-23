@@ -2,7 +2,7 @@
  * USER CONTEXT
  * Manages user authentication state, quiz completion status, and full user profile.
  * Loads complete user data from users table including role, name, phone, quiz data.
- * For new Google users, shows role selection modal.
+ * For new Google users, redirects to complete profile page.
  * Redirects users based on role and quiz completion status.
  */
 
@@ -13,7 +13,6 @@ import { User } from '@supabase/supabase-js';
 import { authService } from '@/app/services/authService';
 import { userService } from '@/app/services/userService';
 import { useRouter, usePathname } from 'next/navigation';
-import RoleSelectionModal from '@/lib/components/RoleSelectionModal';
 
 interface UserProfile {
   id: string;
@@ -49,11 +48,15 @@ export function UserProvider({
 }) {
   const [user, setUser] = useState<User | null>(initialUser);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with true to prevent flash
   const [hasCompletedQuiz, setHasCompletedQuiz] = useState(false);
-  const [showRoleSelection, setShowRoleSelection] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+
+  // List of routes that should not redirect
+  const NO_REDIRECT_ROUTES = ['/complete-profile'];
+  const PUBLIC_ROUTES = ['/login', '/complete-profile'];
+
 
   useEffect(() => {
     // Check if there's a mismatch between initialUser and actual session
@@ -81,53 +84,62 @@ export function UserProvider({
   // Load full user profile and check quiz completion whenever user changes
   useEffect(() => {
     const loadProfile = async () => {
+      setLoading(true);
+      
       if (user) {
-        // Load full profile from users table
-        const profile = await userService.getFullProfile(user.id);
-        
-        if (profile) {
-          // User exists in users table
-          setUserProfile(profile);
-          setShowRoleSelection(false);
+        try {
+          // Load full profile from users table
+          const profile = await userService.getFullProfile(user.id);
           
-          // Check if quiz is completed
-          const completed = profile?.quiz?.completed_at != null;
-          setHasCompletedQuiz(completed);
-          
-          // If completed, redirect based on role
-          if (completed) {
-            if (pathname === '/login' || pathname === '/complete-profile' || pathname === '/complete-profile-admin') {
-              if (profile.role === 'admin') {
-                router.replace('/adminScreens');
+          if (profile) {
+            // User exists in users table
+            setUserProfile(profile);
+            
+            // Check if quiz is completed
+            const completed = profile?.quiz?.completed_at != null;
+            setHasCompletedQuiz(completed);
+            
+            // Only redirect if we're not already on a protected route
+            if (!NO_REDIRECT_ROUTES.includes(pathname)) {
+              if (completed) {
+                // Quiz completed - go to appropriate dashboard
+                if (profile.role === 'admin') {
+                  router.replace('/adminScreens');
+                } else {
+                  router.replace('/UserScreens');
+                }
               } else {
-                router.replace('/UserScreens');
+                // Quiz not completed - redirect to quiz page
+                router.replace('/complete-profile');
               }
             }
           } else {
-            // Quiz not completed - redirect to appropriate quiz page
-            if (pathname !== '/complete-profile' && 
-                pathname !== '/complete-profile-admin' && 
-                pathname !== '/login') {
-              router.push('/complete-profile');
+            // User doesn't exist in users table (new Google user)
+            setUserProfile(null);
+            setHasCompletedQuiz(false);
+            
+            // Only redirect if we're not already on the quiz page
+            if (pathname !== '/complete-profile') {
+              router.replace('/complete-profile');
             }
           }
-        } else {
-          // User doesn't exist in users table (new Google user)
+        } catch (error) {
+          console.error('Error loading profile:', error);
           setUserProfile(null);
           setHasCompletedQuiz(false);
-          
-          // Show role selection modal if not on login or quiz pages
-          if (pathname !== '/login' && 
-              pathname !== '/complete-profile' && 
-              pathname !== '/complete-profile-admin') {
-            setShowRoleSelection(true);
-          }
         }
       } else {
+        // No user - clear profile
         setUserProfile(null);
         setHasCompletedQuiz(false);
-        setShowRoleSelection(false);
+        
+        // Only redirect to login if we're not on a public route
+        if (!PUBLIC_ROUTES.includes(pathname)) {
+          router.replace('/login');
+        }
       }
+      
+      setLoading(false);
     };
 
     loadProfile();
@@ -137,14 +149,13 @@ export function UserProvider({
     setUser(null);
     setUserProfile(null);
     setHasCompletedQuiz(false);
-    setShowRoleSelection(false);
     await authService.signOut();
+    router.replace('/login');
   };
 
   return (
     <UserContext.Provider value={{ user, userProfile, loading, hasCompletedQuiz, signOut }}>
       {children}
-      {showRoleSelection && <RoleSelectionModal />}
     </UserContext.Provider>
   );
 }

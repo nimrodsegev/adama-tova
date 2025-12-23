@@ -1,77 +1,49 @@
 "use client";
 
-import { NEXT_PUBLIC_GOOGLE_CLIENT_ID } from "@/lib/config";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import Image from "next/image";
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: any) => void;
-          renderButton: (element: HTMLElement, config: any) => void;
-        };
-      };
-    };
-  }
+interface GoogleLoginButtonProps {
+  className?: string;
 }
 
-const GoogleLoginButton = () => {
-  const buttonRef = useRef<HTMLDivElement>(null);
+const GoogleLoginButton = ({ className }: GoogleLoginButtonProps) => {
   const supabase = createClient();
   const router = useRouter();
 
-  useEffect(() => {
-    const handleSignInWithGoogle = async (response: any) => {
-      console.log("handleSignInWithGoogle", response);
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: "google",
-        token: response.credential,
-      });
-      
-      if (!error) {
-        // Use router instead of location.reload()
-        router.refresh();
-        router.replace('/');
-      }
-    };
+  const handleGoogleClick = async () => {
+    // Get the current path to use as redirect_to parameter
+    const currentPath = window.location.pathname;
+    
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        // Optional: You can add query parameters if needed
+      },
+    });
 
-    const initializeGoogle = () => {
-      if (window.google && buttonRef.current) {
-        window.google.accounts.id.initialize({
-          client_id: NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-          callback: handleSignInWithGoogle,
-        });
-        window.google.accounts.id.renderButton(buttonRef.current, {
-          type: "standard",
-          shape: "rectangular",
-          theme: "outline",
-          text: "signin_with",
-          size: "medium",
-          logo_alignment: "left",
-          width: 290,
-        });
-      }
-    };
-
-    // Initialize if Google script is already loaded
-    if (window.google) {
-      initializeGoogle();
-    } else {
-      // Wait for the script to load
-      const checkGoogle = setInterval(() => {
-        if (window.google) {
-          clearInterval(checkGoogle);
-          initializeGoogle();
-        }
-      }, 100);
-      return () => clearInterval(checkGoogle);
+    if (error) {
+      console.error("Google login error:", error);
     }
-  }, [supabase.auth, router]);
+  };
 
-  return <div ref={buttonRef} />;
+  return (
+    <button
+      type="button"
+      onClick={handleGoogleClick}
+      className={className}
+    >
+      <span>התחבר עם גוגל</span>
+      <Image
+        src="/icons/google.png"
+        alt="Google"
+        width={20}
+        height={20}
+      />
+    </button>
+  );
 };
 
 export default GoogleLoginButton;
