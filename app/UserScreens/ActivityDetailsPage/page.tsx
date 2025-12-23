@@ -16,13 +16,15 @@ export default function ActivityDetailsPage() {
   const [activity, setActivity] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
+  
+  // STATUS: 'none' | 'confirmed' | 'waitlist'
+  const [regStatus, setRegStatus] = useState<'none' | 'confirmed' | 'waitlist'>('none');
 
   useEffect(() => {
     if (activityId) {
       loadActivity();
       if (user) {
-        checkRegistration();
+        checkRegistrationStatus();
       }
     }
   }, [activityId, user]);
@@ -43,14 +45,13 @@ export default function ActivityDetailsPage() {
     }
   };
 
-  const checkRegistration = async () => {
+  const checkRegistrationStatus = async () => {
     if (!user || !activityId) return;
     try {
-      const [registrationIds, error] =
-        await apiRegistrations.getUserRegistrationIds(user.id);
-      if (!error && registrationIds) {
-        const registered = (registrationIds as string[]).includes(activityId);
-        setIsRegistered(registered);
+      // Use the new helper we added to db_api
+      const [status, error] = await apiRegistrations.getRegistrationStatus(user.id, activityId);
+      if (!error) {
+        setRegStatus(status || 'none');
       }
     } catch (error) {
       console.error("Error checking registration:", error);
@@ -86,8 +87,8 @@ export default function ActivityDetailsPage() {
 
     setProcessing(true);
 
-    if (isRegistered) {
-      // ❌ CANCEL
+    if (regStatus !== 'none') {
+      // ❌ LEAVE (Cancel / Leave Waitlist)
       const [_, error] = await apiRegistrations.cancelRegistration(
         user.id,
         activityId!
@@ -95,13 +96,12 @@ export default function ActivityDetailsPage() {
       if (error) {
         alert("שגיאה בביטול: " + error);
       } else {
-        setIsRegistered(false);
+        setRegStatus('none');
         alert("ההרשמה בוטלה בהצלחה");
-        // Reload activity to update participant count
         await loadActivity();
       }
     } else {
-      // ✅ REGISTER
+      // ✅ JOIN (Register / Waitlist)
       const [res, error] = await apiRegistrations.registerUserToActivity(
         user.id,
         activityId!
@@ -109,10 +109,12 @@ export default function ActivityDetailsPage() {
       if (error) {
         alert("שגיאה בהרשמה: " + error);
       } else {
-        setIsRegistered(true);
-        if (res?.message) alert(res.message);
-        else alert("נרשמת בהצלחה לפעילות!");
-        // Reload activity to update participant count
+        // Check message to see if confirmed or waitlisted
+        const isWaitlist = res?.message?.includes("waitlist");
+        setRegStatus(isWaitlist ? 'waitlist' : 'confirmed');
+        
+        if (res?.message) alert(res.message); // Show API message ("Registered" or "Waitlisted")
+        
         await loadActivity();
       }
     }
@@ -121,38 +123,30 @@ export default function ActivityDetailsPage() {
   };
 
   if (loading || userLoading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div style={{ fontSize: "20px", color: "#666" }}>טוען...</div>
-      </div>
-    );
+    return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>Loading...</div>;
   }
 
   if (!activity) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div style={{ fontSize: "20px", color: "#666" }}>הפעילות לא נמצאה</div>
-      </div>
-    );
+    return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>Activity not found</div>;
   }
 
-  const spotsLeft =
-    activity.max_participants - (activity.current_participants || 0);
+  const spotsLeft = activity.max_participants - (activity.current_participants || 0);
   const isFull = spotsLeft <= 0;
+
+  // Button Logic
+  let buttonText = "✓ הרשם לפעילות";
+  let buttonColor = "#10b981"; // Green
+  
+  if (regStatus === 'confirmed') {
+    buttonText = "❌ בטל הרשמה";
+    buttonColor = "#ef4444"; // Red
+  } else if (regStatus === 'waitlist') {
+    buttonText = "⏳ צא מרשימת המתנה";
+    buttonColor = "#f97316"; // Orange
+  } else if (isFull) {
+    buttonText = "➕ הכנס לרשימת המתנה";
+    buttonColor = "#f59e0b"; // Yellow/Orange
+  }
 
   return (
     <div
@@ -199,13 +193,7 @@ export default function ActivityDetailsPage() {
               color: "white",
             }}
           >
-            <h1
-              style={{
-                fontSize: "36px",
-                fontWeight: "bold",
-                marginBottom: "8px",
-              }}
-            >
+            <h1 style={{ fontSize: "36px", fontWeight: "bold", marginBottom: "8px" }}>
               {activity.title}
             </h1>
             <p style={{ fontSize: "18px", opacity: 0.9 }}>
@@ -215,186 +203,19 @@ export default function ActivityDetailsPage() {
 
           {/* Content */}
           <div style={{ padding: "32px" }}>
-            {/* Quick Info - 6 boxes */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                gap: "16px",
-                marginBottom: "32px",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "#f9fafb",
-                  padding: "16px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "24px", marginBottom: "8px" }}>📅</div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginBottom: "4px",
-                  }}
-                >
-                  תאריך
-                </div>
-                <div style={{ fontWeight: "600" }}>
-                  {new Date(activity.date).toLocaleDateString("he-IL")}
-                </div>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#f9fafb",
-                  padding: "16px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "24px", marginBottom: "8px" }}>🕐</div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginBottom: "4px",
-                  }}
-                >
-                  שעת התחלה
-                </div>
-                <div style={{ fontWeight: "600" }}>
-                  {activity.start_time.slice(0, 5)}
-                </div>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#f9fafb",
-                  padding: "16px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "24px", marginBottom: "8px" }}>🕐</div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginBottom: "4px",
-                  }}
-                >
-                  שעת סיום
-                </div>
-                <div style={{ fontWeight: "600" }}>
-                  {activity.end_time.slice(0, 5)}
-                </div>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#f9fafb",
-                  padding: "16px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "24px", marginBottom: "8px" }}>📍</div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginBottom: "4px",
-                  }}
-                >
-                  מיקום
-                </div>
-                <div style={{ fontWeight: "600" }}>{activity.location}</div>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#f9fafb",
-                  padding: "16px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "24px", marginBottom: "8px" }}>👥</div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginBottom: "4px",
-                  }}
-                >
-                  משתתפים
-                </div>
-                <div style={{ fontWeight: "600" }}>
-                  {activity.current_participants || 0}/
-                  {activity.max_participants}
-                </div>
-              </div>
-              {activity.instructor && (
-                <div
-                  style={{
-                    backgroundColor: "#f9fafb",
-                    padding: "16px",
-                    borderRadius: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  <div style={{ fontSize: "24px", marginBottom: "8px" }}>
-                    👤
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#666",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    מדריך/ה
-                  </div>
-                  <div style={{ fontWeight: "600" }}>{activity.instructor}</div>
-                </div>
-              )}
+            {/* Quick Info Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "32px" }}>
+              <InfoBox icon="📅" label="תאריך" value={new Date(activity.date).toLocaleDateString("he-IL")} />
+              <InfoBox icon="🕐" label="שעת התחלה" value={activity.start_time.slice(0, 5)} />
+              <InfoBox icon="🕐" label="שעת סיום" value={activity.end_time.slice(0, 5)} />
+              <InfoBox icon="📍" label="מיקום" value={activity.location} />
+              <InfoBox icon="👥" label="משתתפים" value={`${activity.current_participants || 0}/${activity.max_participants}`} />
+              {activity.instructor && <InfoBox icon="👤" label="מדריך/ה" value={activity.instructor} />}
             </div>
 
-            {/* Status Badge */}
-            {activity.status && (
-              <div style={{ marginBottom: "32px" }}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    padding: "8px 16px",
-                    borderRadius: "20px",
-                    fontWeight: "600",
-                    backgroundColor:
-                      activity.status === "active" ? "#d1fae5" : "#fee2e2",
-                    color: activity.status === "active" ? "#065f46" : "#991b1b",
-                  }}
-                >
-                  {activity.status === "open" ? "ניתן להירשם" : "הפעילות מלאה"}
-                </span>
-              </div>
-            )}
-
-            {/* Participants Info */}
-            <div
-              style={{
-                backgroundColor: "#dbeafe",
-                border: "1px solid #93c5fd",
-                borderRadius: "8px",
-                padding: "16px",
-                marginBottom: "32px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
+            {/* Participants Status Bar */}
+            <div style={{ backgroundColor: "#dbeafe", border: "1px solid #93c5fd", borderRadius: "8px", padding: "16px", marginBottom: "32px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontSize: "12px", color: "#666" }}>זמינות</div>
                   <div style={{ fontSize: "18px", fontWeight: "bold" }}>
@@ -403,27 +224,11 @@ export default function ActivityDetailsPage() {
                 </div>
                 <div>
                   {isFull ? (
-                    <span
-                      style={{
-                        backgroundColor: "#fee2e2",
-                        color: "#991b1b",
-                        padding: "8px 16px",
-                        borderRadius: "20px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      מלא
+                    <span style={{ backgroundColor: "#fee2e2", color: "#991b1b", padding: "8px 16px", borderRadius: "20px", fontWeight: "600" }}>
+                      מלא (רשימת המתנה)
                     </span>
                   ) : (
-                    <span
-                      style={{
-                        backgroundColor: "#d1fae5",
-                        color: "#065f46",
-                        padding: "8px 16px",
-                        borderRadius: "20px",
-                        fontWeight: "600",
-                      }}
-                    >
+                    <span style={{ backgroundColor: "#d1fae5", color: "#065f46", padding: "8px 16px", borderRadius: "20px", fontWeight: "600" }}>
                       פתוח להרשמה
                     </span>
                   )}
@@ -431,99 +236,47 @@ export default function ActivityDetailsPage() {
               </div>
             </div>
 
-            {/* ACTION BUTTONS - Based on user role */}
+            {/* ACTION BUTTONS */}
             {isAdmin ? (
-              // ADMIN BUTTONS
               <div style={{ display: "flex", gap: "16px" }}>
-                <button
-                  onClick={handleEdit}
-                  disabled={processing}
-                  style={{
-                    flex: 1,
-                    padding: "16px",
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    opacity: processing ? 0.7 : 1,
-                  }}
-                >
+                <button onClick={handleEdit} disabled={processing} style={{ flex: 1, padding: "16px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: "pointer", opacity: processing ? 0.7 : 1 }}>
                   ✏️ ערוך פעילות
                 </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={processing}
-                  style={{
-                    flex: 1,
-                    padding: "16px",
-                    backgroundColor: "#ef4444",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    opacity: processing ? 0.7 : 1,
-                  }}
-                >
+                <button onClick={handleDelete} disabled={processing} style={{ flex: 1, padding: "16px", backgroundColor: "#ef4444", color: "white", border: "none", borderRadius: "8px", fontSize: "16px", fontWeight: "600", cursor: "pointer", opacity: processing ? 0.7 : 1 }}>
                   {processing ? "מוחק..." : "🗑️ מחק פעילות"}
                 </button>
               </div>
             ) : (
-              // USER BUTTONS
               <div>
                 <button
                   onClick={handleToggleRegistration}
-                  disabled={processing || (!isRegistered && isFull)}
+                  disabled={processing}
                   style={{
                     width: "100%",
                     padding: "16px",
-                    backgroundColor: isRegistered
-                      ? "#ef4444"
-                      : isFull
-                      ? "#9ca3af"
-                      : "#10b981",
+                    backgroundColor: buttonColor,
                     color: "white",
                     border: "none",
                     borderRadius: "8px",
                     fontSize: "16px",
                     fontWeight: "600",
-                    cursor:
-                      processing || (!isRegistered && isFull)
-                        ? "not-allowed"
-                        : "pointer",
+                    cursor: processing ? "not-allowed" : "pointer",
                     opacity: processing ? 0.7 : 1,
                   }}
                 >
-                  {processing
-                    ? "מעדכן..."
-                    : isRegistered
-                    ? "❌ בטל הרשמה"
-                    : isFull
-                    ? "הפעילות מלאה"
-                    : "✓ הרשם לפעילות"}
+                  {processing ? "מעדכן..." : buttonText}
                 </button>
 
-                {/* Registration Status Indicator */}
-                {isRegistered && !processing && (
-                  <div
-                    style={{
-                      marginTop: "16px",
-                      backgroundColor: "#d1fae5",
-                      border: "1px solid #10b981",
-                      borderRadius: "8px",
-                      padding: "12px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <p
-                      style={{ color: "#065f46", fontWeight: "600", margin: 0 }}
-                    >
-                      ✓ אתה רשום לפעילות זו
-                    </p>
+                {/* Status Badge */}
+                {regStatus === 'confirmed' && (
+                  <div style={{ marginTop: "16px", backgroundColor: "#d1fae5", border: "1px solid #10b981", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
+                    <p style={{ color: "#065f46", fontWeight: "600", margin: 0 }}>✓ אתה רשום לפעילות זו</p>
+                  </div>
+                )}
+                
+                {regStatus === 'waitlist' && (
+                  <div style={{ marginTop: "16px", backgroundColor: "#ffedd5", border: "1px solid #f97316", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
+                    <p style={{ color: "#c2410c", fontWeight: "600", margin: 0 }}>⏳ אתה ברשימת המתנה. נודיע לך אם יתפנה מקום.</p>
                   </div>
                 )}
               </div>
@@ -531,6 +284,17 @@ export default function ActivityDetailsPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Simple Helper Component for the grid
+function InfoBox({ icon, label, value }: { icon: string, label: string, value: string }) {
+  return (
+    <div style={{ backgroundColor: "#f9fafb", padding: "16px", borderRadius: "8px", textAlign: "center" }}>
+      <div style={{ fontSize: "24px", marginBottom: "8px" }}>{icon}</div>
+      <div style={{ fontSize: "12px", color: "#666", marginBottom: "4px" }}>{label}</div>
+      <div style={{ fontWeight: "600" }}>{value}</div>
     </div>
   );
 }
