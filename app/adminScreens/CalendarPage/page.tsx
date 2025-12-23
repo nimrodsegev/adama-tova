@@ -5,16 +5,16 @@ import WeeklyHeader from "@/lib/components/WeeklyBoard/WeeklyHeader";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
 import MeetingCard from "@/lib/components/Home/MeetingCard";
-import { apiActivities } from "@/app/services/db_api"; 
+import { apiActivities } from "@/app/services/db_api";
 
 export default function AdminWeeklyBoardPage() {
   const router = useRouter(); // 👈 2. Initialize Router
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
-  
+
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const getSelectedDateObject = () => {
@@ -50,6 +50,7 @@ export default function AdminWeeklyBoardPage() {
     fetchActivities();
   }, [selectedDayIndex, currentDate]);
 
+  // --- Navigation ---
   const handleWeekChange = (offset: number) => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + offset * 7);
@@ -80,7 +81,7 @@ export default function AdminWeeklyBoardPage() {
 
       <section style={{ marginTop: "32px" }}>
         <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>
-           ניהול מפגשים - {dayLetters[selectedDayIndex]} (&apos;
+          ניהול מפגשים - {dayLetters[selectedDayIndex]} (&apos;
           {selectedDateObj.toLocaleDateString("he-IL")}&apos;)
         </h2>
 
@@ -96,53 +97,24 @@ export default function AdminWeeklyBoardPage() {
             }}
           >
             {activities.map((activity) => {
-               const isLoadingThis = actionLoading === activity.id;
+              const isLoadingThis = actionLoading === activity.id;
 
-               return (
-                <div key={activity.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              return (
+                <div
+                  key={activity.id}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
                   <MeetingCard
+                    id={activity.id}
                     title={activity.title}
                     time={`${activity.start_time} - ${activity.end_time}`}
                     location={activity.category}
                     description={activity.description}
                   />
-
-                  {/* ADMIN CONTROLS */}
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button 
-                      onClick={() => handleEdit(activity)}
-                      disabled={isLoadingThis}
-                      style={{
-                        flex: 1,
-                        padding: "8px",
-                        backgroundColor: "#0070f3", // Blue
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        opacity: isLoadingThis ? 0.5 : 1
-                      }}
-                    >
-                      ✏️ ערוך
-                    </button>
-
-                    <button 
-                      onClick={() => handleDelete(activity.id)}
-                      disabled={isLoadingThis}
-                      style={{
-                        flex: 1,
-                        padding: "8px",
-                        backgroundColor: "#dc3545", // Red
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        opacity: isLoadingThis ? 0.5 : 1
-                      }}
-                    >
-                      {isLoadingThis ? "..." : "🗑️ מחק"}
-                    </button>
-                  </div>
                 </div>
               );
             })}
