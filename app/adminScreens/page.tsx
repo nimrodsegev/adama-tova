@@ -45,6 +45,13 @@ export default function AdminPage() {
       icon: "👤",
       bgColor: "bg-pink-500 hover:bg-pink-600",
     },
+    {
+      title: "Add Admin",
+      description: "Create new admin accounts",
+      href: "/adminScreens/AddAdminPage",
+      icon: "🛡️",
+      bgColor: "bg-red-500 hover:bg-red-600",
+    }
   ];
 
   return (
