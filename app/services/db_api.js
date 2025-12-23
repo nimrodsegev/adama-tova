@@ -198,7 +198,8 @@ export const apiActivities = {
 
 export const apiRegistrations = {
   /**
-   * REGISTER (With Capacity Check)
+   * REGISTER (Strict Capacity Limit)
+   * Returns an error if the activity is full.
    */
   async registerUserToActivity(userId, activityId) {
     // 1. Check if already registered
@@ -223,20 +224,19 @@ export const apiRegistrations = {
     const current = activity.current_participants || 0;
     const max = activity.max_participants || 0;
 
-    // 3. Determine Status
-    // If current count is equal to or greater than max, the activity is FULL.
-    const isFull = current >= max;
+    // 3. 🛑 STRICT CHECK: Stop if full
+    if (current >= max) {
+      return [null, "Registration failed: This activity is full."];
+    }
 
-    // 4. Insert Registration
-    // If Full -> Waitlist (if_confirmed: false)
-    // If Space -> Confirmed (if_confirmed: true)
+    // 4. Insert Registration (Since we checked capacity, it is always Confirmed)
     const { data: newReg, error: regError } = await supabase
       .from("registrations")
       .insert([
         {
           user_id: userId,
           activity_id: activityId,
-          if_confirmed: !isFull, 
+          if_confirmed: true, // Always true because we checked space above
           created_at: new Date().toISOString()
         },
       ])
@@ -245,24 +245,20 @@ export const apiRegistrations = {
 
     if (regError) return [null, regError.message];
 
-    // 5. UPDATE COUNTER (Only if they took a confirmed spot)
-    if (!isFull) {
-      await supabase
-        .from('activities')
-        .update({ current_participants: current + 1 })
-        .eq('id', activityId);
+    // 5. Increment Counter
+    await supabase
+      .from('activities')
+      .update({ current_participants: current + 1 })
+      .eq('id', activityId);
         
-      return [newReg, null]; // Success: Registered
-    } else {
-      return [{ ...newReg, message: "Activity is full. You have been added to the waitlist." }, null]; 
-    }
+    return [newReg, null];
   },
 
   /**
    * CANCEL (With Counter Decrement)
    */
   async cancelRegistration(userId, activityId) {
-    // 1. Check if the user was confirmed
+    // 1. Check registration to see if we need to decrement
     const { data: registration } = await supabase
       .from("registrations")
       .select("if_confirmed")
@@ -281,7 +277,7 @@ export const apiRegistrations = {
 
     if (deleteError) return [null, deleteError.message];
 
-    // 3. Decrement Counter (Only if they were holding a spot)
+    // 3. Decrement Counter (Only if they were confirmed)
     if (registration.if_confirmed) {
       const { data: activity } = await supabase
         .from('activities')
@@ -290,6 +286,7 @@ export const apiRegistrations = {
         .single();
       
       if (activity) {
+        // Prevent going below 0
         const newCount = Math.max(0, (activity.current_participants || 0) - 1);
         await supabase
           .from('activities')
@@ -301,9 +298,12 @@ export const apiRegistrations = {
     return [true, null];
   },
 
-  // ... (keep getUserRegistrationIds as is) ...
   async getUserRegistrationIds(userId) {
-    const { data, error } = await supabase.from('registrations').select('activity_id').eq('user_id', userId);
+    const { data, error } = await supabase
+      .from('registrations')
+      .select('activity_id')
+      .eq('user_id', userId);
+
     if (error) return [[], error.message];
     return [data.map(r => r.activity_id), null];
   }
