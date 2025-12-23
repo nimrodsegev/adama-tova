@@ -114,7 +114,7 @@ export default function WeeklyBoardPage() {
                     id={activity.id}
                     title={activity.title}
                     time={`${activity.start_time} - ${activity.end_time}`}
-                    location={activity.category}
+                    location={activity.location}
                     description={activity.description}
                   />
                 </div>
