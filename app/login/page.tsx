@@ -1,29 +1,55 @@
-/**
- * LOGIN PAGE
- * Two-step process:
- * Step 1: Choose action (login, signup participant, signup admin, Google)
- * Step 2: Enter credentials (email/password) based on choice
- */
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/app/services/authService';
-import styles from "./page.module.css";
-import GoogleLoginButton from "./GoogleLoginButton";
+import { userService } from '@/app/services/userService';
+import GoogleLoginButton from './GoogleLoginButton';
+import styles from './page.module.css';
 
-type LoginMode = 'choice' | 'login' | 'signup-participant' | 'signup-admin';
+type Mode = 'choice' | 'signup';
 
-export default function Login() {
-  const [mode, setMode] = useState<LoginMode>('choice');
+const CIRCLE_OPTIONS = [
+  'שורדי ושורדות המסיבות',
+  'נפגעי טראומה 7.10 ומלחמת חרבות ברזל',
+  'הורים שכולים',
+  'אחים.ות שכולים',
+  'משפחות וקרובים של פצועים טראומה בגופם ובנפשם',
+  'כוחות הצלה וחילוץ',
+  'תושבי העוטף ומפונים',
+  'מעגל שני ושלישי של משפחות השכול',
+];
+
+const INTEREST_OPTIONS = [
+  'יוגה',
+  'מדיטציה',
+  'אומנות',
+  'כתיבה',
+  'יצירה',
+  'מינדפולנס',
+];
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [mode, setMode] = useState<Mode>('choice');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Auth fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  // Validate password requirements
+  // Quiz fields
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [circle, setCircle] = useState('');
+  const [interests, setInterests] = useState<string[]>([]);
+  const [freeText, setFreeText] = useState('');
+
+  // Validation functions
+  const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
+  const isValidPhone = (p: string) => /^[0-9]{10}$/.test(p.replace(/[-\s]/g, ''));
+
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
       return 'הסיסמה חייבת להכיל לפחות 8 תווים';
@@ -40,178 +66,251 @@ export default function Login() {
     return null;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+
+  const toggleInterest = (i: string) => {
+    setInterests(prev =>
+      prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]
+    );
+  };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('אנא מלא אימייל וסיסמה');
+      return;
+    }
+    
     setLoading(true);
     setError('');
-
+    
     try {
-      if (mode === 'login') {
-        // Login
-        await authService.signIn(email, password);
-        router.refresh();
-        router.replace('/');
-      } else {
-        // Signup (participant or admin)
-        const passwordError = validatePassword(password);
-        if (passwordError) {
-          setError(passwordError);
-          setLoading(false);
-          return;
-        }
-
-        await authService.signUp(email, password);
-        
-        if (mode === 'signup-admin') {
-          router.push('/complete-profile-admin');
-        } else {
-          router.push('/complete-profile');
-        }
-      }
+      await authService.signIn(email, password);
+      router.refresh();
     } catch (err: any) {
-      setError(err.message || 'Could not authenticate user');
+      setError(err.message || 'שגיאה בהתחברות');
     } finally {
       setLoading(false);
     }
   };
 
-  const resetToChoice = () => {
-    setMode('choice');
-    setEmail('');
-    setPassword('');
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
+    setLoading(true);
+
+    try {
+      // Validate email and password
+      if (!email || !password) {
+        throw new Error('אימייל וסיסמה הם שדות חובה');
+      }
+
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        throw new Error(passwordError);
+      }
+
+      // Validate quiz fields
+      if (!fullName || !phone) {
+        throw new Error('שם מלא ומספר טלפון הם שדות חובה');
+      }
+
+      if (!isHebrewName(fullName)) {
+        throw new Error('השם חייב להכיל אותיות עבריות בלבד');
+      }
+
+      if (!isValidPhone(phone)) {
+        throw new Error('מספר הטלפון חייב להכיל 10 ספרות');
+      }
+
+      // Sign up
+      await authService.signUp(email, password);
+
+      // Get the current user
+      const user = await authService.getCurrentUser();
+      if (!user) throw new Error('שגיאה בהרשמה');
+
+      const cleanPhone = phone.replace(/[-\s]/g, '');
+
+      // Save profile
+      await userService.completeProfile(user.id, email, {
+        full_name: fullName.trim(),
+        phone: cleanPhone,
+        circle: circle || undefined,
+        interests: interests.length ? interests : undefined,
+        free_text: freeText || undefined,
+      });
+
+      router.refresh();
+      router.replace('/UserScreens');
+    } catch (err: any) {
+      setError(err.message || 'שגיאה כללית');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Step 1: Choice Screen
+  // Welcome/Choice Screen
   if (mode === 'choice') {
     return (
-      <div className="content">
-        <div className={styles.loginForm} style={{ direction: 'rtl' }}>
-          <h2 style={{ marginBottom: '2rem', textAlign: 'center' }}>ברוכים הבאים לאדמה טובה</h2>
-          
-          <button 
-            onClick={() => setMode('login')}
-            style={{ 
-              width: '100%', 
-              padding: '1rem', 
-              marginBottom: '1rem',
-              background: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            התחבר
-          </button>
+      <div className={styles.container}>
+        <div className={styles.content}>
+          <div className={styles.greeting}>
+            <h1 className={styles.title}>ברוכה הבאה</h1>
+            <p className={styles.subtitle}>להרשמה או התחברות הכניסו פרטים</p>
+          </div>
 
-          <button 
-            onClick={() => setMode('signup-participant')}
-            style={{ 
-              width: '100%', 
-              padding: '1rem', 
-              marginBottom: '1rem',
-              background: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            הירשם כמשתתף
-          </button>
+          <div className={styles.loginContent}>
+            <div className={styles.inputWrapper}>
+              <input
+                type="email"
+                placeholder="אימייל"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.input}
+                dir="rtl"
+              />
+            </div>
 
-          <button 
-            onClick={() => setMode('signup-admin')}
-            style={{ 
-              width: '100%', 
-              padding: '1rem', 
-              marginBottom: '1.5rem',
-              background: '#ffc107',
-              color: '#000',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            הירשם כמנהל
-          </button>
+            <div className={styles.inputWrapper}>
+              <input
+                type="password"
+                placeholder="סיסמה"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.input}
+                dir="rtl"
+              />
+              <button
+                className={styles.forgotPassword}
+                onClick={() => console.log('Forgot password')}
+                type="button"
+              >
+                שכחתי סיסמה
+              </button>
+            </div>
 
-          <div style={{ borderTop: '1px solid #ccc', paddingTop: '1rem', marginTop: '1rem' }}>
-            <GoogleLoginButton />
+            <div className={styles.buttonSection}>
+              <button
+                className={styles.primaryButton}
+                onClick={handleLogin}
+                disabled={loading}
+              >
+                {loading ? 'מתחבר...' : 'התחבר'}
+              </button>
+
+              <button
+                className={styles.secondaryButton}
+                onClick={() => setMode('signup')}
+              >
+                יצירת משתמש
+              </button>
+
+              <div className={styles.orSeparator}>
+                <span className={styles.orLine}></span>
+                <span className={styles.orText}>או</span>
+                <span className={styles.orLine}></span>
+              </div>
+
+              <GoogleLoginButton className={styles.googleButton} />
+            </div>
+
+            {error && (
+              <p className={styles.error}>{error}</p>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  // Step 2: Email/Password Form
-  const getTitleText = () => {
-    if (mode === 'login') return 'התחברות';
-    if (mode === 'signup-admin') return 'הרשמה כמנהל';
-    return 'הרשמה כמשתתף';
-  };
-
-  const getButtonText = () => {
-    if (mode === 'login') return 'התחבר';
-    if (mode === 'signup-admin') return 'הירשם כמנהל';
-    return 'הירשם כמשתתף';
-  };
-
+  // Signup Form
   return (
-    <div className="content">
-      <form className={styles.loginForm} onSubmit={handleSubmit} style={{ direction: 'rtl' }}>
-        <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>{getTitleText()}</h2>
+    <div className={styles.container}>
+      <form onSubmit={handleSignup} className={styles.signupContent}>
+        <h1 className={styles.title}>הרשמה</h1>
 
-        <label htmlFor="email">
-          אימייל{' '}
+        {/* Personal Details */}
+        <div className={styles.formSection}>
+          <h3 className={styles.sectionTitle}>פרטים אישיים</h3>
+
           <input
-            name="email"
-            type="email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="שם מלא"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             required
-            style={{ direction: 'ltr' }}
+            className={styles.input}
+            dir="rtl"
           />
-        </label>
 
-        <label htmlFor="password">
-          סיסמה{' '}
           <input
-            type="password"
-            name="password"
-            placeholder="••••••••"
-            autoComplete="on"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="tel"
+            placeholder="מספר טלפון"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             required
+            className={styles.input}
+            dir="rtl"
           />
-        </label>
 
-        <button type="submit" disabled={loading} style={{ marginTop: '1rem' }}>
-          {loading ? 'טוען...' : getButtonText()}
+          <select
+            value={circle}
+            onChange={(e) => setCircle(e.target.value)}
+            className={styles.select}
+            dir="rtl"
+          >
+            <option value="">מאיזה מעגל אתה? (לא חובה)</option>
+            {CIRCLE_OPTIONS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+
+          <div className={styles.interestsSection}>
+            <label className={styles.label}>מה מעניין אותך? (לא חובה)</label>
+            <div className={styles.interestsList}>
+              {INTEREST_OPTIONS.map((i) => (
+                <label key={i} className={styles.interestItem}>
+                <input
+                  type="checkbox"
+                  checked={interests.includes(i)}
+                  onChange={() => toggleInterest(i)}
+                  className={styles.checkbox}
+                />
+                <span>{i}</span>
+              </label>
+              
+              ))}
+            </div>
+          </div>
+
+          <textarea
+            placeholder="טקסט חופשי (לא חובה)"
+            value={freeText}
+            onChange={(e) => setFreeText(e.target.value)}
+            rows={4}
+            className={styles.textarea}
+            dir="rtl"
+          />
+        </div>
+
+        {error && <p className={styles.error}>{error}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.primaryButton}
+        >
+          {loading ? 'נרשם...' : 'הרשם'}
         </button>
 
-        <button 
-          type="button" 
-          onClick={resetToChoice}
-          style={{ 
-            marginTop: '0.5rem',
-            background: '#6c757d',
-            color: 'white'
-          }}
+        <button
+          type="button"
+          onClick={() => setMode('choice')}
+          className={styles.backButton}
         >
           חזור
         </button>
-
-        {error && <p className={styles.errorMessage}>{error}</p>}
       </form>
     </div>
   );

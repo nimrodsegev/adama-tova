@@ -1,9 +1,7 @@
 /**
- * QUIZ MODAL
- * A modal form that appears after signup.
- * Collects: full name, phone, circle/community (dropdown), interests (checkboxes), free text
- * Validates: Hebrew name, 10-digit phone number
- * User cannot close this - must complete to use the app.
+ * QUIZ MODAL – USED FOR GOOGLE SIGN-IN
+ * This is IDENTICAL to the "צור משתמש" quiz UI
+ * Uses the SAME JSX and SAME CSS module
  */
 
 'use client';
@@ -11,6 +9,7 @@
 import { useState } from 'react';
 import { userService } from '@/app/services/userService';
 import { useRouter } from 'next/navigation';
+import styles from '@/app/login/page.module.css';
 
 interface QuizModalProps {
   userId: string;
@@ -25,7 +24,7 @@ const CIRCLE_OPTIONS = [
   'משפחות וקרובים של פצועים טראומה בגופם ובנפשם',
   'כוחות הצלה וחילוץ',
   'תושבי העוטף ומפונים',
-  'מעגל שני ושלישי של משפחות השכול (סבים וסבתות דודים.ות, אחיינים.ות, בני דודים וכד\')',
+  'מעגל שני ושלישי של משפחות השכול',
 ];
 
 const INTEREST_OPTIONS = [
@@ -38,6 +37,8 @@ const INTEREST_OPTIONS = [
 ];
 
 export default function QuizModal({ userId, userEmail }: QuizModalProps) {
+  const router = useRouter();
+
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [circle, setCircle] = useState('');
@@ -45,58 +46,47 @@ export default function QuizModal({ userId, userEmail }: QuizModalProps) {
   const [freeText, setFreeText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
 
-  // Validate Hebrew characters (includes spaces)
-  const isHebrewName = (name: string) => {
-    const hebrewRegex = /^[\u0590-\u05FF\s]+$/;
-    return hebrewRegex.test(name);
-  };
+  const isHebrewName = (name: string) =>
+    /^[\u0590-\u05FF\s]+$/.test(name);
 
-  // Validate 10-digit phone number
-  const isValidPhone = (phoneNum: string) => {
-    const phoneRegex = /^[0-9]{10}$/;
-    return phoneRegex.test(phoneNum.replace(/[-\s]/g, '')); // Remove dashes and spaces
-  };
+  const isValidPhone = (p: string) =>
+    /^[0-9]{10}$/.test(p.replace(/[-\s]/g, ''));
 
-  const handleInterestToggle = (interest: string) => {
-    setInterests(prev => 
-      prev.includes(interest) 
-        ? prev.filter(i => i !== interest)
-        : [...prev, interest]
+  const toggleInterest = (i: string) => {
+    setInterests(prev =>
+      prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]
     );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validation
-    if (!fullName.trim() || !phone.trim()) {
+    setError('');
+
+    if (!fullName || !phone) {
       setError('שם מלא ומספר טלפון הם שדות חובה');
       return;
     }
 
-    if (!isHebrewName(fullName.trim())) {
+    if (!isHebrewName(fullName)) {
       setError('השם חייב להכיל אותיות עבריות בלבד');
       return;
     }
 
-    const cleanPhone = phone.replace(/[-\s]/g, '');
-    if (!isValidPhone(cleanPhone)) {
+    if (!isValidPhone(phone)) {
       setError('מספר הטלפון חייב להכיל 10 ספרות');
       return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       await userService.completeProfile(userId, userEmail, {
         full_name: fullName.trim(),
-        phone: cleanPhone,
+        phone: phone.replace(/[-\s]/g, ''),
         circle: circle || undefined,
-        interests: interests.length > 0 ? interests : undefined,
-        free_text: freeText.trim() || undefined,
+        interests: interests.length ? interests : undefined,
+        free_text: freeText || undefined,
       });
 
       router.refresh();
@@ -109,174 +99,77 @@ export default function QuizModal({ userId, userEmail }: QuizModalProps) {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-    }}>
-      <div style={{
-        background: 'white',
-        padding: '2rem',
-        borderRadius: '8px',
-        maxWidth: '500px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        direction: 'rtl',
-      }}>
-        <h2 style={{ marginBottom: '1rem' }}>השלמת פרטים אישיים</h2>
-        <p style={{ marginBottom: '2rem', color: '#666' }}>
-          ברוך הבא {userEmail}! בבקשה השלם את הפרטים הבאים
-        </p>
+    <div className={styles.container}>
+      <form onSubmit={handleSubmit} className={styles.signupContent}>
+        <h1 className={styles.title}>הרשמה</h1>
 
-        <form onSubmit={handleSubmit}>
-          {/* Full Name */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              שם מלא *
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              placeholder="שם פרטי ושם משפחה"
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            />
-          </div>
+        <div className={styles.formSection}>
+          <h3 className={styles.sectionTitle}>פרטים אישיים</h3>
 
-          {/* Phone */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              מספר טלפון *
-            </label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-              placeholder="0501234567"
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            />
-          </div>
+          <input
+            className={styles.input}
+            placeholder="שם מלא"
+            value={fullName}
+            onChange={e => setFullName(e.target.value)}
+            dir="rtl"
+          />
 
-          {/* Circle/Community - Dropdown */}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              מאיזה מעגל אתה? (לא חובה)
-            </label>
-            <select
-              value={circle}
-              onChange={(e) => setCircle(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            >
-              <option value="">בחר מעגל</option>
-              {CIRCLE_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
+          <input
+            className={styles.input}
+            placeholder="מספר טלפון"
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+            dir="rtl"
+          />
 
-          {/* Interests */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              מה מעניין אותך? (לא חובה)
-            </label>
-            <div style={{
-              maxHeight: '150px',
-              overflow: 'auto',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              padding: '0.5rem',
-            }}>
-              {INTEREST_OPTIONS.map((interest) => (
-                <label
-                  key={interest}
-                  style={{
-                    display: 'block',
-                    padding: '0.5rem',
-                    cursor: 'pointer',
-                  }}
-                >
+          <select
+            className={styles.select}
+            value={circle}
+            onChange={e => setCircle(e.target.value)}
+            dir="rtl"
+          >
+            <option value="">מאיזה מעגל אתה? (לא חובה)</option>
+            {CIRCLE_OPTIONS.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+
+          <div className={styles.interestsSection}>
+            <label className={styles.label}>מה מעניין אותך? (לא חובה)</label>
+            <div className={styles.interestsList}>
+              {INTEREST_OPTIONS.map(i => (
+                <label key={i} className={styles.interestItem}>
                   <input
                     type="checkbox"
-                    checked={interests.includes(interest)}
-                    onChange={() => handleInterestToggle(interest)}
-                    style={{ marginLeft: '0.5rem' }}
+                    checked={interests.includes(i)}
+                    onChange={() => toggleInterest(i)}
+                    className={styles.checkbox}
                   />
-                  {interest}
+                  <span>{i}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Free Text */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-              טקסט חופשי (כל מה שאתם רוצים לשתף) - לא חובה
-            </label>
-            <textarea
-              value={freeText}
-              onChange={(e) => setFreeText(e.target.value)}
-              placeholder="ספרו לנו קצת על עצמכם..."
-              rows={4}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                resize: 'vertical',
-              }}
-            />
-          </div>
+          <textarea
+            className={styles.textarea}
+            placeholder="טקסט חופשי (לא חובה)"
+            value={freeText}
+            onChange={e => setFreeText(e.target.value)}
+            dir="rtl"
+          />
+        </div>
 
-          {error && (
-            <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>
-          )}
+        {error && <p className={styles.error}>{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontSize: '1rem',
-              fontWeight: 'bold',
-            }}
-          >
-            {loading ? 'שומר...' : 'המשך'}
-          </button>
-        </form>
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.primaryButton}
+        >
+          {loading ? 'נרשם...' : 'הרשם'}
+        </button>
+      </form>
     </div>
   );
 }
