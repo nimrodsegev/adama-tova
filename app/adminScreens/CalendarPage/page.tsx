@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation"; // 👈 1. Import Router
 import WeeklyHeader from "@/lib/components/WeeklyBoard/WeeklyHeader";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
-import MeetingCard from "@/lib/components/Home/MeetingCard";
 import { apiActivities } from "@/app/services/db_api";
+import AdminActivityCard from "@/lib/components/Home/AdminActivityCard";
 
 export default function AdminWeeklyBoardPage() {
   const router = useRouter(); // 👈 2. Initialize Router
@@ -108,12 +108,14 @@ export default function AdminWeeklyBoardPage() {
                     gap: "8px",
                   }}
                 >
-                  <MeetingCard
+                  <AdminActivityCard
+                    key={activity.id}
                     id={activity.id}
                     title={activity.title}
-                    time={`${activity.start_time} - ${activity.end_time}`}
-                    location={activity.category}
-                    description={activity.description}
+                    date={activity.date}
+                    start_time={activity.start_time}
+                    current_participants={activity.current_participants || 0}
+                    max_participants={activity.max_participants}
                   />
                 </div>
               );

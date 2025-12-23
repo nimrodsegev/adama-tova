@@ -85,7 +85,7 @@ export const apiActivities = {
           {
             id: activityData.id,
             title: activityData.title,
-            description: activityData.description, 
+            description: activityData.description,
             date: activityData.date,
             start_time: activityData.start_time,
             end_time: activityData.end_time,
@@ -113,7 +113,8 @@ export const apiActivities = {
     return safeRequest(
       supabase
         .from("registrations")
-        .select(`
+        .select(
+          `
           if_confirmed,
           wait_list_place,
           users (
@@ -122,26 +123,23 @@ export const apiActivities = {
             email,
             phone
           )
-        `)
+        `
+        )
         .eq("activity_id", activityId)
     );
   },
   async update(activityId, updates) {
     // --- STEP 1: Fetch Info (Title & Participants) ---
     const { data: activity } = await supabase
-      .from('activities')
-      .select('title, registrations(user_id)')
-      .eq('id', activityId)
+      .from("activities")
+      .select("title, registrations(user_id)")
+      .eq("id", activityId)
       .single();
 
     // --- STEP 2: Perform the Update ---
     // We execute the update first to make sure it works before notifying
     const updateResult = await safeRequest(
-      supabase
-        .from('activities')
-        .update(updates)
-        .eq('id', activityId)
-        .select()
+      supabase.from("activities").update(updates).eq("id", activityId).select()
     );
 
     const [data, error] = updateResult;
@@ -150,19 +148,25 @@ export const apiActivities = {
     if (error) return updateResult;
 
     // --- STEP 3: Notify Participants ---
-    if (activity && activity.registrations && activity.registrations.length > 0) {
-      console.log(`Notify ${activity.registrations.length} users about update...`);
-      
-      const alerts = activity.registrations.map(reg => ({
+    if (
+      activity &&
+      activity.registrations &&
+      activity.registrations.length > 0
+    ) {
+      console.log(
+        `Notify ${activity.registrations.length} users about update...`
+      );
+
+      const alerts = activity.registrations.map((reg) => ({
         user_id: reg.user_id,
         title: "פרטי הפעילות שונו ✏️",
         message: `פרטי הפעילות "${activity.title}" עודכנו על ידי המנחה.`,
         is_read: false,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       }));
 
       // Send notifications (using insert directly to allow batching)
-      await supabase.from('notifications').insert(alerts);
+      await supabase.from("notifications").insert(alerts);
     }
 
     return updateResult;
@@ -170,9 +174,9 @@ export const apiActivities = {
   async delete(activityId) {
     // --- STEP 1: Fetch Info (Title & Participants) ---
     const { data: activity, error: fetchError } = await supabase
-      .from('activities')
-      .select('title, registrations(user_id)')
-      .eq('id', activityId)
+      .from("activities")
+      .select("title, registrations(user_id)")
+      .eq("id", activityId)
       .single();
 
     if (fetchError) {
@@ -184,43 +188,101 @@ export const apiActivities = {
     // --- STEP 2: Notify Participants ---
     if (registrations && registrations.length > 0) {
       console.log(`Notify ${registrations.length} users about cancellation...`);
-      
-      const alerts = registrations.map(reg => ({
+
+      const alerts = registrations.map((reg) => ({
         user_id: reg.user_id,
         title: "הפעילות בוטלה ⚠️",
         message: `הפעילות "${title}" בוטלה על ידי המנחה.`,
         is_read: false,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       }));
 
       // Batch insert notifications
       const { error: notifError } = await supabase
-        .from('notifications')
+        .from("notifications")
         .insert(alerts);
 
-      if (notifError) console.error("Warning: Failed to send cancellation alerts", notifError);
+      if (notifError)
+        console.error(
+          "Warning: Failed to send cancellation alerts",
+          notifError
+        );
     }
 
     // --- STEP 3: Delete Activity ---
-    // Note: If your DB Foreign Keys are set to 'ON DELETE CASCADE', this single line 
-    // deletes the activity AND the registrations automatically. 
+    // Note: If your DB Foreign Keys are set to 'ON DELETE CASCADE', this single line
+    // deletes the activity AND the registrations automatically.
     // If not, this might fail unless we manually delete registrations first.
     // We will attempt the delete directly:
     return safeRequest(
-      supabase
-        .from('activities')
-        .delete()
-        .eq('id', activityId)
+      supabase.from("activities").delete().eq("id", activityId)
     );
   },
   async getById(id) {
     return safeRequest(
-      supabase
-        .from('activities')
-        .select('*')
-        .eq('id', id)
-        .single()
+      supabase.from("activities").select("*").eq("id", id).single()
     );
+  },
+  /**
+   * 📢 NOTIFY PARTICIPANTS
+   * Sends a custom notification to everyone registered for a specific activity.
+   */
+  async notifyParticipants(activityId, title, message) {
+    // 1. Get all participants (Confirmed & Waitlist)
+    const { data: regs, error } = await supabase
+      .from("registrations")
+      .select("user_id")
+      .eq("activity_id", activityId);
+
+    if (error) return [null, error.message];
+    if (!regs || regs.length === 0)
+      return [null, "No participants found to notify."];
+
+    // 2. Prepare the notification batch
+    const notifications = regs.map((r) => ({
+      user_id: r.user_id,
+      title: title,
+      message: message,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    }));
+
+    // 3. Send all at once
+    return safeRequest(supabase.from("notifications").insert(notifications));
+  },
+  /**
+   * ⭕ NOTIFY BY CIRCLE
+   * Sends a notification to all users who belong to a specific circle.
+   * @param {string} circleName - The name of the circle (e.g., "Year 1", "Staff")
+   * @param {string} title - The title of the notification
+   * @param {string} message - The body text
+   */
+  async notifyByCircle(circleName, title, message) {
+    // 1. Fetch all users in this circle
+    // Note: This assumes 'circle' is a direct column in your 'users' table.
+    // If it is inside the quiz JSON, change to: .eq('quiz->>circle', circleName)
+    const { data: users, error } = await supabase
+      .from("users")
+      .select("id")
+      .eq("circle", circleName);
+
+    if (error) return [null, error.message];
+    if (!users || users.length === 0)
+      return [null, `No users found in circle: "${circleName}"`];
+
+    console.log(`Sending to ${users.length} users in circle ${circleName}`);
+
+    // 2. Prepare Notification Objects
+    const notifications = users.map((u) => ({
+      user_id: u.id,
+      title: title,
+      message: message,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    }));
+
+    // 3. Batch Insert
+    return safeRequest(supabase.from("notifications").insert(notifications));
   },
 };
 
@@ -242,7 +304,8 @@ export const apiRegistrations = {
       .eq("activity_id", activityId)
       .single();
 
-    if (existing) return [null, "User is already registered for this activity."];
+    if (existing)
+      return [null, "User is already registered for this activity."];
 
     // 2. Fetch Capacity Data
     const { data: activity, error: actError } = await supabase
@@ -269,7 +332,7 @@ export const apiRegistrations = {
           user_id: userId,
           activity_id: activityId,
           if_confirmed: true, // Always true because we checked space above
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         },
       ])
       .select()
@@ -279,10 +342,10 @@ export const apiRegistrations = {
 
     // 5. Increment Counter
     await supabase
-      .from('activities')
+      .from("activities")
       .update({ current_participants: current + 1 })
-      .eq('id', activityId);
-        
+      .eq("id", activityId);
+
     return [newReg, null];
   },
 
@@ -312,18 +375,18 @@ export const apiRegistrations = {
     // 3. Decrement Counter (Only if they were confirmed)
     if (registration.if_confirmed) {
       const { data: activity } = await supabase
-        .from('activities')
-        .select('current_participants')
-        .eq('id', activityId)
+        .from("activities")
+        .select("current_participants")
+        .eq("id", activityId)
         .single();
-      
+
       if (activity) {
         // Prevent going below 0
         const newCount = Math.max(0, (activity.current_participants || 0) - 1);
         await supabase
-          .from('activities')
+          .from("activities")
           .update({ current_participants: newCount })
-          .eq('id', activityId);
+          .eq("id", activityId);
       }
     }
 
@@ -332,13 +395,13 @@ export const apiRegistrations = {
 
   async getUserRegistrationIds(userId) {
     const { data, error } = await supabase
-      .from('registrations')
-      .select('activity_id')
-      .eq('user_id', userId);
+      .from("registrations")
+      .select("activity_id")
+      .eq("user_id", userId);
 
     if (error) return [[], error.message];
-    return [data.map(r => r.activity_id), null];
-  }
+    return [data.map((r) => r.activity_id), null];
+  },
 };
 
 // ==========================================================
@@ -416,18 +479,15 @@ export const apiNotifications = {
   async markAsUnread(notificationId) {
     return safeRequest(
       supabase
-        .from('notifications')
+        .from("notifications")
         .update({ is_read: false })
-        .eq('id', notificationId)
+        .eq("id", notificationId)
     );
   },
 
   async delete(notificationId) {
     return safeRequest(
-      supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId)
+      supabase.from("notifications").delete().eq("id", notificationId)
     );
   },
 
@@ -450,19 +510,19 @@ export const apiNotifications = {
   },
   subscribe(userId, onNewNotification) {
     return supabase
-      .channel('public:notifications')
+      .channel("public:notifications")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${userId}`,
         },
         (payload) => onNewNotification(payload.new)
       )
       .subscribe();
-  }
+  },
 };
 
 // ==========================================================
@@ -515,38 +575,42 @@ export const apiUser = {
     return [{ id: randId, email, password }, null];
   },
   // Add this inside the apiUser object
-  
+
   /**
    * CREATE NEW ADMIN
    */
-  async createAdmin(email, password, fullName, phone) { // 👈 Added phone parameter
+  async createAdmin(email, password, fullName, phone) {
+    // 👈 Added phone parameter
     // 1. Sign Up the new user (Auth)
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, phone: phone } // Save metadata to Auth user as well
-      }
+        data: { full_name: fullName, phone: phone }, // Save metadata to Auth user as well
+      },
     });
 
     if (authError) return [null, authError.message];
-    
+
     const newUserId = authData.user?.id;
     if (!newUserId) return [null, "Auth succeeded but no ID returned."];
 
     // 2. Insert into 'users' table with ADMIN role
-    const { error: profileError } = await supabase
-      .from('users')
-      .insert([{ 
-        id: newUserId, 
-        full_name: fullName, 
+    const { error: profileError } = await supabase.from("users").insert([
+      {
+        id: newUserId,
+        full_name: fullName,
         email: email,
         phone: phone, // 👈 Save phone to DB
-        role: 'admin' 
-      }]);
+        role: "admin",
+      },
+    ]);
 
     if (profileError) {
-      return [null, "User created, but database insert failed: " + profileError.message];
+      return [
+        null,
+        "User created, but database insert failed: " + profileError.message,
+      ];
     }
 
     return [{ id: newUserId, email }, null];
@@ -564,7 +628,7 @@ export const apiUser = {
     }
 
     // Assumes your enum or text string is exactly 'admin'
-    const isAdmin = data?.role === 'admin'; 
+    const isAdmin = data?.role === "admin";
     return [isAdmin, null];
   },
   async createUserFromAuth(user) {
