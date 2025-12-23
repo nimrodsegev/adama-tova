@@ -100,19 +100,20 @@ export function UserProvider({
             setHasCompletedQuiz(completed);
             
             // Only redirect if we're not already on a protected route
-            if (!NO_REDIRECT_ROUTES.includes(pathname)) {
-              if (completed) {
-                // Quiz completed - go to appropriate dashboard
-                if (profile.role === 'admin') {
-                  router.replace('/adminScreens');
-                } else {
-                  router.replace('/UserScreens');
-                }
-              } else {
-                // Quiz not completed - redirect to quiz page
-                router.replace('/complete-profile');
-              }
-            }
+            // Only redirect if we're on login or quiz pages
+const shouldRedirect = pathname === '/login' || pathname === '/complete-profile' || pathname === '/';
+
+if (shouldRedirect && completed) {
+  // Quiz completed - go to appropriate dashboard
+  if (profile.role === 'admin') {
+    router.replace('/adminScreens');
+  } else {
+    router.replace('/UserScreens');
+  }
+} else if (!completed && pathname !== '/complete-profile') {
+  // Quiz not completed - redirect to quiz page
+  router.replace('/complete-profile');
+}
           } else {
             // User doesn't exist in users table (new Google user)
             setUserProfile(null);
