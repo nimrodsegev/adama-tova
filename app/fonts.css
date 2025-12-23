@@ -1,0 +1,30 @@
+/* Arfilit */
+@font-face {
+    font-family: 'Arfilit';
+    src: url('/fonts/Arfilit-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Arfilit';
+    src: url('/fonts/Arfilit-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  /* Ezer Shemesh TRIAL ONLY */
+  @font-face {
+    font-family: 'Ezer Shemesh TRIAL ONLY';
+    src: url('/fonts/EzerShemeshTRIALONLY-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Ezer Shemesh TRIAL ONLY';
+    src: url('/fonts/EzerShemeshTRIALONLY-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  

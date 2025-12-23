@@ -6,14 +6,8 @@ import { authService } from '@/app/services/authService';
 import { userService } from '@/app/services/userService';
 import GoogleLoginButton from './GoogleLoginButton';
 import styles from './page.module.css';
-import { createClient } from '@/lib/supabase/client';
 
-
-type Mode =
-  | 'choice'
-  | 'login'
-  | 'signup-participant'
-  | 'signup-admin';
+type Mode = 'choice' | 'signup';
 
 const CIRCLE_OPTIONS = [
   'שורדי ושורדות המסיבות',
@@ -41,24 +35,37 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // auth
+  // Auth fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // quiz (shared)
+  // Quiz fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-
-  // participant-only
   const [circle, setCircle] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [freeText, setFreeText] = useState('');
 
-  const isHebrewName = (name: string) =>
-    /^[\u0590-\u05FF\s]+$/.test(name);
+  // Validation functions
+  const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
+  const isValidPhone = (p: string) => /^[0-9]{10}$/.test(p.replace(/[-\s]/g, ''));
 
-  const isValidPhone = (p: string) =>
-    /^[0-9]{10}$/.test(p.replace(/[-\s]/g, ''));
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return 'הסיסמה חייבת להכיל לפחות 8 תווים';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'הסיסמה חייבת להכיל לפחות אות גדולה אחת באנגלית';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'הסיסמה חייבת להכיל לפחות אות קטנה אחת באנגלית';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'הסיסמה חייבת להכיל לפחות ספרה אחת';
+    }
+    return null;
+  };
+
 
   const toggleInterest = (i: string) => {
     setInterests(prev =>
@@ -66,246 +73,245 @@ export default function LoginPage() {
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('אנא מלא אימייל וסיסמה');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      await authService.signIn(email, password);
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || 'שגיאה בהתחברות');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-  
+
     try {
+      // Validate email and password
       if (!email || !password) {
         throw new Error('אימייל וסיסמה הם שדות חובה');
       }
-  
+
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        throw new Error(passwordError);
+      }
+
+      // Validate quiz fields
       if (!fullName || !phone) {
         throw new Error('שם מלא ומספר טלפון הם שדות חובה');
       }
-  
+
       if (!isHebrewName(fullName)) {
         throw new Error('השם חייב להכיל אותיות עבריות בלבד');
       }
-  
+
       if (!isValidPhone(phone)) {
         throw new Error('מספר הטלפון חייב להכיל 10 ספרות');
       }
-  
-      // 1️⃣ Sign up
-      const { user } = await authService.signUp(email, password);
+
+      // Sign up
+      await authService.signUp(email, password);
+
+      // Get the current user
+      const user = await authService.getCurrentUser();
       if (!user) throw new Error('שגיאה בהרשמה');
-  
+
       const cleanPhone = phone.replace(/[-\s]/g, '');
-  
-      // 2️⃣ Save profile
-      if (mode === 'signup-admin') {
-        // SAME logic as AdminQuizModal
-        const supabase = createClient();
-        const { error: dbError } = await supabase
-          .from('users')
-          .upsert({
-            id: user.id,
-            email,
-            role: 'admin',
-            full_name: fullName.trim(),
-            phone: cleanPhone,
-            notifications_enabled: true,
-            quiz: {
-              completed_at: new Date().toISOString(),
-            },
-          });
-  
-        if (dbError) throw dbError;
-        router.replace('/adminScreens');
-      } else {
-        // SAME logic as QuizModal
-        await userService.completeProfile(user.id, email, {
-          full_name: fullName.trim(),
-          phone: cleanPhone,
-          circle: circle || undefined,
-          interests: interests.length ? interests : undefined,
-          free_text: freeText || undefined,
-        });
-  
-        router.replace('/UserScreens');
-      }
-  
+
+      // Save profile
+      await userService.completeProfile(user.id, email, {
+        full_name: fullName.trim(),
+        phone: cleanPhone,
+        circle: circle || undefined,
+        interests: interests.length ? interests : undefined,
+        free_text: freeText || undefined,
+      });
+
       router.refresh();
+      router.replace('/UserScreens');
     } catch (err: any) {
       setError(err.message || 'שגיאה כללית');
     } finally {
       setLoading(false);
     }
   };
-  
 
-  // ======================
-  // CHOICE SCREEN
-  // ======================
+  // Welcome/Choice Screen
   if (mode === 'choice') {
     return (
-      <div className="content" style={{ direction: 'rtl' }}>
-        <div className={styles.loginForm}>
-          <h2>ברוכים הבאים לאדמה טובה</h2>
+      <div className={styles.container}>
+        <div className={styles.content}>
+          <div className={styles.greeting}>
+            <h1 className={styles.title}>ברוכה הבאה</h1>
+            <p className={styles.subtitle}>להרשמה או התחברות הכניסו פרטים</p>
+          </div>
 
-          <button onClick={() => setMode('login')}>
-            התחבר
-          </button>
+          <div className={styles.loginContent}>
+            <div className={styles.inputWrapper}>
+              <input
+                type="email"
+                placeholder="אימייל"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.input}
+                dir="rtl"
+              />
+            </div>
 
-          <button
-            style={{ background: '#28a745', color: 'white' }}
-            onClick={() => setMode('signup-participant')}
-          >
-            הירשם כמשתתף
-          </button>
+            <div className={styles.inputWrapper}>
+              <input
+                type="password"
+                placeholder="סיסמה"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.input}
+                dir="rtl"
+              />
+              <button
+                className={styles.forgotPassword}
+                onClick={() => console.log('Forgot password')}
+                type="button"
+              >
+                שכחתי סיסמה
+              </button>
+            </div>
 
-          <button
-            style={{ background: '#ffc107' }}
-            onClick={() => setMode('signup-admin')}
-          >
-            הירשם כמנהל
-          </button>
+            <div className={styles.buttonSection}>
+              <button
+                className={styles.primaryButton}
+                onClick={handleLogin}
+                disabled={loading}
+              >
+                {loading ? 'מתחבר...' : 'התחבר'}
+              </button>
 
-          <hr />
-          <GoogleLoginButton />
+              <button
+                className={styles.secondaryButton}
+                onClick={() => setMode('signup')}
+              >
+                יצירת משתמש
+              </button>
+
+              <div className={styles.orSeparator}>
+                <span className={styles.orLine}></span>
+                <span className={styles.orText}>או</span>
+                <span className={styles.orLine}></span>
+              </div>
+
+              <GoogleLoginButton className={styles.googleButton} />
+            </div>
+
+            {error && (
+              <p className={styles.error}>{error}</p>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
-  // ======================
-  // LOGIN ONLY
-  // ======================
-  if (mode === 'login') {
-    return (
-      <form
-        onSubmit={async e => {
-          e.preventDefault();
-          setLoading(true);
-          await authService.signIn(email, password);
-          router.replace('/');
-        }}
-        className={styles.loginForm}
-        style={{ direction: 'rtl' }}
-      >
-        <h2>התחברות</h2>
-
-        <input
-          placeholder="אימייל"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-
-        <input
-          type="password"
-          placeholder="סיסמה"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-
-        <button disabled={loading}>התחבר</button>
-        <button type="button" onClick={() => setMode('choice')}>
-          חזור
-        </button>
-      </form>
-    );
-  }
-
-  // ======================
-  // SIGNUP + QUIZ (ADMIN / PARTICIPANT)
-  // ======================
+  // Signup Form
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={styles.loginForm}
-      style={{ direction: 'rtl' }}
-    >
-      <h2>
-        {mode === 'signup-admin'
-          ? 'הרשמה כמנהל'
-          : 'הרשמה כמשתתף'}
-      </h2>
+    <div className={styles.container}>
+      <form onSubmit={handleSignup} className={styles.signupContent}>
+        <h1 className={styles.title}>הרשמה</h1>
 
-      <input
-        placeholder="אימייל"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
+        {/* Personal Details */}
+        <div className={styles.formSection}>
+          <h3 className={styles.sectionTitle}>פרטים אישיים</h3>
 
-      <input
-        type="password"
-        placeholder="סיסמה"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
+          <input
+            type="text"
+            placeholder="שם מלא"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+            className={styles.input}
+            dir="rtl"
+          />
 
-      <hr />
+          <input
+            type="tel"
+            placeholder="מספר טלפון"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+            className={styles.input}
+            dir="rtl"
+          />
 
-      <input
-        placeholder="שם מלא"
-        value={fullName}
-        onChange={e => setFullName(e.target.value)}
-      />
-
-      <input
-        placeholder="טלפון"
-        value={phone}
-        onChange={e => setPhone(e.target.value)}
-      />
-
-      {mode === 'signup-participant' && (
-        <>
           <select
             value={circle}
-            onChange={e => setCircle(e.target.value)}
+            onChange={(e) => setCircle(e.target.value)}
+            className={styles.select}
+            dir="rtl"
           >
-            <option value="">בחר מעגל</option>
-            {CIRCLE_OPTIONS.map(c => (
-              <option key={c}>{c}</option>
+            <option value="">מאיזה מעגל אתה? (לא חובה)</option>
+            {CIRCLE_OPTIONS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
 
-          <div style={{ marginTop: '1rem', width: '100%' }}>
-  {INTEREST_OPTIONS.map(i => (
-    <label
-      key={i}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr',
-        justifyContent: 'end',
-        alignItems: 'center',
-        columnGap: '0.5rem',
-        direction: 'rtl',
-        marginBottom: '0.75rem',
-        cursor: 'pointer',
-        width: '100%',
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={interests.includes(i)}
-        onChange={() => toggleInterest(i)}
-      />
-      <span>{i}</span>
-    </label>
-  ))}
-</div>
-
+          <div className={styles.interestsSection}>
+            <label className={styles.label}>מה מעניין אותך? (לא חובה)</label>
+            <div className={styles.interestsList}>
+              {INTEREST_OPTIONS.map((i) => (
+                <label key={i} className={styles.interestItem}>
+                <input
+                  type="checkbox"
+                  checked={interests.includes(i)}
+                  onChange={() => toggleInterest(i)}
+                  className={styles.checkbox}
+                />
+                <span>{i}</span>
+              </label>
+              
+              ))}
+            </div>
+          </div>
 
           <textarea
-            placeholder="טקסט חופשי"
+            placeholder="טקסט חופשי (לא חובה)"
             value={freeText}
-            onChange={e => setFreeText(e.target.value)}
+            onChange={(e) => setFreeText(e.target.value)}
+            rows={4}
+            className={styles.textarea}
+            dir="rtl"
           />
-        </>
-      )}
+        </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
 
-      <button disabled={loading}>
-        {loading ? 'שומר...' : 'הרשם'}
-      </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.primaryButton}
+        >
+          {loading ? 'נרשם...' : 'הרשם'}
+        </button>
 
-      <button type="button" onClick={() => setMode('choice')}>
-        חזור
-      </button>
-    </form>
+        <button
+          type="button"
+          onClick={() => setMode('choice')}
+          className={styles.backButton}
+        >
+          חזור
+        </button>
+      </form>
+    </div>
   );
 }

@@ -6,16 +6,62 @@ import { revalidatePath } from 'next/cache';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const redirectTo = requestUrl.searchParams.get("redirect_to") || "/";
   
   if (code) {
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    await supabase.auth.exchangeCodeForSession(code);
+    
+    // Exchange code for session
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    
+    if (exchangeError) {
+      console.error("Exchange error:", exchangeError);
+      return NextResponse.redirect(new URL('/login?error=auth_failed', requestUrl.origin));
+    }
+    
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error("User error:", userError);
+      return NextResponse.redirect(new URL('/login', requestUrl.origin));
+    }
+    
+    // Check if user exists in users table
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    // Handle "no rows" error (PGRST116) - this is normal for new users
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error("Profile error:", profileError);
+    }
+    
+    // Determine where to redirect
+    let targetPath = '/';
+    
+    if (!profile) {
+      // New user - redirect to complete profile
+      targetPath = '/complete-profile';
+    } else if (!profile.quiz?.completed_at) {
+      // User exists but quiz not completed
+      targetPath = '/complete-profile';
+    } else {
+      // User has completed quiz - go to appropriate dashboard
+      targetPath = profile.role === 'admin' ? '/adminScreens' : '/UserScreens';
+    }
+    
+    // Force refresh
+    revalidatePath('/', 'layout');
+    
+    // Redirect to the determined path
+    return NextResponse.redirect(new URL(targetPath, requestUrl.origin));
   }
 
-  // Force Next.js to refresh the layout with new auth state
+  // No code - just redirect to home
   revalidatePath('/', 'layout');
-  
-  // Redirect to home page instead of origin
   return NextResponse.redirect(new URL('/', requestUrl.origin));
 }

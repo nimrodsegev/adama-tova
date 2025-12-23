@@ -1,21 +1,466 @@
-.loginForm {
+/* Base container */
+.container {
+  position: relative;
   width: 100%;
-  max-width: 20rem; /* Or whatever width you prefer */
-  margin: auto;
+  max-width: 24.5625rem; /* 393px */
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #AB4016;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 1rem;
+}
+
+/* Content wrapper */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.25rem; /* 52px */
+  width: 100%;
+  max-width: 19.875rem; /* 318px */
+}
+
+/* Greeting section */
+.greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Arfilit', sans-serif;
+  font-size: 2.25rem;      /* 36px */
+  font-weight: 400;
+  line-height: 1.875rem;   /* 30px */
+  color: #EFEFEF;
+  margin: 0;
+
+  width: 19.875rem;        /* 318px */
+  text-align: center;      /* Figma */
+}
+
+
+
+
+.subtitle {
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 1.25rem;      /* 20px */
+  line-height: 1.25rem;    /* 20px */
+  color: #FFFFFF;
+  margin: 0;
+
+  width: 19.875rem;        /* 318px */
+  text-align: center;      /* Figma */
+}
+
+
+
+/* Login content section */
+.loginContent {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem; /* 🔥 12px – like Figma */
+  width: 19.875rem;
+}
+
+
+
+/* Input styles */
+.input {
+  width: 100%;
+  height: 3.75rem; /* 60px */
+  padding: 0.5rem 2rem; /* 8px 32px */
+  background: #AB4016;
+  border: 0.5px solid #FFFFFF;
+  border-radius: 1.875rem; /* 30px */
+  color: #FFFFFF;
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  outline: none;
+  direction: rtl;
+}
+
+.input::placeholder {
+  color: #CFCFCF;
+  text-align: right;
+}
+
+/* Forgot password button */
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.forgotPassword {
+  position: absolute;
+  left: 0.75rem; /* left side like Figma */
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2.75rem;
+  padding: 0 1rem;
+
+  background: #F9F9F9;
+  border-radius: 25px;
+  border: none;
+
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  color: #1A1A2E;
+
+  cursor: pointer;
+  z-index: 2;
+}
+
+.forgotPassword:hover {
+  opacity: 0.9;
+}
+
+
+/* Button section */
+.buttonSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* 🔥 6px – closer like Figma */
+  width: 100%;
+  margin-top: 0.2rem; /* 🔥 reduce top spacing */
+}
+
+
+/* Primary button (Login/Signup) */
+.primaryButton {
+  width: 100%;
+  height: 2.9375rem; /* 47px */
+  padding: 0.3125rem 4.625rem; /* 5px 74px */
+  background: #EFEFEF;
+  border-radius: 1.5625rem; /* 25px */
+  border: none;
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 1rem; /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  color: #1A1A2E;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary button */
+.secondaryButton {
+  width: 100%;
+  height: 2.9375rem; /* 47px */
+  background: transparent;
+  border: 0.5px solid #EFEFEF;
+  border-radius: 1.5625rem; /* 25px */
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 1rem; /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  color: #EFEFEF;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover {
+  background: rgba(239, 239, 239, 0.1);
+}
+
+/* OR separator */
+.orSeparator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0; /* 🔥 very tight like Figma */
+}
+
+
+
+.orLine {
+  flex: 1;
+  height: 0.03125rem;    /* 0.5px */
+  background: #FFFFFF;
+}
+
+.orSeparator + .googleButton {
+  margin-top: 0.0rem; /* 🔥 pull Google closer */
+}
+
+
+
+.orText {
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 0.875rem; /* 14px */
+  color: #FFFFFF;
+}
+
+/* Google button */
+.googleButton {
+  width: 19.6875rem;
+  height: 2.9375rem;
+  background: #EFEFEF;
+  border-radius: 1.5625rem;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  direction: ltr;          /* 🔥 THIS is the key */
+  cursor: pointer;
+}
+
+.googleButton span {
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 1rem;
+  color: #1A1A2E;
+}
+
+
+
+.googleButton img {
+  margin-right: 0.25rem;
+}
+
+.googleText {
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 1rem;
+  line-height: 1.1875rem;
+  color: #1A1A2E;
+}
+.googleIcon {
+  position: absolute;
+  right: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Back button */
+.backButton {
+  width: 100%;
+  padding: 0.75rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.backButton:hover {
+  opacity: 0.9;
+}
+
+/* Error message */
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Signup specific styles */
+.signupContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 19.875rem; /* 318px */
+  padding: 1rem 0;
+}
+
+.formSection {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.loginForm label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.sectionTitle {
+  font-size: 1.125rem;
+  color: #EFEFEF;
+
+  width: 100%;
+  text-align: right;   /* ✅ FIX */
+  direction: rtl;      /* ✅ FIX */
+
+  margin-bottom: 0.5rem;
 }
 
-.errorMessage {
-  color: rgba(255, 0, 0, 0.805);
-  font-size: 0.8rem;
-  margin: 0.5rem 0;
+
+.select {
+  width: 100%;
+  height: 3.75rem;
+  padding: 0.5rem 2rem;
+  background: #AB4016;
+  border: 0.5px solid #FFFFFF;
+  border-radius: 1.875rem;
+  color: #FFFFFF;
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+  direction: rtl;
+  text-align: right;
+}
+
+.select option {
+  background: #AB4016;
+  color: #FFFFFF;
+}
+
+.label {
+  color: #EFEFEF;
+  font-size: 0.875rem;
+
+  width: 100%;
+  text-align: right;   /* ✅ FIX */
+  direction: rtl;      /* ✅ FIX */
+
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+
+.interestsSection {
+  margin-top: 0.5rem;
+}
+
+.interestsList {
+  border: 0.5px solid #FFFFFF;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  max-height: 9.375rem; /* 150px */
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+
+
+  .interestItem {
+    display: flex;
+    flex-direction: row-reverse; /* 🔥 THIS flips layout */
+    align-items: center;
+    justify-content: flex-start;
+  
+    gap: 12px;
+    padding: 8px 0;
+  
+    direction: rtl;
+    color: #EFEFEF;
+    cursor: pointer;
+  }
+  
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  
+    accent-color: #EFEFEF;
+    cursor: pointer;
+  }
+  
+
+.interestItem span {
+  text-align: right;
+  font-size: 0.875rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  background: #AB4016;
+  border: 0.5px solid #FFFFFF;
+  border-radius: 0.5rem;
+  color: #FFFFFF;
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 0.875rem;
+  resize: vertical;
+  outline: none;
+  direction: rtl;
+}
+
+.textarea::placeholder {
+  color: #CFCFCF;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .title {
+    font-family: 'Arfilit', sans-serif;
+    font-size: 2.25rem; /* 36px */
+    font-weight: 400;
+    line-height: 1.875rem;
+    color: #EFEFEF;
+    margin: 0;
+    width: 100%;
+    text-align: right;   /* ✅ key fix */
+    direction: rtl;      /* ✅ ensure Hebrew flow */
+  }
+  
+  
+  
+  
+  .subtitle {
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 1.25rem;
+    line-height: 1.25rem;
+    color: #FFFFFF;
+    margin: 0;
+    width: 100%;
+    text-align: right;   /* ✅ */
+    direction: rtl;
+  }
+  
+}
+
+/* Add these styles to your existing page.module.css */
+
+/* Input wrapper for positioning */
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+
+
+/* Update the interests checkboxes to be on the right side */
+.interestItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Changed from flex-end */
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  color: #EFEFEF;
+  direction: rtl;
+}
+
+.interestItem span {
+  order: 1; /* Put text on the right */
+}
+
+.interestItem input[type="checkbox"] {
+  order: 2; /* Put checkbox on the left */
 }
