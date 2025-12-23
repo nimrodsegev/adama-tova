@@ -52,6 +52,32 @@ export const apiActivities = {
         .order("date", { ascending: true })
     );
   },
+  async getByUserPreferences(userId) {
+    // 1. Get User's Interests from the 'quiz' JSON column
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('quiz')
+      .eq('id', userId)
+      .single();
+
+    // Check if user exists and has interests
+    if (userError || !user || !user.quiz || !user.quiz.interests || user.quiz.interests.length === 0) {
+      console.log("No interests found for user.");
+      return [[], null]; // Return empty list if no interests found
+    }
+
+    const userInterests = user.quiz.interests; // Example: ["Music", "Technology"]
+
+    // 2. Fetch Activities matching those categories
+    return safeRequest(
+      supabase
+        .from('activities')
+        .select('*')
+        .in('category', userInterests) // 👈 Magic line: Checks if category is inside the array
+        .gte('date', new Date().toISOString()) // Optional: Only show future events
+        .order('date', { ascending: true })
+    );
+  },
 
   // GET a single activity by ID
   async getById(id) {
