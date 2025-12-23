@@ -13,41 +13,28 @@ export default function AdminHomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      fetchData();
-    }
+    if (user) fetchData();
   }, [user]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const day = String(today.getDate()).padStart(2, "0");
-      const dateString = `${year}-${month}-${day}`;
+      const dateString = today.toISOString().split("T")[0];
 
       const [activities, actError] = await apiActivities.getByDate(dateString);
       if (!actError && activities) setTodayActivities(activities);
 
       const [notificationsData, notifError] = await apiNotifications.getList(
         user!.id,
-        5,
+        3,
         false
       );
       if (!notifError && notificationsData) {
-        const formattedNotifications = notificationsData.map((notif: any) => ({
-          id: notif.id,
-          message: notif.message,
-          type: notif.type || "info",
-          timestamp: new Date(notif.created_at),
-          isRead: notif.is_read,
-          category: notif.category || "כללי",
-        }));
-        setNotifications(formattedNotifications);
+        setNotifications(notificationsData);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -55,180 +42,254 @@ export default function AdminHomePage() {
 
   if (userLoading || loading)
     return (
-      <main style={{ textAlign: "center", padding: "20px" }}>
-        <p>טוען...</p>
-      </main>
-    );
-  if (!user || !userProfile)
-    return (
-      <main style={{ textAlign: "center", padding: "20px" }}>
-        <p>עליך להתחבר כדי לראות את הדף</p>
-      </main>
+      <div style={styles.container}>
+        <p style={{ color: "white" }}>טוען...</p>
+      </div>
     );
 
   return (
-    <main
-      style={{
-        padding: "20px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        direction: "rtl",
-      }}
-    >
+    <div style={styles.container}>
+      {/* Background Decorative Vectors (The Group/Circles from CSS) */}
+      <div style={styles.vectorBackground} />
+
       {/* Header */}
-      <h1
-        style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "32px" }}
-      >
-        היי {userProfile.full_name}!
+      <h1 style={styles.headerText}>
+        היי {userProfile?.full_name?.split(" ")[0] || "מנהל"},
       </h1>
 
-      {/* Section 1: Activities Status */}
-      <section style={{ marginBottom: "40px" }}>
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}
-        >
-          סטטוס הרשמה לפעילויות
-        </h2>
-
-        {todayActivities.length > 0 ? (
-          <div
-            style={{
-              display: "flex",
-              gap: "16px",
-              flexWrap: "wrap",
-              marginBottom: "16px",
-            }}
-          >
-            {todayActivities.map((activity) => (
-              <AdminActivityCard
-                key={activity.id}
-                id={activity.id}
-                title={activity.title}
-                date={activity.date}
-                start_time={activity.start_time}
-                current_participants={activity.current_participants || 0}
-                max_participants={activity.max_participants}
-              />
-            ))}
+      <div style={styles.mainContentFrame}>
+        {/* Section 1: Activities */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>סטטוס הרשמה לפעילויות</h2>
+          <div style={styles.horizontalScroll}>
+            {todayActivities.length > 0 ? (
+              todayActivities.map((activity) => (
+                <div key={activity.id} style={styles.glassCard}>
+                  <AdminActivityCard
+                    id={activity.id}
+                    title={activity.title}
+                    date={activity.date}
+                    start_time={activity.start_time}
+                    current_participants={activity.current_participants || 0}
+                    max_participants={activity.max_participants}
+                  />
+                </div>
+              ))
+            ) : (
+              <p style={styles.emptyText}>אין פעילויות היום</p>
+            )}
           </div>
-        ) : (
-          <p style={{ padding: "20px", textAlign: "center", color: "#666" }}>
-            אין פעילויות היום
-          </p>
-        )}
 
-        {/* Activity Buttons */}
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <Link
-            href="/adminScreens/AddActivityPage"
-            style={{
-              padding: "12px 24px",
-              backgroundColor: "#10b981",
-              color: "white",
-              borderRadius: "8px",
-              textDecoration: "none",
-              fontWeight: "600",
-            }}
-          >
-            ➕ הוספת פעילות
-          </Link>
+          {/* Activity Buttons CTA */}
+          <div style={styles.ctaRow}>
+            <Link href="/adminScreens/AddActivityPage" style={styles.buttonM}>
+              ➕ הוספת פעילות
+            </Link>
 
-          <Link
-            href="/adminScreens/CalendarPage"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "45px",
-              height: "45px",
-              backgroundColor: "#3b82f6",
-              color: "white",
-              borderRadius: "50%",
-              textDecoration: "none",
-              fontSize: "20px",
-            }}
-            title="לוח שנה"
-          >
-            ←
-          </Link>
-        </div>
-      </section>
+            {/* כפתור "הכל" במקום החץ הכחול */}
+            <Link
+              href="/adminScreens/CalendarPage"
+              style={{ ...styles.buttonS, width: "auto", padding: "0 15px" }}
+            >
+              <span style={{ ...styles.buttonText, color: "#681F02" }}>
+                הכל
+              </span>
+            </Link>
+          </div>
+        </section>
 
-      {/* Section 2: Recent Notifications */}
-      <section>
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}
-        >
-          הודעות אחרונות
-        </h2>
-
-        {notifications.length > 0 ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-              marginBottom: "16px",
-            }}
-          >
+        {/* Section 2: Recent Notifications */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>הודעות אחרונות</h2>
+          <div style={styles.notificationsList}>
             {notifications.map((notif) => (
-              <div
-                key={notif.id}
-                style={{
-                  padding: "16px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  borderRight: "4px solid #3b82f6",
-                }}
-              >
-                <p style={{ fontSize: "14px", color: "#6b7280" }}>
-                  {notif.category}
-                </p>
-                <p style={{ fontSize: "16px" }}>{notif.message}</p>
+              <div key={notif.id} style={styles.notificationGlassCard}>
+                <div style={styles.notifHeader}>
+                  <span style={styles.notifTime}>
+                    {new Date(notif.created_at).toLocaleTimeString("he-IL", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span style={styles.notifPipe}>|</span>
+                  <span style={styles.notifTitle}>
+                    {notif.category || "כללי"}
+                  </span>
+                </div>
+                <p style={styles.notifMessage}>{notif.message}</p>
               </div>
             ))}
           </div>
-        ) : (
-          <p style={{ padding: "20px", textAlign: "center", color: "#666" }}>
-            אין הודעות
-          </p>
-        )}
 
-        {/* Notification Buttons */}
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <Link
-            href="/adminScreens/addNotification"
-            style={{
-              padding: "12px 24px",
-              backgroundColor: "#10b981",
-              color: "white",
-              borderRadius: "8px",
-              textDecoration: "none",
-              fontWeight: "600",
-            }}
-          >
-            ➕ הודעה חדשה
-          </Link>
-          <Link
-            href="/adminScreens/NotificationPage"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "45px",
-              height: "45px",
-              backgroundColor: "#3b82f6",
-              color: "white",
-              borderRadius: "50%",
-              textDecoration: "none",
-              fontSize: "20px",
-            }}
-            title="עמוד ההתראות"
-          >
-            ←
-          </Link>
-        </div>
-      </section>
-    </main>
+          {/* Notification Buttons CTA */}
+          <div style={styles.ctaRow}>
+            <Link href="/adminScreens/addNotification" style={styles.buttonM}>
+              ➕ הודעה חדשה
+            </Link>
+            <Link
+              href="/adminScreens/NotificationPage"
+              style={{ ...styles.buttonS, width: "auto", padding: "0 15px" }}
+            >
+              <span style={{ ...styles.buttonText, color: "#681F02" }}>
+                הכל
+              </span>
+            </Link>
+          </div>
+        </section>
+      </div>
+
+      {/* Navigation Bar at bottom */}
+      <nav style={styles.navBar}>
+        <div style={styles.navItem}>🏠</div>
+        <div style={styles.navItem}>📅</div>
+        <div style={styles.navItem}>🔔</div>
+        <div style={styles.navItem}>👤</div>
+      </nav>
+    </div>
   );
 }
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    width: "100%",
+    maxWidth: "393px", // Mobile width from CSS
+    minHeight: "852px",
+    margin: "0 auto",
+    backgroundColor: "#AB4016", // Background from CSS
+    position: "relative",
+    overflowX: "hidden",
+    direction: "rtl",
+    paddingBottom: "100px",
+  },
+  vectorBackground: {
+    position: "absolute",
+    width: "150%",
+    height: "40%",
+    top: "2.5%",
+    left: "-25%",
+    border: "2px solid rgba(189, 161, 201, 0.2)",
+    borderRadius: "50%",
+    pointerEvents: "none",
+  },
+  headerText: {
+    position: "absolute",
+    width: "352px",
+    left: "20px",
+    top: "91px",
+    fontFamily: "Arfilit, sans-serif",
+    fontSize: "36px",
+    fontWeight: "400",
+    color: "#FFFFFF",
+    textAlign: "right",
+  },
+  mainContentFrame: {
+    marginTop: "200px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "40px",
+    padding: "0 20px",
+  },
+  section: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+  sectionTitle: {
+    fontSize: "20px",
+    fontWeight: "400",
+    color: "#FFFFFF",
+    textAlign: "right",
+  },
+  horizontalScroll: {
+    display: "flex",
+    flexDirection: "row",
+    gap: "12px",
+    overflowX: "auto",
+    paddingBottom: "10px",
+  },
+  glassCard: {
+    minWidth: "167px",
+    height: "154px",
+    background: "rgba(255, 255, 255, 0.7)",
+    backdropFilter: "blur(6.4px)",
+    WebkitBackdropFilter: "blur(6.4px)",
+    borderRadius: "20px",
+    padding: "12px",
+  },
+  notificationGlassCard: {
+    width: "100%",
+    padding: "12px 16px",
+    background: "rgba(255, 255, 255, 0.7)",
+    borderRadius: "20px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    marginBottom: "10px",
+  },
+  notifHeader: {
+    display: "flex",
+    flexDirection: "row-reverse",
+    gap: "4px",
+    alignItems: "center",
+  },
+  notifTitle: { fontSize: "16px", fontWeight: "600", color: "#681F02" },
+  notifPipe: { color: "#681F02" },
+  notifTime: { fontSize: "14px", color: "#681F02" },
+  notifMessage: {
+    fontSize: "15px",
+    color: "#681F02",
+    textAlign: "right",
+    marginTop: "4px",
+  },
+  ctaRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "10px",
+  },
+  buttonM: {
+    width: "140px",
+    height: "44px",
+    background: "#F9F9F9",
+    borderRadius: "25px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textDecoration: "none",
+    color: "#1A1A2E",
+    fontSize: "14px",
+    fontWeight: "400",
+  },
+  buttonS: {
+    width: "44px",
+    height: "44px",
+    background: "#F9F9F9",
+    borderRadius: "25px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textDecoration: "none",
+  },
+  arrowIcon: { color: "#681F02", fontSize: "20px" },
+  navBar: {
+    position: "fixed",
+    bottom: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "353px",
+    height: "61px",
+    background: "rgba(255, 255, 255, 0.6)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "20px",
+    display: "flex",
+    justifyContent: "space-around",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  navItem: { fontSize: "24px", cursor: "pointer" },
+  emptyText: {
+    color: "rgba(255,255,255,0.7)",
+    textAlign: "center",
+    width: "100%",
+  },
+};
