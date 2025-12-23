@@ -2,6 +2,7 @@
 import MeetingCard from "./MeetingCard";
 
 type Meeting = {
+  id: string;
   title: string;
   time: string;
   location: string;
@@ -25,11 +26,14 @@ export default function PossibleMeetingsSection({
           display: "flex",
           flexDirection: "row",
           marginTop: "16px",
+          gap: "16px",
+          flexWrap: "wrap",
         }}
       >
-        {meetings.map((m, index) => (
+        {meetings.map((m) => (
           <MeetingCard
-            key={index}
+            key={m.id}
+            id={m.id}
             title={m.title}
             time={m.time}
             location={m.location}

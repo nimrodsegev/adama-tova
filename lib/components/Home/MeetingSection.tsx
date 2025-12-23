@@ -2,6 +2,7 @@
 import MeetingCard from "./MeetingCard";
 
 type Meeting = {
+  id: string;
   title: string;
   time: string;
   location: string;
@@ -26,6 +27,7 @@ export default function MeetingSection({ meetings }: MeetingsSectionProps) {
       >
         {meetings.map((m, index) => (
           <MeetingCard
+            id={m.id}
             key={index}
             title={m.title}
             time={m.time}
