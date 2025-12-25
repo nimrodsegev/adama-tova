@@ -39,13 +39,10 @@
   line-height: 1.875rem;   /* 30px */
   color: #EFEFEF;
   margin: 0;
-
-  width: 19.875rem;        /* 318px */
-  text-align: center;      /* Figma */
+  width: 100%;             /* ✅ CHANGED: Full width */
+  text-align: center;      /* ✅ CHANGED: Centered */
+  direction: rtl;
 }
-
-
-
 
 .subtitle {
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
@@ -53,12 +50,10 @@
   line-height: 1.25rem;    /* 20px */
   color: #FFFFFF;
   margin: 0;
-
-  width: 19.875rem;        /* 318px */
-  text-align: center;      /* Figma */
+  width: 100%;             /* ✅ CHANGED: Full width */
+  text-align: center;      /* ✅ CHANGED: Centered */
+  direction: rtl;
 }
-
-
 
 /* Login content section */
 .loginContent {
@@ -68,8 +63,6 @@
   gap: 0.75rem; /* 🔥 12px – like Figma */
   width: 19.875rem;
 }
-
-
 
 /* Input styles */
 .input {
@@ -123,7 +116,6 @@
   opacity: 0.9;
 }
 
-
 /* Button section */
 .buttonSection {
   display: flex;
@@ -132,7 +124,6 @@
   width: 100%;
   margin-top: 0.2rem; /* 🔥 reduce top spacing */
 }
-
 
 /* Primary button (Login/Signup) */
 .primaryButton {
@@ -186,8 +177,6 @@
   margin: 0; /* 🔥 very tight like Figma */
 }
 
-
-
 .orLine {
   flex: 1;
   height: 0.03125rem;    /* 0.5px */
@@ -197,8 +186,6 @@
 .orSeparator + .googleButton {
   margin-top: 0.0rem; /* 🔥 pull Google closer */
 }
-
-
 
 .orText {
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
@@ -229,8 +216,6 @@
   color: #1A1A2E;
 }
 
-
-
 .googleButton img {
   margin-right: 0.25rem;
 }
@@ -241,6 +226,7 @@
   line-height: 1.1875rem;
   color: #1A1A2E;
 }
+
 .googleIcon {
   position: absolute;
   right: 1.25rem;
@@ -295,14 +281,11 @@
 .sectionTitle {
   font-size: 1.125rem;
   color: #EFEFEF;
-
   width: 100%;
-  text-align: right;   /* ✅ FIX */
-  direction: rtl;      /* ✅ FIX */
-
+  text-align: right;
+  direction: rtl;
   margin-bottom: 0.5rem;
 }
-
 
 .select {
   width: 100%;
@@ -328,15 +311,12 @@
 .label {
   color: #EFEFEF;
   font-size: 0.875rem;
-
   width: 100%;
-  text-align: right;   /* ✅ FIX */
-  direction: rtl;      /* ✅ FIX */
-
+  text-align: right;
+  direction: rtl;
   margin-bottom: 0.5rem;
   display: block;
 }
-
 
 .interestsSection {
   margin-top: 0.5rem;
@@ -351,32 +331,25 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.interestItem {
+  display: flex;
+  flex-direction: row-reverse; /* 🔥 THIS flips layout */
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  direction: rtl;
+  color: #EFEFEF;
+  cursor: pointer;
+}
 
-
-  .interestItem {
-    display: flex;
-    flex-direction: row-reverse; /* 🔥 THIS flips layout */
-    align-items: center;
-    justify-content: flex-start;
-  
-    gap: 12px;
-    padding: 8px 0;
-  
-    direction: rtl;
-    color: #EFEFEF;
-    cursor: pointer;
-  }
-  
-
-  .checkbox {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-  
-    accent-color: #EFEFEF;
-    cursor: pointer;
-  }
-  
+.checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: #EFEFEF;
+  cursor: pointer;
+}
 
 .interestItem span {
   text-align: right;
@@ -400,67 +373,183 @@
 .textarea::placeholder {
   color: #CFCFCF;
 }
+/* Error state for inputs */
+.inputError {
+  border: 2px solid #FF0000 !important;
+  box-shadow: 0px 0px 0.03125rem rgba(249, 249, 249, 0.5);
+}
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
+/* Field-specific error text - positioned on TOP border */
+/* Field-specific error text - positioned on TOP border */
+.fieldError {
+  position: absolute;
+  right: 1.5rem;
+  top: -0.5625rem; /* -9px - sits ON the border */
+  
+  padding: 0.0625rem 0.3125rem; /* Small padding */
+  background: #AB4016; /* Same as page background - creates gap in border */
+  
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  font-weight: 400;
+  color: #FF0000;
+  text-shadow: 0px 0px 0.03125rem rgba(255, 255, 255, 0.5);
+  
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* ===================================
+   RESPONSIVE SCALING FOR LARGER SCREENS
+   Mobile design (< 768px) stays exactly as Figma
+   ================================== */
+
+@media (min-width: 48rem) { /* 768px */
+  
+  /* Container scales up */
   .container {
-    padding: 0.5rem;
+    max-width: 100%;
+  }
+  
+  /* Content scales proportionally */
+  .content {
+    max-width: 28rem; /* 448px - scaled from 318px */
+    gap: 4rem; /* scaled from 52px */
+  }
+  
+  /* Login content scales */
+  .loginContent {
+    width: 28rem;
+  }
+  
+  /* Signup content scales */
+  .signupContent {
+    max-width: 28rem;
+  }
+  
+  /* Title scales */
+  .title {
+    font-size: 2.75rem; /* 44px - scaled from 36px */
+    line-height: 2.25rem; /* 36px - scaled from 30px */
+  }
+  
+  /* Subtitle scales */
+  .subtitle {
+    font-size: 1.5rem; /* 24px - scaled from 20px */
+    line-height: 1.5rem; /* 24px - scaled from 20px */
+  }
+  
+  /* Inputs scale */
+  .input {
+    height: 4.5rem; /* 72px - scaled from 60px */
+    font-size: 1.125rem; /* 18px - scaled from 14px */
+    padding: 0.625rem 2.5rem; /* scaled proportionally */
+  }
+  
+  /* Select scales */
+  .select {
+    height: 4.5rem;
+    font-size: 1.125rem;
+    padding: 0.625rem 2.5rem;
+  }
+  
+  /* Buttons scale */
+  .primaryButton,
+  .secondaryButton {
+    height: 3.5rem; /* 56px - scaled from 47px */
+    font-size: 1.25rem; /* 20px - scaled from 16px */
+  }
+  
+  /* Google button scales */
+  .googleButton {
+    width: 28rem;
+    height: 3.5rem;
+  }
+  
+  .googleButton span {
+    font-size: 1.25rem;
+  }
+  
+  /* Forgot password button scales */
+  .forgotPassword {
+    height: 3.25rem;
+    font-size: 1.125rem;
+    padding: 0 1.25rem;
+  }
+  
+  /* Textarea scales */
+  .textarea {
+    font-size: 1.125rem;
+    padding: 1.25rem;
+  }
+  
+  /* Interests list scales */
+  .interestsList {
+    max-height: 12rem; /* scaled from 150px */
+  }
+  
+  .interestItem {
+    gap: 0.875rem;
+    padding: 0.625rem 0;
+  }
+  
+  .interestItem span {
+    font-size: 1.125rem;
+  }
+  
+  .checkbox {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  /* Section title and label scale */
+  .sectionTitle {
+    font-size: 1.375rem;
+  }
+  
+  .label {
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 64rem) { /* 1024px - Desktop */
+  
+  /* Scale up even more for large screens */
+  .content {
+    max-width: 32rem; /* 512px */
+  }
+  
+  .loginContent,
+  .signupContent {
+    width: 32rem;
+    max-width: 32rem;
   }
   
   .title {
-    font-family: 'Arfilit', sans-serif;
-    font-size: 2.25rem; /* 36px */
-    font-weight: 400;
-    line-height: 1.875rem;
-    color: #EFEFEF;
-    margin: 0;
-    width: 100%;
-    text-align: right;   /* ✅ key fix */
-    direction: rtl;      /* ✅ ensure Hebrew flow */
+    font-size: 3rem; /* 48px */
+    line-height: 2.5rem; /* 40px */
   }
-  
-  
-  
   
   .subtitle {
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-size: 1.25rem;
-    line-height: 1.25rem;
-    color: #FFFFFF;
-    margin: 0;
-    width: 100%;
-    text-align: right;   /* ✅ */
-    direction: rtl;
+    font-size: 1.625rem; /* 26px */
+    line-height: 1.625rem;
   }
   
-}
-
-/* Add these styles to your existing page.module.css */
-
-/* Input wrapper for positioning */
-.inputWrapper {
-  position: relative;
-  width: 100%;
-}
-
-
-
-/* Update the interests checkboxes to be on the right side */
-.interestItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Changed from flex-end */
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  cursor: pointer;
-  color: #EFEFEF;
-  direction: rtl;
-}
-
-.interestItem span {
-  order: 1; /* Put text on the right */
-}
-
-.interestItem input[type="checkbox"] {
-  order: 2; /* Put checkbox on the left */
+  .input,
+  .select {
+    height: 5rem; /* 80px */
+    font-size: 1.25rem; /* 20px */
+  }
+  
+  .primaryButton,
+  .secondaryButton,
+  .googleButton {
+    height: 4rem; /* 64px */
+    font-size: 1.375rem; /* 22px */
+  }
+  
+  .googleButton {
+    width: 32rem;
+  }
 }

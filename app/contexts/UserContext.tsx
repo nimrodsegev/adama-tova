@@ -39,6 +39,9 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+const NO_REDIRECT_ROUTES = ['/complete-profile', '/reset-password'];
+const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password'];
+
 export function UserProvider({
   children,
   initialUser,
@@ -48,24 +51,18 @@ export function UserProvider({
 }) {
   const [user, setUser] = useState<User | null>(initialUser);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true); // Start with true to prevent flash
+  const [loading, setLoading] = useState(true);
   const [hasCompletedQuiz, setHasCompletedQuiz] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  // List of routes that should not redirect
-  const NO_REDIRECT_ROUTES = ['/complete-profile'];
-  const PUBLIC_ROUTES = ['/login', '/complete-profile'];
-
-
   useEffect(() => {
-    // Check if there's a mismatch between initialUser and actual session
     const checkSession = async () => {
       try {
         const currentUser = await authService.getCurrentUser();
         if (currentUser?.id !== initialUser?.id) {
           setUser(currentUser);
-          router.refresh(); // Force refresh if mismatch
+          router.refresh();
         }
       } catch (error) {
         setUser(null);
@@ -81,45 +78,45 @@ export function UserProvider({
     return () => subscription.unsubscribe();
   }, [initialUser, router]);
 
-  // Load full user profile and check quiz completion whenever user changes
   useEffect(() => {
     const loadProfile = async () => {
       setLoading(true);
       
       if (user) {
         try {
-          // Load full profile from users table
           const profile = await userService.getFullProfile(user.id);
           
           if (profile) {
-            // User exists in users table
             setUserProfile(profile);
             
-            // Check if quiz is completed
             const completed = profile?.quiz?.completed_at != null;
             setHasCompletedQuiz(completed);
             
-            // Only redirect if we're not already on a protected route
-            // Only redirect if we're on login or quiz pages
-const shouldRedirect = pathname === '/login' || pathname === '/complete-profile' || pathname === '/';
+            if (pathname === '/reset-password') {
+              setLoading(false);
+              return;
+            }
+            
+            const shouldRedirect = pathname === '/login' || pathname === '/complete-profile' || pathname === '/';
 
-if (shouldRedirect && completed) {
-  // Quiz completed - go to appropriate dashboard
-  if (profile.role === 'admin') {
-    router.replace('/adminScreens');
-  } else {
-    router.replace('/UserScreens');
-  }
-} else if (!completed && pathname !== '/complete-profile') {
-  // Quiz not completed - redirect to quiz page
-  router.replace('/complete-profile');
-}
+            if (shouldRedirect && completed) {
+              if (profile.role === 'admin') {
+                router.replace('/adminScreens');
+              } else {
+                router.replace('/UserScreens');
+              }
+            } else if (!completed && pathname !== '/complete-profile') {
+              router.replace('/complete-profile');
+            }
           } else {
-            // User doesn't exist in users table (new Google user)
             setUserProfile(null);
             setHasCompletedQuiz(false);
             
-            // Only redirect if we're not already on the quiz page
+            if (pathname === '/reset-password') {
+              setLoading(false);
+              return;
+            }
+            
             if (pathname !== '/complete-profile') {
               router.replace('/complete-profile');
             }
@@ -130,11 +127,9 @@ if (shouldRedirect && completed) {
           setHasCompletedQuiz(false);
         }
       } else {
-        // No user - clear profile
         setUserProfile(null);
         setHasCompletedQuiz(false);
         
-        // Only redirect to login if we're not on a public route
         if (!PUBLIC_ROUTES.includes(pathname)) {
           router.replace('/login');
         }

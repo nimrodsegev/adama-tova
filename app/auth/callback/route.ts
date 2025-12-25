@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const redirectTo = requestUrl.searchParams.get("redirect_to") || "/";
+  const type = requestUrl.searchParams.get("type");
   
   if (code) {
     const cookieStore = cookies();
@@ -20,7 +20,14 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL('/login?error=auth_failed', requestUrl.origin));
     }
     
-    // Get the current user
+    // Check if this is a password recovery
+    if (type === 'recovery') {
+      // For password reset, just redirect to reset-password page
+      // Don't do the normal login flow
+      return NextResponse.redirect(new URL('/reset-password', requestUrl.origin));
+    }
+    
+    // For normal auth flow (login, signup, etc)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {

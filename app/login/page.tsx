@@ -6,6 +6,9 @@ import { authService } from '@/app/services/authService';
 import { userService } from '@/app/services/userService';
 import GoogleLoginButton from './GoogleLoginButton';
 import styles from './page.module.css';
+import { createClient } from '@/lib/supabase/client';
+import ForgotPasswordModal from '@/lib/components/ForgotPasswordModal';
+
 
 type Mode = 'choice' | 'signup';
 
@@ -39,6 +42,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Field-specific errors
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
   // Quiz fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -49,6 +56,7 @@ export default function LoginPage() {
   // Validation functions
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
   const isValidPhone = (p: string) => /^[0-9]{10}$/.test(p.replace(/[-\s]/g, ''));
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
@@ -66,6 +74,31 @@ export default function LoginPage() {
     return null;
   };
 
+  const validateEmail = (email: string): string | null => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      return 'אימייל הוא שדה חובה';
+    }
+    if (!emailRegex.test(email)) {
+      return 'פורמט האימייל לא תקין';
+    }
+    return null;
+  };
+
+  const checkUserExists = async (email: string): Promise<boolean> => {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email)
+        .single();
+      
+      return !!data;
+    } catch {
+      return false;
+    }
+  };
 
   const toggleInterest = (i: string) => {
     setInterests(prev =>
@@ -74,19 +107,39 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
+    // Clear previous errors
+    setEmailError('');
+    setPasswordError('');
+    setError('');
+    
     if (!email || !password) {
       setError('אנא מלא אימייל וסיסמה');
       return;
     }
     
     setLoading(true);
-    setError('');
     
     try {
-      await authService.signIn(email, password);
-      router.refresh();
+      // First, check if user exists in our database
+      const userExists = await checkUserExists(email);
+      
+      if (!userExists) {
+        // User doesn't exist in our system - show error and STOP
+        setEmailError('אימייל לא נמצא');
+        setLoading(false);
+        return;
+      }
+      
+      // User exists in database - NOW try to authenticate
+      try {
+        await authService.signIn(email, password);
+        router.refresh();
+      } catch (authError: any) {
+        // Authentication failed - wrong password
+        setPasswordError('סיסמה שגויה');
+      }
     } catch (err: any) {
-      setError(err.message || 'שגיאה בהתחברות');
+      setError('שגיאה בהתחברות');
     } finally {
       setLoading(false);
     }
@@ -103,9 +156,9 @@ export default function LoginPage() {
         throw new Error('אימייל וסיסמה הם שדות חובה');
       }
 
-      const passwordError = validatePassword(password);
-      if (passwordError) {
-        throw new Error(passwordError);
+      const passwordValidation = validatePassword(password);
+      if (passwordValidation) {
+        throw new Error(passwordValidation);
       }
 
       // Validate quiz fields
@@ -149,78 +202,131 @@ export default function LoginPage() {
   };
 
   // Welcome/Choice Screen
-  if (mode === 'choice') {
-    return (
-      <div className={styles.container}>
-        <div className={styles.content}>
-          <div className={styles.greeting}>
-            <h1 className={styles.title}>ברוכה הבאה</h1>
-            <p className={styles.subtitle}>להרשמה או התחברות הכניסו פרטים</p>
-          </div>
+if (mode === 'choice') {
+  return (
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.greeting}>
+          <h1 className={styles.title}>ברוכה הבאה</h1>
+          <p className={styles.subtitle}>להרשמה או התחברות הכניסו פרטים</p>
+        </div>
 
-          <div className={styles.loginContent}>
-            <div className={styles.inputWrapper}>
-              <input
-                type="email"
-                placeholder="אימייל"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={styles.input}
-                dir="rtl"
-              />
-            </div>
-
-            <div className={styles.inputWrapper}>
-              <input
-                type="password"
-                placeholder="סיסמה"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={styles.input}
-                dir="rtl"
-              />
-              <button
-                className={styles.forgotPassword}
-                onClick={() => console.log('Forgot password')}
-                type="button"
-              >
-                שכחתי סיסמה
-              </button>
-            </div>
-
-            <div className={styles.buttonSection}>
-              <button
-                className={styles.primaryButton}
-                onClick={handleLogin}
-                disabled={loading}
-              >
-                {loading ? 'מתחבר...' : 'התחבר'}
-              </button>
-
-              <button
-                className={styles.secondaryButton}
-                onClick={() => setMode('signup')}
-              >
-                יצירת משתמש
-              </button>
-
-              <div className={styles.orSeparator}>
-                <span className={styles.orLine}></span>
-                <span className={styles.orText}>או</span>
-                <span className={styles.orLine}></span>
-              </div>
-
-              <GoogleLoginButton className={styles.googleButton} />
-            </div>
-
-            {error && (
-              <p className={styles.error}>{error}</p>
+        <div className={styles.loginContent}>
+          {/* Email Input */}
+          <div className={styles.inputWrapper}>
+            <input
+              type="email"
+              placeholder="אימייל"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailError('');
+              }}
+              className={`${styles.input} ${emailError ? styles.inputError : ''}`}
+              dir="rtl"
+            />
+            {emailError && (
+              <span className={styles.fieldError}>{emailError}</span>
             )}
           </div>
+
+          {/* Password Input */}
+          <div className={styles.inputWrapper}>
+            <input
+              type="password"
+              placeholder="סיסמה"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError('');
+              }}
+              className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
+              dir="rtl"
+            />
+            {passwordError && (
+              <span className={styles.fieldError}>{passwordError}</span>
+            )}
+
+            <button
+              className={styles.forgotPassword}
+              onClick={() => setShowForgotPassword(true)}
+              type="button"
+            >
+              שכחתי סיסמה
+            </button>
+          </div>
+
+          <div className={styles.buttonSection}>
+            <button
+              className={styles.primaryButton}
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? 'מתחבר...' : 'התחבר'}
+            </button>
+
+            <button
+              className={styles.secondaryButton}
+              onClick={async () => {
+                setEmailError('');
+                setPasswordError('');
+                setError('');
+
+                const emailValidation = validateEmail(email);
+                if (emailValidation) {
+                  setEmailError('אימייל לא תקין');
+                  setError(emailValidation);
+                  return;
+                }
+
+                const passwordValidation = validatePassword(password);
+                if (passwordValidation) {
+                  setPasswordError('סיסמה חלשה');
+                  setError(passwordValidation);
+                  return;
+                }
+
+                setLoading(true);
+                const userExists = await checkUserExists(email);
+                setLoading(false);
+
+                if (userExists) {
+                  setEmailError('אימייל קיים במערכת');
+                  setError('המשתמש כבר קיים במערכת. אנא התחבר');
+                  return;
+                }
+
+                setMode('signup');
+              }}
+              disabled={loading}
+            >
+              יצירת משתמש
+            </button>
+
+            <div className={styles.orSeparator}>
+              <span className={styles.orLine}></span>
+              <span className={styles.orText}>או</span>
+              <span className={styles.orLine}></span>
+            </div>
+
+            <GoogleLoginButton className={styles.googleButton} />
+          </div>
+
+          {error && <p className={styles.error}>{error}</p>}
         </div>
       </div>
-    );
-  }
+
+      {showForgotPassword && (
+        <ForgotPasswordModal
+          email={email}
+          onClose={() => setShowForgotPassword(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+
 
   // Signup Form
   return (
@@ -271,15 +377,14 @@ export default function LoginPage() {
             <div className={styles.interestsList}>
               {INTEREST_OPTIONS.map((i) => (
                 <label key={i} className={styles.interestItem}>
-                <input
-                  type="checkbox"
-                  checked={interests.includes(i)}
-                  onChange={() => toggleInterest(i)}
-                  className={styles.checkbox}
-                />
-                <span>{i}</span>
-              </label>
-              
+                  <input
+                    type="checkbox"
+                    checked={interests.includes(i)}
+                    onChange={() => toggleInterest(i)}
+                    className={styles.checkbox}
+                  />
+                  <span>{i}</span>
+                </label>
               ))}
             </div>
           </div>
