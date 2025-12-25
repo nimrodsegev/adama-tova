@@ -1,0 +1,231 @@
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 24.5625rem; /* 393px */
+    min-height: 100vh;
+    margin: 0 auto;
+    background: #AB4016;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3.25rem; /* 52px */
+    width: 100%;
+    max-width: 19.875rem; /* 318px */
+  }
+  
+  .greeting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem; /* 8px */
+    width: 100%;
+    text-align: center;
+  }
+  
+  .title {
+    font-family: 'Arfilit', sans-serif;
+    font-size: 1.5rem; /* 24px */
+    font-weight: 400;
+    line-height: 1.8125rem; /* 29px */
+    color: #EFEFEF;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    direction: rtl;
+  }
+  
+  .subtitle {
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.25rem; /* 20px */
+    color: #FFFFFF;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    direction: rtl;
+  }
+  
+  .loginContent {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem; /* 12px */
+    width: 19.875rem; /* 315px */
+  }
+  
+  .inputWrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  .input {
+    width: 100%;
+    height: 3.75rem; /* 60px */
+    padding: 0.5rem 2rem; /* 8px 32px */
+    background: #AD4E34;
+    border: 0.5px solid #FFFFFF;
+    border-radius: 1.875rem; /* 30px */
+    color: #FFFFFF;
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25rem; /* 20px */
+    outline: none;
+    direction: rtl;
+  }
+  
+  .input::placeholder {
+    visibility: hidden;
+  }
+  
+  .inputLabel {
+    position: absolute;
+    right: 10.5rem; /* Positioned on top border */
+    top: -0.5625rem; /* -9px */
+    padding: 0.0625rem 0.3125rem; /* Small padding */
+    background: #AD4E34; /* Matches page background */
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25rem; /* 20px */
+    font-weight: 400;
+    color: rgba(255, 245, 245, 0.7);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* Error state for inputs */
+  .inputError {
+    border: 2px solid #FF0000 !important;
+    box-shadow: 0px 0px 0.03125rem rgba(249, 249, 249, 0.5);
+  }
+  
+  /* Field-specific error text - positioned on TOP border */
+  .fieldError {
+    position: absolute;
+    right: 6.5rem;
+    top: -0.5625rem;
+    padding: 0.0625rem 0.3125rem;
+    background: #AB4016;
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    color: #FF0000;
+    text-shadow: 0px 0px 0.03125rem rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+    z-index: 3;
+  }
+  
+  .primaryButton {
+    width: 100%;
+    height: 2.9375rem; /* 47px */
+    padding: 0.3125rem 4.625rem; /* 5px 74px */
+    background: #EFEFEF;
+    border-radius: 1.5625rem; /* 25px */
+    border: none;
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 1rem; /* 16px */
+    line-height: 1.1875rem; /* 19px */
+    color: #1A1A2E;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 0.5rem;
+  }
+  
+  .primaryButton:hover {
+    opacity: 0.9;
+  }
+  
+  .primaryButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .error {
+    color: #ff6b6b;
+    text-align: center;
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  }
+  
+  /* Responsive scaling for larger screens */
+  @media (min-width: 48rem) { /* 768px */
+    .container {
+      max-width: 100%;
+    }
+    
+    .content {
+      max-width: 28rem;
+      gap: 4rem;
+    }
+    
+    .title {
+      font-size: 2rem;
+      line-height: 2.25rem;
+    }
+    
+    .subtitle {
+      font-size: 1.5rem;
+      line-height: 1.5rem;
+    }
+    
+    .loginContent {
+      width: 28rem;
+    }
+    
+    .input {
+      height: 4.5rem;
+      font-size: 1.125rem;
+      padding: 0.625rem 2.5rem;
+    }
+    
+    .inputLabel {
+      font-size: 1.125rem;
+    }
+    
+    .primaryButton {
+      height: 3.5rem;
+      font-size: 1.25rem;
+    }
+  }
+  
+  @media (min-width: 64rem) { /* 1024px */
+    .content {
+      max-width: 32rem;
+    }
+    
+    .loginContent {
+      width: 32rem;
+    }
+    
+    .title {
+      font-size: 2.25rem;
+      line-height: 2.5rem;
+    }
+    
+    .subtitle {
+      font-size: 1.625rem;
+      line-height: 1.625rem;
+    }
+    
+    .input {
+      height: 5rem;
+      font-size: 1.25rem;
+    }
+    
+    .primaryButton {
+      height: 4rem;
+      font-size: 1.375rem;
+    }
+  }

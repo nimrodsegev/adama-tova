@@ -7,6 +7,20 @@
 
 import { createClient } from '@/lib/supabase/client';
 
+/**
+ * Maps Hebrew circle names to English database enum values
+ */
+const CIRCLE_MAPPING: Record<string, string> = {
+  'שורדי ושורדות המסיבות': 'Nova Survivor',
+  'נפגעי טראומה 7.10 ומלחמת חרבות ברזל': 'October 7 victim',
+  'הורים שכולים': 'Shkulim parents',
+  'אחים.ות שכולים': 'Shkulim Siblings',
+  'משפחות וקרובים של פצועים טראומה בגופם ובנפשם': 'Family of october 7 victim',
+  'כוחות הצלה וחילוץ': 'Rescue forces',
+  'תושבי העוטף ומפונים': 'Residence of Otef Aza',
+  'מעגל שני ושלישי של משפחות השכול': 'Second or third',
+};
+
 export const userService = {
   // Save quiz answers and create user profile
   async completeProfile(
@@ -22,17 +36,23 @@ export const userService = {
   ) {
     const supabase = createClient();
     
+    // Map Hebrew circle to English enum value
+    const circleEnglish = profileData.circle 
+      ? CIRCLE_MAPPING[profileData.circle] || null 
+      : null;
+    
     const { data, error } = await supabase
       .from('users')
       .upsert({
         id: userId,
-        email: userEmail,           // ✅ Add email
-        role: 'participant',        // ✅ Set role to participant
+        email: userEmail,
+        role: 'participant',
         full_name: profileData.full_name,
         phone: profileData.phone,
-        notifications_enabled: true, // Default to true
+        circle: circleEnglish, // ✅ Store English value in circle column
+        notifications_enabled: true,
         quiz: {
-          circle: profileData.circle || null,
+          circle: profileData.circle || null, // ✅ Keep Hebrew in quiz JSON
           interests: profileData.interests || [],
           free_text: profileData.free_text || null,
           completed_at: new Date().toISOString(),
@@ -58,16 +78,16 @@ export const userService = {
   },
 
   // Get full user profile from users table
-async getFullProfile(userId: string) {
-  const supabase = createClient();
-  
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  
-  if (error) return null;
-  return data;
-},
+  async getFullProfile(userId: string) {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error) return null;
+    return data;
+  },
 };
