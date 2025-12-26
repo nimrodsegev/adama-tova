@@ -17,6 +17,7 @@ interface UserProfile {
   full_name: string;
   phone: string;
   role: 'participant' | 'admin';
+  is_approved: boolean;
   notifications_enabled: boolean;
   quiz: {
     circle?: string;
@@ -37,7 +38,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const NO_REDIRECT_ROUTES = ['/complete-profile', '/reset-password'];
-const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password'];
+const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password', '/pending-approval'];
 
 // 🔑 Detect if user is in password recovery mode
 function isPasswordRecoverySession(user: User | null): boolean {
@@ -104,6 +105,17 @@ export function UserProvider({
             const completed = profile?.quiz?.completed_at != null;
             setHasCompletedQuiz(completed);
             
+            // 🔥 Check if user is approved (participants only)
+            if (!profile.is_approved && profile.role === 'participant') {
+              if (pathname !== '/pending-approval' && pathname !== '/login' && pathname !== '/reset-password') {
+                router.replace('/pending-approval');
+                setLoading(false);
+                return;
+              }
+              setLoading(false);
+              return;
+            }
+            
             if (pathname === '/reset-password') {
               setLoading(false);
               return;
@@ -160,6 +172,32 @@ export function UserProvider({
     await authService.signOut();
     router.replace('/login');
   };
+
+  // 🔥 NEW: Block rendering if user is unapproved - prevents flash
+  if (userProfile && !userProfile.is_approved && userProfile.role === 'participant') {
+    const allowedPaths = ['/pending-approval', '/login', '/reset-password'];
+    if (!allowedPaths.includes(pathname)) {
+      if (!loading) {
+        router.replace('/pending-approval');
+      }
+      return (
+        <UserContext.Provider value={{ user, userProfile, loading: true, hasCompletedQuiz, signOut }}>
+          <div style={{ 
+            minHeight: '100vh', 
+            background: '#AB4016',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#EFEFEF',
+            fontFamily: 'Ezer Shemesh TRIAL ONLY, sans-serif',
+            fontSize: '1.25rem'
+          }}>
+            טוען...
+          </div>
+        </UserContext.Provider>
+      );
+    }
+  }
 
   return (
     <UserContext.Provider value={{ user, userProfile, loading, hasCompletedQuiz, signOut }}>
