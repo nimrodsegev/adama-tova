@@ -706,5 +706,34 @@ export const apiUser = {
         .delete()
         .eq('id', userId)
     );
+  },
+  /**
+   * 🏷️ UPDATE INTERESTS
+   * Updates only the 'interests' array inside the 'quiz' JSON column.
+   */
+  async updateUserInterests(userId, newInterests) {
+    // 1. Fetch current profile to get existing quiz data (to preserve 'circle', etc.)
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('quiz')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError) return [null, fetchError.message];
+
+    // 2. Merge new interests with existing quiz data
+    const currentQuiz = user.quiz || {};
+    const updatedQuiz = {
+      ...currentQuiz,
+      interests: newInterests // Overwrite interests
+    };
+
+    // 3. Save back to DB
+    return safeRequest(
+      supabase
+        .from('users')
+        .update({ quiz: updatedQuiz })
+        .eq('id', userId)
+    );
   }
 };
