@@ -1,30 +1,98 @@
-/* Arfilit */
+/* Ezer Shemesh TRIAL ONLY - UltraLight 200 */
 @font-face {
-    font-family: 'Arfilit';
-    src: url('/fonts/Arfilit-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-  @font-face {
-    font-family: 'Arfilit';
-    src: url('/fonts/Arfilit-Bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-  }
-  
-  /* Ezer Shemesh TRIAL ONLY */
-  @font-face {
-    font-family: 'Ezer Shemesh TRIAL ONLY';
-    src: url('/fonts/EzerShemeshTRIALONLY-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-  @font-face {
-    font-family: 'Ezer Shemesh TRIAL ONLY';
-    src: url('/fonts/EzerShemeshTRIALONLY-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-  }
-  
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-UltraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Ezer Shemesh TRIAL ONLY - Light 300 */
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Ezer Shemesh TRIAL ONLY - Regular 400 */
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Ezer Shemesh TRIAL ONLY - Bold 700 */
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Ezer Shemesh TRIAL ONLY - Black 900 */
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arfilit - ExtraLight 200 */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arfilit - Light 300 */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arfilit - Regular 400 */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arfilit - SemiBold 600 */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arfilit - Bold 700 */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Arfilit - Black 900 */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}

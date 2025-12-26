@@ -3,6 +3,7 @@ import { useState } from "react";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import Link from "next/link";
 import { apiNotifications } from "@/app/services/db_api";
+import styles from "./NotificationSection.styles";
 
 type Notification = {
   id: number;
@@ -10,29 +11,33 @@ type Notification = {
   type: "info" | "warning" | "success" | "error";
   timestamp: Date;
   isRead: boolean;
-  category: string;
+  title: string;
 };
 
 type NotificationSectionProps = {
   notifications: Notification[];
   maxDisplay?: number;
-  onRefresh?: () => void; // Callback to refresh data from parent
+  onRefresh?: () => void;
 };
 
 export default function NotificationSection({
   notifications: initialNotifications,
-  maxDisplay = 3,
+  maxDisplay = 5,
   onRefresh,
 }: NotificationSectionProps) {
   const [notifications, setNotifications] = useState(initialNotifications);
 
-  // Show only unread notifications on home page
+  // Show only unread notifications
   const unreadNotifications = notifications.filter((n) => !n.isRead);
-  // Limit to maxDisplay
   const displayNotifications = unreadNotifications.slice(0, maxDisplay);
 
   if (displayNotifications.length === 0) {
-    return null;
+    return (
+      <section style={styles.section}>
+        <h3 style={styles.sectionTitle}>הודעות ועדכונים</h3>
+        <p style={styles.emptyText}>אין הודעות חדשות</p>
+      </section>
+    );
   }
 
   const handleMarkAsRead = async (id: number) => {
@@ -42,10 +47,7 @@ export default function NotificationSection({
         console.error("Error marking as read:", error);
         alert("שגיאה בעדכון ההודעה");
       } else {
-        // ✅ Remove the notification from local state (it will disappear)
         setNotifications((prev) => prev.filter((n) => n.id !== id));
-
-        // Optionally refresh parent data
         if (onRefresh) {
           onRefresh();
         }
@@ -54,11 +56,6 @@ export default function NotificationSection({
       console.error("Error:", error);
       alert("שגיאה בעדכון ההודעה");
     }
-  };
-
-  const handleMarkAsUnread = async (id: number) => {
-    // Not needed on home page since we only show unread
-    console.log("Mark as unread not available on home page");
   };
 
   const handleDelete = async (id: number) => {
@@ -70,10 +67,7 @@ export default function NotificationSection({
         console.error("Error deleting notification:", error);
         alert("שגיאה במחיקת ההודעה");
       } else {
-        // Remove from local state
         setNotifications((prev) => prev.filter((n) => n.id !== id));
-
-        // Optionally refresh parent data
         if (onRefresh) {
           onRefresh();
         }
@@ -85,59 +79,39 @@ export default function NotificationSection({
   };
 
   return (
-    <section
-      style={{ direction: "rtl", marginTop: "24px", marginBottom: "24px" }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "12px",
-        }}
-      >
-        <h3 style={{ textAlign: "right", fontSize: "20px", margin: 0 }}>
-          הודעות ועדכונים
-        </h3>
+    <section style={styles.section}>
+      {/* Section Header */}
+      <div style={styles.headerContainer}>
+        <h3 style={styles.sectionTitle}>הודעות ועדכונים</h3>
         {unreadNotifications.length > maxDisplay && (
           <Link
             href="/UserScreens/NotificationsPage"
-            style={{
-              fontSize: "14px",
-              color: "#0070f3",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
+            style={styles.viewAllLink}
           >
             הצג הכל ({unreadNotifications.length})
           </Link>
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+
+      {/* Notification Cards */}
+      <div style={styles.notificationsList}>
         {displayNotifications.map((notification) => (
           <NotificationCard
             key={notification.id}
             notification={notification}
             onMarkAsRead={handleMarkAsRead}
-            onMarkAsUnread={handleMarkAsUnread}
             onDelete={handleDelete}
           />
         ))}
       </div>
+
+      {/* View All Link */}
       {displayNotifications.length > 0 && (
         <Link
           href="/UserScreens/NotificationsPage"
-          style={{
-            display: "block",
-            textAlign: "center",
-            marginTop: "12px",
-            color: "#0070f3",
-            textDecoration: "none",
-            fontSize: "14px",
-            fontWeight: "bold",
-          }}
+          style={styles.viewAllButton}
         >
-          עבור לכל ההודעות →
+          עבור לכל ההודעות
         </Link>
       )}
     </section>
