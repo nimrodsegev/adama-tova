@@ -88,7 +88,7 @@ export default function NotificationSection({
             href="/UserScreens/NotificationsPage"
             style={styles.viewAllLink}
           >
-            הצג הכל ({unreadNotifications.length})
+            הצג הכל
           </Link>
         )}
       </div>
@@ -106,14 +106,6 @@ export default function NotificationSection({
       </div>
 
       {/* View All Link */}
-      {displayNotifications.length > 0 && (
-        <Link
-          href="/UserScreens/NotificationsPage"
-          style={styles.viewAllButton}
-        >
-          עבור לכל ההודעות
-        </Link>
-      )}
     </section>
   );
 }

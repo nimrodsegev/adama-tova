@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import {
@@ -7,10 +6,10 @@ import {
   apiRegistrations,
   apiNotifications,
 } from "@/app/services/db_api";
-import HomeHeader from "@/lib/components/Home/HomeHeader";
-import NotificationSection from "@/lib/components/Home/NotificationSection";
-import MeetingSection from "@/lib/components/Home/MeetingSection";
-import PossibleMeetingsSection from "@/lib/components/Home/PossibleMeetingsSection";
+import NotificationCard from "@/lib/components/Notifications/NotificationCard";
+import UserActivityCard from "@/lib/components/Home/UserActivityCard";
+import styles from "./HomePage.styles";
+import Link from "next/link";
 
 export default function HomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
@@ -29,7 +28,6 @@ export default function HomePage() {
     setLoading(true);
 
     try {
-      // 1. Get user's registration IDs
       const [registrationIds = [], regError] =
         await apiRegistrations.getUserRegistrationIds(user!.id);
 
@@ -37,40 +35,35 @@ export default function HomePage() {
         console.error("Error fetching registrations:", regError);
       }
 
-      // 2. Get all activities
       const [activities, actError] = await apiActivities.getAll();
       if (actError) {
         console.error("Error fetching activities:", actError);
       }
 
-      // 3. Get user notifications - ONLY UNREAD (onlyUnread = true)
       const [notificationsData, notifError] = await apiNotifications.getList(
         user!.id,
         20,
-        true // ✅ רק הודעות שלא נקראו
+        true
       );
       if (notifError) {
         console.error("Error fetching notifications:", notifError);
       } else if (notificationsData) {
-        // Format notifications to match NotificationCard structure
         const formattedNotifications = notificationsData.map((notif: any) => ({
           id: notif.id,
           message: notif.message,
           type: notif.type || "info",
           timestamp: new Date(notif.created_at),
           isRead: notif.is_read,
-          category: notif.category || "כללי",
+          title: notif.title || "כללי",
         }));
         setNotifications(formattedNotifications);
       }
 
-      // 4. Filter activities user is registered to
       if (activities && registrationIds) {
         const registered = activities.filter((activity: any) =>
           registrationIds.includes(activity.id)
         );
 
-        // 5. Get activities user is NOT registered to (for suggestions)
         const notRegistered = activities.filter(
           (activity: any) => !registrationIds.includes(activity.id)
         );
@@ -85,124 +78,117 @@ export default function HomePage() {
     }
   };
 
-  // Format activities for MeetingSection component
-  const formatActivitiesForDisplay = (activities: any[]) => {
-    return activities.map((activity) => ({
-      id: activity.id,
-      title: activity.title,
-      time: `${activity.start_time.slice(0, 5)} - ${activity.end_time.slice(
-        0,
-        5
-      )}`,
-      location: activity.location,
-      description: activity.description,
-    }));
-  };
-
   if (userLoading || loading) {
     return (
-      <main
-        style={{
-          padding: "20px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <p>טוען...</p>
-      </main>
+      <div style={styles.container}>
+        <p style={styles.loadingText}>טוען...</p>
+      </div>
     );
   }
 
   if (!user || !userProfile) {
     return (
-      <main
-        style={{
-          padding: "20px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <p>עליך להתחבר כדי לראות את הדף</p>
-      </main>
+      <div style={styles.container}>
+        <p style={styles.loadingText}>עליך להתחבר כדי לראות את הדף</p>
+      </div>
     );
   }
 
-  const upcomingMeetings = formatActivitiesForDisplay(registeredActivities);
-  const possibleMeetings = formatActivitiesForDisplay(
-    allActivities.slice(0, 4)
-  ); // Show first 4 suggestions
+  const possibleActivities = allActivities.slice(0, 4);
 
   return (
-    <main
-      style={{
-        padding: "20px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        direction: "rtl",
-      }}
-    >
-      <HomeHeader userName={userProfile.full_name} />
+    <div style={styles.container}>
+      {/* Background Decorative Vectors */}
+      <div style={styles.vectorBackground} />
 
-      {/* Notifications Section */}
-      {notifications.length > 0 ? (
-        <NotificationSection
-          notifications={notifications}
-          maxDisplay={3}
-          onRefresh={fetchData} // ✅ רענון הנתונים כשהודעה מסומנת כנקראת
-        />
-      ) : (
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#f9fafb",
-            borderRadius: "8px",
-            textAlign: "center",
-            marginBottom: "20px",
-            color: "#666",
-          }}
-        >
-          <p>אין הודעות חדשות</p>
-        </div>
-      )}
+      {/* Header */}
+      <h1 style={styles.headerText}>
+        היי {userProfile?.full_name?.split(" ")[0] || ""},
+      </h1>
 
-      {/* Registered Activities Section */}
-      {upcomingMeetings.length > 0 ? (
-        <MeetingSection meetings={upcomingMeetings} />
-      ) : (
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#f9fafb",
-            borderRadius: "8px",
-            textAlign: "center",
-            marginBottom: "20px",
-            color: "#666",
-          }}
-        >
-          <h3 style={{ marginBottom: "8px" }}>אין פעילויות רשומות</h3>
-          <p>טרם נרשמת לאף פעילות. בדוק את הפעילויות המוצעות למטה!</p>
-        </div>
-      )}
+      <div style={styles.mainContentFrame}>
+        {/* Notifications Section */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>הודעות ועדכונים</h2>
+          {notifications.length > 0 ? (
+            <div style={styles.notificationsList}>
+              {notifications.slice(0, 3).map((notif) => (
+                <NotificationCard key={notif.id} notification={notif} />
+              ))}
+            </div>
+          ) : (
+            <p style={styles.emptyText}>אין הודעות חדשות</p>
+          )}
+          {notifications.length > 0 && (
+            <div style={styles.ctaRow}>
+              <Link
+                href="/UserScreens/NotificationsPage"
+                style={styles.buttonS}
+              >
+                <span style={styles.buttonText}>הכל</span>
+              </Link>
+            </div>
+          )}
+        </section>
 
-      {/* Suggested Activities Section */}
-      {possibleMeetings.length > 0 ? (
-        <PossibleMeetingsSection meetings={possibleMeetings} />
-      ) : (
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#f9fafb",
-            borderRadius: "8px",
-            textAlign: "center",
-            marginBottom: "20px",
-            color: "#666",
-          }}
-        >
-          <p>אין פעילויות זמינות כרגע</p>
-        </div>
-      )}
-    </main>
+        {/* Registered Activities Section */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>המפגשים הבאים שלך</h2>
+          {registeredActivities.length > 0 ? (
+            <div style={styles.horizontalScroll}>
+              {registeredActivities.map((activity) => (
+                <div key={activity.id} style={styles.glassCard}>
+                  <UserActivityCard
+                    id={activity.id}
+                    title={activity.title}
+                    date={activity.date}
+                    start_time={activity.start_time}
+                    location={activity.location}
+                    description={activity.description}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={styles.emptyText}>אין פעילויות רשומות</p>
+          )}
+        </section>
+
+        {/* Suggested Activities Section */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>פעילויות אפשריות</h2>
+          {possibleActivities.length > 0 ? (
+            <>
+              <div style={styles.horizontalScroll}>
+                {possibleActivities.map((activity) => (
+                  <div key={activity.id} style={styles.glassCard}>
+                    <UserActivityCard
+                      id={activity.id}
+                      title={activity.title}
+                      date={activity.date}
+                      start_time={activity.start_time}
+                      location={activity.location}
+                      description={activity.description}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <div style={styles.ctaRow}>
+                <Link
+                  href="/UserScreens/WeeklyBoardPage"
+                  style={styles.buttonS}
+                >
+                  <span style={styles.buttonText}>הכל</span>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <p style={styles.emptyText}>אין פעילויות זמינות כרגע</p>
+          )}
+        </section>
+      </div>
+    </div>
   );
 }
