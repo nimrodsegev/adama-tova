@@ -100,76 +100,17 @@ const styles: { [key: string]: CSSProperties } = {
     flexShrink: 0,
   },
 
-  // Notifications List
+  // Notifications List - Now just container for NotificationCard components
   notificationsList: {
     display: "flex",
     flexDirection: "column",
     gap: "0.75rem", // 12px → rem
-    maxHeight: "11rem", // ADDED: Maximum height (400px)
-    overflowY: "auto", // ADDED: Enable vertical scroll
-    paddingRight: "0.25rem", // ADDED: Space for scrollbar
-    scrollbarWidth: "thin", // ADDED: Thin scrollbar (Firefox)
+    maxHeight: "12rem", // Maximum height (400px)
+    overflowY: "auto", // Enable vertical scroll
+    paddingRight: "0.25rem", // Space for scrollbar
+    scrollbarWidth: "thin", // Thin scrollbar (Firefox)
     scrollbarColor: "rgba(104, 31, 2, 0.3) transparent",
     marginBottom: "0.7rem",
-  },
-
-  // Notification Glass Card
-  notificationGlassCard: {
-    width: "100%",
-    padding: "0.75rem 1rem", // 12px 16px → rem
-    background: "rgba(255, 255, 255, 0.7)",
-    backdropFilter: "blur(0.4rem)",
-    WebkitBackdropFilter: "blur(0.4rem)",
-    borderRadius: "1.25rem", // 20px → rem
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-  },
-
-  // Notification Header
-  notifHeader: {
-    display: "flex",
-    flexDirection: "row-reverse",
-    gap: "0.25rem", // 4px → rem
-    alignItems: "center",
-  },
-
-  // Notification Title - Ezer Shemesh Regular 400
-  notifTitle: {
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
-    fontSize: "1.25rem", // 20px → rem
-    fontWeight: "400",
-    lineHeight: "1.25rem",
-    color: "#681F02",
-  },
-
-  // Notification Pipe
-  notifPipe: {
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
-    fontSize: "1.25rem",
-    fontWeight: "400",
-    color: "#681F02",
-  },
-
-  // Notification Time - Ezer Shemesh Regular 400
-  notifTime: {
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
-    fontSize: "0.875rem", // 14px → rem
-    fontWeight: "400",
-    lineHeight: "1.25rem",
-    color: "#681F02",
-  },
-
-  // Notification Message - Ezer Shemesh Light 300
-  notifMessage: {
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
-    fontSize: "1rem", // 16px → rem
-    fontWeight: "300",
-    lineHeight: "1.0625rem", // 17px → rem
-    color: "#681F02",
-    textAlign: "right",
-    marginTop: "0.5rem", // 8px → rem
-    margin: 0,
   },
 
   // CTA Row (Button Container)
@@ -177,7 +118,7 @@ const styles: { [key: string]: CSSProperties } = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: "-0.5rem", // 12px → rem
+    marginTop: "0rem", // Buttons closer to content
   },
 
   // Medium Button - Ezer Shemesh Regular 400

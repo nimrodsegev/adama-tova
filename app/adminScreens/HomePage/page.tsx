@@ -5,7 +5,10 @@ import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiNotifications } from "@/app/services/db_api";
 import Link from "next/link";
 import AdminActivityCard from "@/lib/components/Home/AdminActivityCard";
+import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import styles from "./AdminHomePage.styles";
+import NotificationEmptyState from "@/lib/components/Notifications/NotificationEmptyState";
+import Image from "next/image";
 
 export default function AdminHomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
@@ -28,11 +31,22 @@ export default function AdminHomePage() {
 
       const [notificationsData, notifError] = await apiNotifications.getList(
         user!.id,
-        3,
+        5,
         false
       );
       if (!notifError && notificationsData) {
-        setNotifications(notificationsData);
+        // Transform to match NotificationCard props
+        const transformedNotifications = notificationsData.map(
+          (notif: any) => ({
+            id: notif.id,
+            message: notif.message,
+            type: "info" as const,
+            timestamp: new Date(notif.created_at),
+            isRead: notif.is_read || false,
+            title: notif.title || "כללי",
+          })
+        );
+        setNotifications(transformedNotifications);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -84,7 +98,7 @@ export default function AdminHomePage() {
           {/* Activity Buttons CTA */}
           <div style={styles.ctaRow}>
             <Link href="/adminScreens/AddActivityPage" style={styles.buttonM}>
-              ➕ הוספת פעילות
+              + הוספת פעילות
             </Link>
 
             <Link href="/adminScreens/CalendarPage" style={styles.buttonS}>
@@ -93,44 +107,56 @@ export default function AdminHomePage() {
           </div>
         </section>
 
-        {/* Section 2: Recent Notifications */}
+        {/* Section 2: Recent Notifications - USING NotificationCard Component */}
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>הודעות אחרונות</h2>
-          <div style={styles.notificationsList}>
-            {notifications.map((notif) => (
-              <div key={notif.id} style={styles.notificationGlassCard}>
-                <div style={styles.notifHeader}>
-                  <span style={styles.notifTime}>
-                    {new Date(notif.created_at).toLocaleTimeString("he-IL", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                  <span style={styles.notifPipe}>|</span>
-                  <span style={styles.notifTitle}>
-                    {notif.category || "כללי"}
-                  </span>
-                </div>
-                <p style={styles.notifMessage}>{notif.message}</p>
-              </div>
-            ))}
-          </div>
 
-          {/* Notification Buttons CTA */}
-          <div style={styles.ctaRow}>
-            <Link href="/adminScreens/addNotification" style={styles.buttonM}>
-              ➕ הודעה חדשה
-            </Link>
-            <Link href="/adminScreens/NotificationPage" style={styles.buttonS}>
-              <span style={styles.buttonText}>הכל</span>
-            </Link>
-          </div>
+          {notifications.length > 0 ? (
+            <>
+              {/* Show notifications list */}
+              <div
+                style={styles.notificationsList}
+                className="notifications-scrollable"
+              >
+                {notifications.map((notif) => (
+                  <NotificationCard key={notif.id} notification={notif} />
+                ))}
+              </div>
+
+              {/* Notification Buttons CTA */}
+              <div style={styles.ctaRow}>
+                <Link
+                  href="/adminScreens/addNotification"
+                  style={styles.buttonM}
+                >
+                  + הודעה חדשה
+                </Link>
+                <Link
+                  href="/adminScreens/NotificationPage"
+                  style={styles.buttonS}
+                >
+                  <span style={styles.buttonText}>הכל</span>
+                </Link>
+              </div>
+            </>
+          ) : (
+            /* Show empty state when no notifications */
+            <NotificationEmptyState />
+          )}
         </section>
       </div>
 
       {/* Navigation Bar at bottom */}
       <nav style={styles.navBar}>
-        <div style={styles.navItem}>🏠</div>
+        <div style={styles.navItem}>
+          <Image
+            src="/icons/figure_icon.svg" // or .png
+            alt="No figure icon"
+            width={71} // Match Figma dimensions
+            height={72} // Match Figma dimensions
+            style={styles.icon}
+          />
+        </div>
         <div style={styles.navItem}>📅</div>
         <div style={styles.navItem}>🔔</div>
         <div style={styles.navItem}>👤</div>
