@@ -62,37 +62,35 @@ export default function QuizModal({ userId, userEmail }: QuizModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (!fullName || !phone) {
-      setError('שם מלא ומספר טלפון הם שדות חובה');
-      return;
-    }
-
-    if (!isHebrewName(fullName)) {
-      setError('השם חייב להכיל אותיות עבריות בלבד');
-      return;
-    }
-
-    if (!isValidPhone(phone)) {
-      setError('מספר הטלפון חייב להכיל 10 ספרות');
-      return;
-    }
-
     setLoading(true);
-
+  
     try {
+      if (!fullName || !phone) {
+        throw new Error('שם מלא ומספר טלפון הם שדות חובה');
+      }
+  
+      if (!isHebrewName(fullName)) {
+        throw new Error('השם חייב להכיל אותיות עבריות בלבד');
+      }
+  
+      if (!isValidPhone(phone)) {
+        throw new Error('מספר הטלפון חייב להכיל 10 ספרות');
+      }
+  
+      const cleanPhone = phone.replace(/[-\s]/g, '');
+  
       await userService.completeProfile(userId, userEmail, {
         full_name: fullName.trim(),
-        phone: phone.replace(/[-\s]/g, ''),
+        phone: cleanPhone,
         circle: circle || undefined,
         interests: interests.length ? interests : undefined,
         free_text: freeText || undefined,
       });
-
-      router.refresh();
-      router.replace('/UserScreens');
+  
+      // 🔥 NEW: Participants always go to pending approval
+      router.replace('/pending-approval');
     } catch (err: any) {
-      setError(err.message || 'שגיאה בשמירת הפרטים');
+      setError(err.message || 'שגיאה כללית');
     } finally {
       setLoading(false);
     }

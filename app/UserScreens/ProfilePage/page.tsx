@@ -1,168 +1,172 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/contexts/UserContext";
+import { apiUser } from "@/app/services/db_api";
 
-// You'll replace this with your actual fetch function later
-const fetchUserProfile = async () => {
-  // Placeholder - replace with your Supabase fetch function
-  return {
-    fullName: "נדב נבון",
-    phoneNumber: "050-1234567",
-    email: "user@example.com",
-  };
-};
+// 🏷️ The list of all possible interests in your system
+const AVAILABLE_INTERESTS = [
+  "מדיטציה", "יוגה",  "אומנות", 
+  "כתיבה", "מיינדפולנס", "יצירה",
+];
 
-type NotificationType = "email" | "sms" | "push";
-
-export default function ProfilePage() {
+export default function UserProfilePage() {
+  const { user, userProfile, loading } = useUser();
   const router = useRouter();
-  const [profile, setProfile] = useState({
-    fullName: "",
-    phoneNumber: "",
-    email: "",
-  });
-  const [notifications, setNotifications] = useState({
-    email: true,
-    sms: false,
-    push: true,
-  });
-  const [loading, setLoading] = useState(true);
 
+  // State
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  // Load interests from Profile Context on mount
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (userProfile?.quiz?.interests) {
+      setSelectedInterests(userProfile.quiz.interests);
+    }
+  }, [userProfile]);
 
-  const loadProfile = async () => {
-    try {
-      const data = await fetchUserProfile();
-      setProfile(data);
-    } catch (error) {
-      console.error("Error loading profile:", error);
-    } finally {
-      setLoading(false);
+  // Toggle Selection Logic
+  const toggleInterest = (interest: string) => {
+    if (selectedInterests.includes(interest)) {
+      setSelectedInterests(prev => prev.filter(i => i !== interest));
+    } else {
+      setSelectedInterests(prev => [...prev, interest]);
     }
   };
 
-  const handleNotificationChange = (type: NotificationType) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [type]: !prev[type],
-    }));
+  // Save to DB
+  const handleSave = async () => {
+    setSaving(true);
+    if (!user) return;
+
+    const [_, error] = await apiUser.updateUserInterests(user.id, selectedInterests);
+
+    if (error) {
+      alert("שגיאה בעדכון: " + error);
+    } else {
+      alert("הפרופיל עודכן בהצלחה! ✅");
+      setIsEditing(false);
+      window.location.reload(); // Refresh to update Context
+    }
+    setSaving(false);
   };
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    router.push("/logout");
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-xl text-gray-600">טוען...</div>
-      </div>
-    );
-  }
+  if (loading) return <div className="p-10 text-center">טוען פרופיל...</div>;
+  if (!userProfile) return <div className="p-10 text-center">לא נמצא משתמש</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6" dir="rtl">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">פרופיל אישי</h1>
+      <div className="max-w-2xl mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-800">הפרופיל שלי</h1>
+          <button onClick={() => router.back()} className="text-blue-600">← חזרה</button>
+        </div>
 
-        {/* Personal Details Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            פרטים אישיים
-          </h2>
-
+        {/* 👤 CARD 1: PERSONAL INFO (Read Only) */}
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <h2 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">פרטים אישיים</h2>
+          
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                שם מלא
-              </label>
-              <div className="text-lg text-gray-900">{profile.fullName}</div>
+              <label className="block text-sm text-gray-500">שם מלא: {userProfile.full_name} </label>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-500">אימייל: {userProfile.email}</label>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-500">טלפון: {userProfile.phone || "לא צוין"}</label>
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                מספר טלפון
-              </label>
-              <div className="text-lg text-gray-900">{profile.phoneNumber}</div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">
-                אימייל
-              </label>
-              <div className="text-lg text-gray-900">{profile.email}</div>
+              <label className="block text-sm text-gray-500">מעגל: (Circle)</label>
+              <div className="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold mt-1">
+                {userProfile.quiz?.circle || "כללי"}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Notification Settings Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            הגדרות התראות
-          </h2>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">התראות דוא&quot;ל</span>
-              <button
-                onClick={() => handleNotificationChange("email")}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.email ? "bg-blue-600" : "bg-gray-300"
-                }`}
+        {/* 🏷️ CARD 2: INTERESTS (Editable) */}
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="flex justify-between items-center mb-4 border-b pb-2">
+            <h2 className="text-xl font-bold text-gray-700">תחומי עניין: </h2>
+            {!isEditing && (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="text-blue-600 font-bold text-sm hover:underline"
               >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    notifications.email ? "translate-x-1" : "translate-x-6"
-                  }`}
-                />
+                ✏️ ערוך תחומי עניין
               </button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">התראות SMS</span>
-              <button
-                onClick={() => handleNotificationChange("sms")}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.sms ? "bg-blue-600" : "bg-gray-300"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    notifications.sms ? "translate-x-1" : "translate-x-6"
-                  }`}
-                />
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">התראות Push</span>
-              <button
-                onClick={() => handleNotificationChange("push")}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.push ? "bg-blue-600" : "bg-gray-300"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    notifications.push ? "translate-x-1" : "translate-x-6"
-                  }`}
-                />
-              </button>
-            </div>
+            )}
           </div>
+
+          {/* VIEW MODE */}
+          {!isEditing ? (
+            <div className="flex flex-wrap gap-2">
+              {selectedInterests.length > 0 ? (
+                selectedInterests.map((tag, idx) => (
+                  <span key={idx} className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full font-medium">
+                    {tag + " "}
+                  </span>
+                ))
+              ) : (
+                <p className="text-gray-400 italic">לא נבחרו תחומי עניין עדיין.</p>
+              )}
+            </div>
+          ) : (
+            /* EDIT MODE */
+            <div>
+              <p className="text-sm text-gray-500 mb-4">בחר את התחומים שמעניינים אותך כדי שנוכל להמליץ לך על פעילויות מתאימות:</p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                {AVAILABLE_INTERESTS.map((tag) => {
+                  const isSelected = selectedInterests.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => toggleInterest(tag)}
+                      className={`
+                        px-4 py-2 rounded-lg text-sm font-bold transition-all
+                        ${isSelected 
+                          ? "bg-blue-600 text-white shadow-md transform scale-105" 
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"}
+                      `}
+                    >
+                      {tag} {isSelected && "✓"}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-3 border-t pt-4">
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-sm transition-colors flex-1"
+                >
+                  {saving ? "שומר..." : "שמור שינויים"}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    // Reset selection to original
+                    if(userProfile?.quiz?.interests) setSelectedInterests(userProfile.quiz.interests);
+                  }}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-bold transition-colors"
+                >
+                  ביטול
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-        >
-          התנתק
-        </button>
       </div>
     </div>
   );
