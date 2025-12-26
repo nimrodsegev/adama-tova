@@ -50,6 +50,7 @@ export const userService = {
         full_name: profileData.full_name,
         phone: profileData.phone,
         circle: circleEnglish, // ✅ Store English value in circle column
+        is_approved: false,
         notifications_enabled: true,
         quiz: {
           circle: profileData.circle || null, // ✅ Keep Hebrew in quiz JSON

@@ -15,6 +15,8 @@ export default function ResetPasswordPage() {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  // NO useEffect - let the session exist for password update
+
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
       return 'הסיסמה חייבת להכיל לפחות 8 תווים';
@@ -94,9 +96,9 @@ export default function ResetPasswordPage() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.greeting}>
-          <h1 className={styles.title}>שינוי ססמא</h1>
+          <h1 className={styles.title}>שינוי סיסמה</h1>
           <p className={styles.subtitle}>
-            הכנס את הססמא החדשה על מנת לקבל שוב גישה למערכת.
+            הכנס את סיסמה החדשה על מנת לקבל שוב גישה למערכת.
           </p>
         </div>
 
@@ -114,7 +116,7 @@ export default function ResetPasswordPage() {
               className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
               dir="rtl"
             />
-            <span className={styles.inputLabel}>ססמא חדשה</span>
+            <span className={styles.inputLabel}>סיסמה חדשה</span>
             {passwordError && (
               <span className={styles.fieldError}>{passwordError}</span>
             )}
@@ -132,7 +134,7 @@ export default function ResetPasswordPage() {
               className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
               dir="rtl"
             />
-            <span className={styles.inputLabel}>הזן שוב ססמא חדשה</span>
+            <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
             {confirmPasswordError && (
               <span className={styles.fieldError}>{confirmPasswordError}</span>
             )}
@@ -145,7 +147,7 @@ export default function ResetPasswordPage() {
             disabled={loading}
             className={styles.primaryButton}
           >
-            {loading ? 'משנה...' : 'שינוי ססמא'}
+            {loading ? 'משנה...' : 'שינוי סיסמה'}
           </button>
         </form>
       </div>

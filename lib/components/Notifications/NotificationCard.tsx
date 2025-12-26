@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import styles from "./NotificationCard.styles";
 
 type Notification = {
   id: number;
@@ -7,14 +7,14 @@ type Notification = {
   type: "info" | "warning" | "success" | "error";
   timestamp: Date;
   isRead: boolean;
-  category: string;
+  title: string;
 };
 
 type NotificationCardProps = {
   notification: Notification;
-  onMarkAsRead: (id: number) => void;
-  onMarkAsUnread: (id: number) => void;
-  onDelete: (id: number) => void;
+  onMarkAsRead?: (id: number) => void;
+  onMarkAsUnread?: (id: number) => void;
+  onDelete?: (id: number) => void;
 };
 
 export default function NotificationCard({
@@ -23,202 +23,62 @@ export default function NotificationCard({
   onMarkAsUnread,
   onDelete,
 }: NotificationCardProps) {
-  const [showActions, setShowActions] = useState(false);
-
-  const getBackgroundColor = (type: string, isRead: boolean) => {
-    if (isRead) {
-      return "#f9f9f9";
-    }
-    switch (type) {
-      case "info":
-        return "#e3f2fd";
-      case "warning":
-        return "#fff3e0";
-      case "success":
-        return "#e8f5e9";
-      case "error":
-        return "#ffebee";
-      default:
-        return "#f5f5f5";
-    }
-  };
-
-  const getBorderColor = (type: string) => {
-    switch (type) {
-      case "info":
-        return "#2196f3";
-      case "warning":
-        return "#ff9800";
-      case "success":
-        return "#4caf50";
-      case "error":
-        return "#f44336";
-      default:
-        return "#ccc";
-    }
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "info":
-        return "ℹ️";
-      case "warning":
-        return "⚠️";
-      case "success":
-        return "✅";
-      case "error":
-        return "❌";
-      default:
-        return "📢";
-    }
-  };
-
-  const formatTimestamp = (date: Date) => {
+  const formatTimestamp = (date: Date): string => {
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
+    const notifDate = new Date(date);
 
-    if (minutes < 60) return `לפני ${minutes} דקות`;
-    if (hours < 24) return `לפני ${hours} שעות`;
-    if (days === 1) return "אתמול";
-    if (days < 7) return `לפני ${days} ימים`;
-    return date.toLocaleDateString("he-IL");
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const notifDay = new Date(
+      notifDate.getFullYear(),
+      notifDate.getMonth(),
+      notifDate.getDate()
+    );
+
+    if (notifDay.getTime() === today.getTime()) {
+      return notifDate.toLocaleTimeString("he-IL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    if (notifDay.getTime() === yesterday.getTime()) {
+      return "אתמול";
+    }
+
+    const day = notifDate.getDate().toString().padStart(2, "0");
+    const month = (notifDate.getMonth() + 1).toString().padStart(2, "0");
+    return `${day}.${month}`;
+  };
+
+  const handleMarkAsRead = () => {
+    if (onMarkAsRead) {
+      onMarkAsRead(notification.id);
+    }
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: getBackgroundColor(
-          notification.type,
-          notification.isRead
-        ),
-        border: `2px solid ${
-          notification.isRead ? "#ddd" : getBorderColor(notification.type)
-        }`,
-        borderRadius: "12px",
-        padding: "16px",
-        position: "relative",
-        transition: "all 0.3s",
-        opacity: notification.isRead ? 0.7 : 1,
-      }}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
-    >
-      <div style={{ display: "flex", alignItems: "start", gap: "12px" }}>
-        <span style={{ fontSize: "24px" }}>{getIcon(notification.type)}</span>
-
-        <div style={{ flex: 1 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "12px",
-                color: "#666",
-                backgroundColor: "#e0e0e0",
-                padding: "2px 8px",
-                borderRadius: "12px",
-              }}
-            >
-              {notification.category}
-            </span>
-            {!notification.isRead && (
-              <span
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  backgroundColor: "#0070f3",
-                  borderRadius: "50%",
-                }}
-              />
-            )}
-          </div>
-
-          <p
-            style={{
-              margin: "8px 0",
-              textAlign: "right",
-              fontSize: "16px",
-              fontWeight: notification.isRead ? "normal" : "bold",
-            }}
-          >
-            {notification.message}
-          </p>
-
-          <p
-            style={{
-              margin: 0,
-              fontSize: "12px",
-              color: "#666",
-              textAlign: "right",
-            }}
-          >
-            {formatTimestamp(notification.timestamp)}
-          </p>
-        </div>
+    <div style={styles.cardContainer}>
+      {/* Header: Title (category) and Time - BOLD if UNREAD */}
+      <div style={styles.header}>
+        <span style={notification.isRead ? styles.time : styles.timeBold}>
+          {formatTimestamp(notification.timestamp)}
+        </span>
+        <span style={styles.pipe}>|</span>
+        <span style={notification.isRead ? styles.title : styles.titleBold}>
+          {notification.title}
+        </span>
       </div>
 
-      {showActions && (
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            marginTop: "12px",
-            justifyContent: "flex-end",
-          }}
-        >
-          {!notification.isRead ? (
-            <button
-              onClick={() => onMarkAsRead(notification.id)}
-              style={{
-                padding: "6px 12px",
-                backgroundColor: "#28a745",
-                color: "#fff",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "12px",
-                cursor: "pointer",
-              }}
-            >
-              סמן כנקרא
-            </button>
-          ) : (
-            <button
-              onClick={() => onMarkAsUnread(notification.id)}
-              style={{
-                padding: "6px 12px",
-                backgroundColor: "#6c757d",
-                color: "#fff",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "12px",
-                cursor: "pointer",
-              }}
-            >
-              סמן כלא נקרא
-            </button>
-          )}
-          <button
-            onClick={() => onDelete(notification.id)}
-            style={{
-              padding: "6px 12px",
-              backgroundColor: "#dc3545",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              fontSize: "12px",
-              cursor: "pointer",
-            }}
-          >
-            מחק
-          </button>
-        </div>
+      {/* Message - Always same weight (Light 300) */}
+      <p style={styles.message}>{notification.message}</p>
+
+      {/* Mark as Read Button - Only show for UNREAD messages */}
+      {!notification.isRead && onMarkAsRead && (
+        <button onClick={handleMarkAsRead} style={styles.markAsReadButton}>
+          ✓
+        </button>
       )}
     </div>
   );

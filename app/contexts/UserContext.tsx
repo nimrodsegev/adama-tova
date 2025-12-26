@@ -1,9 +1,6 @@
 /**
  * USER CONTEXT
  * Manages user authentication state, quiz completion status, and full user profile.
- * Loads complete user data from users table including role, name, phone, quiz data.
- * For new Google users, redirects to complete profile page.
- * Redirects users based on role and quiz completion status.
  */
 
 'use client';
@@ -20,6 +17,7 @@ interface UserProfile {
   full_name: string;
   phone: string;
   role: 'participant' | 'admin';
+  is_approved: boolean;
   notifications_enabled: boolean;
   quiz: {
     circle?: string;
@@ -40,7 +38,12 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const NO_REDIRECT_ROUTES = ['/complete-profile', '/reset-password'];
-const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password'];
+const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password', '/pending-approval'];
+
+// 🔑 Detect if user is in password recovery mode
+function isPasswordRecoverySession(user: User | null): boolean {
+  return !!(user as any)?.recovery_sent_at;
+}
 
 export function UserProvider({
   children,
@@ -81,7 +84,17 @@ export function UserProvider({
   useEffect(() => {
     const loadProfile = async () => {
       setLoading(true);
-      
+
+      // 🔒 CRITICAL: Block everything except reset-password and login during recovery
+      if (isPasswordRecoverySession(user)) {
+        if (pathname !== '/reset-password' && pathname !== '/login') {
+          router.replace('/reset-password');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // 🔓 Normal authenticated flow
       if (user) {
         try {
           const profile = await userService.getFullProfile(user.id);
@@ -91,6 +104,17 @@ export function UserProvider({
             
             const completed = profile?.quiz?.completed_at != null;
             setHasCompletedQuiz(completed);
+            
+            // 🔥 Check if user is approved (participants only)
+            if (!profile.is_approved && profile.role === 'participant') {
+              if (pathname !== '/pending-approval' && pathname !== '/login' && pathname !== '/reset-password') {
+                router.replace('/pending-approval');
+                setLoading(false);
+                return;
+              }
+              setLoading(false);
+              return;
+            }
             
             if (pathname === '/reset-password') {
               setLoading(false);
@@ -148,6 +172,32 @@ export function UserProvider({
     await authService.signOut();
     router.replace('/login');
   };
+
+  // 🔥 NEW: Block rendering if user is unapproved - prevents flash
+  if (userProfile && !userProfile.is_approved && userProfile.role === 'participant') {
+    const allowedPaths = ['/pending-approval', '/login', '/reset-password'];
+    if (!allowedPaths.includes(pathname)) {
+      if (!loading) {
+        router.replace('/pending-approval');
+      }
+      return (
+        <UserContext.Provider value={{ user, userProfile, loading: true, hasCompletedQuiz, signOut }}>
+          <div style={{ 
+            minHeight: '100vh', 
+            background: '#AB4016',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#EFEFEF',
+            fontFamily: 'Ezer Shemesh TRIAL ONLY, sans-serif',
+            fontSize: '1.25rem'
+          }}>
+            טוען...
+          </div>
+        </UserContext.Provider>
+      );
+    }
+  }
 
   return (
     <UserContext.Provider value={{ user, userProfile, loading, hasCompletedQuiz, signOut }}>

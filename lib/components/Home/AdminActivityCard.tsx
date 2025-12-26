@@ -1,6 +1,6 @@
 "use client";
-
 import Link from "next/link";
+import styles from "./AdminActivityCard.styles";
 
 type AdminActivityCardProps = {
   id: string;
@@ -21,91 +21,60 @@ export default function AdminActivityCard({
 }: AdminActivityCardProps) {
   const formattedTime = start_time.slice(0, 5);
 
+  // Format date: "2024-12-23" → "יום שלישי 23.12"
+  const dateObj = new Date(date);
+  const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
+  const dayMonth = `${dateObj.getDate().toString().padStart(2, "0")}.${(
+    dateObj.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, "0")}`;
+
+  const progressPercentage =
+    max_participants > 0 ? (current_participants / max_participants) * 100 : 0;
+
   return (
     <Link
       href={`/UserScreens/ActivityDetailsPage?id=${id}`}
       style={styles.cardContainer}
     >
-      {/* Container לטקסט - מוצמד למעלה וימינה */}
-      <div style={styles.textWrapper}>
+      <div style={styles.frame224}>
+        {/* Title */}
         <h3 style={styles.titleText}>{title}</h3>
-        <p style={styles.bodyM}>שעה: {formattedTime}</p>
-        <p style={styles.bodyL}>
-          {current_participants}/{max_participants} רשומים
-        </p>
+
+        {/* Date and Time - TWO LINES */}
+        <div style={styles.frame266}>
+          <p style={styles.bodyM}>
+            {dayName} {dayMonth}
+            <br />
+            בשעה {formattedTime}
+          </p>
+        </div>
+
+        {/* Participants */}
+        <div style={styles.frame265}>
+          <p style={styles.bodyL}>
+            {current_participants}/{max_participants}
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div style={styles.progressBarContainer}>
+          <div style={styles.progressBarBackground} />
+          <div
+            style={{
+              ...styles.progressBarFill,
+              width: `${progressPercentage}%`,
+            }}
+          />
+        </div>
       </div>
 
-      {/* כפתור חץ - מוצמד לשמאל למטה */}
-      <div style={styles.circleButton}>
-        <span style={styles.arrowIcon}>←</span>
+      {/* Arrow Button - Bottom Left Corner */}
+      <div style={styles.arrowButton}>
+        <span style={styles.arrowIcon}>›</span>
+        {/* ↑ Right-Pointing Angle Quotation Mark (U+203A) - Opposite direction */}
       </div>
     </Link>
   );
 }
-
-const styles: { [key: string]: React.CSSProperties } = {
-  cardContainer: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start", // מצמיד תוכן למעלה
-    alignItems: "flex-end", // מצמיד תוכן לימין (בגלל ה-direction)
-    padding: "16px",
-    width: "200px",
-    height: "180px",
-    background: "none",
-    textDecoration: "none",
-    color: "#681F02",
-    direction: "rtl",
-    position: "relative",
-    cursor: "pointer",
-    flex: "none",
-  },
-  textWrapper: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end", // יישור טקסט לימין
-    gap: "4px", // רווח קטן בין השורות
-    width: "100%",
-  },
-  titleText: {
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
-    fontSize: "20px",
-    fontWeight: "600",
-    color: "#681F02",
-    margin: "0 0 8px 0", // רווח קטן מתחת לכותרת
-    textAlign: "right",
-    lineHeight: "1.2",
-  },
-  bodyM: {
-    fontSize: "16px",
-    fontWeight: "300",
-    color: "#681F02",
-    margin: 0,
-    textAlign: "right",
-  },
-  bodyL: {
-    fontSize: "16px",
-    fontWeight: "400",
-    color: "#681F02",
-    margin: 0,
-    textAlign: "right",
-  },
-  circleButton: {
-    width: "38px",
-    height: "38px",
-    background: "#F9F9F9",
-    borderRadius: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    left: "12px", // צמוד לשמאל
-    bottom: "12px", // צמוד למטה
-    boxShadow: "0px 2px 6px rgba(0,0,0,0.15)",
-  },
-  arrowIcon: {
-    color: "#681F02",
-    fontSize: "16px",
-    fontWeight: "bold",
-  },
-};

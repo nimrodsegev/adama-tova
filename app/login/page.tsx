@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import ForgotPasswordModal from '@/lib/components/ForgotPasswordModal';
 
 
+
 type Mode = 'choice' | 'signup';
 
 const CIRCLE_OPTIONS = [
@@ -124,7 +125,6 @@ export default function LoginPage() {
       const userExists = await checkUserExists(email);
       
       if (!userExists) {
-        // User doesn't exist in our system - show error and STOP
         setEmailError('אימייל לא נמצא');
         setLoading(false);
         return;
@@ -133,6 +133,24 @@ export default function LoginPage() {
       // User exists in database - NOW try to authenticate
       try {
         await authService.signIn(email, password);
+        
+        // 🔥 NEW: Check if user is approved
+        const user = await authService.getCurrentUser();
+        if (user) {
+          const supabase = createClient();
+          const { data: profile } = await supabase
+            .from('users')
+            .select('is_approved, role')
+            .eq('id', user.id)
+            .single();
+          
+          if (profile && !profile.is_approved && profile.role === 'participant') {
+            // User is not approved - redirect to pending page
+            router.replace('/pending-approval');
+            return;
+          }
+        }
+        
         router.refresh();
       } catch (authError: any) {
         // Authentication failed - wrong password
@@ -192,13 +210,12 @@ export default function LoginPage() {
         free_text: freeText || undefined,
       });
 
-      router.refresh();
-      router.replace('/UserScreens');
-    } catch (err: any) {
-      setError(err.message || 'שגיאה כללית');
-    } finally {
-      setLoading(false);
-    }
+      router.replace('/pending-approval');
+  } catch (err: any) {
+    setError(err.message || 'שגיאה כללית');
+  } finally {
+    setLoading(false);
+  }
   };
 
   // Welcome/Choice Screen

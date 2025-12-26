@@ -7,7 +7,7 @@ type Notification = {
   type: "info" | "warning" | "success" | "error";
   timestamp: Date;
   isRead: boolean;
-  category: string;
+  title: string;
 };
 
 type NotificationsBodyProps = {
