@@ -12,7 +12,7 @@ type Notification = {
   type: "info" | "warning" | "success" | "error";
   timestamp: Date;
   isRead: boolean;
-  category: string;
+  title: string;
 };
 
 export default function NotificationsPage() {
@@ -43,7 +43,7 @@ export default function NotificationsPage() {
       type: type,
       timestamp: new Date(dbRecord.created_at),
       isRead: dbRecord.is_read,
-      category: dbRecord.title || "הודעה מערכת",
+      title: dbRecord.title || "הודעה מערכת",
     };
   };
 
