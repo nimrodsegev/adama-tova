@@ -1,9 +1,6 @@
 /**
  * USER CONTEXT
  * Manages user authentication state, quiz completion status, and full user profile.
- * Loads complete user data from users table including role, name, phone, quiz data.
- * For new Google users, redirects to complete profile page.
- * Redirects users based on role and quiz completion status.
  */
 
 'use client';
@@ -41,6 +38,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const NO_REDIRECT_ROUTES = ['/complete-profile', '/reset-password'];
 const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password'];
+
+// 🔑 Detect if user is in password recovery mode
+function isPasswordRecoverySession(user: User | null): boolean {
+  return !!(user as any)?.recovery_sent_at;
+}
 
 export function UserProvider({
   children,
@@ -81,7 +83,17 @@ export function UserProvider({
   useEffect(() => {
     const loadProfile = async () => {
       setLoading(true);
-      
+
+      // 🔒 CRITICAL: Block everything except reset-password and login during recovery
+      if (isPasswordRecoverySession(user)) {
+        if (pathname !== '/reset-password' && pathname !== '/login') {
+          router.replace('/reset-password');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // 🔓 Normal authenticated flow
       if (user) {
         try {
           const profile = await userService.getFullProfile(user.id);

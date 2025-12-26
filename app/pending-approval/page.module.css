@@ -1,0 +1,99 @@
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 24.5625rem;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: #AB4016;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 19.875rem;
+  }
+  
+  .messageBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+  }
+  
+  .title {
+    font-family: 'Arfilit', sans-serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #EFEFEF;
+    margin: 0;
+    text-align: center;
+    direction: rtl;
+  }
+  
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .mainText {
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: #FFFFFF;
+    margin: 0;
+    text-align: center;
+    direction: rtl;
+  }
+  
+  .subText {
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    text-align: center;
+    direction: rtl;
+  }
+  
+  .backButton {
+    width: 100%;
+    height: 2.9375rem;
+    padding: 0.3125rem 4.625rem;
+    background: #EFEFEF;
+    border-radius: 1.5625rem;
+    border: none;
+    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+    font-size: 1rem;
+    line-height: 1.1875rem;
+    color: #681F02;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .backButton:hover {
+    opacity: 0.9;
+  }
+  
+  /* Responsive */
+  @media (min-width: 48rem) {
+    .title {
+      font-size: 2.5rem;
+    }
+    
+    .mainText {
+      font-size: 1.5rem;
+    }
+    
+    .subText {
+      font-size: 1.125rem;
+    }
+  }
