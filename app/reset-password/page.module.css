@@ -86,7 +86,7 @@
   
   .inputLabel {
     position: absolute;
-    right: 10.5rem; /* Positioned on top border */
+    right: 3.5rem; /* Positioned on top border */
     top: -0.5625rem; /* -9px */
     padding: 0.0625rem 0.3125rem; /* Small padding */
     background: #AD4E34; /* Matches page background */
@@ -109,7 +109,7 @@
   /* Field-specific error text - positioned on TOP border */
   .fieldError {
     position: absolute;
-    right: 6.5rem;
+    right: 2.5rem;
     top: -0.5625rem;
     padding: 0.0625rem 0.3125rem;
     background: #AB4016;

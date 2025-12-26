@@ -57,8 +57,13 @@ export async function GET(request: Request) {
       // User exists but quiz not completed
       targetPath = '/complete-profile';
     } else {
-      // User has completed quiz - go to appropriate dashboard
-      targetPath = profile.role === 'admin' ? '/adminScreens' : '/UserScreens';
+      // 🔥 NEW: Check if user is approved (participants only)
+      if (!profile.is_approved && profile.role === 'participant') {
+        targetPath = '/pending-approval';
+      } else {
+        // User has completed quiz and is approved - go to appropriate dashboard
+        targetPath = profile.role === 'admin' ? '/adminScreens' : '/UserScreens';
+      }
     }
     
     // Force refresh
