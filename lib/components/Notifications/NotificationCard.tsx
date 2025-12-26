@@ -7,7 +7,7 @@ type Notification = {
   type: "info" | "warning" | "success" | "error";
   timestamp: Date;
   isRead: boolean;
-  title: string;
+  category: string;
 };
 
 type NotificationCardProps = {
@@ -23,43 +23,63 @@ export default function NotificationCard({
   onMarkAsUnread,
   onDelete,
 }: NotificationCardProps) {
-  const formatTimestamp = (date: Date) => {
-    return date.toLocaleTimeString("he-IL", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const formatTimestamp = (date: Date): string => {
+    const now = new Date();
+    const notifDate = new Date(date);
 
-  // Extract title from message (first sentence or up to first period/newline)
-  const extractTitle = (message: string): string => {
-    // Try to get first sentence (up to first period, exclamation, or question mark)
-    const titleMatch = message.match(/^[^.!?\n]+/);
-    if (titleMatch) {
-      const title = titleMatch[0].trim();
-      // Limit to 30 characters for display
-      return title.length > 30 ? title.substring(0, 27) + "..." : title;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const notifDay = new Date(
+      notifDate.getFullYear(),
+      notifDate.getMonth(),
+      notifDate.getDate()
+    );
+
+    if (notifDay.getTime() === today.getTime()) {
+      return notifDate.toLocaleTimeString("he-IL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     }
-    // Fallback: use first 30 characters
-    return message.length > 30 ? message.substring(0, 27) + "..." : message;
+
+    if (notifDay.getTime() === yesterday.getTime()) {
+      return "אתמול";
+    }
+
+    const day = notifDate.getDate().toString().padStart(2, "0");
+    const month = (notifDate.getMonth() + 1).toString().padStart(2, "0");
+    return `${day}.${month}`;
   };
 
-  const title = extractTitle(notification.title);
+  const handleMarkAsRead = () => {
+    if (onMarkAsRead) {
+      onMarkAsRead(notification.id);
+    }
+  };
 
   return (
     <div style={styles.cardContainer}>
-      {/* Header: Title (extracted from message), Time */}
+      {/* Header: Title (category) and Time - BOLD if UNREAD */}
       <div style={styles.header}>
-        <span style={styles.time}>
+        <span style={notification.isRead ? styles.time : styles.timeBold}>
           {formatTimestamp(notification.timestamp)}
         </span>
         <span style={styles.pipe}>|</span>
-        <span style={styles.category}>{title}</span>
+        <span style={notification.isRead ? styles.title : styles.titleBold}>
+          {notification.category}
+        </span>
       </div>
 
-      {/* Full Message - RTL aligned to right */}
+      {/* Message - Always same weight (Light 300) */}
       <p style={styles.message}>{notification.message}</p>
 
-      {/* Unread indicator dot - positioned on the left */}
+      {/* Mark as Read Button - Only show for UNREAD messages */}
+      {!notification.isRead && onMarkAsRead && (
+        <button onClick={handleMarkAsRead} style={styles.markAsReadButton}>
+          ✓
+        </button>
+      )}
     </div>
   );
 }

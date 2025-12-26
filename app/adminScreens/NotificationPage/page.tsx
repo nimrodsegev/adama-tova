@@ -1,12 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import NotificationsHeader from "@/lib/components/Notifications/NotificationsHeader";
-import NotificationsFilters from "@/lib/components/Notifications/NotificationsFilters";
-import NotificationsBody from "@/lib/components/Notifications/NotificationsBody";
-import { useUser } from "@/app/contexts/UserContext"; // 👈 Import User Context
-import { apiNotifications, supabase } from "@/app/services/db_api"; // 👈 Import API
+import { useUser } from "@/app/contexts/UserContext";
+import { apiNotifications, supabase } from "@/app/services/db_api";
+import Link from "next/link";
+import NotificationCard from "@/lib/components/Notifications/NotificationCard";
+import styles from "./NotificationsPage.styles";
 
-// Matches your UI component's expected type
 type Notification = {
   id: number;
   message: string;
@@ -17,17 +16,13 @@ type Notification = {
 };
 
 export default function NotificationsPage() {
-  const { user } = useUser(); // Get current user
+  const { user } = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
 
-  // --- HELPER: Map DB Data to UI Type ---
-  // This converts the raw DB row into the format your components expect
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
-
-    // 🔍 Auto-detect type based on keywords
     const text = (dbRecord.title + " " + dbRecord.message).toLowerCase();
 
     if (
@@ -35,11 +30,11 @@ export default function NotificationsPage() {
       text.includes("בוטל") ||
       text.includes("ביטול")
     ) {
-      type = "error"; // 🔴 Makes it red
+      type = "error";
     } else if (text.includes("warning") || text.includes("שינוי")) {
-      type = "warning"; // 🟡 Makes it yellow
+      type = "warning";
     } else if (text.includes("success") || text.includes("אושרה")) {
-      type = "success"; // 🟢 Makes it green
+      type = "success";
     }
 
     return {
@@ -48,17 +43,16 @@ export default function NotificationsPage() {
       type: type,
       timestamp: new Date(dbRecord.created_at),
       isRead: dbRecord.is_read,
-      category: dbRecord.title || "הודעה מערכת", // Use Title as Category
+      category: dbRecord.title || "הודעה מערכת",
     };
   };
 
-  // --- 1. Fetch Data ---
   useEffect(() => {
     if (!user) return;
 
     const loadData = async () => {
       setLoading(true);
-      const [data, error] = await apiNotifications.getList(user.id, 50); // Fetch last 50
+      const [data, error] = await apiNotifications.getList(user.id, 50);
       if (data) {
         setNotifications(data.map(mapDbToUi));
       }
@@ -67,8 +61,6 @@ export default function NotificationsPage() {
 
     loadData();
 
-    // --- 2. Real-time Subscription ---
-    // This makes the "Activity Cancelled" pop up instantly!
     const subscription = apiNotifications.subscribe(
       user.id,
       (newRawNotif: any) => {
@@ -77,45 +69,33 @@ export default function NotificationsPage() {
       }
     );
 
-    // Cleanup
     return () => {
       supabase.removeChannel(subscription);
     };
   }, [user]);
 
-  // --- Actions ---
-
-  const markAsRead = async (id: number) => {
-    // Optimistic Update (Update UI immediately)
+  // ✅ Mark as Read Handler
+  const handleMarkAsRead = async (id: number) => {
+    // Optimistic update - update UI immediately
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
-    // API Call
-    await apiNotifications.markAsRead(id);
+
+    // Call API
+    const [_, error] = await apiNotifications.markAsRead(id);
+
+    if (error) {
+      console.error("Error marking as read:", error);
+      // Revert optimistic update on error
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: false } : n))
+      );
+      alert("שגיאה בעדכון ההודעה");
+    }
   };
 
-  const markAsUnread = async (id: number) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: false } : n))
-    );
-    await apiNotifications.markAsUnread(id);
-  };
-
-  const deleteNotification = async (id: number) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-    await apiNotifications.delete(id);
-  };
-
-  const markAllAsRead = async () => {
-    if (!user) return;
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    await apiNotifications.markAllAsRead(user.id);
-  };
-
-  // --- Filtering ---
   const filteredNotifications = notifications.filter((n) => {
     if (filter === "unread") return !n.isRead;
-    if (filter === "read") return n.isRead;
     return true;
   });
 
@@ -123,41 +103,73 @@ export default function NotificationsPage() {
 
   if (!user)
     return (
-      <div style={{ padding: 40, textAlign: "center" }}>
-        אנא התחבר כדי לצפות בהודעות
+      <div style={styles.container}>
+        <p style={styles.loadingText}>אנא התחבר כדי לצפות בהודעות</p>
       </div>
     );
 
   return (
-    <main
-      style={{
-        padding: "20px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        direction: "rtl",
-      }}
-    >
-      <NotificationsHeader unreadCount={unreadCount} />
+    <div style={styles.container}>
+      <div style={styles.vectorBackground} />
 
-      <NotificationsFilters
-        filter={filter}
-        onFilterChange={setFilter}
-        totalCount={notifications.length}
-        unreadCount={unreadCount}
-        readCount={notifications.length - unreadCount}
-        onMarkAllAsRead={markAllAsRead}
-      />
+      <h1 style={styles.headerText}>הודעות ועדכונים</h1>
 
-      {loading ? (
-        <p style={{ textAlign: "center", marginTop: 20 }}>טוען הודעות...</p>
-      ) : (
-        <NotificationsBody
-          notifications={filteredNotifications}
-          onMarkAsRead={markAsRead}
-          onMarkAsUnread={markAsUnread}
-          onDelete={deleteNotification}
-        />
-      )}
-    </main>
+      <div style={styles.mainContentFrame}>
+        <div style={styles.filterContainer}>
+          <button
+            onClick={() => setFilter("all")}
+            style={{
+              ...styles.filterButton,
+              ...(filter === "all" ? styles.filterButtonActive : {}),
+            }}
+          >
+            הכל
+          </button>
+          <button
+            onClick={() => setFilter("unread")}
+            style={{
+              ...styles.filterButton,
+              ...(filter === "unread" ? styles.filterButtonActive : {}),
+            }}
+          >
+            לא נקראו
+          </button>
+        </div>
+
+        {loading ? (
+          <p style={styles.loadingText}>טוען הודעות...</p>
+        ) : (
+          <div
+            style={styles.notificationsList}
+            className="notifications-scrollable"
+          >
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notif) => (
+                <NotificationCard
+                  key={notif.id}
+                  notification={notif}
+                  onMarkAsRead={handleMarkAsRead} // ✅ Pass handler
+                />
+              ))
+            ) : (
+              <p style={styles.emptyText}>אין הודעות להצגה</p>
+            )}
+          </div>
+        )}
+
+        <div style={styles.buttonContainer}>
+          <Link href="/adminScreens/addNotification" style={styles.addButton}>
+            + הודעה חדשה
+          </Link>
+        </div>
+      </div>
+
+      <nav style={styles.navBar}>
+        <div style={styles.navItem}>🏠</div>
+        <div style={styles.navItem}>📅</div>
+        <div style={styles.navItem}>🔔</div>
+        <div style={styles.navItem}>👤</div>
+      </nav>
+    </div>
   );
 }
