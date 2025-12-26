@@ -7,7 +7,7 @@ type Notification = {
   type: "info" | "warning" | "success" | "error";
   timestamp: Date;
   isRead: boolean;
-  category: string;
+  title: string;
 };
 
 type NotificationCardProps = {
@@ -67,7 +67,7 @@ export default function NotificationCard({
         </span>
         <span style={styles.pipe}>|</span>
         <span style={notification.isRead ? styles.title : styles.titleBold}>
-          {notification.category}
+          {notification.title}
         </span>
       </div>
 
