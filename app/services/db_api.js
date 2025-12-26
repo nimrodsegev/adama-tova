@@ -426,7 +426,37 @@ export const apiRegistrations = {
     const { data, error } = await supabase.from('registrations').select('activity_id').eq('user_id', userId);
     if (error) return [[], error.message];
     return [data.map(r => r.activity_id), null];
-  }
+  },
+  /**
+   * 🔢 GET WAITLIST POSITION
+   * Returns the user's position in the waitlist (1, 2, 3...)
+   */
+  async getWaitlistPosition(userId, activityId) {
+    // 1. Get user's registration time
+    const { data: myReg } = await supabase
+      .from("registrations")
+      .select("created_at")
+      .eq("user_id", userId)
+      .eq("activity_id", activityId)
+      .eq("if_confirmed", false) // Ensure they are actually on waitlist
+      .single();
+
+    if (!myReg) return [null, null];
+
+    // 2. Count how many people joined BEFORE this user
+    // We count rows where if_confirmed is false AND created_at is older than mine
+    const { count, error } = await supabase
+      .from("registrations")
+      .select("*", { count: 'exact', head: true })
+      .eq("activity_id", activityId)
+      .eq("if_confirmed", false)
+      .lt("created_at", myReg.created_at); // Less Than my time
+
+    if (error) return [null, error.message];
+
+    // Position is count + 1 (if 0 people before me, I am #1)
+    return [count + 1, null];
+  },
 };
 
 // ==========================================================
