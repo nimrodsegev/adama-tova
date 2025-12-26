@@ -52,10 +52,10 @@ const styles: { [key: string]: CSSProperties } = {
 
   // Main Content Frame
   mainContentFrame: {
-    marginTop: "12.5rem", // 200px → rem
+    marginTop: "11rem", // 200px → rem
     display: "flex",
     flexDirection: "column",
-    gap: "2.5rem", // 40px → rem
+    gap: "1.5rem", // 40px → rem
     padding: "0 1.25rem", // 0 20px → rem
   },
 
