@@ -96,7 +96,7 @@ const styles: { [key: string]: CSSProperties } = {
     display: "flex",
     flexDirection: "column",
     gap: "0.75rem", // 12px
-    maxHeight: "31.5rem", // ~504px (fits 6-7 notifications)
+    maxHeight: "33rem", // ~504px (fits 6-7 notifications)
     overflowY: "auto",
     paddingRight: "0.25rem",
     scrollbarWidth: "thin",

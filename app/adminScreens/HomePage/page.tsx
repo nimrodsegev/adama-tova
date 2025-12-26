@@ -147,20 +147,6 @@ export default function AdminHomePage() {
       </div>
 
       {/* Navigation Bar at bottom */}
-      <nav style={styles.navBar}>
-        <div style={styles.navItem}>
-          <Image
-            src="/icons/figure_icon.svg" // or .png
-            alt="No figure icon"
-            width={71} // Match Figma dimensions
-            height={72} // Match Figma dimensions
-            style={styles.icon}
-          />
-        </div>
-        <div style={styles.navItem}>📅</div>
-        <div style={styles.navItem}>🔔</div>
-        <div style={styles.navItem}>👤</div>
-      </nav>
     </div>
   );
 }

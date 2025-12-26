@@ -163,13 +163,6 @@ export default function NotificationsPage() {
           </Link>
         </div>
       </div>
-
-      <nav style={styles.navBar}>
-        <div style={styles.navItem}>🏠</div>
-        <div style={styles.navItem}>📅</div>
-        <div style={styles.navItem}>🔔</div>
-        <div style={styles.navItem}>👤</div>
-      </nav>
     </div>
   );
 }
