@@ -13,7 +13,7 @@ export default function UserQuizPage() {
 
   useEffect(() => {
     if (userId) loadUser();
-  }, [userId]);
+  });
 
   const loadUser = async () => {
     // We can reuse getAllUsers and find, or add a specific getById in apiUser
@@ -44,7 +44,7 @@ export default function UserQuizPage() {
             <div className="flex flex-wrap gap-2">
               {quiz.interests?.map((tag: string, i: number) => (
                 <span key={i} className="bg-white border border-blue-200 px-3 py-1 rounded-full text-sm">
-                  {tag}
+                  {tag + " "}
                 </span>
               )) || "לא צוינו תחומי עניין"}
             </div>
