@@ -557,3 +557,21 @@
     width: 32rem;
   }
 }
+
+/* Autofill styling - subtle hint */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #AB4016 inset !important;
+  -webkit-text-fill-color: #EFEFEF !important;
+  caret-color: #EFEFEF;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important; /* Slightly thicker glow */
+}
+
+/* For Firefox */
+.input:-moz-autofill {
+  background-color: transparent !important;
+  color: #EFEFEF !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+}
