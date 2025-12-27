@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import WeeklyHeader from "@/lib/components/WeeklyBoard/WeeklyHeader";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
-import MeetingCard from "@/lib/components/Home/MeetingCard";
+import MeetingCard from "@/lib/components/Home/UserActivityCard";
 // 👇 1. Import User Context & Registration API
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
