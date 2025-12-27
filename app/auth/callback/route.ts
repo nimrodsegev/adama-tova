@@ -62,7 +62,7 @@ export async function GET(request: Request) {
         targetPath = '/pending-approval';
       } else {
         // User has completed quiz and is approved - go to appropriate dashboard
-        targetPath = profile.role === 'admin' ? '/adminScreens' : '/UserScreens';
+        targetPath = profile.role === 'admin' ? '/adminScreens/HomePage' : '/UserScreens/HomePage';
       }
     }
     
