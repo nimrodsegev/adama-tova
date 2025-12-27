@@ -125,9 +125,9 @@ export function UserProvider({
 
             if (shouldRedirect && completed) {
               if (profile.role === 'admin') {
-                router.replace('/adminScreens');
+                router.replace('/adminScreens/HomePage');
               } else {
-                router.replace('/UserScreens');
+                router.replace('/UserScreens/HomePage');
               }
             } else if (!completed && pathname !== '/complete-profile') {
               router.replace('/complete-profile');
