@@ -1,10 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 
 export default function PendingApprovalPage() {
   const router = useRouter();
+  const supabase = createClient();
+
+  const handleBackToLogin = async () => {
+    // Sign out the unapproved user
+    await supabase.auth.signOut();
+    // Redirect to login
+    router.push('/login');
+  };
 
   return (
     <div className={styles.container}>
@@ -24,7 +33,7 @@ export default function PendingApprovalPage() {
           </div>
 
           <button
-            onClick={() => router.push('/login')}
+            onClick={handleBackToLogin}
             className={styles.backButton}
           >
             חזור לדף התחברות

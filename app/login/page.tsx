@@ -394,14 +394,14 @@ if (mode === 'choice') {
             <div className={styles.interestsList}>
               {INTEREST_OPTIONS.map((i) => (
                 <label key={i} className={styles.interestItem}>
-                  <input
-                    type="checkbox"
-                    checked={interests.includes(i)}
-                    onChange={() => toggleInterest(i)}
-                    className={styles.checkbox}
-                  />
-                  <span>{i}</span>
-                </label>
+                <span>{i}</span>
+                <input
+                  type="checkbox"
+                  checked={interests.includes(i)}
+                  onChange={() => toggleInterest(i)}
+                  className={styles.checkbox}
+                />
+              </label>
               ))}
             </div>
           </div>
