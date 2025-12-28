@@ -20,7 +20,14 @@ const CIRCLE_MAPPING: Record<string, string> = {
   'תושבי העוטף ומפונים': 'Residence of Otef Aza',
   'מעגל שני ושלישי של משפחות השכול': 'Second or third',
 };
-
+const INTRESTS_MAPPING: Record<string, string> = {
+  'מדיטציה': 'Meditation',
+  'יוגה': 'Yoga',
+  'אומנות': 'Art',
+  'כתיבה': 'Writing',
+  'מינדפולנס': 'Mindfulness',
+  'יצירה': 'Crafts',
+};
 export const userService = {
   // Save quiz answers and create user profile
   async completeProfile(

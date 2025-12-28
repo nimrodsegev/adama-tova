@@ -335,6 +335,49 @@ export const apiActivities = {
     // 3. Batch Insert
     return safeRequest(supabase.from("notifications").insert(notifications));
   },
+  async getByUserPreferences(userId) {
+    // 1. Define the Mapping
+    const INTRESTS_MAPPING = {
+      'מדיטציה': 'Meditation',
+      'יוגה': 'Yoga',
+      'אומנות': 'Art',
+      'כתיבה': 'Writing',
+      'מיינדפולנס': 'Mindfulness',
+      'יצירה': 'Crafts',
+      // Add more as needed
+    };
+
+    // 2. Get User's Interests (Hebrew) from the 'quiz' JSON column
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('quiz')
+      .eq('id', userId)
+      .single();
+
+    // Check if user exists and has interests
+    if (userError || !user || !user.quiz || !user.quiz.interests || user.quiz.interests.length === 0) {
+      console.log("No interests found for user.");
+      return [[], null]; 
+    }
+
+    const hebrewInterests = user.quiz.interests; // Example: ["יוגה", "אומנות"]
+
+    // 3. Convert to English Categories
+    // We map the Hebrew terms to English. If a term isn't found in the map, we keep the original (fallback).
+    const englishCategories = hebrewInterests.map(interest => 
+      INTRESTS_MAPPING[interest] || interest
+    );
+
+    // 4. Fetch Activities matching the English categories
+    return safeRequest(
+      supabase
+        .from('activities')
+        .select('*')
+        .in('category', englishCategories) // 👈 Queries using: ['Yoga', 'Art']
+        .gte('date', new Date().toISOString()) 
+        .order('date', { ascending: true })
+    );
+  },
 };
 
 // ==========================================================
