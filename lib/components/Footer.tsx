@@ -18,6 +18,9 @@ export default function Footer() {
   if (loading || !user || !userProfile) {
     return null;
   }
+  if (userProfile.role === "participant" && !userProfile.is_approved) {
+    return null;
+  }
 
   const isAdmin = userProfile.role === "admin";
 
