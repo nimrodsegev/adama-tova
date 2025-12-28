@@ -1,93 +1,77 @@
 "use client";
+import styles from "./DaySlider.styles";
 
 type DaySliderProps = {
   selectedDayIndex: number;
-  onDaySelect: (dayIndex: number) => void;
+  onDaySelect: (index: number) => void;
   currentWeekStart: Date;
 };
-
-const days = [
-  { letter: "א", name: "ראשון" },
-  { letter: "ב", name: "שני" },
-  { letter: "ג", name: "שלישי" },
-  { letter: "ד", name: "רביעי" },
-  { letter: "ה", name: "חמישי" },
-  { letter: "ו", name: "שישי" },
-  { letter: "ש", name: "שבת" },
-];
 
 export default function DaySlider({
   selectedDayIndex,
   onDaySelect,
   currentWeekStart,
 }: DaySliderProps) {
-  // Calculate dates for each day in the week
-  const getDateForDay = (dayIndex: number) => {
-    const weekStart = new Date(currentWeekStart);
-    weekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + dayIndex);
-    return date;
+  // Hebrew day letters: Sunday to Saturday
+  const dayLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+
+  // Closed days: Monday(1), Thursday(4), Friday(5), Saturday(6)
+  const closedDays = [1, 4, 5, 6];
+
+  // Get the actual dates for the current week
+  const getWeekDates = () => {
+    const dates = [];
+    const start = new Date(currentWeekStart);
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      dates.push(date.getDate()); // Just the day number
+    }
+
+    return dates;
   };
 
-  const formatDayDate = (date: Date) => {
-    return `${date.getDate()}/${date.getMonth() + 1}`;
-  };
+  const weekDates = getWeekDates();
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "12px",
-        padding: "20px 0",
-        borderBottom: "2px solid #e0e0e0",
-        direction: "rtl",
-      }}
-    >
-      {days.map((day, index) => {
-        const dayDate = getDateForDay(index);
-        const isSelected = selectedDayIndex === index;
+    <div style={styles.container}>
+      {dayLetters.map((letter, index) => {
+        const isSelected = index === selectedDayIndex;
+        const isClosed = closedDays.includes(index);
 
         return (
           <button
-            key={day.letter}
+            key={index}
             onClick={() => onDaySelect(index)}
             style={{
-              width: "70px",
-              height: "70px",
-              borderRadius: "12px",
-              border: isSelected ? "3px solid #0070f3" : "2px solid #ccc",
-              backgroundColor: isSelected ? "#0070f3" : "#fff",
-              color: isSelected ? "#fff" : "#333",
-              fontSize: "20px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "4px",
+              ...styles.dayButton,
+              ...(isSelected && styles.dayButtonSelected), // ✅ CHANGED: Always apply selected style when selected
             }}
-            onMouseEnter={(e) => {
-              if (!isSelected) {
-                e.currentTarget.style.backgroundColor = "#f0f0f0";
-                e.currentTarget.style.transform = "scale(1.05)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isSelected) {
-                e.currentTarget.style.backgroundColor = "#fff";
-                e.currentTarget.style.transform = "scale(1)";
-              }
-            }}
-            title={day.name}
           >
-            <span style={{ fontSize: "24px" }}>{day.letter}</span>
-            <span style={{ fontSize: "12px", opacity: 0.8 }}>
-              {formatDayDate(dayDate)}
+            {/* Day Letter (Hebrew) */}
+            <span
+              style={{
+                ...styles.dayLetter,
+                ...(isSelected && styles.dayLetterSelected), // ✅ CHANGED: White when selected (even if closed)
+                ...(isClosed && !isSelected && styles.dayLetterClosed), // ✅ CHANGED: Black only if closed AND not selected
+              }}
+            >
+              {letter}
             </span>
+
+            {/* Date Number */}
+            <div style={styles.dateContainer}>
+              <span
+                style={{
+                  ...styles.dateNumber,
+                  ...(isSelected && styles.dateNumberSelected), // ✅ CHANGED: White when selected (even if closed)
+                  ...(isClosed && !isSelected && styles.dateNumberClosed), // ✅ CHANGED: Black only if closed AND not selected
+                }}
+              >
+                {weekDates[index]}
+              </span>
+            </div>
           </button>
         );
       })}

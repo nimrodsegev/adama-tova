@@ -1,39 +1,38 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import {
-  apiActivities,
-  apiRegistrations,
-  apiNotifications,
-} from "@/app/services/db_api";
-import NotificationCard from "@/lib/components/Notifications/NotificationCard";
+import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
+import EmptyState from "@/lib/components/UI/EmptyState";
 import styles from "./HomePage.styles";
-import Link from "next/link";
-import { act } from "react-dom/test-utils";
 
-// 1. Define Mapping Outside
+// Interests Mapping
 const INTRESTS_MAPPING: Record<string, string> = {
-  'מדיטציה': 'Meditation',
-  'יוגה': 'Yoga',
-  'אומנות': 'Art',
-  'כתיבה': 'Writing',
-  'מינדפולנס': 'Mindfulness',
-  'יצירה': 'Crafts',
+  מדיטציה: "Meditation",
+  יוגה: "Yoga",
+  אומנות: "Art",
+  כתיבה: "Writing",
+  מינדפולנס: "Mindfulness",
+  יצירה: "Crafts",
+};
+
+// Opening hours configuration (24-hour format)
+const OPENING_HOURS = {
+  0: { open: "16:00", close: "22:00" }, // Sunday
+  2: { open: "16:00", close: "22:00" }, // Tuesday
+  3: { open: "16:00", close: "22:00" }, // Wednesday
 };
 
 export default function HomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
   const [registeredActivities, setRegisteredActivities] = useState<any[]>([]);
   const [allActivities, setAllActivities] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       fetchData();
     }
-    // 2. Added userProfile to dependency to ensure we have interests before filtering
   }, [user, userProfile]);
 
   const fetchData = async () => {
@@ -48,28 +47,9 @@ export default function HomePage() {
       }
 
       const [activities, actError] = await apiActivities.getAll();
+
       if (actError) {
         console.error("Error fetching activities:", actError);
-      }
-
-      const [notificationsData, notifError] = await apiNotifications.getList(
-        user!.id,
-        20,
-        true
-      );
-      if (notifError) {
-        console.error("Error fetching notifications:", notifError);
-      } else if (notificationsData) {
-        const formattedNotifications = notificationsData.map((notif: any) => ({
-          id: notif.id,
-          message: notif.message,
-          type: notif.type || "info",
-          timestamp: new Date(notif.created_at),
-          isRead: notif.is_read,
-          title: notif.title || "כללי",
-          activityId: notif.linked_activity_id,
-        }));
-        setNotifications(formattedNotifications);
       }
 
       if (activities && registrationIds) {
@@ -77,34 +57,60 @@ export default function HomePage() {
           registrationIds.includes(activity.id)
         );
 
-        // Raw list of non-registered activities
         const notRegistered = activities.filter(
           (activity: any) => !registrationIds.includes(activity.id)
         );
 
-        // 3. 👇 NEW FILTERING LOGIC 👇
         let filteredSuggestions = notRegistered;
-
-        if (userProfile?.quiz?.interests && userProfile.quiz.interests.length > 0) {
-          // A. Convert Hebrew interests to English
+        if (
+          userProfile?.quiz?.interests &&
+          userProfile.quiz.interests.length > 0
+        ) {
           const myInterestsEnglish = userProfile.quiz.interests.map(
             (interest: string) => INTRESTS_MAPPING[interest] || interest
           );
 
-          // B. Filter activities that match these categories
-          filteredSuggestions = notRegistered.filter((activity: any) => 
+          filteredSuggestions = notRegistered.filter((activity: any) =>
             myInterestsEnglish.includes(activity.category)
           );
         }
-        // 👆 END NEW LOGIC 👆
 
         setRegisteredActivities(registered);
-        setAllActivities(filteredSuggestions); // Set the filtered list
+        setAllActivities(filteredSuggestions);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Get status message based on current day
+  const getStatusMessage = () => {
+    const today = new Date().getDay();
+
+    if (today in OPENING_HOURS) {
+      const hours = OPENING_HOURS[today as keyof typeof OPENING_HOURS];
+      return `שעות הפעילות היום: ${hours.open} עד ${hours.close}`;
+    }
+
+    const openDays = [0, 2, 3];
+    const dayNames = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+
+    let daysUntilOpen = 1;
+    let nextDay = (today + 1) % 7;
+
+    while (!openDays.includes(nextDay) && daysUntilOpen < 7) {
+      daysUntilOpen++;
+      nextDay = (today + daysUntilOpen) % 7;
+    }
+
+    if (daysUntilOpen === 1) {
+      return "היום המרחב סגור אבל נתראה מחר";
+    } else if (daysUntilOpen === 2) {
+      return "היום המרחב סגור אבל נתראה מחרתיים";
+    } else {
+      return `היום המרחב סגור אבל נתראה ביום ${dayNames[nextDay]}`;
     }
   };
 
@@ -136,44 +142,16 @@ export default function HomePage() {
         היי {userProfile?.full_name?.split(" ")[0] || ""},
       </h1>
 
-      <div style={styles.mainContentFrame}>
-        {/* Notifications Section */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>הודעות ועדכונים</h2>
-          {notifications.length > 0 ? (
-            <div style={styles.notificationsList}>
-              {notifications.slice(0, 3).map((notif) => (
-                notif.activityId ? (
-                  <Link 
-                    key={notif.id} 
-                    href={`/UserScreens/ActivityDetailsPage?id=${notif.activityId}`}
-                    style={{ textDecoration: 'none', display: 'block' }}
-                  >
-                    <NotificationCard notification={notif} />
-                  </Link>
-                ) : (
-                  <NotificationCard key={notif.id} notification={notif} />
-                )
-              ))}
-            </div>  
-          ) : (
-            <p style={styles.emptyText}>אין הודעות חדשות</p>
-          )}
-          {notifications.length > 0 && (
-            <div style={styles.ctaRow}>
-              <Link
-                href="/UserScreens/NotificationsPage"
-                style={styles.buttonS}
-              >
-                <span style={styles.buttonText}>הכל</span>
-              </Link>
-            </div>
-          )}
-        </section>
+      {/* Subtitle 1 */}
+      <p style={styles.subtitle}>המרחב כאן בשבילך.</p>
 
+      {/* Subtitle 2 - Status Message */}
+      <p style={styles.statusMessage}>{getStatusMessage()}</p>
+
+      <div style={styles.mainContentFrame}>
         {/* Registered Activities Section */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>המפגשים הבאים שלך</h2>
+          <h2 style={styles.sectionTitle}>המפגשים הבאים שלך:</h2>
           {registeredActivities.length > 0 ? (
             <div style={styles.horizontalScroll}>
               {registeredActivities.map((activity) => (
@@ -185,47 +163,44 @@ export default function HomePage() {
                     start_time={activity.start_time}
                     location={activity.location}
                     description={activity.description}
+                    onRegistrationChange={fetchData}
                   />
                 </div>
               ))}
             </div>
           ) : (
-            <p style={styles.emptyText}>אין פעילויות רשומות</p>
+            <EmptyState
+              message="נראה שאין לך מפגשים השבוע "
+              buttonText="+ הוספת פעילות"
+              buttonHref="/UserScreens/WeeklyBoardPage"
+            />
           )}
         </section>
 
         {/* Suggested Activities Section */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>פעילויות אפשריות</h2>
+          <h2 style={styles.sectionTitle}>חשבנו שיעניין אותך:</h2>
           {possibleActivities.length > 0 ? (
-            <>
-              <div style={styles.horizontalScroll}>
-                {possibleActivities.map((activity) => (
-                  <div key={activity.id} style={styles.glassCard}>
-                    <UserActivityCard
-                      id={activity.id}
-                      title={activity.title}
-                      date={activity.date}
-                      start_time={activity.start_time}
-                      location={activity.location}
-                      description={activity.description}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* CTA Button */}
-              <div style={styles.ctaRow}>
-                <Link
-                  href="/UserScreens/WeeklyBoardPage"
-                  style={styles.buttonS}
-                >
-                  <span style={styles.buttonText}>הכל</span>
-                </Link>
-              </div>
-            </>
+            <div style={styles.horizontalScroll}>
+              {possibleActivities.map((activity) => (
+                <div key={activity.id} style={styles.glassCard}>
+                  <UserActivityCard
+                    id={activity.id}
+                    title={activity.title}
+                    date={activity.date}
+                    start_time={activity.start_time}
+                    location={activity.location}
+                    description={activity.description}
+                    onRegistrationChange={fetchData}
+                  />
+                </div>
+              ))}
+            </div>
           ) : (
-            <p style={styles.emptyText}>לא נמצאו פעילויות מתאימות לתחומי העניין שלך</p>
+            <EmptyState
+              message="לא נמצאו פעילויות מתאימות לתחומי העניין שלך"
+              showIcon={false}
+            />
           )}
         </section>
       </div>
