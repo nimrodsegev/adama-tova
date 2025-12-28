@@ -1,24 +1,45 @@
 "use client";
 import { useState, useEffect } from "react";
-import WeeklyHeader from "@/lib/components/WeeklyBoard/WeeklyHeader";
-import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
-import WeekNavigation from "@/lib/components/WeeklyBoard/WeekNavigation";
-import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
+import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
+import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
+import styles from "./WeeklyBoardPage.styles";
+
+// Interests Mapping (same as HomePage)
+const INTRESTS_MAPPING: Record<string, string> = {
+  מדיטציה: "Meditation",
+  יוגה: "Yoga",
+  אומנות: "Art",
+  כתיבה: "Writing",
+  מינדפולנס: "Mindfulness",
+  יצירה: "Crafts",
+};
 
 export default function WeeklyBoardPage() {
-  const { user } = useUser();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { user, userProfile } = useUser();
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
-
   const [activities, setActivities] = useState<any[]>([]);
-  const [myRegistrationIds, setMyRegistrationIds] = useState<string[]>([]);
+  const [filter, setFilter] = useState<"all" | "foryou">("all");
   const [loading, setLoading] = useState(false);
 
+  // Closed days: Monday(1), Thursday(4), Friday(5), Saturday(6)
+  const closedDays = [1, 4, 5, 6];
+  const isDayClosed = closedDays.includes(selectedDayIndex);
+
+  // Get current week's start date (Sunday)
+  const getWeekStartDate = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
+    const diff = -dayOfWeek; // Days to subtract to get to Sunday
+    const sunday = new Date(now);
+    sunday.setDate(now.getDate() + diff);
+    sunday.setHours(0, 0, 0, 0);
+    return sunday;
+  };
+
   const getSelectedDateObject = () => {
-    const weekStart = new Date(currentDate);
-    weekStart.setDate(currentDate.getDate() - currentDate.getDay());
+    const weekStart = getWeekStartDate();
     const selected = new Date(weekStart);
     selected.setDate(weekStart.getDate() + selectedDayIndex);
     return selected;
@@ -26,8 +47,12 @@ export default function WeeklyBoardPage() {
 
   const selectedDateObj = getSelectedDateObject();
 
-  // Fetch Data (Activities + User Registrations)
   const fetchData = async () => {
+    if (isDayClosed) {
+      setActivities([]);
+      return;
+    }
+
     setLoading(true);
 
     const year = selectedDateObj.getFullYear();
@@ -35,91 +60,102 @@ export default function WeeklyBoardPage() {
     const day = String(selectedDateObj.getDate()).padStart(2, "0");
     const dateString = `${year}-${month}-${day}`;
 
-    // Fetch Activities
     const [actData, actError] = await apiActivities.getByDate(dateString);
     if (actError) console.error("Error fetching activities:", actError);
     else setActivities(actData || []);
-
-    // Fetch User Registrations if logged in
-    if (user) {
-      const [registrationIds, regError] =
-        await apiRegistrations.getUserRegistrationIds(user.id);
-      if (!regError && registrationIds) {
-        setMyRegistrationIds(registrationIds);
-      }
-    }
 
     setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
-  }, [selectedDayIndex, currentDate, user]);
+  }, [selectedDayIndex, user]);
 
-  // Navigation Handlers
-  const handleWeekChange = (offset: number) => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + offset * 7);
-    setCurrentDate(newDate);
+  // Filter activities based on selected filter
+  const getFilteredActivities = () => {
+    if (filter === "all") return activities;
+
+    // "For You" filter - based on user interests
+    if (filter === "foryou" && userProfile?.quiz?.interests) {
+      const myInterestsEnglish = userProfile.quiz.interests.map(
+        (interest: string) => INTRESTS_MAPPING[interest] || interest
+      );
+
+      return activities.filter((activity: any) =>
+        myInterestsEnglish.includes(activity.category)
+      );
+    }
+
+    return activities;
   };
 
-  const dayLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+  const filteredActivities = getFilteredActivities();
 
   return (
-    <main
-      style={{
-        padding: "20px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        direction: "rtl",
-      }}
-    >
-      <WeeklyHeader currentDate={selectedDateObj} />
-      <WeekNavigation
-        currentWeekStart={currentDate}
-        onWeekChange={handleWeekChange}
-      />
-      <DaySlider
-        selectedDayIndex={selectedDayIndex}
-        onDaySelect={setSelectedDayIndex}
-        currentWeekStart={currentDate}
-      />
+    <div style={styles.container}>
+      <div style={styles.mainFrame}>
+        {/* Header Section */}
+        <div style={styles.headerSection}>
+          {/* Top Row - Title RIGHT + Filter LEFT */}
+          <div style={styles.topRow}>
+            {/* Page Title (RIGHT side) */}
+            <h1 style={styles.pageTitle}>לוח פעילויות</h1>
 
-      <section style={{ marginTop: "32px" }}>
-        <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>
-          מפגשים ליום {dayLetters[selectedDayIndex]} (
-          {selectedDateObj.toLocaleDateString("he-IL")})
-        </h2>
+            {/* Filter Options (LEFT side) */}
+            <div style={styles.filterRow}>
+              <span
+                style={
+                  filter === "all" ? styles.filterTextActive : styles.filterText
+                }
+                onClick={() => setFilter("all")}
+              >
+                הכל
+              </span>
+              <span
+                style={
+                  filter === "foryou"
+                    ? styles.filterTextActive
+                    : styles.filterText
+                }
+                onClick={() => setFilter("foryou")}
+              >
+                בשבילך
+              </span>
+            </div>
+          </div>
 
-        {loading ? (
-          <p>טוען נתונים מהשרת...</p>
-        ) : activities.length > 0 ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "16px",
-              flexWrap: "wrap",
-            }}
-          >
-            {activities.map((activity) => (
-              <UserActivityCard
+          {/* Day Slider */}
+          <DaySlider
+            selectedDayIndex={selectedDayIndex}
+            onDaySelect={setSelectedDayIndex}
+            currentWeekStart={getWeekStartDate()}
+          />
+        </div>
+
+        {/* Activities List or Closed Message */}
+        <div style={styles.activitiesList}>
+          {isDayClosed ? (
+            <p style={styles.closedMessage}>המרחב סגור היום</p>
+          ) : loading ? (
+            <p style={styles.emptyText}>טוען...</p>
+          ) : filteredActivities.length > 0 ? (
+            filteredActivities.map((activity) => (
+              <ScheduleActivityCard
                 key={activity.id}
                 id={activity.id}
                 title={activity.title}
-                date={activity.date}
                 start_time={activity.start_time}
-                location={activity.location}
-                description={activity.description}
+                end_time={activity.end_time}
+                current_participants={activity.current_participants || 0}
+                max_participants={activity.max_participants}
+                onRegistrationChange={fetchData}
               />
-            ))}
-          </div>
-        ) : (
-          <p style={{ color: "#888", fontSize: "18px" }}>
-            אין סדנאות רשומות ליום זה.
-          </p>
-        )}
-      </section>
-    </main>
+            ))
+          ) : (
+            <p style={styles.emptyText}>אין פעילויות ליום זה</p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

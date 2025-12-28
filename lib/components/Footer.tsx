@@ -50,7 +50,7 @@ export default function Footer() {
     },
     {
       href: "/UserScreens/WeeklyBoardPage",
-      icon: "/icons/phone_icon.svg",
+      icon: "/icons/calendar_icon.svg",
       label: "Weekly",
     },
     {
