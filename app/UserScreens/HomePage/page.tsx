@@ -10,6 +10,7 @@ import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import styles from "./HomePage.styles";
 import Link from "next/link";
+import { act } from "react-dom/test-utils";
 
 // 1. Define Mapping Outside
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -66,6 +67,7 @@ export default function HomePage() {
           timestamp: new Date(notif.created_at),
           isRead: notif.is_read,
           title: notif.title || "כללי",
+          activityId: notif.linked_activity_id,
         }));
         setNotifications(formattedNotifications);
       }
@@ -141,9 +143,19 @@ export default function HomePage() {
           {notifications.length > 0 ? (
             <div style={styles.notificationsList}>
               {notifications.slice(0, 3).map((notif) => (
-                <NotificationCard key={notif.id} notification={notif} />
+                notif.activityId ? (
+                  <Link 
+                    key={notif.id} 
+                    href={`/UserScreens/ActivityDetailsPage?id=${notif.activityId}`}
+                    style={{ textDecoration: 'none', display: 'block' }}
+                  >
+                    <NotificationCard notification={notif} />
+                  </Link>
+                ) : (
+                  <NotificationCard key={notif.id} notification={notif} />
+                )
               ))}
-            </div>
+            </div>  
           ) : (
             <p style={styles.emptyText}>אין הודעות חדשות</p>
           )}
