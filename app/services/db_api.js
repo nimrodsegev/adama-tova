@@ -163,42 +163,37 @@ export const apiActivities = {
   async update(activityId, updates) {
     // --- STEP 1: Fetch Info (Title & Participants) ---
     const { data: activity } = await supabase
-      .from("activities")
-      .select("title, registrations(user_id)")
-      .eq("id", activityId)
+      .from('activities')
+      .select('title, registrations(user_id)')
+      .eq('id', activityId)
       .single();
 
     // --- STEP 2: Perform the Update ---
-    // We execute the update first to make sure it works before notifying
     const updateResult = await safeRequest(
-      supabase.from("activities").update(updates).eq("id", activityId).select()
+      supabase
+        .from('activities')
+        .update(updates)
+        .eq('id', activityId)
+        .select()
     );
 
     const [data, error] = updateResult;
-
-    // If the update failed, return the error immediately
     if (error) return updateResult;
 
     // --- STEP 3: Notify Participants ---
-    if (
-      activity &&
-      activity.registrations &&
-      activity.registrations.length > 0
-    ) {
-      console.log(
-        `Notify ${activity.registrations.length} users about update...`
-      );
-
-      const alerts = activity.registrations.map((reg) => ({
+    if (activity && activity.registrations && activity.registrations.length > 0) {
+      console.log(`Notify ${activity.registrations.length} users about update...`);
+      
+      const alerts = activity.registrations.map(reg => ({
         user_id: reg.user_id,
         title: "פרטי הפעילות שונו ✏️",
         message: `פרטי הפעילות "${activity.title}" עודכנו על ידי המנחה.`,
         is_read: false,
         created_at: new Date().toISOString(),
+        linked_activity_id: activityId 
       }));
 
-      // Send notifications (using insert directly to allow batching)
-      await supabase.from("notifications").insert(alerts);
+      await supabase.from('notifications').insert(alerts);
     }
 
     return updateResult;

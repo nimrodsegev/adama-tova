@@ -13,6 +13,7 @@ type Notification = {
   timestamp: Date;
   isRead: boolean;
   title: string;
+  activityId?: string; // 👈 1. Added optional activityId
 };
 
 export default function NotificationsPage() {
@@ -21,15 +22,12 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
 
+  // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
     const text = (dbRecord.title + " " + dbRecord.message).toLowerCase();
 
-    if (
-      text.includes("cancel") ||
-      text.includes("בוטל") ||
-      text.includes("ביטול")
-    ) {
+    if (text.includes("cancel") || text.includes("בוטל") || text.includes("ביטול")) {
       type = "error";
     } else if (text.includes("warning") || text.includes("שינוי")) {
       type = "warning";
@@ -44,6 +42,7 @@ export default function NotificationsPage() {
       timestamp: new Date(dbRecord.created_at),
       isRead: dbRecord.is_read,
       title: dbRecord.title || "הודעה מערכת",
+      activityId: dbRecord.linked_activity_id, // 👈 2. Map the new DB column
     };
   };
 
@@ -74,19 +73,16 @@ export default function NotificationsPage() {
     };
   }, [user]);
 
-  // ✅ Mark as Read Handler
   const handleMarkAsRead = async (id: number) => {
-    // Optimistic update - update UI immediately
+    // Optimistic update
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
 
-    // Call API
     const [_, error] = await apiNotifications.markAsRead(id);
 
     if (error) {
       console.error("Error marking as read:", error);
-      // Revert optimistic update on error
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, isRead: false } : n))
       );
@@ -98,8 +94,6 @@ export default function NotificationsPage() {
     if (filter === "unread") return !n.isRead;
     return true;
   });
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   if (!user)
     return (
@@ -139,17 +133,29 @@ export default function NotificationsPage() {
         {loading ? (
           <p style={styles.loadingText}>טוען הודעות...</p>
         ) : (
-          <div
-            style={styles.notificationsList}
-            className="notifications-scrollable"
-          >
+          <div style={styles.notificationsList} className="notifications-scrollable">
             {filteredNotifications.length > 0 ? (
               filteredNotifications.map((notif) => (
-                <NotificationCard
-                  key={notif.id}
-                  notification={notif}
-                  onMarkAsRead={handleMarkAsRead} // ✅ Pass handler
-                />
+                // 3. 👇 WRAP IN LINK CONDITIONALLY
+                notif.activityId ? (
+                  <Link 
+                    key={notif.id} 
+                    href={`/UserScreens/ActivityDetailsPage?id=${notif.activityId}`}
+                    style={{ textDecoration: 'none', display: 'block', marginBottom: '10px' }}
+                  >
+                    <NotificationCard
+                      notification={notif}
+                      onMarkAsRead={handleMarkAsRead}
+                    />
+                  </Link>
+                ) : (
+                  <div key={notif.id} style={{ marginBottom: '10px' }}>
+                    <NotificationCard
+                      notification={notif}
+                      onMarkAsRead={handleMarkAsRead}
+                    />
+                  </div>
+                )
               ))
             ) : (
               <p style={styles.emptyText}>אין הודעות להצגה</p>
