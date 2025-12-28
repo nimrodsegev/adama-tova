@@ -11,6 +11,16 @@ import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import styles from "./HomePage.styles";
 import Link from "next/link";
 
+// 1. Define Mapping Outside
+const INTRESTS_MAPPING: Record<string, string> = {
+  'מדיטציה': 'Meditation',
+  'יוגה': 'Yoga',
+  'אומנות': 'Art',
+  'כתיבה': 'Writing',
+  'מינדפולנס': 'Mindfulness',
+  'יצירה': 'Crafts',
+};
+
 export default function HomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
   const [registeredActivities, setRegisteredActivities] = useState<any[]>([]);
@@ -22,7 +32,8 @@ export default function HomePage() {
     if (user) {
       fetchData();
     }
-  }, [user]);
+    // 2. Added userProfile to dependency to ensure we have interests before filtering
+  }, [user, userProfile]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -64,12 +75,29 @@ export default function HomePage() {
           registrationIds.includes(activity.id)
         );
 
+        // Raw list of non-registered activities
         const notRegistered = activities.filter(
           (activity: any) => !registrationIds.includes(activity.id)
         );
 
+        // 3. 👇 NEW FILTERING LOGIC 👇
+        let filteredSuggestions = notRegistered;
+
+        if (userProfile?.quiz?.interests && userProfile.quiz.interests.length > 0) {
+          // A. Convert Hebrew interests to English
+          const myInterestsEnglish = userProfile.quiz.interests.map(
+            (interest: string) => INTRESTS_MAPPING[interest] || interest
+          );
+
+          // B. Filter activities that match these categories
+          filteredSuggestions = notRegistered.filter((activity: any) => 
+            myInterestsEnglish.includes(activity.category)
+          );
+        }
+        // 👆 END NEW LOGIC 👆
+
         setRegisteredActivities(registered);
-        setAllActivities(notRegistered);
+        setAllActivities(filteredSuggestions); // Set the filtered list
       }
     } catch (error) {
       console.error("Error:", error);
@@ -185,7 +213,7 @@ export default function HomePage() {
               </div>
             </>
           ) : (
-            <p style={styles.emptyText}>אין פעילויות זמינות כרגע</p>
+            <p style={styles.emptyText}>לא נמצאו פעילויות מתאימות לתחומי העניין שלך</p>
           )}
         </section>
       </div>
