@@ -231,47 +231,47 @@ if (mode === 'choice') {
         <div className={styles.loginContent}>
           {/* Email Input */}
           <div className={styles.inputWrapper}>
-            <input
-              type="email"
-              placeholder="אימייל"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setEmailError('');
-              }}
-              className={`${styles.input} ${emailError ? styles.inputError : ''}`}
-              dir="rtl"
-            />
-            {emailError && (
-              <span className={styles.fieldError}>{emailError}</span>
-            )}
-          </div>
+  <input
+    type="email"
+    value={email}
+    onChange={(e) => {
+      setEmail(e.target.value);
+      setEmailError('');
+    }}
+    className={`${styles.input} ${emailError ? styles.inputError : ''}`}
+    dir="rtl"
+  />
+  <span className={styles.inputLabel}>אימייל</span>
+  {emailError && (
+    <span className={styles.fieldError}>{emailError}</span>
+  )}
+</div>
 
           {/* Password Input */}
           <div className={styles.inputWrapper}>
-            <input
-              type="password"
-              placeholder="סיסמה"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordError('');
-              }}
-              className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
-              dir="rtl"
-            />
-            {passwordError && (
-              <span className={styles.fieldError}>{passwordError}</span>
-            )}
+  <input
+    type="password"
+    value={password}
+    onChange={(e) => {
+      setPassword(e.target.value);
+      setPasswordError('');
+    }}
+    className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
+    dir="rtl"
+  />
+  <span className={styles.inputLabel}>סיסמה</span>
+  {passwordError && (
+    <span className={styles.fieldError}>{passwordError}</span>
+  )}
 
-            <button
-              className={styles.forgotPassword}
-              onClick={() => setShowForgotPassword(true)}
-              type="button"
-            >
-              שכחתי סיסמה
-            </button>
-          </div>
+  <button
+    className={styles.forgotPassword}
+    onClick={() => setShowForgotPassword(true)}
+    type="button"
+  >
+    שכחתי סיסמה
+  </button>
+</div>
 
           <div className={styles.buttonSection}>
             <button
