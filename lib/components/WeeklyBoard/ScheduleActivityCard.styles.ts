@@ -35,7 +35,7 @@ const styles: { [key: string]: CSSProperties } = {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-end",
-    gap: "0", // ✅ Smaller gap between lines
+    gap: "0",
     flex: 1,
     order: 1,
   },
@@ -44,7 +44,7 @@ const styles: { [key: string]: CSSProperties } = {
   title: {
     fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
     fontStyle: "normal",
-    fontWeight: "700", // ✅ BOLD
+    fontWeight: "700",
     fontSize: "1.25rem", // 20px
     lineHeight: "1.25rem", // 20px
     textAlign: "right",
@@ -81,8 +81,8 @@ const styles: { [key: string]: CSSProperties } = {
 
   // Line 3: Participants Ratio (FULL - RED)
   participantsFull: {
-    color: "#FF0000", // ✅ RED when full
-    fontWeight: "400", // Slightly bolder when full
+    color: "#FF0000",
+    fontWeight: "400",
   },
 
   // Arrow - LEFT MOST SIDE
