@@ -390,7 +390,7 @@ export const apiRegistrations = {
       .select("if_confirmed")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
-      .single();
+      .maybeSingle();
 
     if (!data) return [null, null]; // Not registered
     return [data.if_confirmed ? "confirmed" : "waitlist", null];
