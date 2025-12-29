@@ -1,3 +1,5 @@
+
+
 /* Base container */
 .container {
     position: relative;
@@ -268,6 +270,13 @@
     .primaryButton {
       height: 4rem;
       font-size: 1.375rem;
+    }
+  }
+  
+
+  @media (min-width: 48rem) {
+    .container {
+      max-width: 100%;
     }
   }
   

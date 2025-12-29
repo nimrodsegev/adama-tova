@@ -7,8 +7,9 @@
   /* Define design variables */
   --color-primary: #2b2d42;
   --color-secondary: #bfc6d2;
-  --color-background: #AD4E34;
+  --color-background: #AB4016;
   --color-accent: #535bf2;
+  --color-auth-background: #AD4E34;
 
   --border-radius: 0.5rem;
 
