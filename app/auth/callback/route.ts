@@ -22,8 +22,6 @@ export async function GET(request: Request) {
     
     // Check if this is a password recovery
     if (type === 'recovery') {
-      // For password reset, just redirect to reset-password page
-      // Don't do the normal login flow
       return NextResponse.redirect(new URL('/reset-password', requestUrl.origin));
     }
     
@@ -40,24 +38,23 @@ export async function GET(request: Request) {
       .from('users')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle(); // ✅ FIXED: Returns null instead of throwing 406
     
-    // Handle "no rows" error (PGRST116) - this is normal for new users
-    if (profileError && profileError.code !== 'PGRST116') {
+    if (profileError) {
       console.error("Profile error:", profileError);
     }
     
     // Determine where to redirect
     let targetPath = '/';
-    
+
     if (!profile) {
-      // New user - redirect to complete profile
-      targetPath = '/complete-profile';
+      // New Google user - redirect to login to show wizard
+      targetPath = '/login';
     } else if (!profile.quiz?.completed_at) {
-      // User exists but quiz not completed
-      targetPath = '/complete-profile';
+      // User exists but quiz not completed - redirect to login
+      targetPath = '/login';
     } else {
-      // 🔥 NEW: Check if user is approved (participants only)
+      // Check if user is approved (participants only)
       if (!profile.is_approved && profile.role === 'participant') {
         targetPath = '/pending-approval';
       } else {

@@ -81,11 +81,13 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
+    <div className={styles.pageBackground}>
       <div className={styles.container}>
         <div className={styles.content}>
           <div className={styles.greeting}>
             <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
             <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
+            </div>
           </div>
         </div>
       </div>
