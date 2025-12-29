@@ -1,14 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
+import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import styles from "./ScheduleActivityCard.styles";
 
 type ScheduleActivityCardProps = {
   id: string;
   title: string;
+  date: string; // ✅ ADDED: Need date for confirmation modal
   start_time: string;
   end_time: string;
   current_participants: number;
@@ -19,6 +21,7 @@ type ScheduleActivityCardProps = {
 export default function ScheduleActivityCard({
   id,
   title,
+  date, // ✅ ADDED
   start_time,
   end_time,
   current_participants,
@@ -32,9 +35,20 @@ export default function ScheduleActivityCard({
     "none"
   );
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const formattedStartTime = start_time.slice(0, 5);
   const formattedEndTime = end_time.slice(0, 5);
+
+  // ✅ ADDED: Format date for cancel modal
+  const dateObj = new Date(date);
+  const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
+  const dayMonth = `${dateObj.getDate().toString().padStart(2, "0")}.${(
+    dateObj.getMonth() + 1
+  )
+    .toString()
+    .padStart(2, "0")}`;
 
   // Check if activity is full
   const isFull = current_participants >= max_participants;
@@ -74,31 +88,26 @@ export default function ScheduleActivityCard({
 
     if (!user || loading || isAdmin) return;
 
+    // ✅ ADDED: If already registered, show cancel confirmation modal
+    if (regStatus !== "none") {
+      setIsCancelModalOpen(true);
+      return;
+    }
+
+    // If not registered, proceed with registration
     setLoading(true);
 
     try {
-      if (regStatus !== "none") {
-        const [_, error] = await apiRegistrations.cancelRegistration(
-          user.id,
-          id
-        );
-        if (!error) {
-          setRegStatus("none");
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          onRegistrationChange?.();
-        }
-      } else {
-        const [res, error] = await apiRegistrations.registerUserToActivity(
-          user.id,
-          id
-        );
-        if (res && res.id) {
-          const isWaitlist =
-            res.if_confirmed === false || error?.message?.includes("waitlist");
-          setRegStatus(isWaitlist ? "waitlist" : "confirmed");
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          onRegistrationChange?.();
-        }
+      const [res, error] = await apiRegistrations.registerUserToActivity(
+        user.id,
+        id
+      );
+      if (res && res.id) {
+        const isWaitlist =
+          res.if_confirmed === false || error?.message?.includes("waitlist");
+        setRegStatus(isWaitlist ? "waitlist" : "confirmed");
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        onRegistrationChange?.();
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -107,119 +116,163 @@ export default function ScheduleActivityCard({
     }
   };
 
+  // ✅ ADDED: Handle cancel confirmation
+  const handleCancelConfirm = async () => {
+    if (!user || loading) return;
+
+    setLoading(true);
+
+    try {
+      const [_, error] = await apiRegistrations.cancelRegistration(user.id, id);
+      if (!error) {
+        setRegStatus("none");
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        onRegistrationChange?.();
+      }
+    } catch (error) {
+      console.error("Unregistration error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't open modal if clicking on register button
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleModalRegistrationChange = () => {
+    // Refresh the card's registration status
+    checkRegistrationStatus();
+    // Call parent's callback
+    onRegistrationChange?.();
+  };
+
   const showRegisterButton = !isAdmin;
   const isRegistered = regStatus !== "none";
 
   return (
-    <Link
-      href={`/UserScreens/ActivityDetailsPage?id=${id}`}
-      style={{
-        ...styles.cardContainer,
-        border: isRegistered ? "0.125rem solid #681F02" : "none",
-      }}
-    >
-      {/* Register/Unregister Button - RIGHT MOST SIDE */}
-      {showRegisterButton && (
-        <Button
-          size="icon"
-          onClick={handleRegistrationToggle}
-          disabled={loading}
-          style={styles.registerButton}
-        >
-          {regStatus !== "none" ? (
-            // ✅ Minus icon - 40x40
-            <svg
-              width="45"
-              height="45"
-              viewBox="0 0 45 45" // ✅ FIXED: Match width/height
-              fill="none"
-            >
-              <line
-                x1="11.25" // ✅ FIXED: Adjusted for 45x45 viewBox (45 * 0.25)
-                y1="22.5" // ✅ FIXED: Center line vertically (45/2 = 22.5)
-                x2="33.75" // ✅ FIXED: Adjusted for 45x45 viewBox (45 * 0.75)
-                y2="22.5" // ✅ FIXED: Center line vertically
-                stroke="#681F02"
-                strokeWidth="1"
-              />
-            </svg>
-          ) : (
-            // ✅ Plus icon - 45x45
-            <svg
-              width="45"
-              height="45"
-              viewBox="0 0 45 45" // ✅ FIXED: Match width/height (was 32 32)
-              fill="none"
-            >
-              {/* Horizontal line */}
-              <line
-                x1="11.25" // ✅ FIXED: Adjusted for 45x45 viewBox (45 * 0.25)
-                y1="22.5" // ✅ FIXED: Center line vertically (45/2 = 22.5)
-                x2="33.75" // ✅ FIXED: Adjusted for 45x45 viewBox (45 * 0.75)
-                y2="22.5" // ✅ FIXED: Center line vertically
-                stroke="#681F02"
-                strokeWidth="1" // ✅ FIXED: Made thicker (was 1)
-              />
-              {/* Vertical line */}
-              <line
-                x1="22.5" // ✅ FIXED: Center line horizontally (45/2 = 22.5)
-                y1="11.25" // ✅ FIXED: Adjusted for 45x45 viewBox (45 * 0.25)
-                x2="22.5" // ✅ FIXED: Center line horizontally
-                y2="33.75" // ✅ FIXED: Adjusted for 45x45 viewBox (45 * 0.75)
-                stroke="#681F02"
-                strokeWidth="1" // ✅ FIXED: Made thicker (was 1)
-              />
-            </svg>
-          )}
-        </Button>
-      )}
+    <>
+      <div
+        onClick={handleCardClick}
+        style={{
+          ...styles.cardContainer,
+          border: isRegistered ? "0.125rem solid #681F02" : "none",
+        }}
+      >
+        {/* Register/Unregister Button - RIGHT MOST SIDE */}
+        {showRegisterButton && (
+          <Button
+            size="icon"
+            onClick={handleRegistrationToggle}
+            disabled={loading}
+            style={styles.registerButton}
+          >
+            {regStatus !== "none" ? (
+              // Minus icon - 45x45
+              <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+                <line
+                  x1="11.25"
+                  y1="22.5"
+                  x2="33.75"
+                  y2="22.5"
+                  stroke="#681F02"
+                  strokeWidth="1"
+                />
+              </svg>
+            ) : (
+              // Plus icon - 45x45
+              <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+                {/* Horizontal line */}
+                <line
+                  x1="11.25"
+                  y1="22.5"
+                  x2="33.75"
+                  y2="22.5"
+                  stroke="#681F02"
+                  strokeWidth="1"
+                />
+                {/* Vertical line */}
+                <line
+                  x1="22.5"
+                  y1="11.25"
+                  x2="22.5"
+                  y2="33.75"
+                  stroke="#681F02"
+                  strokeWidth="1"
+                />
+              </svg>
+            )}
+          </Button>
+        )}
 
-      {/* Content - MIDDLE (3 lines) */}
-      <div style={styles.content}>
-        {/* Line 1: Title (Bold) */}
-        <h3 style={styles.title}>{title}</h3>
+        {/* Content - MIDDLE (3 lines) */}
+        <div style={styles.content}>
+          {/* Line 1: Title (Bold) */}
+          <h3 style={styles.title}>{title}</h3>
 
-        {/* Line 2: Time (start on left, end on right in RTL) */}
-        <p style={styles.time}>
-          {formattedEndTime} - {formattedStartTime}
-        </p>
+          {/* Line 2: Time (start on left, end on right in RTL) */}
+          <p style={styles.time}>
+            {formattedEndTime} - {formattedStartTime}
+          </p>
 
-        {/* Line 3: Participants Ratio (red if full) */}
-        <p
-          style={{
-            ...styles.participants,
-            ...(isFull && styles.participantsFull),
-          }}
-        >
-          {current_participants}/{max_participants}
-        </p>
+          {/* Line 3: Participants Ratio (red if full) */}
+          <p
+            style={{
+              ...styles.participants,
+              ...(isFull && styles.participantsFull),
+            }}
+          >
+            {current_participants}/{max_participants}
+          </p>
+        </div>
+
+        {/* Arrow - LEFT MOST SIDE (pointing left/backwards) */}
+        <div style={styles.arrow}>
+          <svg width="12" height="21" viewBox="0 0 12 21" fill="none">
+            <line
+              x1="10"
+              y1="2"
+              x2="2"
+              y2="10.5"
+              stroke="#F9F9F9"
+              strokeWidth="2"
+            />
+            <line
+              x1="2"
+              y1="10.5"
+              x2="10"
+              y2="19"
+              stroke="#F9F9F9"
+              strokeWidth="2"
+            />
+          </svg>
+        </div>
+
+        {/* Registration Indicator Dot */}
+        {isRegistered && <div style={styles.registrationDot} />}
       </div>
 
-      {/* Arrow - LEFT MOST SIDE (pointing left/backwards) */}
-      <div style={styles.arrow}>
-        {/* ✅ Arrow pointing LEFT (opposite direction) */}
-        <svg width="12" height="21" viewBox="0 0 12 21" fill="none">
-          <line
-            x1="10"
-            y1="2"
-            x2="2"
-            y2="10.5"
-            stroke="#F9F9F9"
-            strokeWidth="2"
-          />
-          <line
-            x1="2"
-            y1="10.5"
-            x2="10"
-            y2="19"
-            stroke="#F9F9F9"
-            strokeWidth="2"
-          />
-        </svg>
-      </div>
+      {/* Activity Details Modal */}
+      <ActivityDetailsModal
+        activityId={id}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onRegistrationChange={handleModalRegistrationChange}
+      />
 
-      {/* Registration Indicator Dot */}
-      {isRegistered && <div style={styles.registrationDot} />}
-    </Link>
+      {/* Cancel Confirmation Modal */}
+      <CancelConfirmationModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={handleCancelConfirm}
+        activityTitle={title}
+        activityDate={`${dayName} ${dayMonth}`}
+        activityTime={formattedStartTime}
+      />
+    </>
   );
 }

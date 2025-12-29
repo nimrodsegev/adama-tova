@@ -144,6 +144,7 @@ export default function WeeklyBoardPage() {
                 key={activity.id}
                 id={activity.id}
                 title={activity.title}
+                date={activity.date}
                 start_time={activity.start_time}
                 end_time={activity.end_time}
                 current_participants={activity.current_participants || 0}
