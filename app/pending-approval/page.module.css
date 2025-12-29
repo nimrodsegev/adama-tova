@@ -178,7 +178,7 @@
   right: 1.5rem; /* 🔥 NEW: 24px from right */
   
   width: auto; /* 🔥 CHANGED: Auto width */
-  min-width: 8rem; /* 🔥 NEW: Minimum width */
+  min-width: 3rem; /* 🔥 NEW: Minimum width */
   height: 2.25rem; /* 🔥 CHANGED: 36px (smaller) */
   padding: 0.5rem 1.25rem; /* 🔥 CHANGED: Smaller padding */
   

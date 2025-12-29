@@ -155,7 +155,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       <div className={styles.content}>
         {/* Step 1: Name + Phone */}
         {currentStep === 0 && (
-          <div className={styles.stepContainer}>
+          <div className={`${styles.stepContainer} ${styles.step1}`}>
             <h2 className={styles.stepTitle}>השלם את הפרטים הבאים:</h2>
 
             
@@ -195,7 +195,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
         {/* Step 2: Circle Selection */}
         {currentStep === 1 && (
-          <div className={styles.stepContainer}>
+          <div className={`${styles.stepContainer} ${styles.step2}`}>
             <h2 className={styles.stepTitle}>מאיזה מקום אישי את.ה מגיע.ה אלינו?</h2>
 
             
@@ -203,7 +203,9 @@ export default function SignupWizard({ signupType, email, password, googleUserId
               {CIRCLE_OPTIONS.map((option) => (
                 <button
                   key={option}
-                  onClick={() => setCircle(option)}
+                  onClick={() =>
+                    setCircle(prev => (prev === option ? '' : option))
+                  }
                   className={`${styles.optionButton} ${circle === option ? styles.selected : ''}`}
                 >
                   {option}
@@ -228,7 +230,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
         {/* Step 3: Interests */}
         {currentStep === 2 && (
-          <div className={styles.stepContainer}>
+          <div className={`${styles.stepContainer} ${styles.step3}`}>
             <h2 className={styles.stepTitle}>מה מעניין אותך?</h2>
 
             
@@ -250,21 +252,24 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
         {/* Step 4: Free Text */}
         {currentStep === 3 && (
-          <div className={styles.stepContainer}>
-            <h2 className={styles.stepTitle}>כל דבר אחר שתרצה שנדע:</h2>
+  <div className={`${styles.stepContainer} ${styles.step4}`}>
+    <h2 className={styles.stepTitle}>כל דבר אחר שתרצה שנדע:</h2>
 
-            
-            <div className={styles.textareaWrapper}>
-              <textarea
-                value={freeText}
-                onChange={(e) => setFreeText(e.target.value)}
-                className={styles.textarea}
-                rows={6}
-                dir="rtl"
-              />
-            </div>
-          </div>
-        )}
+    <div className={styles.textareaWrapper}>
+      <div className={styles.inputWrapper}>
+        <textarea
+          value={freeText}
+          onChange={(e) => setFreeText(e.target.value)}
+          className={styles.textarea}
+          rows={6}
+          dir="rtl"
+        />
+        <span className={styles.inputLabel}>אחר</span>
+      </div>
+    </div>
+  </div>
+)}
+
 
         {error && <p className={styles.error}>{error}</p>}
 

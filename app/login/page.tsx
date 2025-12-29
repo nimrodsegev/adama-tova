@@ -138,17 +138,36 @@ export default function LoginPage() {
           const supabase = createClient();
           const { data: profile } = await supabase
             .from('users')
-            .select('is_approved, role')
+            .select('is_approved, role, quiz')
             .eq('id', user.id)
-            .maybeSingle(); // ✅ FIXED
+            .maybeSingle();
           
-          if (profile && !profile.is_approved && profile.role === 'participant') {
-            router.replace('/pending-approval');
-            return;
+          if (profile) {
+            // Check approval status first
+            if (!profile.is_approved && profile.role === 'participant') {
+              router.replace('/pending-approval');
+              setLoading(false);
+              return;
+            }
+            
+            // Check quiz completion
+            if (!profile.quiz?.completed_at) {
+              router.replace('/login'); // Show wizard
+              setLoading(false);
+              return;
+            }
+            
+            // 🔥 FIXED: Navigate to correct dashboard
+            if (profile.role === 'admin') {
+              router.replace('/adminScreens/HomePage');
+            } else {
+              router.replace('/UserScreens/HomePage');
+            }
+          } else {
+            // No profile exists - should not happen for existing users
+            setEmailError('שגיאה בטעינת פרופיל');
           }
         }
-        
-        router.refresh();
       } catch (authError: any) {
         setPasswordError('סיסמה שגויה');
       }
@@ -238,7 +257,7 @@ export default function LoginPage() {
                   setEmail(e.target.value);
                   setEmailError('');
                 }}
-                className={`${styles.input} ${emailError ? styles.inputError : ''}`}
+                className={`${styles.input} ${styles.inputLtr} ${emailError ? styles.inputError : ''}`}
                 dir="rtl"
               />
               <span className={styles.inputLabel}>אימייל</span>

@@ -12,6 +12,7 @@
   padding: 1rem;
 }
 
+
 /* Content wrapper */
 .content {
   display: flex;
@@ -122,6 +123,11 @@
   z-index: 1;
 }
 
+.inputLtr {
+  direction: ltr;
+  text-align: right;
+}
+
 /* Input error state */
 .inputError {
   border: 2px solid #FF0000 !important;
@@ -132,9 +138,9 @@
 .fieldError {
   position: absolute;
   right: 1.5rem;
-  top: -0.5625rem; /* -9px - sits ON the border */
+  top: -0.5rem; /* -9px - sits ON the border */
   
-  padding: 0.0625rem 0.3125rem;
+  padding: 0rem 0.3125rem;
   background: #AD4E34;
   
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
@@ -356,10 +362,11 @@
   }
   
   .forgotPassword {
-    height: 3.25rem;
-    font-size: 1.125rem;
-    padding: 0 1.25rem;
+    margin-top: 0.5rem;
+    min-height: 1.6rem;
+    max-height: 1.6rem;
   }
+  
 }
 
 @media (min-width: 64rem) { /* 1024px */

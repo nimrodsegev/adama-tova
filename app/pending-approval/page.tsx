@@ -47,7 +47,7 @@ export default function PendingApprovalPage() {
           onClick={handleBackToLogin}
           className={styles.backButton}
         >
-          חזור לדף התחברות
+          סיום
         </button>
       </div>
     </div>
