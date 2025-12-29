@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
+import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import styles from "./UserActivityCard.styles";
 
 type UserActivityCardProps = {
@@ -33,6 +34,8 @@ export default function UserActivityCard({
     "none"
   );
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const formattedTime = start_time.slice(0, 5);
 
@@ -79,58 +82,39 @@ export default function UserActivityCard({
 
     if (!user || loading || isAdmin) return;
 
-    console.log("🔵 Starting registration toggle...");
+    // If already registered, show cancel confirmation modal
+    if (regStatus !== "none") {
+      setIsCancelModalOpen(true);
+      return;
+    }
+
+    // If not registered, proceed with registration
+    console.log("🟢 Registering for activity:", id);
     setLoading(true);
 
     try {
-      if (regStatus !== "none") {
-        console.log("🔴 Unregistering from activity:", id);
-        const [_, error] = await apiRegistrations.cancelRegistration(
-          user.id,
-          id
+      const [res, error] = await apiRegistrations.registerUserToActivity(
+        user.id,
+        id
+      );
+      console.log("Registration response:", res, "Error:", error);
+
+      if (res && res.id) {
+        const isWaitlist =
+          res.if_confirmed === false || error?.message?.includes("waitlist");
+        setRegStatus(isWaitlist ? "waitlist" : "confirmed");
+        console.log(
+          "✅ Registration successful, status:",
+          isWaitlist ? "waitlist" : "confirmed"
         );
-        if (!error) {
-          console.log("✅ Unregistration successful");
-          setRegStatus("none");
-          console.log("📞 Calling onRegistrationChange callback...");
+        console.log("📞 Calling onRegistrationChange callback...");
 
-          // Add small delay to ensure DB is updated
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          onRegistrationChange?.();
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        onRegistrationChange?.();
 
-          console.log("📞 Callback called");
-        } else {
-          console.error("❌ Error unregistering:", error);
-        }
+        console.log("📞 Callback called");
       } else {
-        console.log("🟢 Registering for activity:", id);
-        const [res, error] = await apiRegistrations.registerUserToActivity(
-          user.id,
-          id
-        );
-        console.log("Registration response:", res, "Error:", error);
-
-        // ✅ FIXED: Check if we got data back (registration happened)
-        // The error might just be a waitlist message
-        if (res && res.id) {
-          // If we got a registration ID, it worked
-          const isWaitlist =
-            res.if_confirmed === false || error?.message?.includes("waitlist");
-          setRegStatus(isWaitlist ? "waitlist" : "confirmed");
-          console.log(
-            "✅ Registration successful, status:",
-            isWaitlist ? "waitlist" : "confirmed"
-          );
-          console.log("📞 Calling onRegistrationChange callback...");
-
-          // Add small delay to ensure DB is updated
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          onRegistrationChange?.();
-
-          console.log("📞 Callback called");
-        } else {
-          console.error("❌ Error registering:", error);
-        }
+        console.error("❌ Error registering:", error);
       }
     } catch (error) {
       console.error("💥 Registration error:", error);
@@ -140,76 +124,132 @@ export default function UserActivityCard({
     }
   };
 
+  const handleCancelConfirm = async () => {
+    if (!user || loading) return;
+
+    console.log("🔴 Unregistering from activity:", id);
+    setLoading(true);
+
+    try {
+      const [_, error] = await apiRegistrations.cancelRegistration(user.id, id);
+      if (!error) {
+        console.log("✅ Unregistration successful");
+        setRegStatus("none");
+        console.log("📞 Calling onRegistrationChange callback...");
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        onRegistrationChange?.();
+
+        console.log("📞 Callback called");
+      } else {
+        console.error("❌ Error unregistering:", error);
+      }
+    } catch (error) {
+      console.error("💥 Unregistration error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't open modal if clicking on register button
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleModalRegistrationChange = () => {
+    // Refresh the card's registration status
+    checkRegistrationStatus();
+    // Call parent's callback
+    onRegistrationChange?.();
+  };
+
   const showRegisterButton = !isAdmin;
 
   return (
-    <Link
-      href={`/UserScreens/ActivityDetailsPage?id=${id}`}
-      style={styles.cardContainer}
-    >
-      <div style={styles.frame224}>
-        <h3 style={styles.titleText}>{title}</h3>
+    <>
+      <div onClick={handleCardClick} style={styles.cardContainer}>
+        <div style={styles.frame224}>
+          <h3 style={styles.titleText}>{title}</h3>
 
-        <div style={styles.frame266}>
-          <p style={styles.bodyM}>
-            {dayName} {dayMonth}
-            <br />
-            בשעה {formattedTime}
-            <br />
-            {location}
-          </p>
+          <div style={styles.frame266}>
+            <p style={styles.bodyM}>
+              {dayName} {dayMonth}
+              <br />
+              בשעה {formattedTime}
+              <br />
+              {location}
+            </p>
+          </div>
+        </div>
+
+        {showRegisterButton && (
+          <Button
+            size="icon"
+            onClick={handleRegistrationToggle}
+            disabled={loading}
+            style={styles.registerButton}
+          >
+            {regStatus !== "none" ? (
+              // Minus icon - 45x45
+              <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+                <line
+                  x1="11.25"
+                  y1="22.5"
+                  x2="33.75"
+                  y2="22.5"
+                  stroke="#681F02"
+                  strokeWidth="1"
+                />
+              </svg>
+            ) : (
+              // Plus icon - 45x45
+              <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+                <line
+                  x1="11.25"
+                  y1="22.5"
+                  x2="33.75"
+                  y2="22.5"
+                  stroke="#681F02"
+                  strokeWidth="1"
+                />
+                <line
+                  x1="22.5"
+                  y1="11.25"
+                  x2="22.5"
+                  y2="33.75"
+                  stroke="#681F02"
+                  strokeWidth="1"
+                />
+              </svg>
+            )}
+          </Button>
+        )}
+
+        <div style={styles.arrowButton}>
+          <span style={styles.arrowIcon}>›</span>
         </div>
       </div>
 
-      {/* ✅ UPDATED: Using styles.registerButton from CSS file */}
-      {showRegisterButton && (
-        <Button
-          size="icon"
-          onClick={handleRegistrationToggle}
-          disabled={loading}
-          style={styles.registerButton} // ✅ Reference CSS file
-        >
-          {regStatus !== "none" ? (
-            // Minus icon - 45x45
-            <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
-              <line
-                x1="11.25"
-                y1="22.5"
-                x2="33.75"
-                y2="22.5"
-                stroke="#681F02"
-                strokeWidth="1"
-              />
-            </svg>
-          ) : (
-            // Plus icon - 45x45
-            <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
-              {/* Horizontal line */}
-              <line
-                x1="11.25"
-                y1="22.5"
-                x2="33.75"
-                y2="22.5"
-                stroke="#681F02"
-                strokeWidth="1"
-              />
-              {/* Vertical line */}
-              <line
-                x1="22.5"
-                y1="11.25"
-                x2="22.5"
-                y2="33.75"
-                stroke="#681F02"
-                strokeWidth="1"
-              />
-            </svg>
-          )}
-        </Button>
-      )}
+      {/* Activity Details Modal */}
+      <ActivityDetailsModal
+        activityId={id}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onRegistrationChange={handleModalRegistrationChange}
+      />
 
-      <div style={styles.arrowButton}>
-        <span style={styles.arrowIcon}>›</span>
-      </div>
-    </Link>
+      {/* Cancel Confirmation Modal */}
+      <CancelConfirmationModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={handleCancelConfirm}
+        activityTitle={title}
+        activityDate={`${dayName} ${dayMonth}`}
+        activityTime={formattedTime}
+      />
+    </>
   );
 }

@@ -198,8 +198,9 @@ export default function HomePage() {
             </div>
           ) : (
             <EmptyState
-              message="לא נמצאו פעילויות מתאימות לתחומי העניין שלך"
-              showIcon={false}
+              message="לא נמצאו פעילויות מתאימות"
+              buttonText="להוספת תחומי עניין"
+              buttonHref="/profile"
             />
           )}
         </section>
