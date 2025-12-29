@@ -18,6 +18,9 @@ export default function Footer() {
   if (loading || !user || !userProfile) {
     return null;
   }
+  if (userProfile.role === "participant" && !userProfile.is_approved) {
+    return null;
+  }
 
   const isAdmin = userProfile.role === "admin";
 
@@ -50,7 +53,7 @@ export default function Footer() {
     },
     {
       href: "/UserScreens/WeeklyBoardPage",
-      icon: "/icons/phone_icon.svg",
+      icon: "/icons/calendar_icon.svg",
       label: "Weekly",
     },
     {

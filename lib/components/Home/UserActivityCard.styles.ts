@@ -40,10 +40,10 @@ const styles: { [key: string]: CSSProperties } = {
     width: "100%",
     maxWidth: "8.4375rem",
     height: "auto",
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif", // ✅ Updated
+    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
     fontStyle: "normal",
-    fontWeight: "400", // ✅ Regular 400
-    fontSize: "clamp(1.125rem, 4.5vw, 1.375rem)", // ✅ CHANGED: from clamp(1rem, 4vw, 1.25rem) - larger font
+    fontWeight: "400",
+    fontSize: "clamp(1.125rem, 4.5vw, 1.375rem)",
     lineHeight: "1.375rem",
     display: "flex",
     alignItems: "flex-end",
@@ -70,10 +70,10 @@ const styles: { [key: string]: CSSProperties } = {
   bodyM: {
     width: "100%",
     maxWidth: "8.4375rem",
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif", // ✅ Updated
+    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
     fontStyle: "light",
-    fontWeight: "300", // ✅ Light 300
-    fontSize: "clamp(0.9375rem, 3.8vw, 1.0625rem)", // ✅ CHANGED: from clamp(0.875rem, 3.5vw, 1rem) - larger font
+    fontWeight: "300",
+    fontSize: "clamp(0.9375rem, 3.8vw, 1.0625rem)",
     lineHeight: "1.125rem",
     textAlign: "right",
     color: "#681F02",
@@ -97,46 +97,22 @@ const styles: { [key: string]: CSSProperties } = {
     height: "1.1875rem",
     left: "0",
     top: "0",
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif", // ✅ Updated
+    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
     fontStyle: "normal",
-    fontWeight: "400", // ✅ Light 300 (for ratio)
-    fontSize: "clamp(0.9375rem, 3.8vw, 1.0625rem)", // ✅ CHANGED: from clamp(0.875rem, 3.5vw, 1rem) - larger font
+    fontWeight: "400",
+    fontSize: "clamp(0.9375rem, 3.8vw, 1.0625rem)",
     lineHeight: "1.25rem",
     textAlign: "right",
     color: "#681F02",
     margin: 0,
   },
 
-  progressBarContainer: {
-    width: "5rem",
-    height: "0.375rem",
-    position: "relative",
-    flex: "none",
-    order: 3,
-    flexGrow: 0,
-    alignSelf: "flex-start",
-    marginTop: "-0.25rem",
-  },
-
-  progressBarBackground: {
+  // ✅ Register button styling - controlled from CSS
+  registerButton: {
     position: "absolute",
-    left: "0",
-    right: "0",
-    top: "0",
-    width: "100%",
-    height: "0.375rem",
-    border: "0.1875rem solid #AD4E34",
-    borderRadius: "0.1875rem",
-  },
-
-  progressBarFill: {
-    position: "absolute",
-    left: "0",
-    top: "0",
-    height: "0.375rem",
-    border: "0.1875rem solid #681F02",
-    borderRadius: "0.1875rem",
-    transition: "width 0.3s ease",
+    left: "0.5rem", // Top left corner in LTR (right in RTL)
+    top: "1.5rem",
+    zIndex: 10,
   },
 
   arrowButton: {
