@@ -37,8 +37,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const NO_REDIRECT_ROUTES = ['/complete-profile', '/reset-password'];
-const PUBLIC_ROUTES = ['/login', '/complete-profile', '/reset-password', '/pending-approval'];
+const PUBLIC_ROUTES = ['/login', '/reset-password', '/pending-approval'];
 
 // 🔑 Detect if user is in password recovery mode
 function isPasswordRecoverySession(user: User | null): boolean {
@@ -96,6 +95,12 @@ export function UserProvider({
 
       // 🔓 Normal authenticated flow
       if (user) {
+        // 🔥 NEW: Skip profile check if user is on login page (wizard might be active)
+        if (pathname === '/login') {
+          setLoading(false);
+          return;
+        }
+
         try {
           const profile = await userService.getFullProfile(user.id);
           
@@ -121,7 +126,8 @@ export function UserProvider({
               return;
             }
             
-            const shouldRedirect = pathname === '/login' || pathname === '/complete-profile' || pathname === '/';
+            // Don't redirect away from /login (wizard might be active)
+            const shouldRedirect = pathname === '/';
 
             if (shouldRedirect && completed) {
               if (profile.role === 'admin') {
@@ -129,10 +135,12 @@ export function UserProvider({
               } else {
                 router.replace('/UserScreens/HomePage');
               }
-            } else if (!completed && pathname !== '/complete-profile') {
-              router.replace('/complete-profile');
+            } else if (!completed && pathname !== '/login') {
+              // Redirect to login (wizard handles signup flow)
+              router.replace('/login');
             }
           } else {
+            // No profile exists - user just signed up
             setUserProfile(null);
             setHasCompletedQuiz(false);
             
@@ -141,8 +149,9 @@ export function UserProvider({
               return;
             }
             
-            if (pathname !== '/complete-profile') {
-              router.replace('/complete-profile');
+            // Stay on /login to show wizard
+            if (pathname !== '/login') {
+              router.replace('/login');
             }
           }
         } catch (error) {
@@ -173,7 +182,7 @@ export function UserProvider({
     router.replace('/login');
   };
 
-  // 🔥 NEW: Block rendering if user is unapproved - prevents flash
+  // 🔥 Block rendering if user is unapproved - prevents flash
   if (userProfile && !userProfile.is_approved && userProfile.role === 'participant') {
     const allowedPaths = ['/pending-approval', '/login', '/reset-password'];
     if (!allowedPaths.includes(pathname)) {
@@ -184,7 +193,7 @@ export function UserProvider({
         <UserContext.Provider value={{ user, userProfile, loading: true, hasCompletedQuiz, signOut }}>
           <div style={{ 
             minHeight: '100vh', 
-            background: '#AB4016',
+            background: '#AD4E34',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

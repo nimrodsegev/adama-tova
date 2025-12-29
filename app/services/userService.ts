@@ -20,6 +20,7 @@ const CIRCLE_MAPPING: Record<string, string> = {
   'תושבי העוטף ומפונים': 'Residence of Otef Aza',
   'מעגל שני ושלישי של משפחות השכול': 'Second or third',
 };
+
 const INTRESTS_MAPPING: Record<string, string> = {
   'מדיטציה': 'Meditation',
   'יוגה': 'Yoga',
@@ -28,6 +29,7 @@ const INTRESTS_MAPPING: Record<string, string> = {
   'מינדפולנס': 'Mindfulness',
   'יצירה': 'Crafts',
 };
+
 export const userService = {
   // Save quiz answers and create user profile
   async completeProfile(
@@ -37,6 +39,7 @@ export const userService = {
       full_name: string;
       phone: string;
       circle?: string;
+      proximity?: string;
       interests?: string[];
       free_text?: string;
     }
@@ -56,11 +59,12 @@ export const userService = {
         role: 'participant',
         full_name: profileData.full_name,
         phone: profileData.phone,
-        circle: circleEnglish, // ✅ Store English value in circle column
+        circle: circleEnglish,
         is_approved: false,
         notifications_enabled: true,
         quiz: {
-          circle: profileData.circle || null, // ✅ Keep Hebrew in quiz JSON
+          circle: profileData.circle || null,
+          proximity: profileData.proximity || null,
           interests: profileData.interests || [],
           free_text: profileData.free_text || null,
           completed_at: new Date().toISOString(),
@@ -75,13 +79,12 @@ export const userService = {
   async hasCompletedQuiz(userId: string) {
     const supabase = createClient();
     
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('users')
       .select('quiz')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // ✅ FIXED
     
-    if (error) return false;
     return data?.quiz?.completed_at != null;
   },
 
@@ -93,9 +96,13 @@ export const userService = {
       .from('users')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // ✅ FIXED: Returns null instead of throwing 406
     
-    if (error) return null;
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
+    
     return data;
   },
 };
