@@ -5,7 +5,7 @@
   max-width: 24.5625rem; /* 393px */
   min-height: 100vh;
   margin: 0 auto;
-  background: #AD4E34;
+  background: #F28130;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,7 +129,7 @@
   width: 100%;
   height: 3.75rem; /* 60px */
   padding: 0.5rem 1.625rem; /* 8px 26px */
-  background: #AD4E34;
+  background: #F28130;
   border: 0.5px solid #FFFFFF;
   border-radius: 1.875rem; /* 30px */
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
@@ -158,7 +158,7 @@
   
   height: 1.0625rem; /* 17px */
   
-  background: #AD4E34;
+  background: #F28130;
   
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-style: normal;
@@ -183,7 +183,7 @@
   right: 6.5rem; /* 🔥 CHANGED: 88px (was 72px) - much more to the right */
   top: -0.5625rem;
   padding: 0.0625rem 0.5rem;
-  background: #AD4E34;
+  background: #F28130;
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
@@ -243,7 +243,7 @@
   width: 100%;
   height: 3.75rem; /* 60px */
   padding: 1rem 1.625rem;
-  background: #AD4E34;
+  background: #F28130;
   border: 0.5px solid #FFFFFF;
   border-radius: 1.875rem; /* 30px */
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;

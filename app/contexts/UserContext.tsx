@@ -193,7 +193,7 @@ export function UserProvider({
         <UserContext.Provider value={{ user, userProfile, loading: true, hasCompletedQuiz, signOut }}>
           <div style={{ 
             minHeight: '100vh', 
-            background: '#AD4E34',
+            background: '#F28130',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

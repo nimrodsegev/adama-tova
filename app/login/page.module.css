@@ -5,7 +5,7 @@
   max-width: 24.5625rem; /* 393px */
   min-height: 100vh;
   margin: 0 auto;
-  background: #AD4E34;
+  background: #F28130;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,7 +76,7 @@
   width: 100%;
   height: 3.75rem; /* 60px */
   padding: 0.5rem 2rem;
-  background: #AD4E34;
+  background: #F28130;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.875rem; /* 30px */
   color: #FFFFFF;
@@ -109,7 +109,7 @@
   
   height: 1.0625rem; /* 17px */
   
-  background: #AD4E34;
+  background: #F28130;
   
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-style: normal;
@@ -141,7 +141,7 @@
   top: -0.5rem; /* -9px - sits ON the border */
   
   padding: 0rem 0.3125rem;
-  background: #AD4E34;
+  background: #F28130;
   
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-size: 0.875rem; /* 14px */
@@ -303,7 +303,7 @@
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus,
 .input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #AD4E34 inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #F28130 inset !important;
   -webkit-text-fill-color: #EFEFEF !important;
   caret-color: #EFEFEF;
   border: 2px solid rgba(255, 255, 255, 0.4) !important;

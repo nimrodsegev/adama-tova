@@ -13,7 +13,7 @@ const styles: { [key: string]: CSSProperties } = {
     width: "100%",
     maxWidth: "22.0625rem", // 353px
     height: "11.625rem", // 186px
-    background: "#AD4E34", // Background color
+    background: "#F28130", // Background color
     border: "0.0625rem solid #F9F9F9", // 1px border
     borderRadius: "1.25rem", // 20px
     flex: "none",
