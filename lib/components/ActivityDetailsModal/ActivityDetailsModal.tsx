@@ -181,7 +181,23 @@ export default function ActivityDetailsModal({
         </button>
 
         {/* ✅ CHANGED: Single container for all content */}
+        
         <div style={styles.contentFrame}>
+          {activity?.image_url && (
+            <div style={{ 
+              width: "100%", 
+              height: "180px", 
+              marginBottom: "16px", 
+              borderRadius: "8px", 
+              overflow: "hidden" 
+            }}>
+              <img 
+                src={activity.image_url} 
+                alt={activity.title} 
+                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+              />
+            </div>
+          )}
           {/* Title */}
           <h2 style={styles.titleText}>{activity?.title || ""}</h2>
 
