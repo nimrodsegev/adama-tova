@@ -1,9 +1,16 @@
 "use client";
 import { useState } from "react";
 import { apiActivities } from "@/app/services/db_api";
+import styles from "./AddActivityPage.styles";
 
 type ActivityStatus = "open" | "closed" | "cancelled";
-type ActivityCategory = "Art" | "Yoga" | "Meditation" | "Writing" | "Crafts" | "Mindfulness";
+type ActivityCategory =
+  | "Art"
+  | "Yoga"
+  | "Meditation"
+  | "Writing"
+  | "Crafts"
+  | "Mindfulness";
 
 export default function AddActivityPage() {
   const [formData, setFormData] = useState({
@@ -19,7 +26,6 @@ export default function AddActivityPage() {
     location: "",
   });
 
-  // 👇 New State for Image
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -28,6 +34,7 @@ export default function AddActivityPage() {
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // ✅ FIXED: Correct type definition using union (|) instead of commas
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -41,7 +48,7 @@ export default function AddActivityPage() {
     e.preventDefault();
     setSubmitStatus("idle");
     setErrorMessage("");
-    setUploading(true); // Start loading
+    setUploading(true);
 
     let imageUrl = null;
 
@@ -70,7 +77,7 @@ export default function AddActivityPage() {
       category: formData.category,
       instructor: formData.instructor,
       location: formData.location,
-      image_url: imageUrl, // 👈 Save the URL
+      image_url: imageUrl,
     };
 
     try {
@@ -101,7 +108,7 @@ export default function AddActivityPage() {
           instructor: "",
           location: "",
         });
-        setImageFile(null); // Reset file
+        setImageFile(null);
         setSubmitStatus("idle");
       }, 2000);
     } catch (error) {
@@ -114,468 +121,247 @@ export default function AddActivityPage() {
   };
 
   return (
-    <main
-      style={{
-        padding: "20px",
-        maxWidth: "800px",
-        margin: "0 auto",
-        direction: "rtl",
-      }}
-    >
-      <header
-        style={{
-          marginBottom: "32px",
-          backgroundColor: "transparent",
-          padding: 0,
-          border: "none",
-        }}
-      >
-        <h1
-          style={{ fontSize: "32px", marginBottom: "8px", textAlign: "right" }}
-        >
-          הוספת פעילות חדשה
-        </h1>
-        <p style={{ fontSize: "16px", color: "#666", textAlign: "right" }}>
-          מלא את הפרטים להוספת פעילות למערכת
-        </p>
+    <main style={styles.mainContainer}>
+      {/* Header - Fixed at top */}
+      <header style={styles.header}>
+        <h1 style={styles.title}>הוספת פעילות חדשה</h1>
+        <p style={styles.subtitle}>מלא את הפרטים להוספת פעילות למערכת</p>
       </header>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      >
-        {/* Title */}
-        <div>
-          <label
-            htmlFor="title"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            שם הפעילות *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-            }}
-            placeholder="לדוגמה: סדנת ציור"
-          />
-        </div>
+      {/* Scrollable form container */}
+      <div style={styles.scrollableContainer}>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          {/* Title */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="title" style={styles.label}>
+              שם הפעילות *
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              style={styles.input}
+              placeholder="לדוגמה: סדנת ציור"
+            />
+          </div>
 
-        {/* 👇 NEW IMAGE INPUT */}
-        <div>
-          <label
+          {/* Image Input */}
+          <div style={styles.fieldContainer}>
+            <label style={styles.label}>תמונה לפעילות (אופציונלי)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setImageFile(e.target.files[0]);
+                }
+              }}
+              style={styles.fileInput}
+            />
+            {imageFile && (
+              <div style={styles.fileNameDisplay}>
+                קובץ נבחר: {imageFile.name}
+              </div>
+            )}
+          </div>
+
+          {/* Instructor */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="instructor" style={styles.label}>
+              שם המנחה *
+            </label>
+            <input
+              type="text"
+              id="instructor"
+              name="instructor"
+              value={formData.instructor}
+              onChange={handleChange}
+              required
+              style={styles.input}
+              placeholder="לדוגמה: יוסי לוי"
+            />
+          </div>
+
+          {/* Location */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="location" style={styles.label}>
+              מיקום הפעילות *
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              required
+              style={styles.input}
+              placeholder="לדוגמה: במרחה החיצוני"
+            />
+          </div>
+
+          {/* Date */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="date" style={styles.label}>
+              תאריך *
+            </label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              required
+              style={styles.input}
+            />
+          </div>
+
+          {/* Start Time and End Time */}
+          <div style={styles.timeRow}>
+            <div style={styles.timeField}>
+              <label htmlFor="start_time" style={styles.label}>
+                שעת התחלה *
+              </label>
+              <input
+                type="time"
+                id="start_time"
+                name="start_time"
+                value={formData.start_time}
+                onChange={handleChange}
+                required
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.timeField}>
+              <label htmlFor="end_time" style={styles.label}>
+                שעת סיום *
+              </label>
+              <input
+                type="time"
+                id="end_time"
+                name="end_time"
+                value={formData.end_time}
+                onChange={handleChange}
+                required
+                style={styles.input}
+              />
+            </div>
+          </div>
+
+          {/* Category */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="category" style={styles.label}>
+              קטגוריה *
+            </label>
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              style={styles.select}
+            >
+              <option value="Art">אמנות</option>
+              <option value="Yoga">יוגה</option>
+              <option value="Meditation">מדיטציה</option>
+              <option value="Writing">כתיבה</option>
+              <option value="Crafts">יצירה</option>
+              <option value="Mindfulness">מיידנפולנס</option>
+            </select>
+          </div>
+
+          {/* Max Participants */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="max_participants" style={styles.label}>
+              מספר משתתפים מקסימלי *
+            </label>
+            <input
+              type="number"
+              id="max_participants"
+              name="max_participants"
+              value={formData.max_participants}
+              onChange={handleChange}
+              required
+              min="1"
+              style={styles.input}
+              placeholder="לדוגמה: 20"
+            />
+          </div>
+
+          {/* Status */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="status" style={styles.label}>
+              סטטוס *
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              required
+              style={styles.select}
+            >
+              <option value="open">פנוי</option>
+              <option value="closed">מלא</option>
+              <option value="cancelled">בוטל</option>
+            </select>
+          </div>
+
+          {/* Description */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="description" style={styles.label}>
+              תיאור *
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              rows={4}
+              style={styles.textarea}
+              placeholder="תאר את הפעילות..."
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={uploading || submitStatus === "success"}
             style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
+              ...styles.submitButton,
+              backgroundColor:
+                submitStatus === "success" ? "#28a745" : "#0070f3",
+              opacity: uploading || submitStatus === "success" ? 0.7 : 1,
+              cursor:
+                uploading || submitStatus === "success"
+                  ? "not-allowed"
+                  : "pointer",
             }}
           >
-            תמונה לפעילות (אופציונלי)
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                setImageFile(e.target.files[0]);
-              }
-            }}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              backgroundColor: "white",
-              textAlign: "right",
-              direction: "rtl",
-            }}
-          />
-          {imageFile && (
-            <div style={{ marginTop: "8px", fontSize: "14px", color: "#666" }}>
-              קובץ נבחר: {imageFile.name}
+            {uploading
+              ? "מעלה תמונה..."
+              : submitStatus === "success"
+              ? "✓ הפעילות נוספה"
+              : "הוסף פעילות"}
+          </button>
+
+          {/* Error Message */}
+          {submitStatus === "error" && (
+            <div style={styles.errorMessage}>
+              ❌ {errorMessage || "שגיאה בהוספת הפעילות. נסה שוב."}
             </div>
           )}
-        </div>
 
-        {/* Instructor */}
-        <div>
-          <label
-            htmlFor="instructor"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            שם המנחה *
-          </label>
-          <input
-            type="text"
-            id="instructor"
-            name="instructor"
-            value={formData.instructor}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-            }}
-            placeholder="לדוגמה: יוסי לוי"
-          />
-        </div>
-        {/* Location */}
-        <div>
-          <label
-            htmlFor="location"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            מיקום הפעילות *
-          </label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-            }}
-            placeholder="לדוגמה: במרחה החיצוני"
-          />
-        </div>
-        {/* Date */}
-        <div>
-          <label
-            htmlFor="date"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            תאריך *
-          </label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-            }}
-          />
-        </div>
-
-        {/* Start Time and End Time */}
-        <div style={{ display: "flex", gap: "16px" }}>
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="start_time"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-                textAlign: "right",
-              }}
-            >
-              שעת התחלה *
-            </label>
-            <input
-              type="time"
-              id="start_time"
-              name="start_time"
-              value={formData.start_time}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "2px solid #ccc",
-                fontSize: "16px",
-                textAlign: "right",
-                direction: "rtl",
-              }}
-            />
-          </div>
-
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="end_time"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "bold",
-                textAlign: "right",
-              }}
-            >
-              שעת סיום *
-            </label>
-            <input
-              type="time"
-              id="end_time"
-              name="end_time"
-              value={formData.end_time}
-              onChange={handleChange}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "2px solid #ccc",
-                fontSize: "16px",
-                textAlign: "right",
-                direction: "rtl",
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Category */}
-        <div>
-          <label
-            htmlFor="category"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            קטגוריה *
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-              cursor: "pointer",
-            }}
-          >
-            <option value="Art">אמנות</option>
-            <option value="Yoga">יוגה</option>
-            <option value="Meditation">מדיטציה</option>
-            <option value="Writing">כתיבה</option>
-            <option value="Crafts">יצירה</option>
-            <option value="Mindfulness">מיידנפולנס</option>
-          </select>
-        </div>
-
-        {/* Max Participants */}
-        <div>
-          <label
-            htmlFor="max_participants"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            מספר משתתפים מקסימלי *
-          </label>
-          <input
-            type="number"
-            id="max_participants"
-            name="max_participants"
-            value={formData.max_participants}
-            onChange={handleChange}
-            required
-            min="1"
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-            }}
-            placeholder="לדוגמה: 20"
-          />
-        </div>
-
-        {/* Status */}
-        <div>
-          <label
-            htmlFor="status"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            סטטוס *
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-              cursor: "pointer",
-            }}
-          >
-            <option value="open">פנוי</option>
-            <option value="closed">מלא</option>
-            <option value="cancelled">בוטל</option>
-          </select>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label
-            htmlFor="description"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-              textAlign: "right",
-            }}
-          >
-            תיאור *
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-            rows={4}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-              textAlign: "right",
-              direction: "rtl",
-              resize: "vertical",
-            }}
-            placeholder="תאר את הפעילות..."
-          />
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={uploading || submitStatus === "success"}
-          style={{
-            padding: "16px",
-            backgroundColor: submitStatus === "success" ? "#28a745" : "#0070f3",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "18px",
-            fontWeight: "bold",
-            cursor: (uploading || submitStatus === "success") ? "not-allowed" : "pointer",
-            transition: "background-color 0.3s",
-            opacity: (uploading || submitStatus === "success") ? 0.7 : 1,
-          }}
-        >
-          {uploading 
-            ? "מעלה תמונה..." 
-            : submitStatus === "success" 
-              ? "✓ הפעילות נוספה" 
-              : "הוסף פעילות"}
-        </button>
-
-        {/* Error Message */}
-        {submitStatus === "error" && (
-          <div
-            style={{
-              padding: "16px",
-              backgroundColor: "#ffebee",
-              border: "2px solid #f44336",
-              borderRadius: "8px",
-              textAlign: "center",
-              color: "#c62828",
-              fontWeight: "bold",
-            }}
-          >
-            ❌ {errorMessage || "שגיאה בהוספת הפעילות. נסה שוב."}
-          </div>
-        )}
-
-        {/* Success Message */}
-        {submitStatus === "success" && (
-          <div
-            style={{
-              padding: "16px",
-              backgroundColor: "#e8f5e9",
-              border: "2px solid #4caf50",
-              borderRadius: "8px",
-              textAlign: "center",
-              color: "#2e7d32",
-              fontWeight: "bold",
-            }}
-          >
-            ✅ הפעילות נוספה בהצלחה!
-          </div>
-        )}
-      </form>
+          {/* Success Message */}
+          {submitStatus === "success" && (
+            <div style={styles.successMessage}>✅ הפעילות נוספה בהצלחה!</div>
+          )}
+        </form>
+      </div>
     </main>
   );
 }

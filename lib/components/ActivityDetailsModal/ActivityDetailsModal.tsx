@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
@@ -21,6 +22,7 @@ export default function ActivityDetailsModal({
   onClose,
   onRegistrationChange,
 }: ActivityDetailsModalProps) {
+  const router = useRouter();
   const { user, userProfile } = useUser();
   const [activity, setActivity] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -32,8 +34,8 @@ export default function ActivityDetailsModal({
     total: 10,
   });
   const [mounted, setMounted] = useState(false);
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // ✅ ADDED
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // ✅ ADDED
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -98,11 +100,11 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // ✅ UPDATED: Handle registration toggle with modals
+  // USER: Handle registration toggle with modals
   const handleRegistrationToggle = async () => {
     if (!user || loading || isAdmin) return;
 
-    // ✅ If already registered, show cancel confirmation modal
+    // If already registered, show cancel confirmation modal
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
       return;
@@ -123,7 +125,7 @@ export default function ActivityDetailsModal({
 
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
 
-        // ✅ Show success modal - DO NOT refresh or close main modal yet
+        // Show success modal - DO NOT refresh or close main modal yet
         setIsSuccessModalOpen(true);
       }
     } catch (error) {
@@ -133,7 +135,7 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // ✅ ADDED: Handle cancel confirmation
+  // USER: Handle cancel confirmation
   const handleCancelConfirm = async () => {
     if (!user || loading) return;
 
@@ -157,12 +159,35 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // ✅ ADDED: Handle success modal close - refresh data AFTER modal closes
+  // USER: Handle success modal close - refresh data AFTER modal closes
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
     // Refresh data after modal closes
     onRegistrationChange?.();
     fetchActivityDetails();
+  };
+
+  // ADMIN: Handle edit
+  const handleEdit = () => {
+    onClose(); // Close modal first
+    router.push(`/adminScreens/EditActivityPage?id=${activityId}`);
+  };
+
+  // ADMIN: Handle delete
+  const handleDelete = async () => {
+    if (!confirm("האם אתה בטוח שברצונך למחוק פעילות זו?")) return;
+
+    setLoading(true);
+    const [_, error] = await apiActivities.delete(activityId);
+
+    if (error) {
+      alert("שגיאה במחיקה: " + error);
+      setLoading(false);
+    } else {
+      alert("הפעילות נמחקה בהצלחה");
+      onClose();
+      onRegistrationChange?.(); // Refresh parent data
+    }
   };
 
   if (!isOpen || !mounted) return null;
@@ -247,23 +272,7 @@ export default function ActivityDetailsModal({
 
           {/* Bottom bar */}
           <div style={styles.bottomBar}>
-            {/* Register button - RIGHT SIDE */}
-            {!isAdmin && (
-              <div style={styles.registerButtonContainer}>
-                <Button
-                  size="S"
-                  onClick={handleRegistrationToggle}
-                  disabled={loading}
-                  style={styles.registerButton}
-                >
-                  <span style={styles.registerButtonText}>
-                    {regStatus !== "none" ? "ביטול" : "הרשמה"}
-                  </span>
-                </Button>
-              </div>
-            )}
-
-            {/* Capacity info - LEFT SIDE */}
+            {/* Capacity info - RIGHT SIDE in RTL */}
             <div style={styles.capacityFrame}>
               <p style={styles.capacityText}>
                 {registrationCount.confirmed}/{registrationCount.total}
@@ -279,11 +288,35 @@ export default function ActivityDetailsModal({
                 />
               </div>
             </div>
+
+            {/* Action buttons - LEFT SIDE in RTL */}
+            <div style={styles.actionButtonsContainer}>
+              {isAdmin ? (
+                // ADMIN: Edit + Delete buttons
+                <>
+                  <Button size="M" onClick={handleEdit} disabled={loading}>
+                    ערוך
+                  </Button>
+                  <Button size="M" onClick={handleDelete} disabled={loading}>
+                    {loading ? "מוחק..." : "מחק"}
+                  </Button>
+                </>
+              ) : (
+                // USER: Register button
+                <Button
+                  size="M"
+                  onClick={handleRegistrationToggle}
+                  disabled={loading}
+                >
+                  {regStatus !== "none" ? "ביטול" : "הרשמה"}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ✅ ADDED: Cancel Confirmation Modal */}
+      {/* Cancel Confirmation Modal */}
       {isCancelModalOpen && (
         <CancelConfirmationModal
           isOpen={isCancelModalOpen}
@@ -295,7 +328,7 @@ export default function ActivityDetailsModal({
         />
       )}
 
-      {/* ✅ ADDED: Success Modal */}
+      {/* Success Modal */}
       {isSuccessModalOpen && (
         <RegistrationSuccessModal
           isOpen={isSuccessModalOpen}

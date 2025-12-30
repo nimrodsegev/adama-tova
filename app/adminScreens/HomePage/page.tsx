@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiNotifications } from "@/app/services/db_api";
-import Link from "next/link";
 import AdminActivityCard from "@/lib/components/Home/AdminActivityCard";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
+import EmptyState from "@/lib/components/UI/EmptyState";
+import Button from "@/lib/components/UI/Button";
 import styles from "./AdminHomePage.styles";
-import NotificationEmptyState from "@/lib/components/Notifications/NotificationEmptyState";
-import Image from "next/image";
 
 export default function AdminHomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
@@ -76,38 +75,45 @@ export default function AdminHomePage() {
         {/* Section 1: Activities */}
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>סטטוס הרשמה לפעילויות</h2>
-          <div style={styles.horizontalScroll}>
-            {todayActivities.length > 0 ? (
-              todayActivities.map((activity) => (
-                <div key={activity.id} style={styles.glassCard}>
-                  <AdminActivityCard
-                    id={activity.id}
-                    title={activity.title}
-                    date={activity.date}
-                    start_time={activity.start_time}
-                    current_participants={activity.current_participants || 0}
-                    max_participants={activity.max_participants}
-                  />
-                </div>
-              ))
-            ) : (
-              <p style={styles.emptyText}>אין פעילויות היום</p>
-            )}
-          </div>
 
-          {/* Activity Buttons CTA */}
-          <div style={styles.ctaRow}>
-            <Link href="/adminScreens/AddActivityPage" style={styles.buttonM}>
-              + הוספת פעילות
-            </Link>
+          {todayActivities.length > 0 ? (
+            <>
+              <div style={styles.horizontalScroll}>
+                {todayActivities.map((activity) => (
+                  <div key={activity.id} style={styles.glassCard}>
+                    <AdminActivityCard
+                      id={activity.id}
+                      title={activity.title}
+                      date={activity.date}
+                      start_time={activity.start_time}
+                      current_participants={activity.current_participants || 0}
+                      max_participants={activity.max_participants}
+                    />
+                  </div>
+                ))}
+              </div>
 
-            <Link href="/adminScreens/CalendarPage" style={styles.buttonS}>
-              <span style={styles.buttonText}>הכל</span>
-            </Link>
-          </div>
+              {/* Activity Buttons CTA */}
+              <div style={styles.ctaRow}>
+                <Button size="M" href="/adminScreens/AddActivityPage">
+                  + הוספת פעילות
+                </Button>
+
+                <Button size="S" href="/adminScreens/AdminCalendarPage">
+                  הכל
+                </Button>
+              </div>
+            </>
+          ) : (
+            <EmptyState
+              message="אין פעילויות היום"
+              buttonText="+ הוספת פעילות"
+              buttonHref="/adminScreens/AddActivityPage"
+            />
+          )}
         </section>
 
-        {/* Section 2: Recent Notifications - USING NotificationCard Component */}
+        {/* Section 2: Recent Notifications */}
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>הודעות אחרונות</h2>
 
@@ -125,23 +131,22 @@ export default function AdminHomePage() {
 
               {/* Notification Buttons CTA */}
               <div style={styles.ctaRow}>
-                <Link
-                  href="/adminScreens/addNotification"
-                  style={styles.buttonM}
-                >
+                <Button size="M" href="/adminScreens/addNotification">
                   + הודעה חדשה
-                </Link>
-                <Link
-                  href="/adminScreens/NotificationPage"
-                  style={styles.buttonS}
-                >
-                  <span style={styles.buttonText}>הכל</span>
-                </Link>
+                </Button>
+
+                <Button size="S" href="/adminScreens/NotificationPage">
+                  הכל
+                </Button>
               </div>
             </>
           ) : (
             /* Show empty state when no notifications */
-            <NotificationEmptyState />
+            <EmptyState
+              message="אין הודעות חדשות"
+              buttonText="+ הודעה חדשה"
+              buttonHref="/adminScreens/addNotification"
+            />
           )}
         </section>
       </div>

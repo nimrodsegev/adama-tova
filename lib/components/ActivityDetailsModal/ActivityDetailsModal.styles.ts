@@ -19,7 +19,7 @@ const styles: { [key: string]: CSSProperties } = {
   modalContainer: {
     position: "fixed",
     top: 0,
-    bottom: "7.8125rem", // 61px for navbar - ends above navbar
+    bottom: "6.8125rem", // 61px for navbar - ends above navbar
     left: 0,
     right: 0,
     width: "100%",
@@ -145,7 +145,7 @@ const styles: { [key: string]: CSSProperties } = {
   // Bottom bar is now a flex child, not separate
   bottomBar: {
     display: "flex",
-    flexDirection: "row-reverse", // capacity right, button left
+    flexDirection: "row", // capacity right, button left
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: "100%",
@@ -243,6 +243,46 @@ const styles: { [key: string]: CSSProperties } = {
     lineHeight: "1.25rem", // 20px
     textAlign: "center",
     color: "#681F02",
+  },
+  // Add these to your existing styles object:
+
+  // Admin buttons container
+  adminButtonsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    gap: "0.75rem", // 12px gap between buttons
+    width: "100%",
+  },
+
+  // Edit button (green-ish)
+  editButton: {
+    flex: 1,
+    backgroundColor: "#F9F9F9",
+  },
+
+  // Delete button (red-ish)
+  deleteButton: {
+    flex: 1,
+    backgroundColor: "#F9F9F9",
+  },
+
+  // Admin button text
+  adminButtonText: {
+    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
+    fontStyle: "normal",
+    fontWeight: "400",
+    fontSize: "0.875rem", // 14px
+    lineHeight: "1.25rem", // 20px
+    textAlign: "center",
+    color: "#681F02",
+  },
+  // Action buttons container - LEFT SIDE
+  actionButtonsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    gap: "0.5rem", // 8px gap between buttons
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
 };
 

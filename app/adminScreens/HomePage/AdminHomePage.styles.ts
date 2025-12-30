@@ -7,7 +7,6 @@ const styles: { [key: string]: CSSProperties } = {
     maxWidth: "24.5625rem", // 393px → rem
     minHeight: "53.25rem", // 852px → rem
     margin: "0 auto",
-    backgroundColor: "#AB4016",
     position: "relative",
     overflowX: "hidden",
     direction: "rtl",
@@ -77,15 +76,19 @@ const styles: { [key: string]: CSSProperties } = {
     margin: 0,
   },
 
-  // Horizontal Scroll Container
+  // Horizontal Scroll Container - FIXED: No vertical scroll
   horizontalScroll: {
     display: "flex",
     flexDirection: "row",
     gap: "0.75rem", // 12px → rem
-    overflowX: "auto",
+    overflowX: "auto", // ✅ Horizontal scroll only
+    overflowY: "hidden", // ✅ No vertical scroll
     paddingBottom: "0.625rem", // 10px → rem
     scrollbarWidth: "thin",
     scrollbarColor: "rgba(255,255,255,0.3) transparent",
+    // ✅ Prevent vertical expansion
+    maxHeight: "10.25rem", // 164px (card height 154px + padding 10px)
+    alignItems: "flex-start", // ✅ Align cards to top
   },
 
   // Glass Card for Activities
@@ -121,51 +124,6 @@ const styles: { [key: string]: CSSProperties } = {
     marginTop: "0rem", // Buttons closer to content
   },
 
-  // Medium Button - Ezer Shemesh Regular 400
-  buttonM: {
-    width: "7.5rem", // 120px → rem
-    height: "2.75rem", // 44px → rem
-    background: "#F9F9F9",
-    borderRadius: "1.5625rem", // 25px → rem
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    textDecoration: "none",
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif", // ✅ Ezer Shemesh Regular 400
-    fontSize: "0.875rem", // 14px → rem
-    fontWeight: "400", // ✅ Regular
-    lineHeight: "1.25rem",
-    color: "#681F02",
-    transition: "transform 0.2s ease",
-  },
-
-  // Small Button (Perfect Circle) - Ezer Shemesh Regular 400
-  buttonS: {
-    width: "2.75rem", // 44px → rem (SAME as height)
-    height: "2.75rem", // 44px → rem
-    minWidth: "2.75rem", // Ensure perfect circle
-    minHeight: "2.75rem",
-    background: "#F9F9F9",
-    borderRadius: "50%", // ✅ Perfect circle
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    textDecoration: "none",
-    padding: "0", // ✅ Remove padding for perfect circle
-    transition: "transform 0.2s ease",
-    flexShrink: 0, // Prevent squashing
-  },
-
-  // Button Text - Ezer Shemesh Regular 400
-  buttonText: {
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif", // ✅ Ezer Shemesh Regular 400
-    fontSize: "0.875rem", // 14px → rem
-    fontWeight: "400", // ✅ Regular
-    lineHeight: "1.25rem",
-    color: "#681F02",
-    textAlign: "center",
-  },
-
   // Navigation Bar
   navBar: {
     position: "fixed",
@@ -192,7 +150,7 @@ const styles: { [key: string]: CSSProperties } = {
     transition: "transform 0.2s ease",
   },
 
-  // Empty Text
+  // Empty Text - REMOVED (now using EmptyState component)
   emptyText: {
     fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
     fontSize: "1rem",

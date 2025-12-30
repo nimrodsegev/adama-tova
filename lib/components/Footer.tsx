@@ -32,8 +32,13 @@ export default function Footer() {
       label: "Notifications",
     },
     {
+      href: "/adminScreens/AdminCalendarPage",
+      icon: "/icons/calendar_icon.svg",
+      label: "Calendar",
+    },
+    {
       href: "/adminScreens/UsersManagementPage",
-      icon: "/icons/figure_icon.svg",
+      icon: "/icons/favicon.png",
       label: "Users",
     },
     {
