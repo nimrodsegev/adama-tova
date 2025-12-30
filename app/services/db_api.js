@@ -103,6 +103,28 @@ export const apiActivities = {
         .order("date", { ascending: true })
     );
   },
+  async uploadImage(file) {
+    if (!file) return [null, "No file provided"];
+
+    // 1. Generate unique file name
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    // 2. Upload to 'activity_images' bucket
+    const { error: uploadError } = await supabase.storage
+      .from('activity_images')
+      .upload(filePath, file);
+
+    if (uploadError) return [null, uploadError.message];
+
+    // 3. Get Public URL
+    const { data } = supabase.storage
+      .from('activity_images')
+      .getPublicUrl(filePath);
+
+    return [data.publicUrl, null];
+  },
   async createActivity(activityData) {
     // 1. Basic Validation
     if (!activityData.title) return [null, "Title is required"];
@@ -126,6 +148,7 @@ export const apiActivities = {
             category: activityData.category,
             location: activityData.location,
             instructor: activityData.instructor,
+            image_url: activityData.image_url,
           },
         ])
         .select()
@@ -390,7 +413,7 @@ export const apiRegistrations = {
       .select("if_confirmed")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
-      .single();
+      .maybeSingle();
 
     if (!data) return [null, null]; // Not registered
     return [data.if_confirmed ? "confirmed" : "waitlist", null];

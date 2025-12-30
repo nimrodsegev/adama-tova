@@ -48,7 +48,6 @@ export default function ActivityDetailsPage() {
   const checkRegistrationStatus = async () => {
     if (!user || !activityId) return;
     try {
-      // Use the new helper we added to db_api
       const [status, error] = await apiRegistrations.getRegistrationStatus(user.id, activityId);
       if (!error) {
         setRegStatus(status || 'none');
@@ -58,7 +57,6 @@ export default function ActivityDetailsPage() {
     }
   };
 
-  // Check if user is admin
   const isAdmin = userProfile?.role === "admin";
 
   // ADMIN FUNCTIONS
@@ -88,11 +86,8 @@ export default function ActivityDetailsPage() {
     setProcessing(true);
 
     if (regStatus !== 'none') {
-      // ❌ LEAVE (Cancel / Leave Waitlist)
-      const [_, error] = await apiRegistrations.cancelRegistration(
-        user.id,
-        activityId!
-      );
+      // ❌ LEAVE
+      const [_, error] = await apiRegistrations.cancelRegistration(user.id, activityId!);
       if (error) {
         alert("שגיאה בביטול: " + error);
       } else {
@@ -101,24 +96,17 @@ export default function ActivityDetailsPage() {
         await loadActivity();
       }
     } else {
-      // ✅ JOIN (Register / Waitlist)
-      const [res, error] = await apiRegistrations.registerUserToActivity(
-        user.id,
-        activityId!
-      );
+      // ✅ JOIN
+      const [res, error] = await apiRegistrations.registerUserToActivity(user.id, activityId!);
       if (error) {
         alert("שגיאה בהרשמה: " + error);
       } else {
-        // Check message to see if confirmed or waitlisted
         const isWaitlist = res?.message?.includes("waitlist");
         setRegStatus(isWaitlist ? 'waitlist' : 'confirmed');
-        
-        if (res?.message) alert(res.message); // Show API message ("Registered" or "Waitlisted")
-        
+        if (res?.message) alert(res.message);
         await loadActivity();
       }
     }
-
     setProcessing(false);
   };
 
@@ -185,6 +173,17 @@ export default function ActivityDetailsPage() {
             overflow: "hidden",
           }}
         >
+          {/* 👇 1. NEW: IMAGE BANNER (Only if image_url exists) */}
+          {activity.image_url && (
+            <div style={{ width: "100%", height: "300px", overflow: "hidden" }}>
+              <img 
+                src={activity.image_url} 
+                alt={activity.title} 
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+          )}
+
           {/* Header */}
           <div
             style={{
@@ -267,7 +266,6 @@ export default function ActivityDetailsPage() {
                   {processing ? "מעדכן..." : buttonText}
                 </button>
 
-                {/* Status Badge */}
                 {regStatus === 'confirmed' && (
                   <div style={{ marginTop: "16px", backgroundColor: "#d1fae5", border: "1px solid #10b981", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
                     <p style={{ color: "#065f46", fontWeight: "600", margin: 0 }}>✓ אתה רשום לפעילות זו</p>
@@ -288,7 +286,6 @@ export default function ActivityDetailsPage() {
   );
 }
 
-// Simple Helper Component for the grid
 function InfoBox({ icon, label, value }: { icon: string, label: string, value: string }) {
   return (
     <div style={{ backgroundColor: "#f9fafb", padding: "16px", borderRadius: "8px", textAlign: "center" }}>

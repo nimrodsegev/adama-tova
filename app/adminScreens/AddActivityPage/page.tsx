@@ -19,6 +19,10 @@ export default function AddActivityPage() {
     location: "",
   });
 
+  // 👇 New State for Image
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
@@ -37,8 +41,24 @@ export default function AddActivityPage() {
     e.preventDefault();
     setSubmitStatus("idle");
     setErrorMessage("");
+    setUploading(true); // Start loading
 
-    // Create activity object matching your friend's structure
+    let imageUrl = null;
+
+    // 1. Upload Image (If selected)
+    if (imageFile) {
+      const [url, error] = await apiActivities.uploadImage(imageFile);
+      if (error) {
+        console.error("Image upload failed:", error);
+        setErrorMessage("שגיאה בהעלאת התמונה: " + error);
+        setSubmitStatus("error");
+        setUploading(false);
+        return;
+      }
+      imageUrl = url;
+    }
+
+    // 2. Create Activity Object
     const activityObject = {
       title: formData.title,
       date: formData.date,
@@ -50,23 +70,24 @@ export default function AddActivityPage() {
       category: formData.category,
       instructor: formData.instructor,
       location: formData.location,
+      image_url: imageUrl, // 👈 Save the URL
     };
 
     try {
-      // Call your friend's function
       const [data, error] = await apiActivities.createActivity(activityObject);
 
       if (error) {
         console.error("Error adding activity:", error);
         setErrorMessage(error);
         setSubmitStatus("error");
+        setUploading(false);
         return;
       }
 
       console.log("Activity created successfully:", data);
       setSubmitStatus("success");
 
-      // Reset form after success
+      // Reset form
       setTimeout(() => {
         setFormData({
           title: "",
@@ -80,12 +101,15 @@ export default function AddActivityPage() {
           instructor: "",
           location: "",
         });
+        setImageFile(null); // Reset file
         setSubmitStatus("idle");
       }, 2000);
     } catch (error) {
       console.error("Unexpected error:", error);
       setErrorMessage("שגיאה בלתי צפויה");
       setSubmitStatus("error");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -152,6 +176,44 @@ export default function AddActivityPage() {
             placeholder="לדוגמה: סדנת ציור"
           />
         </div>
+
+        {/* 👇 NEW IMAGE INPUT */}
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold",
+              textAlign: "right",
+            }}
+          >
+            תמונה לפעילות (אופציונלי)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setImageFile(e.target.files[0]);
+              }
+            }}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              border: "2px solid #ccc",
+              backgroundColor: "white",
+              textAlign: "right",
+              direction: "rtl",
+            }}
+          />
+          {imageFile && (
+            <div style={{ marginTop: "8px", fontSize: "14px", color: "#666" }}>
+              קובץ נבחר: {imageFile.name}
+            </div>
+          )}
+        </div>
+
         {/* Instructor */}
         <div>
           <label
@@ -459,7 +521,7 @@ export default function AddActivityPage() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={submitStatus === "success"}
+          disabled={uploading || submitStatus === "success"}
           style={{
             padding: "16px",
             backgroundColor: submitStatus === "success" ? "#28a745" : "#0070f3",
@@ -468,22 +530,16 @@ export default function AddActivityPage() {
             borderRadius: "8px",
             fontSize: "18px",
             fontWeight: "bold",
-            cursor: submitStatus === "success" ? "not-allowed" : "pointer",
+            cursor: (uploading || submitStatus === "success") ? "not-allowed" : "pointer",
             transition: "background-color 0.3s",
-            opacity: submitStatus === "success" ? 0.7 : 1,
-          }}
-          onMouseEnter={(e) => {
-            if (submitStatus !== "success") {
-              e.currentTarget.style.backgroundColor = "#0051cc";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (submitStatus !== "success") {
-              e.currentTarget.style.backgroundColor = "#0070f3";
-            }
+            opacity: (uploading || submitStatus === "success") ? 0.7 : 1,
           }}
         >
-          {submitStatus === "success" ? "✓ הפעילות נוספה" : "הוסף פעילות"}
+          {uploading 
+            ? "מעלה תמונה..." 
+            : submitStatus === "success" 
+              ? "✓ הפעילות נוספה" 
+              : "הוסף פעילות"}
         </button>
 
         {/* Error Message */}
