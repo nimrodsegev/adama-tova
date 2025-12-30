@@ -33,7 +33,7 @@ export default function Footer() {
     },
     {
       href: "/adminScreens/UsersManagementPage",
-      icon: "/icons/phone_icon.svg",
+      icon: "/icons/figure_icon.svg",
       label: "Users",
     },
     {
