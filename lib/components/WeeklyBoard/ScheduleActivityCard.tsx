@@ -5,12 +5,13 @@ import { apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
+import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import styles from "./ScheduleActivityCard.styles";
 
 type ScheduleActivityCardProps = {
   id: string;
   title: string;
-  date: string; // ✅ ADDED: Need date for confirmation modal
+  date: string;
   start_time: string;
   end_time: string;
   current_participants: number;
@@ -21,7 +22,7 @@ type ScheduleActivityCardProps = {
 export default function ScheduleActivityCard({
   id,
   title,
-  date, // ✅ ADDED
+  date,
   start_time,
   end_time,
   current_participants,
@@ -37,11 +38,12 @@ export default function ScheduleActivityCard({
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // ✅ ADDED
 
   const formattedStartTime = start_time.slice(0, 5);
   const formattedEndTime = end_time.slice(0, 5);
 
-  // ✅ ADDED: Format date for cancel modal
+  // Format date for modals
   const dateObj = new Date(date);
   const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
   const dayMonth = `${dateObj.getDate().toString().padStart(2, "0")}.${(
@@ -88,7 +90,7 @@ export default function ScheduleActivityCard({
 
     if (!user || loading || isAdmin) return;
 
-    // ✅ ADDED: If already registered, show cancel confirmation modal
+    // If already registered, show cancel confirmation modal
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
       return;
@@ -102,12 +104,17 @@ export default function ScheduleActivityCard({
         user.id,
         id
       );
-      if (res && res.id) {
+
+      // ✅ UPDATED: Check if registration successful
+      if (res) {
         const isWaitlist =
-          res.if_confirmed === false || error?.message?.includes("waitlist");
+          res.if_confirmed === false ||
+          (error && error.message && error.message.includes("waitlist"));
+
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        onRegistrationChange?.();
+
+        // ✅ Show success modal - DO NOT refresh data yet
+        setIsSuccessModalOpen(true);
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -116,7 +123,7 @@ export default function ScheduleActivityCard({
     }
   };
 
-  // ✅ ADDED: Handle cancel confirmation
+  // Handle cancel confirmation
   const handleCancelConfirm = async () => {
     if (!user || loading) return;
 
@@ -134,6 +141,13 @@ export default function ScheduleActivityCard({
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ ADDED: Handle success modal close - refresh data AFTER modal closes
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
+    // Refresh page data after modal closes
+    onRegistrationChange?.();
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -251,9 +265,6 @@ export default function ScheduleActivityCard({
             />
           </svg>
         </div>
-
-        {/* Registration Indicator Dot */}
-        {isRegistered && <div style={styles.registrationDot} />}
       </div>
 
       {/* Activity Details Modal */}
@@ -271,6 +282,15 @@ export default function ScheduleActivityCard({
         onConfirm={handleCancelConfirm}
         activityTitle={title}
         activityDate={`${dayName} ${dayMonth}`}
+        activityTime={formattedStartTime}
+      />
+
+      {/* Success Modal */}
+      <RegistrationSuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={handleSuccessModalClose}
+        activityTitle={title}
+        activityDate={dayMonth}
         activityTime={formattedStartTime}
       />
     </>

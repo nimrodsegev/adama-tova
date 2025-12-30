@@ -1,6 +1,7 @@
 import { CSSProperties } from "react";
 
 const styles: { [key: string]: CSSProperties } = {
+  // Card Container
   cardContainer: {
     display: "flex",
     flexDirection: "column",
@@ -21,52 +22,61 @@ const styles: { [key: string]: CSSProperties } = {
     transition: "transform 0.2s ease",
   },
 
+  // Frame 224 - Contains title and date/time with ABSOLUTE positioning
   frame224: {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-end",
     padding: "0",
-    gap: "0.375rem",
+    gap: "0", // ✅ REMOVED gap - we'll use absolute positioning instead
     width: "100%",
     maxWidth: "8.4375rem",
+    position: "relative", // ✅ CHANGED: relative positioning for absolute children
     flex: "none",
     order: 0,
     alignSelf: "stretch",
     flexGrow: 0,
     zIndex: 0,
+    marginTop: "1rem", // Starting position from top
+    height: "6rem", // ✅ ADDED: Fixed height to contain both elements
   },
 
+  // Title text - FIXED ALLOCATED SPACE
   titleText: {
+    position: "absolute", // ✅ CHANGED: Absolute positioning
+    top: "0", // ✅ Title always starts at top of frame224
+    right: "0", // ✅ Align to right
     width: "100%",
-    maxWidth: "8.4375rem",
-    height: "auto",
+    maxWidth: "4.5rem", // Width limit
+    height: "2.75rem", // ✅ ADDED: Fixed allocated space for title (2 lines)
+    minHeight: "2.75rem", // ✅ ADDED: Ensures space is always reserved
     fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
     fontStyle: "normal",
     fontWeight: "400",
     fontSize: "clamp(1.125rem, 4.5vw, 1.375rem)",
     lineHeight: "1.375rem",
-    display: "flex",
-    alignItems: "flex-end",
+    display: "block", // ✅ CHANGED: from flex to block
     textAlign: "right",
     color: "#681F02",
-    marginTop: "-0.25rem",
-    flex: "none",
-    order: 0,
-    flexGrow: 0,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
+    marginTop: "0",
+    marginLeft: "2rem",
+    overflow: "hidden", // ✅ Hide text that exceeds allocated space
+    whiteSpace: "normal", // ✅ Allows wrapping
+    wordBreak: "keep-all", // ✅ Never break words
+    overflowWrap: "normal", // ✅ Only break at natural word boundaries
   },
 
+  // Frame 266 - Contains date and time - FIXED POSITION
   frame266: {
+    position: "absolute", // ✅ CHANGED: Absolute positioning
+    top: "3.25rem", // ✅ FIXED: Always 3.25rem from top (below title space)
+    right: "0", // ✅ Align to right
     width: "100%",
     maxWidth: "8.4375rem",
     flex: "none",
-    order: 1,
-    flexGrow: 0,
-    position: "relative",
   },
 
+  // Body M - Date and time text
   bodyM: {
     width: "100%",
     maxWidth: "8.4375rem",
@@ -77,44 +87,18 @@ const styles: { [key: string]: CSSProperties } = {
     lineHeight: "1.125rem",
     textAlign: "right",
     color: "#681F02",
-    margin: "0.1rem 0rem",
+    margin: "0",
   },
 
-  frame265: {
-    width: "100%",
-    maxWidth: "8.4375rem",
-    height: "1.1875rem",
-    flex: "none",
-    order: 2,
-    flexGrow: 0,
-    position: "relative",
-  },
-
-  bodyL: {
-    position: "absolute",
-    width: "100%",
-    maxWidth: "8.4375rem",
-    height: "1.1875rem",
-    left: "0",
-    top: "0",
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
-    fontStyle: "normal",
-    fontWeight: "400",
-    fontSize: "clamp(0.9375rem, 3.8vw, 1.0625rem)",
-    lineHeight: "1.25rem",
-    textAlign: "right",
-    color: "#681F02",
-    margin: 0,
-  },
-
-  // ✅ Register button styling - controlled from CSS
+  // Register button - Top left corner
   registerButton: {
     position: "absolute",
-    left: "0.5rem", // Top left corner in LTR (right in RTL)
+    left: "0.5rem",
     top: "1.5rem",
     zIndex: 10,
   },
 
+  // Arrow button - Bottom left
   arrowButton: {
     position: "absolute",
     left: "-0.1rem",

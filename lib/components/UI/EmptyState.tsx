@@ -89,7 +89,7 @@ const styles: { [key: string]: CSSProperties } = {
     width: "100%",
     maxWidth: "22.0625rem", // 353px
     minHeight: "11.625rem", // 186px
-    background: "#AB4016",
+    background: "#F28130",
     border: "0.0625rem solid #F9F9F9", // 1px
     borderRadius: "1.25rem", // 20px
   },

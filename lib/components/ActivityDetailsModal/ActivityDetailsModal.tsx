@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
+import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
+import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import styles from "./ActivityDetailsModal.styles";
 
 type ActivityDetailsModalProps = {
@@ -30,6 +32,8 @@ export default function ActivityDetailsModal({
     total: 10,
   });
   const [mounted, setMounted] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // ✅ ADDED
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // ✅ ADDED
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -94,41 +98,71 @@ export default function ActivityDetailsModal({
     }
   };
 
+  // ✅ UPDATED: Handle registration toggle with modals
   const handleRegistrationToggle = async () => {
     if (!user || loading || isAdmin) return;
 
+    // ✅ If already registered, show cancel confirmation modal
+    if (regStatus !== "none") {
+      setIsCancelModalOpen(true);
+      return;
+    }
+
+    // If not registered, proceed with registration
     setLoading(true);
     try {
-      if (regStatus !== "none") {
-        const [_, error] = await apiRegistrations.cancelRegistration(
-          user.id,
-          activityId
-        );
-        if (!error) {
-          setRegStatus("none");
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          onRegistrationChange?.();
-          fetchActivityDetails();
-        }
-      } else {
-        const [res, error] = await apiRegistrations.registerUserToActivity(
-          user.id,
-          activityId
-        );
-        if (res && res.id) {
-          const isWaitlist =
-            res.if_confirmed === false || error?.message?.includes("waitlist");
-          setRegStatus(isWaitlist ? "waitlist" : "confirmed");
-          await new Promise((resolve) => setTimeout(resolve, 300));
-          onRegistrationChange?.();
-          fetchActivityDetails();
-        }
+      const [res, error] = await apiRegistrations.registerUserToActivity(
+        user.id,
+        activityId
+      );
+
+      if (res) {
+        const isWaitlist =
+          res.if_confirmed === false ||
+          (error && error.message && error.message.includes("waitlist"));
+
+        setRegStatus(isWaitlist ? "waitlist" : "confirmed");
+
+        // ✅ Show success modal - DO NOT refresh or close main modal yet
+        setIsSuccessModalOpen(true);
       }
     } catch (error) {
       console.error("Registration error:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ ADDED: Handle cancel confirmation
+  const handleCancelConfirm = async () => {
+    if (!user || loading) return;
+
+    setLoading(true);
+
+    try {
+      const [_, error] = await apiRegistrations.cancelRegistration(
+        user.id,
+        activityId
+      );
+      if (!error) {
+        setRegStatus("none");
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        onRegistrationChange?.();
+        fetchActivityDetails();
+      }
+    } catch (error) {
+      console.error("Unregistration error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ ADDED: Handle success modal close - refresh data AFTER modal closes
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
+    // Refresh data after modal closes
+    onRegistrationChange?.();
+    fetchActivityDetails();
   };
 
   if (!isOpen || !mounted) return null;
@@ -180,24 +214,18 @@ export default function ActivityDetailsModal({
           </svg>
         </button>
 
-        {/* ✅ CHANGED: Single container for all content */}
-        
         <div style={styles.contentFrame}>
+          {/* Image */}
           {activity?.image_url && (
-            <div style={{ 
-              width: "100%", 
-              height: "180px", 
-              marginBottom: "16px", 
-              borderRadius: "8px", 
-              overflow: "hidden" 
-            }}>
-              <img 
-                src={activity.image_url} 
-                alt={activity.title} 
-                style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+            <div style={styles.imageContainer}>
+              <img
+                src={activity.image_url}
+                alt={activity.title}
+                style={styles.activityImage}
               />
             </div>
           )}
+
           {/* Title */}
           <h2 style={styles.titleText}>{activity?.title || ""}</h2>
 
@@ -217,7 +245,7 @@ export default function ActivityDetailsModal({
             <p style={styles.descriptionText}>{activity?.description || ""}</p>
           </div>
 
-          {/* ✅ CHANGED: Bottom bar now inside contentFrame */}
+          {/* Bottom bar */}
           <div style={styles.bottomBar}>
             {/* Register button - RIGHT SIDE */}
             {!isAdmin && (
@@ -254,6 +282,29 @@ export default function ActivityDetailsModal({
           </div>
         </div>
       </div>
+
+      {/* ✅ ADDED: Cancel Confirmation Modal */}
+      {isCancelModalOpen && (
+        <CancelConfirmationModal
+          isOpen={isCancelModalOpen}
+          onClose={() => setIsCancelModalOpen(false)}
+          onConfirm={handleCancelConfirm}
+          activityTitle={activity?.title || ""}
+          activityDate={`${dayName} ${dayMonth}`}
+          activityTime={formattedTime}
+        />
+      )}
+
+      {/* ✅ ADDED: Success Modal */}
+      {isSuccessModalOpen && (
+        <RegistrationSuccessModal
+          isOpen={isSuccessModalOpen}
+          onClose={handleSuccessModalClose}
+          activityTitle={activity?.title || ""}
+          activityDate={dayMonth}
+          activityTime={formattedTime}
+        />
+      )}
     </>
   );
 

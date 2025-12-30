@@ -24,7 +24,7 @@ const styles: { [key: string]: CSSProperties } = {
     right: 0,
     width: "100%",
     maxWidth: "100vw",
-    backgroundColor: "#AB4016",
+    backgroundColor: "#F28130",
     zIndex: 1000,
     overflowY: "auto",
     overflowX: "hidden",
@@ -64,6 +64,25 @@ const styles: { [key: string]: CSSProperties } = {
     maxWidth: "24.5625rem", // 393px
     margin: "0 auto",
     marginTop: "5rem", // Space for close button
+  },
+
+  // ✅ ADDED: Image container
+  imageContainer: {
+    width: "100%",
+    height: "12rem", // 192px - adjust based on image aspect ratio
+    marginBottom: "0", // No extra margin, gap handles spacing
+    borderRadius: "0.75rem", // 12px - rounded corners
+    overflow: "hidden",
+    border: "0.1rem solid #F9F9F9", // White border
+    flex: "none",
+  },
+
+  // ✅ ADDED: Activity image
+  activityImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover", // Maintains aspect ratio, crops if needed
+    display: "block",
   },
 
   // Title text - EXACT SPECS
@@ -166,7 +185,7 @@ const styles: { [key: string]: CSSProperties } = {
     alignSelf: "flex-end",
   },
 
-  // Progress bar background - ✅ EXACT MATCH: Light border only, NO backgroundColor
+  // Progress bar background - EXACT MATCH: Light border only, NO backgroundColor
   progressBarBackground: {
     position: "absolute",
     left: "0",
@@ -174,20 +193,20 @@ const styles: { [key: string]: CSSProperties } = {
     top: "0",
     width: "100%",
     height: "0.375rem", // 6px
-    border: "0.1875rem solid rgba(255, 255, 255, 0.4)", // ✅ Light white border (3px)
+    border: "0.1875rem solid rgba(255, 255, 255, 0.4)", // Light white border (3px)
     borderRadius: "0.1875rem", // 3px
-    backgroundColor: "transparent", // ✅ No background
+    backgroundColor: "transparent",
   },
 
-  // Progress bar fill - ✅ EXACT MATCH: Darker border only, NO backgroundColor
+  // Progress bar fill - EXACT MATCH: Darker border only, NO backgroundColor
   progressBarFill: {
     position: "absolute",
     left: "0",
     top: "0",
     height: "0.375rem", // 6px
-    border: "0.1875rem solid #681F02", // ✅ CHANGED: Dark red/brown border - this is the "fill"
+    border: "0.1875rem solid #681F02", // Dark red/brown border - this is the "fill"
     borderRadius: "0.1875rem", // 3px
-    backgroundColor: "transparent", // ✅ No background - just border
+    backgroundColor: "transparent",
     transition: "width 0.3s ease",
   },
 
