@@ -7,7 +7,6 @@ const styles: { [key: string]: CSSProperties } = {
     maxWidth: "24.5625rem", // 393px
     minHeight: "53.25rem", // 852px
     margin: "0 auto",
-    backgroundColor: "#AB4016",
     position: "relative",
     overflowX: "hidden",
     direction: "rtl",
