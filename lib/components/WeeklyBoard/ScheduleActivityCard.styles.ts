@@ -94,19 +94,6 @@ const styles: { [key: string]: CSSProperties } = {
     flex: "none",
     order: 2,
   },
-
-  // Registration Indicator Dot
-  registrationDot: {
-    boxSizing: "border-box",
-    position: "absolute",
-    right: "3.5rem",
-    top: "0.875rem",
-    width: "0.46875rem",
-    height: "0.46875rem",
-    background: "#E6C3BB",
-    border: "0.0625rem solid #681F02",
-    borderRadius: "50%",
-  },
 };
 
 export default styles;
