@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiNotifications, supabase } from "@/app/services/db_api";
-import Link from "next/link";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
+import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import styles from "./NotificationsPage.styles";
 
 type Notification = {
@@ -13,7 +13,7 @@ type Notification = {
   timestamp: Date;
   isRead: boolean;
   title: string;
-  activityId?: string; // 👈 1. Added optional activityId
+  activityId?: string;
 };
 
 export default function NotificationsPage() {
@@ -21,6 +21,10 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
+  
+  // 🔥 NEW: Modal state
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
@@ -42,7 +46,7 @@ export default function NotificationsPage() {
       timestamp: new Date(dbRecord.created_at),
       isRead: dbRecord.is_read,
       title: dbRecord.title || "הודעה מערכת",
-      activityId: dbRecord.linked_activity_id, // 👈 2. Map the new DB column
+      activityId: dbRecord.linked_activity_id,
     };
   };
 
@@ -88,6 +92,20 @@ export default function NotificationsPage() {
       );
       alert("שגיאה בעדכון ההודעה");
     }
+  };
+
+  // 🔥 NEW: Handle notification click
+  const handleNotificationClick = (notif: Notification) => {
+    if (notif.activityId) {
+      setSelectedActivityId(notif.activityId);
+      setIsModalOpen(true);
+    }
+  };
+
+  // 🔥 NEW: Close modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedActivityId(null);
   };
 
   const filteredNotifications = notifications.filter((n) => {
@@ -136,26 +154,20 @@ export default function NotificationsPage() {
           <div style={styles.notificationsList} className="notifications-scrollable">
             {filteredNotifications.length > 0 ? (
               filteredNotifications.map((notif) => (
-                // 3. 👇 WRAP IN LINK CONDITIONALLY
-                notif.activityId ? (
-                  <Link 
-                    key={notif.id} 
-                    href={`/UserScreens/ActivityDetailsPage?id=${notif.activityId}`}
-                    style={{ textDecoration: 'none', display: 'block', marginBottom: '10px' }}
-                  >
-                    <NotificationCard
-                      notification={notif}
-                      onMarkAsRead={handleMarkAsRead}
-                    />
-                  </Link>
-                ) : (
-                  <div key={notif.id} style={{ marginBottom: '10px' }}>
-                    <NotificationCard
-                      notification={notif}
-                      onMarkAsRead={handleMarkAsRead}
-                    />
-                  </div>
-                )
+                // 🔥 CHANGED: Click handler instead of Link
+                <div 
+                  key={notif.id} 
+                  style={{ 
+                    marginBottom: '10px',
+                    cursor: notif.activityId ? 'pointer' : 'default'
+                  }}
+                  onClick={() => handleNotificationClick(notif)}
+                >
+                  <NotificationCard
+                    notification={notif}
+                    onMarkAsRead={handleMarkAsRead}
+                  />
+                </div>
               ))
             ) : (
               <p style={styles.emptyText}>אין הודעות להצגה</p>
@@ -163,6 +175,15 @@ export default function NotificationsPage() {
           </div>
         )}
       </div>
+
+              {/* 🔥 NEW: Render Modal */}
+        {selectedActivityId && (
+          <ActivityDetailsModal
+            isOpen={isModalOpen}
+            activityId={selectedActivityId}
+            onClose={handleCloseModal}
+          />
+        )}
     </div>
   );
 }
