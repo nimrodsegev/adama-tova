@@ -125,7 +125,7 @@ const styles: { [key: string]: CSSProperties } = {
     top: "0",
     width: "100%",
     height: "0.375rem",
-    border: "0.1875rem solid #AD4E34",
+    border: "0.1875rem solid #F28130",
     borderRadius: "0.1875rem",
   },
 
