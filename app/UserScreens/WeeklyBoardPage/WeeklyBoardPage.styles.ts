@@ -94,6 +94,12 @@ const styles: { [key: string]: CSSProperties } = {
     alignItems: "flex-start",
     gap: "0.75rem", // 12px
     width: "22.0625rem", // 353px
+    maxHeight: "calc(100vh - 21rem)", // 100vh - (top position + header + navbar + padding)
+    overflowY: "auto", // Enable vertical scrolling
+    overflowX: "hidden", // Prevent horizontal scroll
+    paddingBottom: "1rem", // Extra padding at bottom
+    scrollbarWidth: "thin", // Thin scrollbar (Firefox)
+    scrollbarColor: "rgba(255, 255, 255, 0.3) transparent", // White scrollbar
   },
 
   // Empty State

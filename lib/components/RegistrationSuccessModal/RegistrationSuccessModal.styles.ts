@@ -19,7 +19,7 @@ const styles: { [key: string]: CSSProperties } = {
   modalContainer: {
     position: "fixed",
     top: 0,
-    bottom: "7.8125rem", // 61px for navbar
+    bottom: "6.8125rem", // 61px for navbar
     left: 0,
     right: 0,
     width: "100%",
