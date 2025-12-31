@@ -78,7 +78,8 @@ export function UserProvider({
     });
 
     return () => subscription.unsubscribe();
-  }, [initialUser, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialUser]);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -172,7 +173,8 @@ export function UserProvider({
     };
 
     loadProfile();
-  }, [user, pathname, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, pathname]);
 
   const signOut = async () => {
     setUser(null);
