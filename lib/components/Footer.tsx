@@ -36,17 +36,18 @@ export default function Footer() {
       icon: "/icons/calendar_icon.svg",
       label: "Calendar",
     },
-    {
-      href: "/adminScreens/UsersManagementPage",
-      icon: "/icons/favicon.png",
-      label: "Users",
-    },
+
     {
       href: "/adminScreens/HomePage",
       icon: "/icons/home_icon.svg",
       label: "Home",
     },
     { href: "/profile", icon: "/icons/figure_icon.svg", label: "Profile" },
+    {
+      href: "/adminScreens/UsersManagementPage",
+      icon: "/icons/users_management_icon.svg",
+      label: "Users",
+    },
   ];
 
   // User navigation

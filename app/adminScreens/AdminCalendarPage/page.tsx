@@ -61,7 +61,7 @@ export default function AdminCalendarPage() {
         {/* Header Section */}
         <div style={styles.headerSection}>
           {/* Page Title */}
-          <h1 style={styles.pageTitle}>לוח שנה - ניהול</h1>
+          <h1 style={styles.pageTitle}>לוח שבועי</h1>
 
           {/* Day Slider */}
           <DaySlider
