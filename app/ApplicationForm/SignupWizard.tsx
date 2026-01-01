@@ -53,7 +53,8 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [phoneError, setPhoneError] = useState('');
 
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
-  const isValidPhone = (p: string) => /^[0-9]{10}$/.test(p.replace(/[-\s]/g, ''));
+  // Israeli mobile: 05X-XXXXXXX (10 digits starting with 05)
+  const isValidIsraeliMobile = (p: string) => /^05\d{8}$/.test(p.replace(/[-\s]/g, ''));
 
   const validateStep1 = (): boolean => {
     setNameError('');
@@ -72,8 +73,8 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       return false;
     }
     const cleanPhone = phone.replace(/[-\s]/g, '');
-    if (!isValidPhone(cleanPhone)) {
-      setPhoneError('עשר ספרות');
+    if (!isValidIsraeliMobile(cleanPhone)) {
+      setPhoneError('מספר טלפון לא תקין');
       return false;
     }
     return true;
@@ -277,25 +278,25 @@ export default function SignupWizard({ signupType, email, password, googleUserId
         <div className={styles.navigation}>
           <div className={styles.navButtons}>
             <button
-              onClick={handleBack}
-              className={styles.navButton}
-              disabled={loading}
-            >
-              ←
-            </button>
-            
-            <button
               onClick={handleNext}
               className={styles.navButton}
               disabled={loading}
             >
-              {currentStep === 3 ? (loading ? '...' : '✓') : '→'}
+              {currentStep === 3 ? (loading ? '...' : '✓') : '←'}
+            </button>
+
+            <button
+              onClick={handleBack}
+              className={styles.navButton}
+              disabled={loading}
+            >
+              →
             </button>
           </div>
 
           {/* Progress Dots */}
           <div className={styles.progressDots}>
-            {[0, 1, 2, 3].map((step) => (
+            {[3, 2, 1, 0].map((step) => (
               <div
                 key={step}
                 className={`${styles.dot} ${currentStep === step ? styles.activeDot : ''}`}
