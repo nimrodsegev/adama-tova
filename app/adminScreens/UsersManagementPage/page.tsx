@@ -37,6 +37,18 @@ export default function UserManagementPage() {
     setProcessingId(userId);
     const [_, error] = await apiUser.approveUser(userId);
     if (!error) {
+      // Find the user to get their email and name
+      const user = users.find((u) => u.id === userId);
+
+      // Send approval email (fire-and-forget, won't block UI)
+      if (user?.email) {
+        fetch("/api/send-approval-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user.email, name: user.full_name }),
+        }).catch((err) => console.error("Failed to send approval email:", err));
+      }
+
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, is_approved: true } : u))
       );
