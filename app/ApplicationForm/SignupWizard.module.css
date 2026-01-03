@@ -377,7 +377,7 @@
 
 .genderToggle.open {
   border-radius: 1.875rem 1.875rem 0 0;
-  border-bottom: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .genderToggleArrow {
@@ -404,29 +404,33 @@
 
 .genderOption {
   width: 100%;
-  padding: 0.75rem 1.625rem;
+  padding: 1rem 1.625rem;
   background: transparent;
   border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-weight: 300;
   font-size: 1rem;
   text-align: right;
-  color: rgba(249, 249, 249, 0.8);
+  color: rgba(249, 249, 249, 0.9);
   direction: rtl;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .genderOption:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
 }
 
 .genderOption.selected {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   font-weight: 400;
+  color: #FFFFFF;
 }
 
 .genderOption:last-child {
+  border-bottom: none;
   border-radius: 0 0 1.875rem 1.875rem;
 }
 

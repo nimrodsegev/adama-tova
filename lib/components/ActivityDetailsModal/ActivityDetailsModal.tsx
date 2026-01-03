@@ -297,10 +297,10 @@ export default function ActivityDetailsModal({
                 // ADMIN: Edit + Delete buttons
                 <>
                   <Button size="M" onClick={handleEdit} disabled={loading}>
-                    ערוך
+                    {t('[ערוך|ערכי]')}
                   </Button>
                   <Button size="M" onClick={handleDelete} disabled={loading}>
-                    {loading ? "מוחק..." : "מחק"}
+                    {loading ? "מוחק..." : t("מחק/י")}
                   </Button>
                 </>
               ) : (

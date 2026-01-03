@@ -325,7 +325,7 @@ export default function AddActivityPage() {
               required
               rows={4}
               style={styles.textarea}
-              placeholder="תאר את הפעילות..."
+              placeholder={t("תאר/י את הפעילות...")}
             />
           </div>
 
