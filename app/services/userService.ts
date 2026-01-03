@@ -38,6 +38,7 @@ export const userService = {
     profileData: {
       full_name: string;
       phone: string;
+      gender?: 'male' | 'female' | 'neutral' | 'prefer_not_to_say' | null;
       circle?: string;
       proximity?: string;
       interests?: string[];
@@ -45,12 +46,12 @@ export const userService = {
     }
   ) {
     const supabase = createClient();
-    
+
     // Map Hebrew circle to English enum value
-    const circleEnglish = profileData.circle 
-      ? CIRCLE_MAPPING[profileData.circle] || null 
+    const circleEnglish = profileData.circle
+      ? CIRCLE_MAPPING[profileData.circle] || null
       : null;
-    
+
     const { data, error } = await supabase
       .from('users')
       .upsert({
@@ -59,6 +60,7 @@ export const userService = {
         role: 'participant',
         full_name: profileData.full_name,
         phone: profileData.phone,
+        gender: profileData.gender || null,
         circle: circleEnglish,
         is_approved: false,
         notifications_enabled: true,
@@ -70,7 +72,7 @@ export const userService = {
           completed_at: new Date().toISOString(),
         }
       });
-    
+
     if (error) throw error;
     return data;
   },

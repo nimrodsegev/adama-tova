@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { apiActivities } from "@/app/services/db_api";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 
 export default function AddNotificationPage() {
   const router = useRouter();
+  const { t } = useIvrita();
 
   // Form State
   const [targetType, setTargetType] = useState<
@@ -115,7 +117,7 @@ export default function AddNotificationPage() {
         {/* Target Audience Selection */}
         <div>
           <label style={{ display: "block", marginBottom: "8px" }}>
-            בחר קהל יעד:
+            {t('בחר/י קהל יעד:')}
           </label>
           <select
             required
@@ -123,7 +125,7 @@ export default function AddNotificationPage() {
             onChange={(e) => setTargetType(e.target.value as any)}
             style={styles.input}
           >
-            <option value="">-- בחר אפשרות --</option>
+            <option value="">{t('-- בחר/י אפשרות --')}</option>
             <option value="activity">לפי פעילות</option>
             <option value="date">לפי תאריך</option>
             <option value="circle">לפי מעגל</option>
@@ -134,7 +136,7 @@ export default function AddNotificationPage() {
         {targetType === "circle" && (
           <div>
             <label style={{ display: "block", marginBottom: "8px" }}>
-              בחר מעגל:
+              {t('בחר/י מעגל:')}
             </label>
             <select
               required
@@ -142,7 +144,7 @@ export default function AddNotificationPage() {
               onChange={(e) => setSelectedCircle(e.target.value)}
               style={styles.input}
             >
-              <option value="">-- בחר מעגל מהרשימה --</option>
+              <option value="">{t('-- בחר/י מעגל מהרשימה --')}</option>
               {circleOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -156,7 +158,7 @@ export default function AddNotificationPage() {
         {targetType === "activity" && (
           <div>
             <label style={{ display: "block", marginBottom: "8px" }}>
-              בחר סדנא:
+              {t('בחר/י סדנא:')}
             </label>
             {loadingActivities ? (
               <p>טוען סדנאות...</p>
@@ -167,7 +169,7 @@ export default function AddNotificationPage() {
                 onChange={(e) => setSelectedActivityId(e.target.value)}
                 style={styles.input}
               >
-                <option value="">-- בחר סדנא מהרשימה --</option>
+                <option value="">{t('-- בחר/י סדנא מהרשימה --')}</option>
                 {allActivities.map((act) => (
                   <option key={act.id} value={act.id}>
                     {act.title} | {act.date} | {act.start_time?.slice(0, 5)}
@@ -182,7 +184,7 @@ export default function AddNotificationPage() {
         {targetType === "date" && (
           <div>
             <label style={{ display: "block", marginBottom: "8px" }}>
-              בחר תאריך:
+              {t('בחר/י תאריך:')}
             </label>
             <input
               type="date"
@@ -204,7 +206,7 @@ export default function AddNotificationPage() {
           <input
             type="text"
             required
-            placeholder="הכנס כותרת..."
+            placeholder={t('[הכנס|הכניסי] כותרת...')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={styles.input}

@@ -19,6 +19,7 @@ interface UserProfile {
   role: 'participant' | 'admin';
   is_approved: boolean;
   notifications_enabled: boolean;
+  gender?: 'male' | 'female' | 'neutral' | 'prefer_not_to_say' | null;
   quiz: {
     circle?: string;
     interests?: string[];

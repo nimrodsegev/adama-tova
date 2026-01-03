@@ -3,6 +3,7 @@ import { useState } from "react";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import Link from "next/link";
 import { apiNotifications } from "@/app/services/db_api";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./NotificationSection.styles";
 
 type Notification = {
@@ -25,6 +26,7 @@ export default function NotificationSection({
   maxDisplay = 5,
   onRefresh,
 }: NotificationSectionProps) {
+  const { t } = useIvrita();
   const [notifications, setNotifications] = useState(initialNotifications);
 
   // Show only unread notifications
@@ -59,7 +61,7 @@ export default function NotificationSection({
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("האם אתה בטוח שברצונך למחוק את ההודעה?")) return;
+    if (!confirm(t("האם את/ה בטוח/ה שברצונך למחוק את ההודעה?"))) return;
 
     try {
       const [_, error] = await apiNotifications.delete(id);

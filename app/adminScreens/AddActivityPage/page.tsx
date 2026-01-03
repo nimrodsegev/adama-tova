@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { apiActivities } from "@/app/services/db_api";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./AddActivityPage.styles";
 
 type ActivityStatus = "open" | "closed" | "cancelled";
@@ -13,6 +14,7 @@ type ActivityCategory =
   | "Mindfulness";
 
 export default function AddActivityPage() {
+  const { t } = useIvrita();
   const [formData, setFormData] = useState({
     title: "",
     date: "",
@@ -125,7 +127,7 @@ export default function AddActivityPage() {
       {/* Header - Fixed at top */}
       <header style={styles.header}>
         <h1 style={styles.title}>הוספת פעילות חדשה</h1>
-        <p style={styles.subtitle}>מלא את הפרטים להוספת פעילות למערכת</p>
+        <p style={styles.subtitle}>{t('מלא/י את הפרטים להוספת פעילות למערכת')}</p>
       </header>
 
       {/* Scrollable form container */}

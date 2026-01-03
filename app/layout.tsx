@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 // import Navbar from "@/lib/components/Navbar";
 import Footer from "@/lib/components/Footer";
-import { UserProvider } from "@/app/contexts/UserContext";
+import { AppProviders } from "@/app/providers/AppProviders";
 
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
@@ -48,10 +48,10 @@ export default async function RootLayout({
       </head>
       <body>
         {/* 👇 hydrate client with server user */}
-        <UserProvider initialUser={user}>
+        <AppProviders initialUser={user}>
           <div>{children}</div>
           <Footer />
-        </UserProvider>
+        </AppProviders>
       </body>
     </html>
   );
