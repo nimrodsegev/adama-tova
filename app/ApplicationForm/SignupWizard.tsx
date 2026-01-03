@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/app/services/authService';
 import { userService } from '@/app/services/userService';
 import styles from './SignupWizard.module.css';
+import { useIvrita } from '@/app/contexts/IvritaContext';
 
 interface SignupWizardProps {
   signupType: 'email' | 'google';
@@ -34,15 +35,26 @@ const INTEREST_OPTIONS = [
   'מינדפולנס',
 ];
 
+// Gender options for display
+const GENDER_OPTIONS: { value: 'male' | 'female' | 'neutral' | 'prefer_not_to_say'; label: string }[] = [
+  { value: 'male', label: 'זכר' },
+  { value: 'female', label: 'נקבה' },
+  { value: 'neutral', label: 'ניטרלי' },
+  { value: 'prefer_not_to_say', label: 'מעדיפ/ה לא לציין' },
+];
+
 export default function SignupWizard({ signupType, email, password, googleUserId, onBack }: SignupWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t, setGender: setIvritaGender } = useIvrita();
 
   // Form data
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | 'neutral' | 'prefer_not_to_say' | null>(null);
+  const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
   const [circle, setCircle] = useState('');
   const [proximity, setProximity] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
@@ -129,6 +141,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       await userService.completeProfile(userId, email, {
         full_name: fullName.trim(),
         phone: cleanPhone,
+        gender: gender || undefined,
         circle: circle || undefined,
         proximity: proximity || undefined,
         interests: interests.length ? interests : undefined,
@@ -157,7 +170,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
         {/* Step 1: Name + Phone */}
         {currentStep === 0 && (
           <div className={`${styles.stepContainer} ${styles.step1}`}>
-            <h2 className={styles.stepTitle}>השלם את הפרטים הבאים:</h2>
+            <h2 className={styles.stepTitle}>{t('השלם/י את הפרטים הבאים:')}</h2>
 
             
             <div className={styles.inputsContainer}>
@@ -190,6 +203,39 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 <span className={styles.inputLabel}>טלפון</span>
                 {phoneError && <span className={styles.fieldError}>{phoneError}</span>}
               </div>
+
+              {/* Gender selector (optional) */}
+              <div className={styles.genderSelector}>
+                <div className={styles.inputWrapper}>
+                  <button
+                    type="button"
+                    onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
+                    className={`${styles.genderToggle} ${genderDropdownOpen ? styles.open : ''}`}
+                  >
+                    <span>{gender ? GENDER_OPTIONS.find(g => g.value === gender)?.label : 'בחר/י'}</span>
+                    <span className={`${styles.genderToggleArrow} ${genderDropdownOpen ? styles.open : ''}`}>▼</span>
+                  </button>
+                  <span className={styles.inputLabel}>מגדר (אופציונלי)</span>
+                </div>
+                {genderDropdownOpen && (
+                  <div className={styles.genderDropdown}>
+                    {GENDER_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setGender(option.value);
+                          setIvritaGender(option.value); // Update IvritaContext for immediate text transformation
+                          setGenderDropdownOpen(false);
+                        }}
+                        className={`${styles.genderOption} ${gender === option.value ? styles.selected : ''}`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -197,7 +243,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
         {/* Step 2: Circle Selection */}
         {currentStep === 1 && (
           <div className={`${styles.stepContainer} ${styles.step2}`}>
-            <h2 className={styles.stepTitle}>מאיזה מקום אישי את.ה מגיע.ה אלינו?</h2>
+            <h2 className={styles.stepTitle}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</h2>
 
             
             <div className={styles.optionsContainer}>
