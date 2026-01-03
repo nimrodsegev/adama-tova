@@ -1,5 +1,6 @@
 "use client";
 import UserActivityCard from "./UserActivityCard";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 
 type Activity = {
   id: string;
@@ -17,10 +18,11 @@ type PossibleActivitiesSectionProps = {
 export default function PossibleActivitiesSection({
   activities,
 }: PossibleActivitiesSectionProps) {
+  const { t } = useIvrita();
   return (
     <section style={{ direction: "rtl", marginTop: "32px" }}>
       <h2 style={{ textAlign: "right" }}>
-        פעילויות אפשריות שאתה יכול להצטרף אליהן
+        {t('פעילויות אפשריות שאת/ה יכול/ה להצטרף אליהן')}
       </h2>
       <div
         style={{

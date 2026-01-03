@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/app/contexts/UserContext";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 
 export default function ActivityDetailsPage() {
@@ -12,6 +13,7 @@ export default function ActivityDetailsPage() {
 
   // Get user info from context
   const { user, userProfile, loading: userLoading } = useUser();
+  const { t } = useIvrita();
 
   const [activity, setActivity] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -49,8 +51,8 @@ export default function ActivityDetailsPage() {
     if (!user || !activityId) return;
     try {
       const [status, error] = await apiRegistrations.getRegistrationStatus(user.id, activityId);
-      if (!error) {
-        setRegStatus(status || 'none');
+      if (!error && status) {
+        setRegStatus(status as 'none' | 'confirmed' | 'waitlist');
       }
     } catch (error) {
       console.error("Error checking registration:", error);
@@ -65,7 +67,7 @@ export default function ActivityDetailsPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("האם אתה בטוח שברצונך למחוק פעילות זו?")) return;
+    if (!confirm(t("האם את/ה בטוח/ה שברצונך למחוק פעילות זו?"))) return;
 
     setProcessing(true);
     const [_, error] = await apiActivities.delete(activityId!);
@@ -122,17 +124,17 @@ export default function ActivityDetailsPage() {
   const isFull = spotsLeft <= 0;
 
   // Button Logic
-  let buttonText = "✓ הרשם לפעילות";
+  let buttonText = "✓ הירשם/י לפעילות";
   let buttonColor = "#10b981"; // Green
-  
+
   if (regStatus === 'confirmed') {
-    buttonText = "❌ בטל הרשמה";
+    buttonText = "❌ בטל/י הרשמה";
     buttonColor = "#ef4444"; // Red
   } else if (regStatus === 'waitlist') {
-    buttonText = "⏳ צא מרשימת המתנה";
+    buttonText = "⏳ צא/י מרשימת המתנה";
     buttonColor = "#f97316"; // Orange
   } else if (isFull) {
-    buttonText = "➕ הכנס לרשימת המתנה";
+    buttonText = "➕ הכנס/י לרשימת המתנה";
     buttonColor = "#f59e0b"; // Yellow/Orange
   }
 
@@ -263,18 +265,18 @@ export default function ActivityDetailsPage() {
                     opacity: processing ? 0.7 : 1,
                   }}
                 >
-                  {processing ? "מעדכן..." : buttonText}
+                  {processing ? "מעדכן..." : t(buttonText)}
                 </button>
 
                 {regStatus === 'confirmed' && (
                   <div style={{ marginTop: "16px", backgroundColor: "#d1fae5", border: "1px solid #10b981", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
-                    <p style={{ color: "#065f46", fontWeight: "600", margin: 0 }}>✓ אתה רשום לפעילות זו</p>
+                    <p style={{ color: "#065f46", fontWeight: "600", margin: 0 }}>{t('✓ את/ה רשום/ה לפעילות זו')}</p>
                   </div>
                 )}
                 
                 {regStatus === 'waitlist' && (
                   <div style={{ marginTop: "16px", backgroundColor: "#ffedd5", border: "1px solid #f97316", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
-                    <p style={{ color: "#c2410c", fontWeight: "600", margin: 0 }}>⏳ אתה ברשימת המתנה. נודיע לך אם יתפנה מקום.</p>
+                    <p style={{ color: "#c2410c", fontWeight: "600", margin: 0 }}>{t('⏳ את/ה ברשימת המתנה. נודיע לך אם יתפנה מקום.')}</p>
                   </div>
                 )}
               </div>

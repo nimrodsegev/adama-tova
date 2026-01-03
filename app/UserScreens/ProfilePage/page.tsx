@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/contexts/UserContext";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiUser } from "@/app/services/db_api";
 
 // 🏷️ The list of all possible interests in your system
@@ -12,6 +13,7 @@ const AVAILABLE_INTERESTS = [
 
 export default function UserProfilePage() {
   const { user, userProfile, loading } = useUser();
+  const { t } = useIvrita();
   const router = useRouter();
 
   // State
@@ -122,7 +124,7 @@ export default function UserProfilePage() {
           ) : (
             /* EDIT MODE */
             <div>
-              <p className="text-sm text-gray-500 mb-4">בחר את התחומים שמעניינים אותך כדי שנוכל להמליץ לך על פעילויות מתאימות:</p>
+              <p className="text-sm text-gray-500 mb-4">{t('בחר/י את התחומים שמעניינים אותך כדי שנוכל להמליץ לך על פעילויות מתאימות:')}</p>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
                 {AVAILABLE_INTERESTS.map((tag) => {

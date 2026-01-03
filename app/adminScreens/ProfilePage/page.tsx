@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 
 // You'll replace this with your actual fetch function later
 const fetchUserProfile = async () => {
@@ -17,6 +18,7 @@ type NotificationType = "email" | "sms" | "push";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { t } = useIvrita();
   const [profile, setProfile] = useState({
     fullName: "",
     phoneNumber: "",
@@ -161,7 +163,7 @@ export default function ProfilePage() {
           onClick={handleLogout}
           className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
         >
-          התנתק
+          {t('התנתק/י')}
         </button>
       </div>
     </div>

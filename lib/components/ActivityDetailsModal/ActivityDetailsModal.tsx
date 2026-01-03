@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/contexts/UserContext";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
@@ -24,6 +25,7 @@ export default function ActivityDetailsModal({
 }: ActivityDetailsModalProps) {
   const router = useRouter();
   const { user, userProfile } = useUser();
+  const { t } = useIvrita();
   const [activity, setActivity] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
@@ -175,7 +177,7 @@ export default function ActivityDetailsModal({
 
   // ADMIN: Handle delete
   const handleDelete = async () => {
-    if (!confirm("האם אתה בטוח שברצונך למחוק פעילות זו?")) return;
+    if (!confirm(t("האם את/ה בטוח/ה שברצונך למחוק פעילות זו?"))) return;
 
     setLoading(true);
     const [_, error] = await apiActivities.delete(activityId);

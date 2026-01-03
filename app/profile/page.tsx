@@ -7,10 +7,12 @@
 "use client";
 import ProtectedRoute from "@/lib/components/ProtectedRoute";
 import { useUser } from "@/app/contexts/UserContext";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { user, userProfile, loading, signOut } = useUser();
+  const { t } = useIvrita();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -65,7 +67,7 @@ export default function ProfilePage() {
             onMouseOver={(e) => (e.currentTarget.style.opacity = "0.8")}
             onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            התנתק
+            {t('התנתק/י')}
           </button>
         </div>
 
