@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useState, useEffect } from "react";
 import Button from "@/lib/components/UI/Button";
 import styles from "./CancelConfirmationModal.styles";
+import { useIvrita } from '@/app/contexts/IvritaContext';
 
 type CancelConfirmationModalProps = {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export default function CancelConfirmationModal({
   activityTime,
 }: CancelConfirmationModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { t } = useIvrita();
 
   useEffect(() => {
     setMounted(true);
@@ -46,7 +48,7 @@ export default function CancelConfirmationModal({
         <div style={styles.contentFrame}>
           {/* Question text */}
           <p style={styles.questionText}>
-            ?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה
+            {t('?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה')}
           </p>
 
           {/* Activity details text */}

@@ -220,7 +220,7 @@ export default function AddNotificationPage() {
           <textarea
             required
             rows={5}
-            placeholder="כתוב את תוכן ההודעה כאן..."
+            placeholder={t("[כתוב|כתבי] את תוכן ההודעה כאן...")}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             style={{ ...styles.input, resize: "none" }}
@@ -235,7 +235,7 @@ export default function AddNotificationPage() {
             backgroundColor: issubmitting ? "#9ca3af" : "#10b981",
           }}
         >
-          {issubmitting ? "שולח..." : "שלח הודעה לקהל היעד"}
+          {issubmitting ? "שולח..." : t("שלח/י הודעה לקהל היעד")}
         </button>
       </form>
     </main>

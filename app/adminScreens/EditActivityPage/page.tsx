@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api"; // Import your API
+import { useIvrita } from '@/app/contexts/IvritaContext';
 
 export default function EditActivityPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activityId = searchParams.get("id");
+  const { t } = useIvrita();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -114,12 +116,12 @@ export default function EditActivityPage() {
     <div className="min-h-screen bg-gray-50 p-6" dir="rtl">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">ערוך פעילות</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('[ערוך|ערכי] פעילות')}</h1>
           <button
             onClick={() => router.back()}
             className="text-gray-600 hover:text-gray-900"
           >
-            ← חזור
+            ← {t('[חזור|חזרי]')}
           </button>
         </div>
 
@@ -233,7 +235,7 @@ export default function EditActivityPage() {
               disabled={saving}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:bg-gray-400"
             >
-              {saving ? "שומר..." : "שמור שינויים"}
+              {saving ? "שומר..." : t("שמור/י שינויים")}
             </button>
             <button
               type="button"

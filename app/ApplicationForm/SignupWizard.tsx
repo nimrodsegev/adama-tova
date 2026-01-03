@@ -36,10 +36,9 @@ const INTEREST_OPTIONS = [
 ];
 
 // Gender options for display
-const GENDER_OPTIONS: { value: 'male' | 'female' | 'neutral' | 'prefer_not_to_say'; label: string }[] = [
+const GENDER_OPTIONS: { value: 'male' | 'female' | 'prefer_not_to_say'; label: string }[] = [
   { value: 'male', label: 'זכר' },
   { value: 'female', label: 'נקבה' },
-  { value: 'neutral', label: 'ניטרלי' },
   { value: 'prefer_not_to_say', label: 'מעדיפ/ה לא לציין' },
 ];
 
@@ -53,7 +52,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   // Form data
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [gender, setGender] = useState<'male' | 'female' | 'neutral' | 'prefer_not_to_say' | null>(null);
+  const [gender, setGender] = useState<'male' | 'female' | 'prefer_not_to_say' | null>(null);
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
   const [circle, setCircle] = useState('');
   const [proximity, setProximity] = useState('');
