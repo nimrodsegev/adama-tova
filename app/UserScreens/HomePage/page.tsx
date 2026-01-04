@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiActivities, apiUser, supabase } from "@/app/services/db_api"; // 👈 Added supabase to imports
+import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
 import styles from "./HomePage.styles";
@@ -40,7 +40,7 @@ export default function HomePage() {
     setLoading(true);
 
     try {
-      // 1. Fetch Registrations with STATUS directly (Needed for logic)
+      // 1. Fetch Registrations
       const { data: rawRegs, error: regError } = await supabase
         .from("registrations")
         .select("activity_id, status")
@@ -48,15 +48,15 @@ export default function HomePage() {
 
       if (regError) console.error("Error fetching registrations:", regError);
 
-      // List A: Truly Approved (Show in "My Schedule")
+      // List A: Approved IDs (Show in "My Schedule")
       const approvedIds = (rawRegs || [])
         .filter((r: any) => r.status === 'approved')
         .map((r: any) => r.activity_id);
 
-      // List B: All Interactions (Approved + Pending) -> Hide from "Suggestions"
+      // List B: All Interacted IDs (Hide from "Suggestions")
       const allInteractedIds = (rawRegs || []).map((r: any) => r.activity_id);
 
-      // 2. Fetch Activities & User Branches
+      // 2. Fetch Activities & Branches
       const [
         [activities, actError],
         [userBranches, branchError]
@@ -75,36 +75,52 @@ export default function HomePage() {
           !activity.branch || userBranches.includes(activity.branch)
         );
 
-        // 4. Build "Registered" List (Only Approved items)
-        const registeredList = branchFilteredActivities.filter((activity: any) =>
+        // --- 4. REGISTERED LIST LOGIC (Updated) ---
+        const rawRegisteredList = branchFilteredActivities.filter((activity: any) =>
           approvedIds.includes(activity.id)
         );
 
-        // 5. Build "Suggestions" List
-        // Start with everything the user hasn't interacted with yet
+        // 👇 DEDUPLICATE REGISTERED LIST
+        // Only show the *next* meeting for each series.
+        const uniqueRegisteredList: any[] = [];
+        const seenRegisteredSeries = new Set();
+
+        rawRegisteredList.forEach((act: any) => {
+          if (!act.series_id) {
+            // Not a group, always show
+            uniqueRegisteredList.push(act);
+          } else {
+            // Is a group
+            if (!seenRegisteredSeries.has(act.series_id)) {
+              // This is the first (earliest) session we've seen for this group
+              seenRegisteredSeries.add(act.series_id);
+              uniqueRegisteredList.push(act);
+            }
+            // If seen, skip (it's a later session)
+          }
+        });
+
+        // --- 5. SUGGESTIONS LIST LOGIC ---
         const candidates = branchFilteredActivities.filter(
           (activity: any) => !allInteractedIds.includes(activity.id)
         );
 
-        // 5a. DEDUPLICATE SERIES (Groups)
-        // If a group has 5 sessions, only show the first one in suggestions
+        // Deduplicate suggestions (show only 1 card per group)
         const uniqueSuggestions: any[] = [];
-        const seenSeries = new Set();
+        const seenSuggestionSeries = new Set();
 
         candidates.forEach((act: any) => {
           if (act.series_id) {
-            // It's a group session
-            if (!seenSeries.has(act.series_id)) {
-              seenSeries.add(act.series_id);
-              uniqueSuggestions.push(act); // Add only the first occurrence found
+            if (!seenSuggestionSeries.has(act.series_id)) {
+              seenSuggestionSeries.add(act.series_id);
+              uniqueSuggestions.push(act);
             }
           } else {
-            // Single activity
             uniqueSuggestions.push(act);
           }
         });
 
-        // 5b. Filter Unique Suggestions by Interest
+        // Filter by Interest
         let finalSuggestions = uniqueSuggestions;
         if (
           userProfile?.quiz?.interests &&
@@ -119,7 +135,7 @@ export default function HomePage() {
           );
         }
 
-        setRegisteredActivities(registeredList);
+        setRegisteredActivities(uniqueRegisteredList); // 👈 Set the filtered unique list
         setAllActivities(finalSuggestions);
       }
     } catch (error) {
@@ -129,7 +145,6 @@ export default function HomePage() {
     }
   };
 
-  // Get status message based on current day
   const getStatusMessage = () => {
     const today = new Date().getDay();
 
@@ -178,18 +193,14 @@ export default function HomePage() {
 
   return (
     <div style={styles.container}>
-      {/* Background Decorative Vectors */}
       <div style={styles.vectorBackground} />
 
-      {/* Header */}
       <h1 style={styles.headerText}>
         היי {userProfile?.full_name?.split(" ")[0] || ""},
       </h1>
 
-      {/* Subtitle 1 */}
       <p style={styles.subtitle}>המרחב כאן בשבילך.</p>
 
-      {/* Subtitle 2 - Status Message */}
       <p style={styles.statusMessage}>{getStatusMessage()}</p>
 
       <div style={styles.mainContentFrame}>
