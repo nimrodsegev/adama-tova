@@ -9,6 +9,7 @@ type RegistrationSuccessModalProps = {
   activityTitle: string;
   activityDate: string;
   activityTime: string;
+  isGroup?: boolean;
 };
 
 export default function RegistrationSuccessModal({

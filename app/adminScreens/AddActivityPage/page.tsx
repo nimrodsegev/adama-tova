@@ -12,7 +12,7 @@ type ActivityCategory =
   | "Writing"
   | "Crafts"
   | "Mindfulness";
-  type ActivityBranch = "satria" | "nahalal";
+type ActivityBranch = "satria" | "nahalal";
 
 export default function AddActivityPage() {
   const { t } = useIvrita();
@@ -32,13 +32,17 @@ export default function AddActivityPage() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  
+  // 👇 NEW STATE FOR GROUPS
+  const [isGroup, setIsGroup] = useState(false);
+  const [weeks, setWeeks] = useState(4); // Default to 4 weeks if group is selected
+  const [requiresApproval, setRequiresApproval] = useState(false);
 
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // ✅ FIXED: Correct type definition using union (|) instead of commas
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -83,6 +87,9 @@ export default function AddActivityPage() {
       location: formData.location,
       image_url: imageUrl,
       branch: formData.branch,
+      // 👇 ADDED GROUP FIELDS
+      weeks: isGroup ? weeks : 1,
+      requires_approval: requiresApproval, 
     };
 
     try {
@@ -115,6 +122,9 @@ export default function AddActivityPage() {
           branch: "satria" as ActivityBranch,
         });
         setImageFile(null);
+        setIsGroup(false); // Reset Group toggle
+        setWeeks(4);
+        setRequiresApproval(false);
         setSubmitStatus("idle");
       }, 2000);
     } catch (error) {
@@ -128,20 +138,17 @@ export default function AddActivityPage() {
 
   return (
     <main style={styles.mainContainer}>
-      {/* Header - Fixed at top */}
       <header style={styles.header}>
         <h1 style={styles.title}>הוספת פעילות חדשה</h1>
         <p style={styles.subtitle}>{t('מלא/י את הפרטים להוספת פעילות למערכת')}</p>
       </header>
 
-      {/* Scrollable form container */}
       <div style={styles.scrollableContainer}>
         <form onSubmit={handleSubmit} style={styles.form}>
+          
           {/* Title */}
           <div style={styles.fieldContainer}>
-            <label htmlFor="title" style={styles.label}>
-              שם הפעילות *
-            </label>
+            <label htmlFor="title" style={styles.label}>שם הפעילות *</label>
             <input
               type="text"
               id="title"
@@ -153,6 +160,64 @@ export default function AddActivityPage() {
               placeholder="לדוגמה: סדנת ציור"
             />
           </div>
+
+          {/* 👇 NEW GROUP TOGGLE SECTION */}
+          <div style={{
+            marginBottom: '20px', 
+            padding: '15px', 
+            border: '1px solid #e5e7eb', 
+            borderRadius: '8px',
+            backgroundColor: isGroup ? '#f0f9ff' : 'transparent',
+            transition: 'all 0.3s ease'
+          }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1.1rem' }}>
+              <input 
+                type="checkbox" 
+                checked={isGroup} 
+                onChange={(e) => {
+                  setIsGroup(e.target.checked);
+                  if (e.target.checked) setRequiresApproval(true); // Auto-check approval for groups
+                }} 
+                style={{ width: '20px', height: '20px' }}
+              />
+              זוהי קבוצה (סדרת מפגשים)
+            </label>
+
+            {isGroup && (
+              <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <label style={{ fontWeight: '500' }}>מספר מפגשים (שבועות):</label>
+                  <input 
+                    type="number" 
+                    value={weeks} 
+                    min="2"
+                    onChange={(e) => setWeeks(Number(e.target.value))}
+                    style={{ 
+                      width: '80px', 
+                      padding: '8px', 
+                      borderRadius: '6px',
+                      border: '1px solid #ccc' 
+                    }}
+                  />
+                </div>
+                
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#4b5563' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={requiresApproval} 
+                    onChange={(e) => setRequiresApproval(e.target.checked)} 
+                    style={{ width: '18px', height: '18px' }}
+                  />
+                  דורש אישור מנהל להרשמה (Pending Approval)
+                </label>
+                <p style={{ fontSize: '0.85rem', color: '#666' }}>
+                  * המערכת תיצור אוטומטית {weeks} מפגשים שבועיים החל מתאריך ההתחלה שתבחר למטה.
+                </p>
+              </div>
+            )}
+          </div>
+          {/* 👆 END GROUP SECTION */}
+
           {/* Branch Selector */}
           <div style={styles.fieldContainer}>
             <label htmlFor="branch" style={styles.label}>סניף *</label>
@@ -168,6 +233,7 @@ export default function AddActivityPage() {
               <option value="nahalal">נהלל</option>
             </select>
           </div>
+
           {/* Image Input */}
           <div style={styles.fieldContainer}>
             <label style={styles.label}>תמונה לפעילות (אופציונלי)</label>
@@ -190,9 +256,7 @@ export default function AddActivityPage() {
 
           {/* Instructor */}
           <div style={styles.fieldContainer}>
-            <label htmlFor="instructor" style={styles.label}>
-              שם המנחה *
-            </label>
+            <label htmlFor="instructor" style={styles.label}>שם המנחה *</label>
             <input
               type="text"
               id="instructor"
@@ -207,9 +271,7 @@ export default function AddActivityPage() {
 
           {/* Location */}
           <div style={styles.fieldContainer}>
-            <label htmlFor="location" style={styles.label}>
-              מיקום הפעילות *
-            </label>
+            <label htmlFor="location" style={styles.label}>מיקום הפעילות *</label>
             <input
               type="text"
               id="location"
@@ -225,7 +287,7 @@ export default function AddActivityPage() {
           {/* Date */}
           <div style={styles.fieldContainer}>
             <label htmlFor="date" style={styles.label}>
-              תאריך *
+              {isGroup ? "תאריך מפגש ראשון *" : "תאריך *"}
             </label>
             <input
               type="date"
@@ -241,9 +303,7 @@ export default function AddActivityPage() {
           {/* Start Time and End Time */}
           <div style={styles.timeRow}>
             <div style={styles.timeField}>
-              <label htmlFor="start_time" style={styles.label}>
-                שעת התחלה *
-              </label>
+              <label htmlFor="start_time" style={styles.label}>שעת התחלה *</label>
               <input
                 type="time"
                 id="start_time"
@@ -256,9 +316,7 @@ export default function AddActivityPage() {
             </div>
 
             <div style={styles.timeField}>
-              <label htmlFor="end_time" style={styles.label}>
-                שעת סיום *
-              </label>
+              <label htmlFor="end_time" style={styles.label}>שעת סיום *</label>
               <input
                 type="time"
                 id="end_time"
@@ -273,9 +331,7 @@ export default function AddActivityPage() {
 
           {/* Category */}
           <div style={styles.fieldContainer}>
-            <label htmlFor="category" style={styles.label}>
-              קטגוריה *
-            </label>
+            <label htmlFor="category" style={styles.label}>קטגוריה *</label>
             <select
               id="category"
               name="category"
@@ -313,9 +369,7 @@ export default function AddActivityPage() {
 
           {/* Status */}
           <div style={styles.fieldContainer}>
-            <label htmlFor="status" style={styles.label}>
-              סטטוס *
-            </label>
+            <label htmlFor="status" style={styles.label}>סטטוס *</label>
             <select
               id="status"
               name="status"
@@ -332,9 +386,7 @@ export default function AddActivityPage() {
 
           {/* Description */}
           <div style={styles.fieldContainer}>
-            <label htmlFor="description" style={styles.label}>
-              תיאור *
-            </label>
+            <label htmlFor="description" style={styles.label}>תיאור *</label>
             <textarea
               id="description"
               name="description"
@@ -353,13 +405,9 @@ export default function AddActivityPage() {
             disabled={uploading || submitStatus === "success"}
             style={{
               ...styles.submitButton,
-              backgroundColor:
-                submitStatus === "success" ? "#28a745" : "#0070f3",
+              backgroundColor: submitStatus === "success" ? "#28a745" : "#0070f3",
               opacity: uploading || submitStatus === "success" ? 0.7 : 1,
-              cursor:
-                uploading || submitStatus === "success"
-                  ? "not-allowed"
-                  : "pointer",
+              cursor: uploading || submitStatus === "success" ? "not-allowed" : "pointer",
             }}
           >
             {uploading
@@ -369,14 +417,12 @@ export default function AddActivityPage() {
               : "הוסף פעילות"}
           </button>
 
-          {/* Error Message */}
           {submitStatus === "error" && (
             <div style={styles.errorMessage}>
               ❌ {errorMessage || "שגיאה בהוספת הפעילות. נסה שוב."}
             </div>
           )}
 
-          {/* Success Message */}
           {submitStatus === "success" && (
             <div style={styles.successMessage}>✅ הפעילות נוספה בהצלחה!</div>
           )}

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiActivities, apiRegistrations, apiUser } from "@/app/services/db_api";
+import { apiActivities, apiUser, supabase } from "@/app/services/db_api"; // 👈 Added supabase to imports
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
 import styles from "./HomePage.styles";
@@ -33,44 +33,79 @@ export default function HomePage() {
     if (user) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, userProfile]);
 
   const fetchData = async () => {
     setLoading(true);
 
     try {
-      const [registrationIds = [], regError] =
-        await apiRegistrations.getUserRegistrationIds(user!.id);
+      // 1. Fetch Registrations with STATUS directly (Needed for logic)
+      const { data: rawRegs, error: regError } = await supabase
+        .from("registrations")
+        .select("activity_id, status")
+        .eq("user_id", user!.id);
 
-      if (regError) {
-        console.error("Error fetching registrations:", regError);
-      }
-      const [activities, actError] = await apiActivities.getAll();
+      if (regError) console.error("Error fetching registrations:", regError);
 
-      if (actError) {
-        console.error("Error fetching activities:", actError);
-      }
-      const [userBranches, branchError] = await apiUser.getUserBranches(
-        user!.id
-      );
+      // List A: Truly Approved (Show in "My Schedule")
+      const approvedIds = (rawRegs || [])
+        .filter((r: any) => r.status === 'approved')
+        .map((r: any) => r.activity_id);
 
-      if (branchError) {
-        console.error("Error fetching user branches:", branchError);
-      }
-      if (activities && registrationIds && userBranches) {
-        //  Filter by Branch 
+      // List B: All Interactions (Approved + Pending) -> Hide from "Suggestions"
+      const allInteractedIds = (rawRegs || []).map((r: any) => r.activity_id);
+
+      // 2. Fetch Activities & User Branches
+      const [
+        [activities, actError],
+        [userBranches, branchError]
+      ] = await Promise.all([
+        apiActivities.getAll(),
+        apiUser.getUserBranches(user!.id)
+      ]);
+
+      if (actError) console.error("Error fetching activities:", actError);
+      if (branchError) console.error("Error fetching user branches:", branchError);
+
+      if (activities && userBranches) {
+        
+        // 3. Filter by Branch
         const branchFilteredActivities = activities.filter((activity: any) => 
           !activity.branch || userBranches.includes(activity.branch)
         );
-        const registered = branchFilteredActivities.filter((activity: any) =>
-          registrationIds.includes(activity.id)
-        );
-        
-        const notRegistered = branchFilteredActivities.filter(
-          (activity: any) => !registrationIds.includes(activity.id)
+
+        // 4. Build "Registered" List (Only Approved items)
+        const registeredList = branchFilteredActivities.filter((activity: any) =>
+          approvedIds.includes(activity.id)
         );
 
-        let filteredSuggestions = notRegistered;
+        // 5. Build "Suggestions" List
+        // Start with everything the user hasn't interacted with yet
+        const candidates = branchFilteredActivities.filter(
+          (activity: any) => !allInteractedIds.includes(activity.id)
+        );
+
+        // 5a. DEDUPLICATE SERIES (Groups)
+        // If a group has 5 sessions, only show the first one in suggestions
+        const uniqueSuggestions: any[] = [];
+        const seenSeries = new Set();
+
+        candidates.forEach((act: any) => {
+          if (act.series_id) {
+            // It's a group session
+            if (!seenSeries.has(act.series_id)) {
+              seenSeries.add(act.series_id);
+              uniqueSuggestions.push(act); // Add only the first occurrence found
+            }
+          } else {
+            // Single activity
+            uniqueSuggestions.push(act);
+          }
+        });
+
+        // 5b. Filter Unique Suggestions by Interest
+        let finalSuggestions = uniqueSuggestions;
         if (
           userProfile?.quiz?.interests &&
           userProfile.quiz.interests.length > 0
@@ -79,13 +114,13 @@ export default function HomePage() {
             (interest: string) => INTRESTS_MAPPING[interest] || interest
           );
 
-          filteredSuggestions = notRegistered.filter((activity: any) =>
+          finalSuggestions = uniqueSuggestions.filter((activity: any) =>
             myInterestsEnglish.includes(activity.category)
           );
         }
 
-        setRegisteredActivities(registered);
-        setAllActivities(filteredSuggestions);
+        setRegisteredActivities(registeredList);
+        setAllActivities(finalSuggestions);
       }
     } catch (error) {
       console.error("Error:", error);
