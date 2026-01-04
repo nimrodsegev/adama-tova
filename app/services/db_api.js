@@ -148,6 +148,7 @@ export const apiActivities = {
             location: activityData.location,
             instructor: activityData.instructor,
             image_url: activityData.image_url,
+            branch: activityData.branch,
           },
         ])
         .select()
@@ -866,6 +867,39 @@ export const apiUser = {
     // 3. Save back to DB
     return safeRequest(
       supabase.from("users").update({ quiz: updatedQuiz }).eq("id", userId)
+    );
+  },
+  /**
+   * 🌿 GET USER BRANCHES
+   * Fetches the preferred branches for a user.
+   * Returns ['nahalal', 'satria'] if the field is null/empty.
+   */
+  async getUserBranches(userId) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('branches')
+      .eq('id', userId)
+      .single();
+
+    if (error) return [null, error.message];
+
+    // Default to BOTH if null or empty array
+    const branches = (data?.branches && data.branches.length > 0) 
+      ? data.branches 
+      : ['nahalal', 'satria'];
+
+    return [branches, null];
+  },
+  /**
+   * 🌿 UPDATE USER BRANCHES
+   * Saves the user's preferred branches (e.g. ['nahalal', 'satria'])
+   */
+  async updateUserBranches(userId, branchesArray) {
+    return safeRequest(
+      supabase
+        .from('users')
+        .update({ branches: branchesArray })
+        .eq('id', userId)
     );
   },
 };

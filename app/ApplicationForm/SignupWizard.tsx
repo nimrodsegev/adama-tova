@@ -35,7 +35,12 @@ const INTEREST_OPTIONS = [
   'מינדפולנס',
 ];
 
-// Gender options for display
+// 👇 New Branch Options
+const BRANCH_OPTIONS = [
+  { value: 'nahalal', label: 'נהלל' },
+  { value: 'satria', label: 'סטריה' },
+];
+
 const GENDER_OPTIONS: { value: 'male' | 'female' | 'prefer_not_to_say'; label: string }[] = [
   { value: 'male', label: 'זכר' },
   { value: 'female', label: 'נקבה' },
@@ -57,6 +62,10 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [circle, setCircle] = useState('');
   const [proximity, setProximity] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
+  
+  // 👇 New State for Branches
+  const [branches, setBranches] = useState<string[]>([]);
+  
   const [freeText, setFreeText] = useState('');
 
   // Field errors
@@ -64,7 +73,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [phoneError, setPhoneError] = useState('');
 
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
-  // Israeli mobile: 05X-XXXXXXX (10 digits starting with 05)
   const isValidIsraeliMobile = (p: string) => /^05\d{8}$/.test(p.replace(/[-\s]/g, ''));
 
   const validateStep1 = (): boolean => {
@@ -96,7 +104,8 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       if (!validateStep1()) return;
     }
 
-    if (currentStep === 3) {
+    // 👇 Check for last step (Now step 4)
+    if (currentStep === 4) {
       await handleSubmit();
     } else {
       setCurrentStep(currentStep + 1);
@@ -107,7 +116,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     } else {
-      // 🔥 Back from first step → return to login
       onBack();
     }
   };
@@ -119,22 +127,16 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     try {
       let userId: string;
 
-      // 🔥 Create auth account NOW (only if email signup)
       if (signupType === 'email') {
         await authService.signUp(email, password);
         const user = await authService.getCurrentUser();
         
-        if (!user) {
-          throw new Error('שגיאה ביצירת חשבון');
-        }
-        
+        if (!user) throw new Error('שגיאה ביצירת חשבון');
         userId = user.id;
       } else {
-        // Google signup - already have userId
         userId = googleUserId!;
       }
 
-      // Create profile in database
       const cleanPhone = phone.replace(/[-\s]/g, '');
 
       await userService.completeProfile(userId, email, {
@@ -144,6 +146,8 @@ export default function SignupWizard({ signupType, email, password, googleUserId
         circle: circle || undefined,
         proximity: proximity || undefined,
         interests: interests.length ? interests : undefined,
+        // 👇 Submit branches to DB
+        branches: branches.length ? branches : undefined,
         free_text: freeText || undefined,
       });
 
@@ -163,16 +167,25 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     );
   };
 
+  // 👇 Helper for Branch Toggling
+  const toggleBranch = (branchValue: string) => {
+    setBranches(prev => 
+      prev.includes(branchValue)
+        ? prev.filter(b => b !== branchValue)
+        : [...prev, branchValue]
+    );
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        {/* Step 1: Name + Phone */}
+        
+        {/* Step 0: Name + Phone */}
         {currentStep === 0 && (
           <div className={`${styles.stepContainer} ${styles.step1}`}>
             <h2 className={styles.stepTitle}>{t('השלם/י את הפרטים הבאים:')}</h2>
-
-            
             <div className={styles.inputsContainer}>
+              {/* ... Same inputs ... */}
               <div className={styles.inputWrapper}>
                 <input
                   type="text"
@@ -203,7 +216,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 {phoneError && <span className={styles.fieldError}>{phoneError}</span>}
               </div>
 
-              {/* Gender selector (optional) */}
               <div className={styles.genderSelector}>
                 <div className={styles.inputWrapper}>
                   <button
@@ -224,7 +236,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                         type="button"
                         onClick={() => {
                           setGender(option.value);
-                          setIvritaGender(option.value); // Update IvritaContext for immediate text transformation
+                          setIvritaGender(option.value);
                           setGenderDropdownOpen(false);
                         }}
                         className={`${styles.genderOption} ${gender === option.value ? styles.selected : ''}`}
@@ -239,26 +251,21 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         )}
 
-        {/* Step 2: Circle Selection */}
+        {/* Step 1: Circle Selection */}
         {currentStep === 1 && (
           <div className={`${styles.stepContainer} ${styles.step2}`}>
             <h2 className={styles.stepTitle}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</h2>
-
-            
             <div className={styles.optionsContainer}>
               {CIRCLE_OPTIONS.map((option) => (
                 <button
                   key={option}
-                  onClick={() =>
-                    setCircle(prev => (prev === option ? '' : option))
-                  }
+                  onClick={() => setCircle(prev => (prev === option ? '' : option))}
                   className={`${styles.optionButton} ${circle === option ? styles.selected : ''}`}
                 >
                   {option}
                 </button>
               ))}
             </div>
-
             <div className={styles.inputsContainer}>
               <div className={styles.inputWrapper}>
                 <input
@@ -274,20 +281,16 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         )}
 
-        {/* Step 3: Interests */}
+        {/* Step 2: Interests */}
         {currentStep === 2 && (
           <div className={`${styles.stepContainer} ${styles.step3}`}>
             <h2 className={styles.stepTitle}>מה מעניין אותך?</h2>
-
-            
             <div className={styles.optionsContainer}>
               {INTEREST_OPTIONS.map((option) => (
                 <button
                   key={option}
                   onClick={() => toggleInterest(option)}
-                  className={`${styles.optionButton} ${
-                    interests.includes(option) ? styles.selected : ''
-                  }`}
+                  className={`${styles.optionButton} ${interests.includes(option) ? styles.selected : ''}`}
                 >
                   {option}
                 </button>
@@ -296,26 +299,45 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         )}
 
-        {/* Step 4: Free Text */}
+        {/* 👇 NEW STEP 3: Branch Selection */}
         {currentStep === 3 && (
-  <div className={`${styles.stepContainer} ${styles.step4}`}>
-    <h2 className={styles.stepTitle}>כל דבר אחר שתרצה שנדע:</h2>
+          <div className={`${styles.stepContainer} ${styles.step3}`}>
+            <h2 className={styles.stepTitle}>{t('באיזה סניף תרצה/י לפעול?')}</h2>
+            <p className={styles.stepSubtitle} style={{textAlign: 'center', marginBottom: '1rem', opacity: 0.8}}>
+              ניתן לבחור יותר מאחד
+            </p>
+            <div className={styles.optionsContainer}>
+              {BRANCH_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => toggleBranch(option.value)}
+                  className={`${styles.optionButton} ${branches.includes(option.value) ? styles.selected : ''}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-    <div className={styles.textareaWrapper}>
-      <div className={styles.inputWrapper}>
-        <textarea
-          value={freeText}
-          onChange={(e) => setFreeText(e.target.value)}
-          className={styles.textarea}
-          rows={6}
-          dir="rtl"
-        />
-        <span className={styles.inputLabel}>אחר</span>
-      </div>
-    </div>
-  </div>
-)}
-
+        {/* Step 4: Free Text (Updated index from 3 to 4) */}
+        {currentStep === 4 && (
+          <div className={`${styles.stepContainer} ${styles.step4}`}>
+            <h2 className={styles.stepTitle}>כל דבר אחר שתרצה שנדע:</h2>
+            <div className={styles.textareaWrapper}>
+              <div className={styles.inputWrapper}>
+                <textarea
+                  value={freeText}
+                  onChange={(e) => setFreeText(e.target.value)}
+                  className={styles.textarea}
+                  rows={6}
+                  dir="rtl"
+                />
+                <span className={styles.inputLabel}>אחר</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {error && <p className={styles.error}>{error}</p>}
 
@@ -327,7 +349,8 @@ export default function SignupWizard({ signupType, email, password, googleUserId
               className={styles.navButton}
               disabled={loading}
             >
-              {currentStep === 3 ? (loading ? '...' : '✓') : '←'}
+              {/* Update logic for last step check (4) */}
+              {currentStep === 4 ? (loading ? '...' : '✓') : '←'}
             </button>
 
             <button
@@ -339,9 +362,9 @@ export default function SignupWizard({ signupType, email, password, googleUserId
             </button>
           </div>
 
-          {/* Progress Dots */}
+          {/* Update Progress Dots for 5 steps (4 down to 0) */}
           <div className={styles.progressDots}>
-            {[3, 2, 1, 0].map((step) => (
+            {[4, 3, 2, 1, 0].map((step) => (
               <div
                 key={step}
                 className={`${styles.dot} ${currentStep === step ? styles.activeDot : ''}`}

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiActivities, apiRegistrations } from "@/app/services/db_api";
+import { apiActivities, apiRegistrations, apiUser } from "@/app/services/db_api";
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
 import styles from "./HomePage.styles";
@@ -45,19 +45,28 @@ export default function HomePage() {
       if (regError) {
         console.error("Error fetching registrations:", regError);
       }
-
       const [activities, actError] = await apiActivities.getAll();
 
       if (actError) {
         console.error("Error fetching activities:", actError);
       }
+      const [userBranches, branchError] = await apiUser.getUserBranches(
+        user!.id
+      );
 
-      if (activities && registrationIds) {
-        const registered = activities.filter((activity: any) =>
+      if (branchError) {
+        console.error("Error fetching user branches:", branchError);
+      }
+      if (activities && registrationIds && userBranches) {
+        //  Filter by Branch 
+        const branchFilteredActivities = activities.filter((activity: any) => 
+          !activity.branch || userBranches.includes(activity.branch)
+        );
+        const registered = branchFilteredActivities.filter((activity: any) =>
           registrationIds.includes(activity.id)
         );
-
-        const notRegistered = activities.filter(
+        
+        const notRegistered = branchFilteredActivities.filter(
           (activity: any) => !registrationIds.includes(activity.id)
         );
 

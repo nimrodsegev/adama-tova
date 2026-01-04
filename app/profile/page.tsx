@@ -2,23 +2,64 @@
  * PROFILE PAGE
  * Displays complete user profile information from users table.
  * Shows: name, email, phone, role, circle, interests, free text.
+ * Allows managing Branch Preferences.
  * Protected route - only accessible when logged in.
  */
 "use client";
+import { useState, useEffect } from "react";
 import ProtectedRoute from "@/lib/components/ProtectedRoute";
 import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
+import { apiUser } from "@/app/services/db_api"; // 👈 Don't forget this import!
 
 export default function ProfilePage() {
   const { user, userProfile, loading, signOut } = useUser();
   const { t } = useIvrita();
   const router = useRouter();
 
+  // 👇 1. Local state for branches
+  const [branches, setBranches] = useState<string[]>([]);
+
+  // 👇 2. Sync state with profile data
+  useEffect(() => {
+    if (userProfile) {
+      // If user has saved branches, use them. Otherwise default to BOTH.
+      if (userProfile.branches && userProfile.branches.length > 0) {
+        setBranches(userProfile.branches);
+      } else {
+        setBranches(['nahalal', 'satria']);
+      }
+    }
+  }, [userProfile]);
+
   const handleLogout = async () => {
     await signOut();
     router.replace("/login");
     router.refresh();
+  };
+
+  // 👇 3. Handle Branch Toggling
+  const toggleBranch = async (branch: string) => {
+    if (!user) return;
+
+    let newBranches = [];
+    if (branches.includes(branch)) {
+      // Prevent unselecting the last branch (must have at least one)
+      if (branches.length === 1) {
+        alert(t("חובה לבחור לפחות סניף אחד"));
+        return;
+      }
+      newBranches = branches.filter((b) => b !== branch);
+    } else {
+      newBranches = [...branches, branch];
+    }
+
+    // Optimistic UI Update
+    setBranches(newBranches);
+
+    // Save to Database
+    await apiUser.updateUserBranches(user.id, newBranches);
   };
 
   if (loading) {
@@ -67,7 +108,7 @@ export default function ProfilePage() {
             onMouseOver={(e) => (e.currentTarget.style.opacity = "0.8")}
             onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
           >
-            {t('התנתק/י')}
+            {t("התנתק/י")}
           </button>
         </div>
 
@@ -94,10 +135,50 @@ export default function ProfilePage() {
             <strong>תפקיד:</strong>{" "}
             {userProfile?.role === "admin" ? "מנהל" : "משתתף"}
           </p>
-          <p>
-            <strong>התראות:</strong>{" "}
-            {userProfile?.notifications_enabled ? "מופעלות" : "כבויות"}
+        </div>
+
+        {/* 👇 4. NEW: Branch Preference Section */}
+        <div
+          style={{
+            marginTop: "2rem",
+            background: "#fff", // White background to stand out
+            border: "1px solid #ddd",
+            padding: "1.5rem",
+            borderRadius: "8px",
+          }}
+        >
+          <h2 style={{ marginTop: 0 }}>סניף מועדף</h2>
+          <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1rem" }}>
+            {t("בחר/י את הסניפים בהם תרצה/י לראות פעילויות:")}
           </p>
+          
+          <div style={{ display: "flex", gap: "1rem" }}>
+            {['nahalal', 'satria'].map((branch) => {
+              const isSelected = branches.includes(branch);
+              const label = branch === 'nahalal' ? 'נהלל' : 'סטריה';
+              
+              return (
+                <button
+                  key={branch}
+                  onClick={() => toggleBranch(branch)}
+                  style={{
+                    flex: 1,
+                    padding: "1rem",
+                    borderRadius: "8px",
+                    border: isSelected ? "2px solid #3b82f6" : "1px solid #ccc",
+                    background: isSelected ? "#eff6ff" : "#f9fafb",
+                    color: isSelected ? "#1d4ed8" : "#666",
+                    fontWeight: isSelected ? "bold" : "normal",
+                    cursor: "pointer",
+                    fontSize: "1rem",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  {isSelected && "✓ "} {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Quiz Info */}
@@ -123,7 +204,7 @@ export default function ProfilePage() {
                 <div>
                   <strong>תחומי עניין:</strong>
                   <ul style={{ marginTop: "0.5rem" }}>
-                    {userProfile.quiz.interests.map((interest, i) => (
+                    {userProfile.quiz.interests.map((interest: string, i: number) => (
                       <li key={i}>{interest}</li>
                     ))}
                   </ul>
@@ -145,17 +226,6 @@ export default function ProfilePage() {
                   {userProfile.quiz.free_text}
                 </p>
               </div>
-            )}
-
-            {userProfile.quiz.completed_at && (
-              <p
-                style={{ fontSize: "0.9rem", color: "#666", marginTop: "1rem" }}
-              >
-                <strong>השאלון הושלם ב:</strong>{" "}
-                {new Date(userProfile.quiz.completed_at).toLocaleDateString(
-                  "he-IL"
-                )}
-              </p>
             )}
           </div>
         )}

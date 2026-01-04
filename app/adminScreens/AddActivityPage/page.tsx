@@ -12,6 +12,7 @@ type ActivityCategory =
   | "Writing"
   | "Crafts"
   | "Mindfulness";
+  type ActivityBranch = "satria" | "nahalal";
 
 export default function AddActivityPage() {
   const { t } = useIvrita();
@@ -26,6 +27,7 @@ export default function AddActivityPage() {
     category: "Art" as ActivityCategory,
     instructor: "",
     location: "",
+    branch: "satria" as ActivityBranch,
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -80,6 +82,7 @@ export default function AddActivityPage() {
       instructor: formData.instructor,
       location: formData.location,
       image_url: imageUrl,
+      branch: formData.branch,
     };
 
     try {
@@ -109,6 +112,7 @@ export default function AddActivityPage() {
           category: "Art",
           instructor: "",
           location: "",
+          branch: "satria" as ActivityBranch,
         });
         setImageFile(null);
         setSubmitStatus("idle");
@@ -149,7 +153,21 @@ export default function AddActivityPage() {
               placeholder="לדוגמה: סדנת ציור"
             />
           </div>
-
+          {/* Branch Selector */}
+          <div style={styles.fieldContainer}>
+            <label htmlFor="branch" style={styles.label}>סניף *</label>
+            <select
+              id="branch"
+              name="branch"
+              value={formData.branch}
+              onChange={handleChange}
+              required
+              style={styles.select}
+            >
+              <option value="satria">סתריה</option>
+              <option value="nahalal">נהלל</option>
+            </select>
+          </div>
           {/* Image Input */}
           <div style={styles.fieldContainer}>
             <label style={styles.label}>תמונה לפעילות (אופציונלי)</label>

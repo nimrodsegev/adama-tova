@@ -5,7 +5,6 @@ import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiUser } from "@/app/services/db_api";
 
-// 🏷️ The list of all possible interests in your system
 const AVAILABLE_INTERESTS = [
   "מדיטציה", "יוגה",  "אומנות", 
   "כתיבה", "מיינדפולנס", "יצירה",
@@ -16,19 +15,27 @@ export default function UserProfilePage() {
   const { t } = useIvrita();
   const router = useRouter();
 
-  // State
   const [isEditing, setIsEditing] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  // 👇 1. New State for Branches
+  const [branches, setBranches] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  // Load interests from Profile Context on mount
   useEffect(() => {
-    if (userProfile?.quiz?.interests) {
-      setSelectedInterests(userProfile.quiz.interests);
+    if (userProfile) {
+      // Load Interests
+      if (userProfile.quiz?.interests) {
+        setSelectedInterests(userProfile.quiz.interests);
+      }
+      // 👇 2. Load Branches (Default to both if empty)
+      if (userProfile.branches && userProfile.branches.length > 0) {
+        setBranches(userProfile.branches);
+      } else {
+        setBranches(['nahalal', 'satria']); 
+      }
     }
   }, [userProfile]);
 
-  // Toggle Selection Logic
   const toggleInterest = (interest: string) => {
     if (selectedInterests.includes(interest)) {
       setSelectedInterests(prev => prev.filter(i => i !== interest));
@@ -37,8 +44,27 @@ export default function UserProfilePage() {
     }
   };
 
-  // Save to DB
-  const handleSave = async () => {
+  // 👇 3. Handle Branch Toggle (Auto-saves immediately)
+  const toggleBranch = async (branch: string) => {
+    if (!user) return;
+    
+    let newBranches = [];
+    if (branches.includes(branch)) {
+      // Don't allow unselecting the last one (must have at least one)
+      if (branches.length === 1) return alert("חובה לבחור לפחות סניף אחד.");
+      newBranches = branches.filter(b => b !== branch);
+    } else {
+      newBranches = [...branches, branch];
+    }
+    
+    // Optimistic Update
+    setBranches(newBranches);
+    
+    // Save to DB immediately
+    await apiUser.updateUserBranches(user.id, newBranches);
+  };
+
+  const handleSaveInterests = async () => {
     setSaving(true);
     if (!user) return;
 
@@ -49,7 +75,7 @@ export default function UserProfilePage() {
     } else {
       alert("הפרופיל עודכן בהצלחה! ✅");
       setIsEditing(false);
-      window.location.reload(); // Refresh to update Context
+      window.location.reload(); 
     }
     setSaving(false);
   };
@@ -67,24 +93,15 @@ export default function UserProfilePage() {
           <button onClick={() => router.back()} className="text-blue-600">← חזרה</button>
         </div>
 
-        {/* 👤 CARD 1: PERSONAL INFO (Read Only) */}
+        {/* 👤 CARD 1: PERSONAL INFO */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <h2 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">פרטים אישיים</h2>
-          
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-500">שם מלא: {userProfile.full_name} </label>
-            </div>
-            
+            <div><label className="block text-sm text-gray-500">שם מלא: {userProfile.full_name} </label></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-500">אימייל: {userProfile.email}</label>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500">טלפון: {userProfile.phone || "לא צוין"}</label>
-              </div>
+              <div><label className="block text-sm text-gray-500">אימייל: {userProfile.email}</label></div>
+              <div><label className="block text-sm text-gray-500">טלפון: {userProfile.phone || "לא צוין"}</label></div>
             </div>
-
             <div>
               <label className="block text-sm text-gray-500">מעגל: (Circle)</label>
               <div className="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold mt-1">
@@ -94,27 +111,50 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* 🏷️ CARD 2: INTERESTS (Editable) */}
+        {/* 🌿 CARD 2: BRANCH PREFERENCE (NEW) */}
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <h2 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">סניף מועדף</h2>
+          <p className="text-sm text-gray-500 mb-4">בחר את הסניפים בהם תרצה לראות פעילויות:</p>
+          
+          <div className="flex gap-4">
+            {['nahalal', 'satria'].map((branch) => {
+              const isSelected = branches.includes(branch);
+              const label = branch === 'nahalal' ? 'נהלל' : 'סטריה';
+              return (
+                <button
+                  key={branch}
+                  onClick={() => toggleBranch(branch)}
+                  className={`
+                    flex-1 py-3 rounded-lg font-bold text-lg transition-all border
+                    ${isSelected 
+                      ? "bg-blue-600 text-white border-blue-600 shadow-md" 
+                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"}
+                  `}
+                >
+                  {isSelected && "✓ "} {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 🏷️ CARD 3: INTERESTS */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <div className="flex justify-between items-center mb-4 border-b pb-2">
-            <h2 className="text-xl font-bold text-gray-700">תחומי עניין: </h2>
+            <h2 className="text-xl font-bold text-gray-700">תחומי עניין</h2>
             {!isEditing && (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="text-blue-600 font-bold text-sm hover:underline"
-              >
-                ✏️ ערוך תחומי עניין
+              <button onClick={() => setIsEditing(true)} className="text-blue-600 font-bold text-sm hover:underline">
+                ✏️ ערוך
               </button>
             )}
           </div>
 
-          {/* VIEW MODE */}
           {!isEditing ? (
             <div className="flex flex-wrap gap-2">
               {selectedInterests.length > 0 ? (
                 selectedInterests.map((tag, idx) => (
                   <span key={idx} className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full font-medium">
-                    {tag + " "}
+                    {tag}
                   </span>
                 ))
               ) : (
@@ -122,10 +162,8 @@ export default function UserProfilePage() {
               )}
             </div>
           ) : (
-            /* EDIT MODE */
             <div>
-              <p className="text-sm text-gray-500 mb-4">{t('בחר/י את התחומים שמעניינים אותך כדי שנוכל להמליץ לך על פעילויות מתאימות:')}</p>
-              
+              <p className="text-sm text-gray-500 mb-4">{t('בחר/י את התחומים שמעניינים אותך:')}</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
                 {AVAILABLE_INTERESTS.map((tag) => {
                   const isSelected = selectedInterests.includes(tag);
@@ -148,7 +186,7 @@ export default function UserProfilePage() {
 
               <div className="flex gap-3 border-t pt-4">
                 <button
-                  onClick={handleSave}
+                  onClick={handleSaveInterests}
                   disabled={saving}
                   className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-sm transition-colors flex-1"
                 >
@@ -157,7 +195,6 @@ export default function UserProfilePage() {
                 <button
                   onClick={() => {
                     setIsEditing(false);
-                    // Reset selection to original
                     if(userProfile?.quiz?.interests) setSelectedInterests(userProfile.quiz.interests);
                   }}
                   className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-bold transition-colors"
