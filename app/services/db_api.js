@@ -128,31 +128,51 @@ export const apiActivities = {
     // 1. Basic Validation
     if (!activityData.title) return [null, "Title is required"];
     if (!activityData.date) return [null, "Date is required"];
-    const randomDigit = crypto.randomUUID();
-    activityData.id = randomDigit;
-    // 2. Insert into DB
+
+    // 2. Extract Group Logic Params
+    const { 
+      weeks = 1, 
+      requires_approval = false, 
+      ...baseData 
+    } = activityData;
+
+    // 3. Prepare Rows
+    const rowsToInsert = [];
+    // Generate a unique series ID if creating more than 1 week (a Group)
+    const seriesId = weeks > 1 ? crypto.randomUUID() : null;
+    const startDate = new Date(baseData.date);
+
+    for (let i = 0; i < weeks; i++) {
+      // Calculate date: Start Date + (i * 7 days)
+      const sessionDate = new Date(startDate);
+      sessionDate.setDate(startDate.getDate() + (i * 7));
+
+      rowsToInsert.push({
+        id: crypto.randomUUID(), // Generate unique ID for each session
+        title: baseData.title,
+        description: baseData.description,
+        date: sessionDate.toISOString().split('T')[0], // Format YYYY-MM-DD
+        start_time: baseData.start_time,
+        end_time: baseData.end_time,
+        max_participants: baseData.max_participants,
+        status: baseData.status,
+        category: baseData.category,
+        location: baseData.location,
+        instructor: baseData.instructor,
+        image_url: baseData.image_url,
+        branch: baseData.branch,
+        // 👇 New Group Fields
+        series_id: seriesId,
+        requires_approval: requires_approval
+      });
+    }
+
+    // 4. Batch Insert
     return safeRequest(
       supabase
         .from("activities")
-        .insert([
-          {
-            id: activityData.id,
-            title: activityData.title,
-            description: activityData.description,
-            date: activityData.date,
-            start_time: activityData.start_time,
-            end_time: activityData.end_time,
-            max_participants: activityData.max_participants,
-            status: activityData.status,
-            category: activityData.category,
-            location: activityData.location,
-            instructor: activityData.instructor,
-            image_url: activityData.image_url,
-            branch: activityData.branch,
-          },
-        ])
-        .select()
-        .single()
+        .insert(rowsToInsert)
+        .select() // Returns all created rows
     );
   },
   async getByDate(dateString) {
@@ -420,155 +440,277 @@ export const apiRegistrations = {
   },
 
   /**
-   * 📝 REGISTER (Smart Waitlist Logic)
+   * 📝 REGISTER (Fixed - No SQL Needed)
    */
   async registerUserToActivity(userId, activityId) {
-    // 1. Check if already registered
-    const { data: existing } = await supabase
-      .from("registrations")
-      .select("id, if_confirmed")
-      .eq("user_id", userId)
-      .eq("activity_id", activityId)
-      .single();
-
-    if (existing) {
-      const status = existing.if_confirmed ? "confirmed" : "waitlist";
-      return [null, `User is already ${status}`];
-    }
-
-    // 2. Fetch Capacity
+    // 1. Fetch Activity Details
     const { data: activity } = await supabase
       .from("activities")
-      .select("title, max_participants, current_participants")
+      .select("id, series_id, requires_approval, max_participants, current_participants")
       .eq("id", activityId)
       .single();
 
     if (!activity) return [null, "Activity not found."];
 
+    // 2. Identify all IDs to register for (Series logic)
+    let idsToRegister = [activity.id];
+
+    if (activity.series_id) {
+      const { data: seriesActivities } = await supabase
+        .from("activities")
+        .select("id")
+        .eq("series_id", activity.series_id);
+      
+      if (seriesActivities) {
+        idsToRegister = seriesActivities.map(a => a.id);
+      }
+    }
+
+    // 3. Determine Status
+    const isApprovalNeeded = activity.requires_approval;
     const current = activity.current_participants || 0;
     const max = activity.max_participants || 0;
     const isFull = current >= max;
 
-    // 3. Register User
-    // If Full -> if_confirmed: false (Waitlist)
-    const { data: newReg, error: regError } = await supabase
-      .from("registrations")
-      .insert([
-        {
-          user_id: userId,
-          activity_id: activityId,
-          if_confirmed: !isFull,
-          created_at: new Date().toISOString(),
-        },
-      ])
-      .select()
-      .single();
-
-    if (regError) return [null, regError.message];
-
-    // 4. Update Counter (Only if confirmed)
+    let initialStatus = 'approved';
+    let initialConfirmed = !isFull;
     let message = "Successfully registered! ✅";
-    if (!isFull) {
-      await supabase
-        .from("activities")
-        .update({ current_participants: current + 1 })
-        .eq("id", activityId);
-    } else {
+
+    if (isApprovalNeeded) {
+      initialStatus = 'pending';
+      initialConfirmed = false;
+      message = "Request sent to admin for approval ⏳";
+    } else if (isFull) {
       message = "Activity is full. You are on the waitlist ⏳";
     }
 
-    return [newReg, { message }]; // Return success object with message
-  },
+    // 4. Check for existing registration (Fixes 406 Error)
+    const { data: existing } = await supabase
+      .from("registrations")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("activity_id", idsToRegister[0])
+      .maybeSingle(); // 👈 Uses maybeSingle to avoid errors if no row exists
 
+    if (existing) return [null, "User is already registered"];
+
+    // 5. Insert Registrations
+    const registrationsToInsert = idsToRegister.map(id => ({
+      user_id: userId,
+      activity_id: id,
+      if_confirmed: initialConfirmed,
+      status: initialStatus,
+      created_at: new Date().toISOString(),
+    }));
+
+    const { error: regError } = await supabase
+      .from("registrations")
+      .insert(registrationsToInsert);
+
+    if (regError) return [null, regError.message];
+
+    // 6. Update Participant Counts (Fixes 404 & 400 Errors)
+    // We update manually in a loop instead of calling a missing SQL function
+    if (initialConfirmed && !isApprovalNeeded) {
+      for (const id of idsToRegister) {
+        // A. Get fresh count for this specific session
+        const { data: freshAct } = await supabase
+          .from('activities')
+          .select('current_participants')
+          .eq('id', id)
+          .single();
+        
+        if (freshAct) {
+          // B. Update correctly using .update()
+          await supabase
+            .from("activities")
+            .update({ current_participants: (freshAct.current_participants || 0) + 1 })
+            .eq('id', id);
+        }
+      }
+    }
+
+    return [{ success: true }, { message }];
+  },
   /**
-   * ❌ CANCEL (Auto-Promote Next Person)
+   * ❌ CANCEL
    */
   async cancelRegistration(userId, activityId) {
-    // 1. Check who is cancelling
-    const { data: leavingUser } = await supabase
+    // 1. Get info before delete (to check if it's a series and if user was confirmed)
+    const { data: regData } = await supabase
       .from("registrations")
-      .select("if_confirmed")
+      .select("if_confirmed, activities(series_id)")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
       .single();
 
-    if (!leavingUser) return [null, "Registration not found"];
+    if (!regData) return [null, "Registration not found"];
 
-    // 2. Delete the registration
+    // 2. Identify all IDs to delete (Series logic)
+    let idsToDelete = [activityId];
+    
+    // If it's part of a group series, find all other session IDs
+    if (regData.activities?.series_id) {
+       const { data: seriesActs } = await supabase
+        .from("activities")
+        .select("id")
+        .eq("series_id", regData.activities.series_id);
+       
+       if (seriesActs) idsToDelete = seriesActs.map(a => a.id);
+    }
+
+    // 3. Delete Registrations
     const { error: delError } = await supabase
       .from("registrations")
       .delete()
       .eq("user_id", userId)
-      .eq("activity_id", activityId);
+      .in("activity_id", idsToDelete);
 
     if (delError) return [null, delError.message];
 
-    // 3. IF A CONFIRMED USER LEFT -> Promote the next person
-    if (leavingUser.if_confirmed) {
-      // A. Find the first person on waitlist (Oldest created_at)
-      const { data: waiter } = await supabase
-        .from("registrations")
-        .select("id, user_id")
-        .eq("activity_id", activityId)
-        .eq("if_confirmed", false)
-        .order("created_at", { ascending: true }) // First in line
-        .limit(1)
-        .single();
-
-      if (waiter) {
-        // B. PROMOTE THEM
-        console.log("Promoting user:", waiter.user_id);
-
-        // Update registration to confirmed
-        await supabase
-          .from("registrations")
-          .update({ if_confirmed: true })
-          .eq("id", waiter.id);
-
-        // Notify them
-        const { data: act } = await supabase
-          .from("activities")
-          .select("title")
-          .eq("id", activityId)
-          .single();
-        await supabase.from("notifications").insert([
-          {
-            user_id: waiter.user_id,
-            title: "You're In! 🎉",
-            message: `A spot opened up in "${
-              act?.title || "Activity"
-            }" and you have been automatically registered.`,
-            is_read: false,
-          },
-        ]);
-
-        // Note: We DO NOT decrement current_participants because one left (-1) and one entered (+1).
-      } else {
-        // C. NO WAITLIST? Just decrement the count
-        const { data: activity } = await supabase
-          .from("activities")
-          .select("current_participants")
-          .eq("id", activityId)
-          .single();
-
-        const newCount = Math.max(0, (activity.current_participants || 0) - 1);
-        await supabase
-          .from("activities")
-          .update({ current_participants: newCount })
-          .eq("id", activityId);
-      }
+    // 4. Decrement Participant Count (Only if the user was actually confirmed)
+    // We update each session manually to be safe.
+    if (regData.if_confirmed) {
+       for (const id of idsToDelete) {
+          // A. Fetch current count
+          const { data: act } = await supabase
+            .from('activities')
+            .select('current_participants')
+            .eq('id', id)
+            .single();
+          
+          if (act) {
+            // B. Calculate new count (ensure it doesn't drop below 0)
+            const newCount = Math.max(0, (act.current_participants || 0) - 1);
+            
+            // C. Update
+            await supabase
+              .from('activities')
+              .update({ current_participants: newCount })
+              .eq('id', id);
+          }
+       }
     }
 
     return [true, null];
   },
-
-  async getUserRegistrationIds(userId) {
+  /**
+   * 🕵️ GET PENDING REGISTRATIONS (For Admin)
+   * Fetches all registrations that are waiting for approval.
+   * ✅ FIXED: Filters out duplicates so Admin only sees 1 request per Group Series.
+   */
+  async getPendingRegistrations() {
     const { data, error } = await supabase
       .from("registrations")
-      .select("activity_id")
-      .eq("user_id", userId);
-    if (error) return [[], error.message];
-    return [data.map((r) => r.activity_id), null];
+      .select(`
+        id,
+        created_at,
+        status,
+        user_id, 
+        users (id, full_name, email, phone),
+        activities (id, title, start_time, date, series_id)
+      `)
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
+
+    if (error) return [null, error.message];
+    if (!data) return [[], null];
+
+    // 🧹 FILTER DUPLICATES Logic
+    // If a user registered for a Series (Group), we only want to show 1 request card,
+    // not 4 or 10. We use a Set to track unique "User + Series" combinations.
+    const uniqueRequests = [];
+    const seenSeriesMap = new Set(); 
+
+    data.forEach((reg) => {
+      const seriesId = reg.activities?.series_id;
+      const userId = reg.users?.id;
+
+      if (seriesId) {
+        // It's a Group/Series
+        const uniqueKey = `${userId}_${seriesId}`;
+        
+        if (!seenSeriesMap.has(uniqueKey)) {
+          seenSeriesMap.add(uniqueKey);
+          uniqueRequests.push(reg); // Add only the first occurrence
+        }
+        // If we already saw this User+Series combo, skip this row (it's a duplicate session)
+      } else {
+        // It's a regular single activity, always add it
+        uniqueRequests.push(reg);
+      }
+    });
+
+    return [uniqueRequests, null];
+  },
+
+  /**
+   * ✅ APPROVE REGISTRATION (Admin Action)
+   * Approves this registration AND increments participant counts for all sessions.
+   */
+  async approveRegistration(registrationId) {
+    // 1. Get details of the request
+    const { data: reg } = await supabase
+      .from("registrations")
+      .select("user_id, activity_id, activities(series_id)")
+      .eq("id", registrationId)
+      .single();
+
+    if (!reg) return [null, "Registration not found"];
+
+    // 2. Identify all related Activity IDs (if it's a series)
+    let idsToApprove = [reg.activity_id];
+    
+    if (reg.activities?.series_id) {
+       const { data: seriesActs } = await supabase
+        .from("activities")
+        .select("id")
+        .eq("series_id", reg.activities.series_id);
+       
+       if (seriesActs) idsToApprove = seriesActs.map(a => a.id);
+    }
+
+    // 3. Update Registration Status (Approve User)
+    const { error: updateError } = await supabase
+        .from("registrations")
+        .update({ status: 'approved', if_confirmed: true })
+        .eq("user_id", reg.user_id)
+        .in("activity_id", idsToApprove);
+
+    if (updateError) return [null, updateError.message];
+
+    // 4. 👇 NEW: Increment Participant Count for ALL sessions
+    // We loop through to ensure every single session date gets updated.
+    for (const id of idsToApprove) {
+      // A. Fetch current count
+      const { data: activity } = await supabase
+        .from("activities")
+        .select("current_participants")
+        .eq("id", id)
+        .single();
+      
+      if (activity) {
+        const newCount = (activity.current_participants || 0) + 1;
+        
+        // B. Update with new count
+        await supabase
+          .from("activities")
+          .update({ current_participants: newCount })
+          .eq("id", id);
+      }
+    }
+
+    return [{ success: true }, null];
+  },
+
+  /**
+   * ❌ REJECT REGISTRATION
+   */
+  async rejectRegistration(registrationId) {
+    // We simply delete the request so they can try again or it disappears
+    return safeRequest(
+      supabase.from("registrations").delete().eq("id", registrationId)
+    );
   },
 };
 
