@@ -902,4 +902,12 @@ export const apiUser = {
         .eq('id', userId)
     );
   },
+  async updateUserPhone(userId, newPhone) {
+    return safeRequest(
+      supabase
+        .from('users')
+        .update({ phone: newPhone })
+        .eq('id', userId)
+    );
+  },
 };
