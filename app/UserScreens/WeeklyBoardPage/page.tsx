@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiActivities, apiRegistrations } from "@/app/services/db_api";
+// 👇 Added apiUser to imports
+import { apiActivities, apiRegistrations, apiUser } from "@/app/services/db_api";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
 import styles from "./WeeklyBoardPage.styles";
@@ -48,6 +49,7 @@ export default function WeeklyBoardPage() {
   const selectedDateObj = getSelectedDateObject();
 
   const fetchData = async () => {
+    // If closed day, clear and return
     if (isDayClosed) {
       setActivities([]);
       return;
@@ -60,18 +62,38 @@ export default function WeeklyBoardPage() {
     const day = String(selectedDateObj.getDate()).padStart(2, "0");
     const dateString = `${year}-${month}-${day}`;
 
-    const [actData, actError] = await apiActivities.getByDate(dateString);
-    if (actError) console.error("Error fetching activities:", actError);
-    else setActivities(actData || []);
+    // 👇 1. Fetch Activities AND User Branches in parallel
+    const [
+      [actData, actError],
+      [userBranches, branchError]
+    ] = await Promise.all([
+      apiActivities.getByDate(dateString),
+      // Only fetch branches if we have a user, otherwise null
+      user ? apiUser.getUserBranches(user.id) : Promise.resolve([null, null])
+    ]);
 
+    if (actError) console.error("Error fetching activities:", actError);
+    if (branchError) console.error("Error fetching branches:", branchError);
+
+    const rawActivities = actData || [];
+    const validBranches = userBranches || ['nahalal', 'satria']; // Default to both
+
+    // 👇 2. Filter by Branch
+    const branchFilteredActivities = rawActivities.filter((activity: any) => {
+      // Keep if: No branch defined OR branch is in user's list
+      return !activity.branch || validBranches.includes(activity.branch);
+    });
+
+    setActivities(branchFilteredActivities);
     setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDayIndex, user]);
 
-  // Filter activities based on selected filter
+  // Filter activities based on selected filter ("All" vs "For You")
   const getFilteredActivities = () => {
     if (filter === "all") return activities;
 

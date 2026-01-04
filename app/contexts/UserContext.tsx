@@ -20,11 +20,13 @@ interface UserProfile {
   is_approved: boolean;
   notifications_enabled: boolean;
   gender?: 'male' | 'female' | 'neutral' | 'prefer_not_to_say' | null;
+  branches?: string[];
   quiz: {
     circle?: string;
     interests?: string[];
     free_text?: string;
     completed_at?: string;
+    branches?: string[];
   };
 }
 

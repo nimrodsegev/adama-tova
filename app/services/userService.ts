@@ -29,6 +29,10 @@ const INTRESTS_MAPPING: Record<string, string> = {
   'מינדפולנס': 'Mindfulness',
   'יצירה': 'Crafts',
 };
+const BRANCHES_MAPPING: Record<string, string> = {
+  'נהלל': 'nahalal',
+  'סתריה': 'satria',
+};
 
 export const userService = {
   // Save quiz answers and create user profile
@@ -42,6 +46,7 @@ export const userService = {
       circle?: string;
       proximity?: string;
       interests?: string[];
+      branches?: string[];
       free_text?: string;
     }
   ) {
@@ -64,6 +69,7 @@ export const userService = {
         circle: circleEnglish,
         is_approved: false,
         notifications_enabled: true,
+        branches: profileData.branches,
         quiz: {
           circle: profileData.circle || null,
           proximity: profileData.proximity || null,
