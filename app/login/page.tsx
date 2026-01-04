@@ -297,7 +297,7 @@ export default function LoginPage() {
                 onClick={handleLogin}
                 disabled={loading}
               >
-                {loading ? 'מתחבר...' : 'התחבר'}
+                {loading ? '...מתחבר' : 'התחבר'}
               </button>
 
               <button

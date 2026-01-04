@@ -149,7 +149,7 @@ export default function ResetPasswordPage() {
             disabled={loading}
             className={styles.primaryButton}
           >
-            {loading ? 'משנה...' : 'שינוי סיסמה'}
+            {loading ? '...משנה' : 'שינוי סיסמה'}
           </button>
         </form>
       </div>
