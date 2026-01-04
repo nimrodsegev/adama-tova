@@ -174,14 +174,15 @@
     background: #EFEFEF;
     border-radius: 1.5625rem;
     border: none;
-  
+
     font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
     font-size: 1rem;
     line-height: 1.1875rem;
     color: #681F02;
-  
+
     cursor: pointer;
     transition: opacity 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .primaryButton:hover {
@@ -192,7 +193,12 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
+  .primaryButton:focus {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   /* Autofill (saved password) */
   .input:-webkit-autofill,
   .input:-webkit-autofill:hover,

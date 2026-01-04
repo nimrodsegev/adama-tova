@@ -231,7 +231,7 @@ export default function LoginPage() {
             fontSize: '1.25rem',
             textAlign: 'center'
           }}>
-            טוען...
+            ...טוען
           </div>
         </div>
       </div>
@@ -297,7 +297,7 @@ export default function LoginPage() {
                 onClick={handleLogin}
                 disabled={loading}
               >
-                {loading ? 'מתחבר...' : 'התחבר'}
+                {loading ? '...מתחבר' : 'התחבר'}
               </button>
 
               <button

@@ -130,7 +130,7 @@
   height: 3.75rem; /* 60px */
   padding: 0.5rem 1.625rem; /* 8px 26px */
   background: #F28130;
-  border: 0.5px solid #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.875rem; /* 30px */
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-weight: 300;
@@ -222,10 +222,16 @@
   color: #681F02;
   cursor: pointer;
   transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .optionButton:hover {
   opacity: 0.9;
+}
+
+.optionButton:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Selected option (semi-transparent) */
@@ -244,7 +250,7 @@
   height: 3.75rem; /* 60px */
   padding: 1rem 1.625rem;
   background: #F28130;
-  border: 0.5px solid #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.875rem; /* 30px */
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-size: 1rem;
@@ -295,6 +301,7 @@
   color: #681F02;
   cursor: pointer;
   transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .navButton:hover:not(:disabled) {
@@ -305,6 +312,11 @@
 .navButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.navButton:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Progress dots */
@@ -359,7 +371,7 @@
   height: 3.75rem; /* 60px */
   padding: 0.5rem 1.625rem; /* 8px 26px */
   background: #F28130;
-  border: 0.5px solid #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.875rem; /* 30px */
   font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
   font-weight: 300;
@@ -373,11 +385,18 @@
   align-items: center;
   justify-content: space-between;
   transition: border-radius 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .genderToggle.open {
   border-radius: 1.875rem 1.875rem 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.genderToggle:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .genderToggleArrow {
@@ -395,7 +414,7 @@
   left: 0;
   right: 0;
   background: #F28130;
-  border: 0.5px solid #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-top: none;
   border-radius: 0 0 1.875rem 1.875rem;
   overflow: hidden;
@@ -416,11 +435,17 @@
   direction: rtl;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .genderOption:hover {
   background: rgba(255, 255, 255, 0.15);
   color: #FFFFFF;
+}
+
+.genderOption:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .genderOption.selected {
