@@ -231,7 +231,7 @@ export default function LoginPage() {
             fontSize: '1.25rem',
             textAlign: 'center'
           }}>
-            טוען...
+            ...טוען
           </div>
         </div>
       </div>
