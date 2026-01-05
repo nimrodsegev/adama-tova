@@ -5,13 +5,12 @@
   max-width: 24.5625rem; /* 393px */
   min-height: 100vh;
   margin: 0 auto;
-  background: #F28130;
+  background: #f28130;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
 }
-
 
 /* Content wrapper */
 .content {
@@ -34,11 +33,11 @@
 }
 
 .title {
-  font-family: 'Arfilit', sans-serif;
-  font-size: 2.25rem;      /* 36px */
+  font-family: "Arfilit", sans-serif;
+  font-size: 2.25rem; /* 36px */
   font-weight: 400;
-  line-height: 1.875rem;   /* 30px */
-  color: #EFEFEF;
+  line-height: 1.875rem; /* 30px */
+  color: #efefef;
   margin: 0;
   width: 100%;
   text-align: center;
@@ -46,10 +45,10 @@
 }
 
 .subtitle {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-size: 1.25rem;      /* 20px */
-  line-height: 1.25rem;    /* 20px */
-  color: #FFFFFF;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.25rem; /* 20px */
+  color: #ffffff;
   margin: 0;
   width: 100%;
   text-align: center;
@@ -76,11 +75,11 @@
   width: 100%;
   height: 3.75rem; /* 60px */
   padding: 0.5rem 2rem;
-  background: #F28130;
+  background: #f28130;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.875rem; /* 30px */
-  color: #FFFFFF;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  color: #ffffff;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-size: 0.875rem; /* 14px */
   line-height: 1.25rem; /* 20px */
   outline: none;
@@ -88,7 +87,7 @@
 }
 
 .input::placeholder {
-  color: #CFCFCF;
+  color: #cfcfcf;
   text-align: right;
 }
 
@@ -101,24 +100,24 @@
   position: absolute;
   right: 1.8125rem; /* 29px */
   top: -0.5rem; /* -8.5px */
-  
+
   display: flex;
   align-items: center;
   padding: 0.0625rem 0.5rem; /* 1px 8px */
   gap: 0.5rem; /* 8px */
-  
+
   height: 1.0625rem; /* 17px */
-  
-  background: #F28130;
-  
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+
+  background: #f28130;
+
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 0.875rem; /* 14px */
   line-height: 1.25rem; /* 20px */
   text-align: right;
   color: rgba(255, 245, 245, 0.7);
-  
+
   pointer-events: none;
   z-index: 1;
 }
@@ -130,7 +129,7 @@
 
 /* Input error state */
 .inputError {
-  border: 2px solid #FF0000 !important;
+  border: 2px solid #ff0000 !important;
   box-shadow: 0px 0px 0.03125rem rgba(249, 249, 249, 0.5);
 }
 
@@ -139,17 +138,17 @@
   position: absolute;
   right: 1.5rem;
   top: -0.5rem; /* -9px - sits ON the border */
-  
+
   padding: 0rem 0.3125rem;
-  background: #F28130;
-  
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  background: #f28130;
+
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-size: 0.875rem; /* 14px */
   line-height: 1.25rem; /* 20px */
   font-weight: 400;
-  color: #FF0000;
+  color: #ff0000;
   text-shadow: 0px 0px 0.03125rem rgba(255, 255, 255, 0.5);
-  
+
   white-space: nowrap;
   z-index: 3;
 }
@@ -168,17 +167,17 @@
   width: 6.125rem; /* 98px */
   height: 1.375rem; /* 22px */
 
-  background: #F9F9F9;
+  background: #f9f9f9;
   border-radius: 1.5625rem; /* 25px */
   border: none;
 
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 0.6875rem; /* 11px */
   line-height: 1.25rem; /* 20px */
   text-align: center;
-  color: #681F02;
+  color: #681f02;
 
   cursor: pointer;
   transition: opacity 0.2s;
@@ -209,13 +208,13 @@
   width: 100%;
   height: 2.9375rem; /* 47px */
   padding: 0.3125rem 4.625rem; /* 5px 74px */
-  background: #EFEFEF;
+  background: #efefef;
   border-radius: 1.5625rem; /* 25px */
   border: none;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-size: 1rem; /* 16px */
   line-height: 1.1875rem; /* 19px */
-  color: #681F02;
+  color: #681f02;
   cursor: pointer;
   transition: opacity 0.2s;
   -webkit-tap-highlight-color: transparent;
@@ -239,10 +238,10 @@
 .secondaryButton {
   width: 100%;
   height: 2.9375rem; /* 47px */
-  background: #681F02;
+  background: #681f02;
   border: none;
   border-radius: 1.5625rem; /* 25px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-size: 1rem; /* 16px */
   line-height: 1.1875rem; /* 19px */
   color: rgba(255, 245, 245, 0.7);
@@ -281,16 +280,16 @@
 }
 
 .orText {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-size: 0.875rem; /* 14px */
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 /* Google button */
 .googleButton {
   width: 19.6875rem;
   height: 2.9375rem;
-  background: #EFEFEF;
+  background: #efefef;
   border-radius: 1.5625rem;
   border: none;
   display: flex;
@@ -313,9 +312,9 @@
 }
 
 .googleButton span {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
   font-size: 1rem;
-  color: #681F02;
+  color: #681f02;
 }
 
 .googleButton img {
@@ -327,104 +326,137 @@
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus,
 .input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #F28130 inset !important;
-  -webkit-text-fill-color: #EFEFEF !important;
-  caret-color: #EFEFEF;
+  -webkit-box-shadow: 0 0 0 1000px #f28130 inset !important;
+  -webkit-text-fill-color: #efefef !important;
+  caret-color: #efefef;
   border: 2px solid rgba(255, 255, 255, 0.4) !important;
 }
 
 .input:-moz-autofill {
   background-color: transparent !important;
-  color: #EFEFEF !important;
+  color: #efefef !important;
   border: 2px solid rgba(255, 255, 255, 0.4) !important;
 }
 
+/* About Link - Small button at bottom */
+.aboutLink {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.375rem 1.25rem; /* 6px 20px */
+
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.25rem; /* 20px */
+
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.aboutLink:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
 /* Responsive scaling */
-@media (min-width: 48rem) { /* 768px */
+@media (min-width: 48rem) {
+  /* 768px */
   .container {
     max-width: 100%;
   }
-  
+
   .content {
     max-width: 28rem;
     gap: 4rem;
   }
-  
+
   .loginContent {
     width: 28rem;
   }
-  
+
   .title {
     font-size: 2.75rem;
     line-height: 2.25rem;
   }
-  
+
   .subtitle {
     font-size: 1.5rem;
     line-height: 1.5rem;
   }
-  
+
   .input {
     height: 4.5rem;
     font-size: 1.125rem;
     padding: 0.625rem 2.5rem;
   }
-  
+
   .primaryButton,
   .secondaryButton {
     height: 3.5rem;
     font-size: 1.25rem;
   }
-  
+
   .googleButton {
     width: 28rem;
     height: 3.5rem;
   }
-  
+
   .googleButton span {
     font-size: 1.25rem;
   }
-  
+
   .forgotPassword {
     margin-top: 0.5rem;
     min-height: 1.6rem;
     max-height: 1.6rem;
   }
-  
 }
 
-@media (min-width: 64rem) { /* 1024px */
+@media (min-width: 64rem) {
+  /* 1024px */
   .content {
     max-width: 32rem;
   }
-  
+
   .loginContent {
     width: 32rem;
     max-width: 32rem;
   }
-  
+
   .title {
     font-size: 3rem;
     line-height: 2.5rem;
   }
-  
+
   .subtitle {
     font-size: 1.625rem;
     line-height: 1.625rem;
   }
-  
+
   .input {
     height: 5rem;
     font-size: 1.25rem;
   }
-  
+
   .primaryButton,
   .secondaryButton,
   .googleButton {
     height: 4rem;
     font-size: 1.375rem;
   }
-  
+
   .googleButton {
     width: 32rem;
   }

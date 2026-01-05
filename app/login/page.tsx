@@ -1,61 +1,61 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { authService } from '@/app/services/authService';
-import GoogleLoginButton from './GoogleLoginButton';
-import styles from './page.module.css';
-import { createClient } from '@/lib/supabase/client';
-import ForgotPasswordModal from '@/lib/components/ForgotPasswordModal';
-import SignupWizard from '@/app/ApplicationForm/SignupWizard';
-import { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
+import { authService } from "@/app/services/authService";
+import GoogleLoginButton from "./GoogleLoginButton";
+import styles from "./page.module.css";
+import { createClient } from "@/lib/supabase/client";
+import ForgotPasswordModal from "@/lib/components/ForgotPasswordModal";
+import SignupWizard from "@/app/ApplicationForm/SignupWizard";
+import { useState, useEffect } from "react";
 
-type Mode = 'choice' | 'signup';
-type SignupType = 'email' | 'google';
+type Mode = "choice" | "signup";
+type SignupType = "email" | "google";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>('choice');
+  const [mode, setMode] = useState<Mode>("choice");
   const [loading, setLoading] = useState(false);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   // Auth fields
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // Field-specific errors
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Store signup info for wizard
-  const [signupType, setSignupType] = useState<SignupType>('email');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [googleUserId, setGoogleUserId] = useState('');
+  const [signupType, setSignupType] = useState<SignupType>("email");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [googleUserId, setGoogleUserId] = useState("");
 
   // 🔥 Check ONLY for Google OAuth users who need to complete profile
   useEffect(() => {
     const checkAuthUser = async () => {
       try {
         const currentUser = await authService.getCurrentUser();
-        
-        if (currentUser && mode === 'choice') {
+
+        if (currentUser && mode === "choice") {
           // User is authenticated via Google - check if they have a profile
           const supabase = createClient();
-          
+
           const { data: profile } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', currentUser.id)
+            .from("users")
+            .select("*")
+            .eq("id", currentUser.id)
             .maybeSingle(); // ✅ FIXED: Returns null instead of throwing 406
-          
+
           if (!profile || !profile.quiz?.completed_at) {
             // Google user without profile or incomplete quiz - show wizard
-            setSignupType('google');
+            setSignupType("google");
             setGoogleUserId(currentUser.id);
-            setSignupEmail(currentUser.email || '');
-            setMode('signup');
+            setSignupEmail(currentUser.email || "");
+            setMode("signup");
           }
         }
       } catch (error) {
@@ -64,22 +64,22 @@ export default function LoginPage() {
         setInitialCheckDone(true);
       }
     };
-    
+
     checkAuthUser();
   }, []);
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
-      return 'הסיסמה חייבת להכיל לפחות 8 תווים';
+      return "הסיסמה חייבת להכיל לפחות 8 תווים";
     }
     if (!/[A-Z]/.test(password)) {
-      return 'הסיסמה חייבת להכיל לפחות אות גדולה אחת באנגלית';
+      return "הסיסמה חייבת להכיל לפחות אות גדולה אחת באנגלית";
     }
     if (!/[a-z]/.test(password)) {
-      return 'הסיסמה חייבת להכיל לפחות אות קטנה אחת באנגלית';
+      return "הסיסמה חייבת להכיל לפחות אות קטנה אחת באנגלית";
     }
     if (!/[0-9]/.test(password)) {
-      return 'הסיסמה חייבת להכיל לפחות ספרה אחת';
+      return "הסיסמה חייבת להכיל לפחות ספרה אחת";
     }
     return null;
   };
@@ -87,10 +87,10 @@ export default function LoginPage() {
   const validateEmail = (email: string): string | null => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      return 'אימייל הוא שדה חובה';
+      return "אימייל הוא שדה חובה";
     }
     if (!emailRegex.test(email)) {
-      return 'פורמט האימייל לא תקין';
+      return "פורמט האימייל לא תקין";
     }
     return null;
   };
@@ -100,11 +100,11 @@ export default function LoginPage() {
     try {
       const supabase = createClient();
       const { data } = await supabase
-        .from('users')
-        .select('email')
-        .eq('email', email)
+        .from("users")
+        .select("email")
+        .eq("email", email)
         .maybeSingle(); // ✅ FIXED: Returns null instead of throwing 406
-      
+
       return !!data;
     } catch {
       return false;
@@ -112,64 +112,64 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
-    setEmailError('');
-    setPasswordError('');
-    
+    setEmailError("");
+    setPasswordError("");
+
     if (!email || !password) {
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const userExists = await checkUserExists(email);
-      
+
       if (!userExists) {
-        setEmailError('אימייל לא נמצא');
+        setEmailError("אימייל לא נמצא");
         setLoading(false);
         return;
       }
-      
+
       try {
         await authService.signIn(email, password);
-        
+
         const user = await authService.getCurrentUser();
         if (user) {
           const supabase = createClient();
           const { data: profile } = await supabase
-            .from('users')
-            .select('is_approved, role, quiz')
-            .eq('id', user.id)
+            .from("users")
+            .select("is_approved, role, quiz")
+            .eq("id", user.id)
             .maybeSingle();
-          
+
           if (profile) {
             // Check approval status first
-            if (!profile.is_approved && profile.role === 'participant') {
-              router.replace('/pending-approval');
+            if (!profile.is_approved && profile.role === "participant") {
+              router.replace("/pending-approval");
               setLoading(false);
               return;
             }
-            
+
             // Check quiz completion
             if (!profile.quiz?.completed_at) {
-              router.replace('/login'); // Show wizard
+              router.replace("/login"); // Show wizard
               setLoading(false);
               return;
             }
-            
+
             // 🔥 FIXED: Navigate to correct dashboard
-            if (profile.role === 'admin') {
-              router.replace('/adminScreens/HomePage');
+            if (profile.role === "admin") {
+              router.replace("/adminScreens/HomePage");
             } else {
-              router.replace('/UserScreens/HomePage');
+              router.replace("/UserScreens/HomePage");
             }
           } else {
             // No profile exists - should not happen for existing users
-            setEmailError('שגיאה בטעינת פרופיל');
+            setEmailError("שגיאה בטעינת פרופיל");
           }
         }
       } catch (authError: any) {
-        setPasswordError('סיסמה שגויה');
+        setPasswordError("סיסמה שגויה");
       }
     } catch (err: any) {
       // Error handled
@@ -180,18 +180,18 @@ export default function LoginPage() {
 
   // Just validate and show wizard (DON'T create auth account yet)
   const handleSignupClick = async () => {
-    setEmailError('');
-    setPasswordError('');
+    setEmailError("");
+    setPasswordError("");
 
     const emailValidation = validateEmail(email);
     if (emailValidation) {
-      setEmailError('אימייל לא תקין');
+      setEmailError("אימייל לא תקין");
       return;
     }
 
     const passwordValidation = validatePassword(password);
     if (passwordValidation) {
-      setPasswordError('סיסמה חלשה');
+      setPasswordError("סיסמה חלשה");
       return;
     }
 
@@ -200,23 +200,23 @@ export default function LoginPage() {
     setLoading(false);
 
     if (userExists) {
-      setEmailError('אימייל קיים במערכת');
+      setEmailError("אימייל קיים במערכת");
       return;
     }
 
     // Store email/password and show wizard (don't create account yet)
-    setSignupType('email');
+    setSignupType("email");
     setSignupEmail(email);
     setSignupPassword(password);
-    setMode('signup');
+    setMode("signup");
   };
 
   // Handle back from wizard
   const handleBackToLogin = async () => {
-    setMode('choice');
-    
+    setMode("choice");
+
     // If it was a Google signup, sign them out
-    if (signupType === 'google') {
+    if (signupType === "google") {
       await authService.signOut();
     }
   };
@@ -225,12 +225,14 @@ export default function LoginPage() {
     return (
       <div className={styles.container}>
         <div className={styles.content}>
-          <div style={{ 
-            color: '#EFEFEF',
-            fontFamily: 'Ezer Shemesh TRIAL ONLY, sans-serif',
-            fontSize: '1.25rem',
-            textAlign: 'center'
-          }}>
+          <div
+            style={{
+              color: "#EFEFEF",
+              fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
+              fontSize: "1.25rem",
+              textAlign: "center",
+            }}
+          >
             ...טוען
           </div>
         </div>
@@ -239,7 +241,7 @@ export default function LoginPage() {
   }
 
   // LOGIN SCREEN
-  if (mode === 'choice') {
+  if (mode === "choice") {
     return (
       <div className={styles.container}>
         <div className={styles.content}>
@@ -255,9 +257,11 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  setEmailError('');
+                  setEmailError("");
                 }}
-                className={`${styles.input} ${styles.inputLtr} ${emailError ? styles.inputError : ''}`}
+                className={`${styles.input} ${styles.inputLtr} ${
+                  emailError ? styles.inputError : ""
+                }`}
                 dir="rtl"
               />
               <span className={styles.inputLabel}>אימייל</span>
@@ -272,9 +276,11 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  setPasswordError('');
+                  setPasswordError("");
                 }}
-                className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
+                className={`${styles.input} ${
+                  passwordError ? styles.inputError : ""
+                }`}
                 dir="rtl"
               />
               <span className={styles.inputLabel}>סיסמה</span>
@@ -297,7 +303,7 @@ export default function LoginPage() {
                 onClick={handleLogin}
                 disabled={loading}
               >
-                {loading ? '...מתחבר' : 'התחבר'}
+                {loading ? "...מתחבר" : "התחבר"}
               </button>
 
               <button
@@ -317,6 +323,11 @@ export default function LoginPage() {
               <GoogleLoginButton className={styles.googleButton} />
             </div>
           </div>
+
+          {/* Link to About Page */}
+          <a href="/login/about" className={styles.aboutLink}>
+            אודות העמותה
+          </a>
         </div>
 
         {showForgotPassword && (
@@ -331,7 +342,7 @@ export default function LoginPage() {
 
   // SIGNUP WIZARD
   return (
-    <SignupWizard 
+    <SignupWizard
       signupType={signupType}
       email={signupEmail}
       password={signupPassword}
