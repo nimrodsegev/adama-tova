@@ -106,6 +106,7 @@ const styles = {
     justifyContent: "space-around",
     alignItems: "center",
     zIndex: 1000,
+    WebkitTapHighlightColor: "transparent",
   },
   navItem: {
     fontSize: "1.5rem",
