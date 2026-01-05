@@ -5,11 +5,16 @@ import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import { apiUser } from "@/app/services/db_api";
+import styles from "./ProfilePage.module.css";
 
 // Available options for Interests
 const AVAILABLE_INTERESTS = [
-  "מדיטציה", "יוגה", "אומנות", 
-  "כתיבה", "מיינדפולנס", "יצירה",
+  "מדיטציה",
+  "יוגה",
+  "אומנות",
+  "כתיבה",
+  "מיינדפולנס",
+  "יצירה",
 ];
 
 export default function ProfilePage() {
@@ -19,15 +24,15 @@ export default function ProfilePage() {
 
   // --- STATE ---
   const [branches, setBranches] = useState<string[]>([]);
-  
+
   // Phone Editing State
   const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [phone, setPhone] = useState("");
-  
+
   // Interests Editing State
   const [isEditingInterests, setIsEditingInterests] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  
+
   const [saving, setSaving] = useState(false);
 
   // --- EFFECT: Load Data ---
@@ -37,7 +42,7 @@ export default function ProfilePage() {
       if (userProfile.branches && userProfile.branches.length > 0) {
         setBranches(userProfile.branches);
       } else {
-        setBranches(['nahalal', 'satria']);
+        setBranches(["nahalal", "satria"]);
       }
 
       // 2. Phone
@@ -74,10 +79,10 @@ export default function ProfilePage() {
   const handleSavePhone = async () => {
     if (!user) return;
     setSaving(true);
-    
+
     // Clean phone (remove dashes/spaces)
-    const cleanPhone = phone.replace(/[-\s]/g, '');
-    
+    const cleanPhone = phone.replace(/[-\s]/g, "");
+
     // Basic validation (Israeli mobile)
     const isValid = /^05\d{8}$/.test(cleanPhone);
     if (!isValid) {
@@ -87,7 +92,7 @@ export default function ProfilePage() {
     }
 
     const [_, error] = await apiUser.updateUserPhone(user.id, cleanPhone);
-    
+
     if (error) {
       alert("שגיאה בעדכון: " + error);
     } else {
@@ -101,16 +106,19 @@ export default function ProfilePage() {
   // --- HANDLERS: Interests ---
   const toggleInterest = (interest: string) => {
     if (selectedInterests.includes(interest)) {
-      setSelectedInterests(prev => prev.filter(i => i !== interest));
+      setSelectedInterests((prev) => prev.filter((i) => i !== interest));
     } else {
-      setSelectedInterests(prev => [...prev, interest]);
+      setSelectedInterests((prev) => [...prev, interest]);
     }
   };
 
   const handleSaveInterests = async () => {
     if (!user) return;
     setSaving(true);
-    const [_, error] = await apiUser.updateUserInterests(user.id, selectedInterests);
+    const [_, error] = await apiUser.updateUserInterests(
+      user.id,
+      selectedInterests
+    );
 
     if (error) {
       alert("שגיאה בעדכון: " + error);
@@ -125,219 +133,219 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div style={{ padding: "2rem", textAlign: "center" }}>טוען...</div>
+        <div className={styles.loadingContainer}>טוען...</div>
       </ProtectedRoute>
     );
   }
 
   return (
     <ProtectedRoute>
-      <div className="content" style={{ padding: "2rem", direction: "rtl", maxWidth: "800px", margin: "0 auto" }}>
-        
-        {/* HEADER */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h1>הפרופיל שלי</h1>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "0.75rem 1.5rem",
-              background: "#681F02",
-              color: "white",
-              border: "none",
-              borderRadius: "1.5625rem",
-              cursor: "pointer",
-            }}
-          >
-            {t("התנתק/י")}
-          </button>
-        </div>
-
-        {/* 1. PERSONAL DETAILS (Editable Phone) */}
-        <div style={{ marginTop: "2rem", background: "#f5f5f5", padding: "1.5rem", borderRadius: "8px" }}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-             <h2 style={{ margin: 0 }}>פרטים אישיים</h2>
-             {!isEditingDetails && (
-               <button 
-                 onClick={() => setIsEditingDetails(true)} 
-                 style={{background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontWeight: 'bold'}}
-               >
-                 ✏️ עריכה
-               </button>
-             )}
+      <div className={styles.container}>
+        <div className={styles.content}>
+          {/* HEADER */}
+          <div className={styles.header}>
+            <h1 className={styles.pageTitle}>הפרופיל שלי</h1>
+            <button onClick={handleLogout} className={styles.logoutButton}>
+              {t("התנתק/י")}
+            </button>
           </div>
-          
-          <p><strong>שם מלא:</strong> {userProfile?.full_name || "לא צוין"}</p>
-          <p><strong>אימייל:</strong> {userProfile?.email || user?.email}</p>
-          
-          {/* Phone Field - Toggle between Text and Input */}
-          <div style={{ marginTop: '10px' }}>
-            <strong>טלפון: </strong>
-            {isEditingDetails ? (
-              <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
-                <input 
-                  type="text" 
-                  value={phone} 
-                  onChange={(e) => setPhone(e.target.value)}
-                  style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                  dir="ltr"
-                />
-                <button 
-                  onClick={handleSavePhone} 
-                  disabled={saving}
-                  style={{ background: '#22c55e', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
-                >
-                  ✓ שמור
-                </button>
-                <button 
-                  onClick={() => { setIsEditingDetails(false); setPhone(userProfile?.phone || ""); }} 
-                  style={{ background: '#9ca3af', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
-                >
-                  ביטול
-                </button>
-              </div>
-            ) : (
-              <span>{userProfile?.phone || "לא צוין"}</span>
-            )}
-          </div>
-        </div>
 
-        {/* 2. BRANCH PREFERENCES */}
-        <div style={{ marginTop: "2rem", background: "#fff", border: "1px solid #ddd", padding: "1.5rem", borderRadius: "8px" }}>
-          <h2 style={{ marginTop: 0 }}>סניף מועדף</h2>
-          <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1rem" }}>
-            {t("בחר/י את הסניפים בהם תרצה/י לראות פעילויות:")}
-          </p>
-          
-          <div style={{ display: "flex", gap: "1rem" }}>
-            {['nahalal', 'satria'].map((branch) => {
-              const isSelected = branches.includes(branch);
-              const label = branch === 'nahalal' ? 'נהלל' : 'סטריה';
-              return (
+          {/* 1. PERSONAL DETAILS (Editable Phone) */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>פרטים אישיים</h2>
+              {!isEditingDetails && (
                 <button
-                  key={branch}
-                  onClick={() => toggleBranch(branch)}
-                  style={{
-                    flex: 1,
-                    padding: "1rem",
-                    borderRadius: "8px",
-                    border: isSelected ? "2px solid #3b82f6" : "1px solid #ccc",
-                    background: isSelected ? "#eff6ff" : "#f9fafb",
-                    color: isSelected ? "#1d4ed8" : "#666",
-                    fontWeight: isSelected ? "bold" : "normal",
-                    cursor: "pointer",
-                    fontSize: "1rem",
-                    transition: "all 0.2s ease"
-                  }}
+                  onClick={() => setIsEditingDetails(true)}
+                  className={styles.editButton}
                 >
-                  {isSelected && "✓ "} {label}
+                  ✏️ עריכה
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 3. INTERESTS (Editable) */}
-        <div style={{ marginTop: "2rem", background: "#e8f4f8", padding: "1.5rem", borderRadius: "8px" }}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-             <h2 style={{ margin: 0 }}>תחומי עניין</h2>
-             {!isEditingInterests && (
-               <button 
-                 onClick={() => setIsEditingInterests(true)} 
-                 style={{background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontWeight: 'bold'}}
-               >
-                 ✏️ עריכה
-               </button>
-             )}
-          </div>
-
-          {isEditingInterests ? (
-            // --- EDIT MODE ---
-            <div>
-              <p style={{fontSize: '0.9rem', color: '#666'}}>בחר/י תחומים:</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
-                {AVAILABLE_INTERESTS.map((tag) => {
-                   const isSelected = selectedInterests.includes(tag);
-                   return (
-                     <button
-                       key={tag}
-                       onClick={() => toggleInterest(tag)}
-                       style={{
-                         padding: '8px',
-                         borderRadius: '8px',
-                         border: 'none',
-                         background: isSelected ? '#3b82f6' : 'white',
-                         color: isSelected ? 'white' : '#4b5563',
-                         cursor: 'pointer',
-                         fontWeight: 'bold',
-                         fontSize: '0.9rem'
-                       }}
-                     >
-                       {tag} {isSelected && "✓"}
-                     </button>
-                   );
-                })}
-              </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
-                  onClick={handleSaveInterests} 
-                  disabled={saving}
-                  style={{ flex: 1, padding: '10px', background: '#22c55e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-                >
-                  {saving ? 'שומר...' : 'שמור שינויים'}
-                </button>
-                <button 
-                   onClick={() => { 
-                     setIsEditingInterests(false); 
-                     // Reset to original
-                     if (userProfile?.quiz?.interests) setSelectedInterests(userProfile.quiz.interests);
-                   }} 
-                   style={{ padding: '10px 20px', background: '#d1d5db', color: '#374151', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-                >
-                   ביטול
-                </button>
-              </div>
-            </div>
-          ) : (
-            // --- VIEW MODE ---
-            <div>
-               {selectedInterests.length > 0 ? (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {selectedInterests.map((interest, i) => (
-                    <span key={i} style={{ background: 'white', padding: '4px 12px', borderRadius: '16px', fontSize: '0.9rem', color: '#0369a1', fontWeight: '500' }}>
-                      {interest}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p style={{fontStyle: 'italic', color: '#666'}}>לא נבחרו תחומי עניין.</p>
               )}
             </div>
-          )}
 
-          {/* Extra Quiz Info (Read Only) */}
-          {userProfile?.quiz && (
-             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #bfdbfe' }}>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>שם מלא:</span>
+              <span className={styles.detailValue}>
+                {userProfile?.full_name || "לא צוין"}
+              </span>
+            </div>
+
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>אימייל:</span>
+              <span className={styles.detailValue}>
+                {userProfile?.email || user?.email}
+              </span>
+            </div>
+
+            {/* Phone Field - Toggle between Text and Input */}
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>טלפון:</span>
+              {isEditingDetails ? (
+                <div className={styles.editPhoneContainer}>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className={styles.phoneInput}
+                  />
+                  <button
+                    onClick={handleSavePhone}
+                    disabled={saving}
+                    className={styles.saveButton}
+                  >
+                    ✓ שמור
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingDetails(false);
+                      setPhone(userProfile?.phone || "");
+                    }}
+                    className={styles.cancelButton}
+                  >
+                    ביטול
+                  </button>
+                </div>
+              ) : (
+                <span className={styles.detailValue}>
+                  {userProfile?.phone || "לא צוין"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* 2. BRANCH PREFERENCES */}
+          <div className={styles.card}>
+            <h2 className={styles.cardTitle}>סניף מועדף</h2>
+            <p className={styles.cardSubtitle}>
+              {t("בחר/י את הסניפים בהם תרצה/י לראות פעילויות:")}
+            </p>
+
+            <div className={styles.branchContainer}>
+              {["nahalal", "satria"].map((branch) => {
+                const isSelected = branches.includes(branch);
+                const label = branch === "nahalal" ? "נהלל" : "סטריה";
+                return (
+                  <button
+                    key={branch}
+                    onClick={() => toggleBranch(branch)}
+                    className={`${styles.branchButton} ${
+                      isSelected ? styles.branchButtonSelected : ""
+                    }`}
+                  >
+                    {isSelected && "✓ "} {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. INTERESTS (Editable) */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>תחומי עניין</h2>
+              {!isEditingInterests && (
+                <button
+                  onClick={() => setIsEditingInterests(true)}
+                  className={styles.editButton}
+                >
+                  ✏️ עריכה
+                </button>
+              )}
+            </div>
+
+            {isEditingInterests ? (
+              // --- EDIT MODE ---
+              <div>
+                <p className={styles.cardSubtitle}>בחר/י תחומים:</p>
+                <div className={styles.interestsGrid}>
+                  {AVAILABLE_INTERESTS.map((tag) => {
+                    const isSelected = selectedInterests.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        onClick={() => toggleInterest(tag)}
+                        className={`${styles.interestButton} ${
+                          isSelected ? styles.interestButtonSelected : ""
+                        }`}
+                      >
+                        {tag} {isSelected && "✓"}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className={styles.actionButtons}>
+                  <button
+                    onClick={handleSaveInterests}
+                    disabled={saving}
+                    className={styles.saveButton}
+                  >
+                    {saving ? "שומר..." : "שמור שינויים"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingInterests(false);
+                      if (userProfile?.quiz?.interests)
+                        setSelectedInterests(userProfile.quiz.interests);
+                    }}
+                    className={styles.cancelButton}
+                  >
+                    ביטול
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // --- VIEW MODE ---
+              <div>
+                {selectedInterests.length > 0 ? (
+                  <div className={styles.interestTags}>
+                    {selectedInterests.map((interest, i) => (
+                      <span key={i} className={styles.interestTag}>
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className={styles.emptyText}>לא נבחרו תחומי עניין.</p>
+                )}
+              </div>
+            )}
+
+            {/* Extra Quiz Info (Read Only) */}
+            {userProfile?.quiz && (
+              <div className={styles.quizInfo}>
                 {userProfile.quiz.circle && (
-                  <p><strong>מעגל:</strong> {userProfile.quiz.circle}</p>
+                  <div className={styles.detailRow}>
+                    <span className={styles.detailLabel}>מעגל:</span>
+                    <span className={styles.detailValue}>
+                      {userProfile.quiz.circle}
+                    </span>
+                  </div>
                 )}
                 {userProfile.quiz.free_text && (
-                  <div style={{ marginTop: "1rem" }}>
-                    <strong>טקסט חופשי:</strong>
-                    <p style={{ marginTop: "0.5rem", padding: "1rem", background: "white", borderRadius: "4px", whiteSpace: "pre-wrap" }}>
+                  <div className={styles.freeTextContainer}>
+                    <strong className={styles.detailLabel}>טקסט חופשי:</strong>
+                    <p className={styles.freeText}>
                       {userProfile.quiz.free_text}
                     </p>
                   </div>
                 )}
-             </div>
-          )}
-        </div>
-
-        {/* Admin Badge */}
-        {userProfile?.role === "admin" && (
-          <div style={{ marginTop: "2rem", background: "#fff3cd", border: "2px solid #ffc107", padding: "1rem", borderRadius: "8px", textAlign: "center" }}>
-            <p style={{ margin: 0, fontWeight: "bold" }}>🔑 יש לך הרשאות מנהל</p>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Admin Badge */}
+          {userProfile?.role === "admin" && (
+            <div className={styles.adminBadge}>
+              <p className={styles.adminText}>🔑 יש לך הרשאות מנהל</p>
+            </div>
+          )}
+
+          {/* Link to About Page */}
+          <a href="/login/about" className={styles.aboutLink}>
+            אודות העמותה
+          </a>
+        </div>
       </div>
     </ProtectedRoute>
   );
