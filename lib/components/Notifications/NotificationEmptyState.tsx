@@ -24,7 +24,7 @@ export default function NotificationEmptyState() {
 
       {/* Add notification button */}
       <div style={styles.buttonContainer}>
-        <Link href="/adminScreens/addNotification" style={styles.addButton}>
+        <Link href="/AdminScreens/addNotification" style={styles.addButton}>
           <span style={styles.buttonText}>+ הודעה חדשה</span>
         </Link>
       </div>

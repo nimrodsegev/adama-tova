@@ -159,7 +159,7 @@ export default function LoginPage() {
 
             // 🔥 FIXED: Navigate to correct dashboard
             if (profile.role === "admin") {
-              router.replace("/adminScreens/HomePage");
+              router.replace("/AdminScreens/HomePage");
             } else {
               router.replace("/UserScreens/HomePage");
             }
