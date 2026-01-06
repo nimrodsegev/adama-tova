@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import imageCompression from "browser-image-compression";
 
 // Initialize the client once here
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -105,19 +106,34 @@ export const apiActivities = {
   async uploadImage(file) {
     if (!file) return [null, "No file provided"];
 
-    // 1. Generate unique file name
+    // 1. Compress the image before upload
+    let fileToUpload = file;
+    try {
+      const compressionOptions = {
+        maxSizeMB: 0.5,           // Target max ~500KB after compression
+        maxWidthOrHeight: 1920,   // Good for web display
+        useWebWorker: true,
+      };
+      fileToUpload = await imageCompression(file, compressionOptions);
+      console.log(`Image compressed: ${(file.size / 1024).toFixed(1)}KB → ${(fileToUpload.size / 1024).toFixed(1)}KB`);
+    } catch (compressionError) {
+      console.warn("Image compression failed, uploading original:", compressionError);
+      // Continue with original file if compression fails
+    }
+
+    // 2. Generate unique file name
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
     const filePath = `${fileName}`;
 
-    // 2. Upload to 'activity_images' bucket
+    // 3. Upload to 'activity_images' bucket
     const { error: uploadError } = await supabase.storage
       .from('activity_images')
-      .upload(filePath, file);
+      .upload(filePath, fileToUpload);
 
     if (uploadError) return [null, uploadError.message];
 
-    // 3. Get Public URL
+    // 4. Get Public URL
     const { data } = supabase.storage
       .from('activity_images')
       .getPublicUrl(filePath);

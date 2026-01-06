@@ -62,27 +62,43 @@ export function UserProvider({
   const pathname = usePathname();
 
   useEffect(() => {
+    // Flag to prevent state updates after unmount
+    let isMounted = true;
+
     const checkSession = async () => {
       try {
         const currentUser = await authService.getCurrentUser();
-        if (currentUser?.id !== initialUser?.id) {
+        if (isMounted && currentUser?.id !== initialUser?.id) {
           setUser(currentUser);
-          router.refresh();
+          // Only refresh when going from logged out → logged in
+          // This prevents the infinite loop while still updating server state
+          if (!initialUser && currentUser) {
+            router.refresh();
+          }
         }
       } catch (error) {
-        setUser(null);
+        // Only clear user on actual auth errors, not network issues
+        if (isMounted && (error as any)?.status === 401) {
+          setUser(null);
+        }
+        // For other errors (network, rate limit), keep existing user state
       }
     };
 
     checkSession();
 
-    const subscription = authService.onAuthStateChange((user) => {
-      setUser(user);
+    const subscription = authService.onAuthStateChange((newUser) => {
+      if (isMounted) {
+        setUser(newUser);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialUser]);
+  }, [initialUser]); // Re-run when initialUser changes
 
   useEffect(() => {
     const loadProfile = async () => {
