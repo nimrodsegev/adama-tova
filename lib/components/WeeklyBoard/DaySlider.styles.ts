@@ -18,7 +18,10 @@ const styles: { [key: string]: CSSProperties } = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: "0.5rem 0.6875rem", // 8px 11px
+    paddingTop: "0.5rem", // 8px - ✅ CHANGED: Use specific properties instead of shorthand
+    paddingRight: "0.6875rem", // 11px
+    paddingBottom: "0.5rem", // 8px
+    paddingLeft: "0.6875rem", // 11px
     gap: "0.3125rem", // 5px
     background: "transparent",
     border: "none",
@@ -30,9 +33,9 @@ const styles: { [key: string]: CSSProperties } = {
 
   // Selected Day Button - WHITE background
   dayButtonSelected: {
-    background: "rgba(249, 249, 249, 0.7)", // ✅ CHANGED: Added transparency (0.6 = 60% opacity)
-    paddingTop: "0.8rem", // ✅ CHANGED: More vertical padding for taller oval (14px, was 10px)
-    paddingBottom: "0.8rem", // ✅ ADDED: Increase vertical padding for oval shape (10px)
+    background: "rgba(249, 249, 249, 0.7)", // Added transparency (0.7 = 70% opacity)
+    paddingTop: "0.8rem", // ✅ More vertical padding for taller oval (14px)
+    paddingBottom: "0.8rem", // ✅ Increase vertical padding for oval shape
   },
 
   // Day Letter (א, ב, ג, etc.) - unselected
@@ -51,7 +54,7 @@ const styles: { [key: string]: CSSProperties } = {
 
   // Day Letter - selected (RED/BROWN)
   dayLetterSelected: {
-    color: "#681F02", // ✅ CHANGED: DarkTypo red-brown color (was #F9F9F9 white)
+    color: "#681F02", // DarkTypo red-brown color
   },
 
   // Day Letter - closed (black)
@@ -65,7 +68,8 @@ const styles: { [key: string]: CSSProperties } = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: "0 0.5rem", // 0px 8px
+    paddingLeft: "0.5rem", // ✅ CHANGED: Use specific properties
+    paddingRight: "0.5rem", // 8px
     gap: "0.625rem", // 10px
     minWidth: "1.75rem", // Ensure enough space for date
     borderRadius: "62.4375rem", // 999px
@@ -90,7 +94,7 @@ const styles: { [key: string]: CSSProperties } = {
 
   // Date Number - selected (RED/BROWN)
   dateNumberSelected: {
-    color: "#681F02", // ✅ CHANGED: DarkTypo red-brown color (was #F9F9F9 white)
+    color: "#681F02", // DarkTypo red-brown color
   },
 
   // Date Number - closed (black)
