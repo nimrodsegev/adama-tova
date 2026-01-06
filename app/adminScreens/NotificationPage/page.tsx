@@ -158,7 +158,7 @@ export default function NotificationsPage() {
         )}
 
         <div style={styles.buttonContainer}>
-          <Link href="/adminScreens/addNotification" style={styles.addButton}>
+          <Link href="/AdminScreens/addNotification" style={styles.addButton}>
             + הודעה חדשה
           </Link>
         </div>

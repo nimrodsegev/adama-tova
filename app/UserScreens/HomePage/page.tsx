@@ -294,7 +294,7 @@ export default function HomePage() {
             <EmptyState
               message="נראה שאין לך מפגשים השבוע "
               buttonText="+ הוספת פעילות"
-              buttonHref="/UserScreens/WeeklyBoardPage"
+              buttonHref="/UserScreens/UserCalendarPage"
             />
           )}
         </section>

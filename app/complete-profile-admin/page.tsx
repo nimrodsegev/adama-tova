@@ -1,15 +1,15 @@
 /**
  * ADMIN PROFILE COMPLETION PAGE
  * Simple form for admin users - only collects name and phone.
- * After submission, redirects to /adminScreens.
+ * After submission, redirects to /AdminScreens.
  */
 
-'use client';
+"use client";
 
-import { useUser } from '@/app/contexts/UserContext';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import AdminQuizModal from '@/lib/components/AdminQuizModal';
+import { useUser } from "@/app/contexts/UserContext";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import AdminQuizModal from "@/lib/components/AdminQuizModal";
 
 export default function CompleteProfileAdminPage() {
   const { user, loading } = useUser();
@@ -17,13 +17,13 @@ export default function CompleteProfileAdminPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace('/login');
+      router.replace("/login");
     }
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>טוען...</div>;
+    return <div style={{ padding: "2rem", textAlign: "center" }}>טוען...</div>;
   }
 
-  return <AdminQuizModal userId={user.id} userEmail={user.email || ''} />;
+  return <AdminQuizModal userId={user.id} userEmail={user.email || ""} />;
 }

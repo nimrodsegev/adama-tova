@@ -27,24 +27,24 @@ export default function Footer() {
   // Admin navigation
   const adminNavItems = [
     {
-      href: "/adminScreens/NotificationPage",
+      href: "/AdminScreens/NotificationPage",
       icon: "/icons/message_icon.svg",
       label: "Notifications",
     },
     {
-      href: "/adminScreens/AdminCalendarPage",
+      href: "/AdminScreens/AdminCalendarPage",
       icon: "/icons/calendar_icon.svg",
       label: "Calendar",
     },
 
     {
-      href: "/adminScreens/HomePage",
+      href: "/AdminScreens/HomePage",
       icon: "/icons/home_icon.svg",
       label: "Home",
     },
     { href: "/profile", icon: "/icons/figure_icon.svg", label: "Profile" },
     {
-      href: "/adminScreens/UsersManagementPage",
+      href: "/AdminScreens/UsersManagementPage",
       icon: "/icons/users_management_icon.svg",
       label: "Users",
     },
@@ -58,9 +58,9 @@ export default function Footer() {
       label: "Notifications",
     },
     {
-      href: "/UserScreens/WeeklyBoardPage",
+      href: "/UserScreens/UserCalendarPage",
       icon: "/icons/calendar_icon.svg",
-      label: "Weekly",
+      label: "UserCalendar",
     },
     {
       href: "/UserScreens/HomePage",

@@ -9,7 +9,7 @@ import {
 } from "@/app/services/db_api";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
-import styles from "./WeeklyBoardPage.styles";
+import styles from "./UserCalendarPage.styles";
 
 // Interests Mapping (same as HomePage)
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -21,7 +21,7 @@ const INTRESTS_MAPPING: Record<string, string> = {
   יצירה: "Crafts",
 };
 
-export default function WeeklyBoardPage() {
+export default function UserCalendarPage() {
   const { user, userProfile } = useUser();
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
   const [activities, setActivities] = useState<any[]>([]);

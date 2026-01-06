@@ -172,7 +172,7 @@ export default function ActivityDetailsModal({
   // ADMIN: Handle edit
   const handleEdit = () => {
     onClose(); // Close modal first
-    router.push(`/adminScreens/EditActivityPage?id=${activityId}`);
+    router.push(`/AdminScreens/EditActivityPage?id=${activityId}`);
   };
 
   // ADMIN: Handle delete
@@ -297,7 +297,7 @@ export default function ActivityDetailsModal({
                 // ADMIN: Edit + Delete buttons
                 <>
                   <Button size="M" onClick={handleEdit} disabled={loading}>
-                    {t('[ערוך|ערכי]')}
+                    {t("[ערוך|ערכי]")}
                   </Button>
                   <Button size="M" onClick={handleDelete} disabled={loading}>
                     {loading ? "מוחק..." : t("מחק/י")}

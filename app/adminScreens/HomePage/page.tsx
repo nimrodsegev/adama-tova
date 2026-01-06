@@ -95,11 +95,11 @@ export default function AdminHomePage() {
 
               {/* Activity Buttons CTA */}
               <div style={styles.ctaRow}>
-                <Button size="M" href="/adminScreens/AddActivityPage">
+                <Button size="M" href="/AdminScreens/AddActivityPage">
                   + הוספת פעילות
                 </Button>
 
-                <Button size="S" href="/adminScreens/AdminCalendarPage">
+                <Button size="S" href="/AdminScreens/AdminCalendarPage">
                   הכל
                 </Button>
               </div>
@@ -108,7 +108,7 @@ export default function AdminHomePage() {
             <EmptyState
               message="אין פעילויות היום"
               buttonText="+ הוספת פעילות"
-              buttonHref="/adminScreens/AddActivityPage"
+              buttonHref="/AdminScreens/AddActivityPage"
             />
           )}
         </section>
@@ -131,11 +131,11 @@ export default function AdminHomePage() {
 
               {/* Notification Buttons CTA */}
               <div style={styles.ctaRow}>
-                <Button size="M" href="/adminScreens/addNotification">
+                <Button size="M" href="/AdminScreens/addNotification">
                   + הודעה חדשה
                 </Button>
 
-                <Button size="S" href="/adminScreens/NotificationPage">
+                <Button size="S" href="/AdminScreens/NotificationPage">
                   הכל
                 </Button>
               </div>
@@ -145,7 +145,7 @@ export default function AdminHomePage() {
             <EmptyState
               message="אין הודעות חדשות"
               buttonText="+ הודעה חדשה"
-              buttonHref="/adminScreens/addNotification"
+              buttonHref="/AdminScreens/addNotification"
             />
           )}
         </section>
