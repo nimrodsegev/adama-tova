@@ -1,9 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
+import BreathingCircles, {
+  BreathingCirclesRef,
+} from "@/lib/components/BreathingCircles/BreathingCircles";
+import { calculateBreathingParams } from "@/app/utils/breathingParamsCalculator";
 import styles from "./HomePage.styles";
 
 // Interests Mapping
@@ -29,15 +33,34 @@ export default function HomePage() {
   const [allActivities, setAllActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔵 Breathing circles ref
+  const breathingRef = useRef<BreathingCirclesRef>(null);
+  const mountedRef = useRef(false);
+
+  // ✅ Update circle layers when activity count changes
   useEffect(() => {
-    if (user) {
+    if (breathingRef.current && !loading) {
+      const newLayers = calculateBreathingParams(
+        userProfile,
+        registeredActivities.length
+      ).layers;
+      breathingRef.current.updateLayers(newLayers);
+    }
+  }, [registeredActivities.length, userProfile, loading]);
+
+  useEffect(() => {
+    // Only fetch on initial mount when user is available
+    if (user && !mountedRef.current) {
+      mountedRef.current = true;
       fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, userProfile]);
+  }, [user]);
 
   const fetchData = async () => {
     setLoading(true);
+
+    // 🔵 Circles already breathing continuously, no need to start
 
     try {
       // 1. Fetch Registrations
@@ -50,34 +73,33 @@ export default function HomePage() {
 
       // List A: Approved IDs (Show in "My Schedule")
       const approvedIds = (rawRegs || [])
-        .filter((r: any) => r.status === 'approved')
+        .filter((r: any) => r.status === "approved")
         .map((r: any) => r.activity_id);
 
       // List B: All Interacted IDs (Hide from "Suggestions")
       const allInteractedIds = (rawRegs || []).map((r: any) => r.activity_id);
 
       // 2. Fetch Activities & Branches
-      const [
-        [activities, actError],
-        [userBranches, branchError]
-      ] = await Promise.all([
-        apiActivities.getAll(),
-        apiUser.getUserBranches(user!.id)
-      ]);
+      const [[activities, actError], [userBranches, branchError]] =
+        await Promise.all([
+          apiActivities.getAll(),
+          apiUser.getUserBranches(user!.id),
+        ]);
 
       if (actError) console.error("Error fetching activities:", actError);
-      if (branchError) console.error("Error fetching user branches:", branchError);
+      if (branchError)
+        console.error("Error fetching user branches:", branchError);
 
       if (activities && userBranches) {
-        
         // 3. Filter by Branch
-        const branchFilteredActivities = activities.filter((activity: any) => 
-          !activity.branch || userBranches.includes(activity.branch)
+        const branchFilteredActivities = activities.filter(
+          (activity: any) =>
+            !activity.branch || userBranches.includes(activity.branch)
         );
 
         // --- 4. REGISTERED LIST LOGIC (Updated) ---
-        const rawRegisteredList = branchFilteredActivities.filter((activity: any) =>
-          approvedIds.includes(activity.id)
+        const rawRegisteredList = branchFilteredActivities.filter(
+          (activity: any) => approvedIds.includes(activity.id)
         );
 
         // 👇 DEDUPLICATE REGISTERED LIST
@@ -142,7 +164,26 @@ export default function HomePage() {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+
+      // 🔵 Don't stop breathing - let it continue
+      // The circles should breathe continuously on the home page
     }
+  };
+
+  // 🔵 Handle registration changes with breath animation
+  const handleRegistrationChange = (isRegistering: boolean) => {
+    if (isRegistering) {
+      // ✅ Inhale when registering
+      breathingRef.current?.triggerInhale();
+    } else {
+      // ❌ Exhale when unregistering
+      breathingRef.current?.triggerExhale();
+    }
+
+    // Refresh data after animation
+    setTimeout(() => {
+      fetchData();
+    }, 300);
   };
 
   const getStatusMessage = () => {
@@ -173,6 +214,12 @@ export default function HomePage() {
     }
   };
 
+  // 🔵 Calculate breathing parameters based on user profile
+  const breathingParams = calculateBreathingParams(
+    userProfile,
+    registeredActivities.length
+  );
+
   if (userLoading || loading) {
     return (
       <div style={styles.container}>
@@ -193,6 +240,26 @@ export default function HomePage() {
 
   return (
     <div style={styles.container}>
+      {/* 🔵 Breathing Circles - Behind all content */}
+      <BreathingCircles
+        ref={breathingRef}
+        speed={breathingParams.speed}
+        complexity={breathingParams.complexity}
+        smoothness={breathingParams.smoothness}
+        layers={breathingParams.layers} // ✅ Dynamic based on activity count
+        opacity={0.6}
+        thickness={0.5}
+        position={{ x: 0.3, y: 0.15 }} // Top left, near the name
+        size={0.25} // Medium size (25% of screen)
+        startBreathing={true} // ✅ Start breathing immediately
+        colors={[
+          "rgba(189, 161, 201, 0.9)",
+          "rgba(173, 78, 52, 0.85)",
+          "rgba(212, 137, 106, 0.8)",
+          "rgba(255, 245, 245, 0.75)",
+        ]}
+      />
+
       <div style={styles.vectorBackground} />
 
       <h1 style={styles.headerText}>
@@ -218,7 +285,7 @@ export default function HomePage() {
                     start_time={activity.start_time}
                     location={activity.location}
                     description={activity.description}
-                    onRegistrationChange={fetchData}
+                    onRegistrationChange={() => handleRegistrationChange(false)}
                   />
                 </div>
               ))}
@@ -246,7 +313,7 @@ export default function HomePage() {
                     start_time={activity.start_time}
                     location={activity.location}
                     description={activity.description}
-                    onRegistrationChange={fetchData}
+                    onRegistrationChange={() => handleRegistrationChange(true)}
                   />
                 </div>
               ))}

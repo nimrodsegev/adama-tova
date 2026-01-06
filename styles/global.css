@@ -1,6 +1,12 @@
 @import url("reset.css");
 /* This is a custom font from google fonts */
 @import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /* what is :root? https://developer.mozilla.org/en-US/docs/Web/CSS/:root */
 :root {
@@ -9,7 +15,7 @@
   --color-secondary: #bfc6d2;
   --color-background: #f28130;
   --color-accent: #535bf2;
-  --color-auth-background: #F28130;
+  --color-auth-background: #f28130;
 
   --border-radius: 0.5rem;
 

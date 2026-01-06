@@ -20,6 +20,7 @@ const styles: { [key: string]: CSSProperties } = {
     cursor: "pointer",
     flex: "none",
     transition: "transform 0.2s ease",
+    WebkitTapHighlightColor: "transparent",
   },
 
   // Frame 224 - Contains title and date/time with ABSOLUTE positioning

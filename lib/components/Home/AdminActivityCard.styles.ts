@@ -19,6 +19,7 @@ const styles: { [key: string]: CSSProperties } = {
     cursor: "pointer",
     flex: "none",
     transition: "transform 0.2s ease",
+    WebkitTapHighlightColor: "transparent",
   },
 
   frame224: {

@@ -61,6 +61,7 @@ const styles: { [key: string]: CSSProperties } = {
     lineHeight: "1.0625rem", // 17px
     color: "#F9F9F9",
     cursor: "pointer",
+    WebkitTapHighlightColor: "transparent", // ✅ No blue tap highlight
   },
 
   // Filter Text - Active (underlined)
@@ -73,6 +74,7 @@ const styles: { [key: string]: CSSProperties } = {
     color: "#F9F9F9",
     textDecoration: "underline",
     cursor: "pointer",
+    WebkitTapHighlightColor: "transparent", // ✅ No blue tap highlight
   },
 
   // Page Title (RIGHT side in RTL)
@@ -87,6 +89,45 @@ const styles: { [key: string]: CSSProperties } = {
     margin: 0,
   },
 
+  // ✅ Week Navigation Container
+  weekNavigation: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "1rem", // 16px
+    width: "100%",
+    height: "2rem", // 32px
+  },
+
+  // ✅ Week Navigation Button
+  weekNavButton: {
+    background: "rgba(255, 255, 255, 0.2)",
+    border: "1px solid rgba(255, 255, 255, 0.4)",
+    borderRadius: "50%",
+    width: "2rem", // 32px
+    height: "2rem", // 32px
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1.5rem",
+    color: "#FFFFFF",
+    transition: "all 0.2s ease",
+    WebkitTapHighlightColor: "transparent", // ✅ No blue tap highlight
+  },
+
+  // ✅ Week Display Text
+  weekDisplay: {
+    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
+    fontStyle: "normal",
+    fontWeight: "300",
+    fontSize: "1rem", // 16px
+    lineHeight: "1.0625rem", // 17px
+    color: "#FFFFFF",
+    textAlign: "center",
+    minWidth: "12rem", // Enough space for text
+  },
+
   // Activities List
   activitiesList: {
     display: "flex",
@@ -94,7 +135,7 @@ const styles: { [key: string]: CSSProperties } = {
     alignItems: "flex-start",
     gap: "0.75rem", // 12px
     width: "22.0625rem", // 353px
-    maxHeight: "calc(100vh - 21rem)", // 100vh - (top position + header + navbar + padding)
+    maxHeight: "calc(100vh - 24rem)", // 100vh - (top position + header + navbar + padding)
     overflowY: "auto", // Enable vertical scrolling
     overflowX: "hidden", // Prevent horizontal scroll
     paddingBottom: "1rem", // Extra padding at bottom
@@ -126,10 +167,7 @@ const styles: { [key: string]: CSSProperties } = {
     padding: "0.75rem 2rem",
     border: "0.0625rem solid #FFFFFF",
     borderRadius: "1.25rem",
-    margin: "0 auto 0 1.4rem", // ✅ CHANGED: Left margin pushes it right (in RTL = moves left visually)
-    // OR use this alternative:
-    // marginRight: "auto",
-    // marginLeft: "0.5rem", // ✅ Adjust this value to move more/less (0.5rem, 1rem, 1.5rem, etc.)
+    margin: "0 auto 0 1.4rem",
   },
 };
 

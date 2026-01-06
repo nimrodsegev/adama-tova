@@ -1,0 +1,432 @@
+/* Container - Full viewport height with proper bottom spacing */
+.container {
+  width: 100%;
+  max-width: 24.5625rem; /* 393px */
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #f28130;
+  direction: rtl;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Content wrapper with bottom padding for navbar */
+.content {
+  padding: 2rem 1.25rem;
+  padding-bottom: calc(23vh + 1rem); /* 23vh for navbar + 1rem extra spacing */
+  max-width: 50rem; /* 800px */
+  margin: 0 auto;
+}
+
+/* Loading Container */
+.loadingContainer {
+  padding: 2rem;
+  text-align: center;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  color: #ffffff;
+  font-size: 1.25rem;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pageTitle {
+  font-family: "Arfilit", sans-serif;
+  font-size: 2rem; /* 32px */
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0;
+  text-align: right;
+}
+
+.logoutButton {
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #681f02;
+  border: none;
+  border-radius: 1.5625rem; /* 25px */
+  cursor: pointer;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 500;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.logoutButton:hover {
+  background: #ffffff;
+  transform: scale(1.02);
+}
+
+/* Card Styles */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(0.625rem); /* 10px */
+  -webkit-backdrop-filter: blur(0.625rem);
+  padding: 1.5rem;
+  border-radius: 1.25rem; /* 20px */
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cardTitle {
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-size: 1.375rem; /* 22px */
+  font-weight: 700;
+  color: #681f02;
+  margin: 0;
+}
+
+.cardSubtitle {
+  color: #666;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-size: 0.9375rem; /* 15px */
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+/* Edit Button */
+.editButton {
+  background: none;
+  border: none;
+  color: #f28130;
+  cursor: pointer;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: opacity 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.editButton:hover {
+  opacity: 0.8;
+}
+
+/* Detail Rows */
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(104, 31, 2, 0.1);
+  gap: 1rem;
+  direction: rtl;
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.detailLabel {
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 600;
+  color: #681f02;
+  font-size: 0.9375rem;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.detailValue {
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  color: #333;
+  font-size: 0.9375rem;
+  text-align: right;
+}
+
+/* Phone Edit Container */
+.editPhoneContainer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  direction: rtl;
+}
+
+.phoneInput {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-size: 0.9375rem;
+  flex: 1;
+  min-width: 8rem;
+  text-align: right;
+}
+
+/* Branch Container */
+.branchContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  direction: rtl;
+}
+
+.branchButton {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  background: rgba(242, 129, 48, 0.1);
+  color: #666;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.branchButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.branchButtonSelected {
+  border-color: #f28130;
+  background: rgba(242, 129, 48, 0.2);
+  color: #681f02;
+  font-weight: 700;
+}
+
+/* Interests Grid */
+.interestsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+  direction: rtl;
+}
+
+.interestButton {
+  padding: 1rem 0.75rem;
+  border-radius: 0.75rem;
+  border: none;
+  background: rgba(242, 129, 48, 0.1);
+  color: #4b5563;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.interestButton:hover {
+  transform: scale(1.05);
+}
+
+.interestButtonSelected {
+  background: #f28130;
+  color: white;
+}
+
+/* Interest Tags (View Mode) */
+.interestTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  direction: rtl;
+}
+
+.interestTag {
+  background: rgba(242, 129, 48, 0.15);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-size: 0.9375rem;
+  color: #681f02;
+  font-weight: 600;
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  direction: rtl;
+}
+
+.saveButton {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.saveButton:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  background: #d1d5db;
+  color: #374151;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.cancelButton:hover {
+  background: #9ca3af;
+}
+
+/* Empty Text */
+.emptyText {
+  font-style: italic;
+  color: #666;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  margin: 0.5rem 0;
+}
+
+/* Quiz Info Section */
+.quizInfo {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid rgba(242, 129, 48, 0.2);
+  direction: rtl;
+}
+
+.freeTextContainer {
+  margin-top: 1rem;
+  direction: rtl;
+}
+
+.freeText {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(242, 129, 48, 0.05);
+  border-radius: 0.75rem;
+  white-space: pre-wrap;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  color: #333;
+  line-height: 1.6;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Admin Badge */
+.adminBadge {
+  background: rgba(255, 243, 205, 0.9);
+  border: 2px solid #ffc107;
+  padding: 1rem;
+  border-radius: 1.25rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.adminText {
+  margin: 0;
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 700;
+  color: #681f02;
+  font-size: 1rem;
+}
+
+/* About Link */
+.aboutLink {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  margin: 2rem auto 0;
+  width: fit-content;
+
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 1.5625rem; /* 25px */
+
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-weight: 500;
+  font-size: 0.9375rem; /* 15px */
+  color: #ffffff;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.aboutLink:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 23.4375rem) {
+  /* 375px */
+  .content {
+    padding: 1.5rem 1rem;
+    padding-bottom: calc(23vh + 1rem);
+  }
+
+  .pageTitle {
+    font-size: 1.75rem;
+  }
+
+  .interestsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .branchContainer {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 48rem) {
+  /* 768px */
+  .container {
+    max-width: 100%;
+  }
+
+  .content {
+    max-width: 50rem;
+    padding-bottom: calc(23vh + 2rem);
+  }
+
+  .pageTitle {
+    font-size: 2.5rem;
+  }
+
+  .card {
+    padding: 2rem;
+  }
+}
