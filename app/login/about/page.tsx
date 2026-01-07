@@ -54,6 +54,11 @@ export default function AboutPage() {
           לפרטים נוספים
         </a>
       </div>
+
+      {/* Back Button */}
+      <Link href="/login" className={styles.backButton}>
+        חזרה
+      </Link>
     </div>
   );
 }

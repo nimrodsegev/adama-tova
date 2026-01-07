@@ -157,6 +157,37 @@
   }
 }
 
+/* Back Button */
+.backButton {
+  position: absolute;
+  bottom: 2rem;
+  right: 1.25rem;
+
+  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 0.125rem solid rgba(255, 255, 255, 0.7);
+  border-radius: 1.25rem;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 @media (min-width: 28rem) {
   /* 448px */
   .container {
