@@ -28,6 +28,7 @@ export default function AddActivityPage() {
     instructor: "",
     location: "",
     branch: "satria" as ActivityBranch,
+    whatsapp_group_url: "",
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -87,7 +88,8 @@ export default function AddActivityPage() {
       location: formData.location,
       image_url: imageUrl,
       branch: formData.branch,
-      // 👇 ADDED GROUP FIELDS
+      whatsapp_group_url: formData.whatsapp_group_url,
+      is_group: isGroup,
       weeks: isGroup ? weeks : 1,
       requires_approval: requiresApproval, 
     };
@@ -120,6 +122,7 @@ export default function AddActivityPage() {
           instructor: "",
           location: "",
           branch: "satria" as ActivityBranch,
+          whatsapp_group_url: "",
         });
         setImageFile(null);
         setIsGroup(false); // Reset Group toggle
@@ -283,7 +286,19 @@ export default function AddActivityPage() {
               placeholder="לדוגמה: במרחה החיצוני"
             />
           </div>
-
+          <div style={styles.fieldContainer}>
+            <label htmlFor="whatsapp_group_url" style={styles.label}>קישור לקבוצת וואטסאפ (אופציונלי)</label>
+            <input
+              type="url"
+              id="whatsapp_group_url"
+              name="whatsapp_group_url"
+              value={formData.whatsapp_group_url}
+              onChange={handleChange}
+              style={styles.input}
+              placeholder="https://chat.whatsapp.com/..."
+              dir="ltr" // Force LTR for URL input
+            />
+          </div>
           {/* Date */}
           <div style={styles.fieldContainer}>
             <label htmlFor="date" style={styles.label}>

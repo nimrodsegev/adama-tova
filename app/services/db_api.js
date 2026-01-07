@@ -148,7 +148,9 @@ export const apiActivities = {
     // 2. Extract Group Logic Params
     const { 
       weeks = 1, 
-      requires_approval = false, 
+      requires_approval = false,
+      whatsapp_group_url = null,
+      is_group = false, 
       ...baseData 
     } = activityData;
 
@@ -177,9 +179,10 @@ export const apiActivities = {
         instructor: baseData.instructor,
         image_url: baseData.image_url,
         branch: baseData.branch,
-        // 👇 New Group Fields
         series_id: seriesId,
-        requires_approval: requires_approval
+        is_group: is_group,
+        requires_approval: requires_approval,
+        whatapp_group_url: whatsapp_group_url
       });
     }
 
@@ -455,8 +458,8 @@ export const apiRegistrations = {
     return [data.if_confirmed ? "confirmed" : "waitlist", null];
   },
 
-  /**
-   * 📝 REGISTER (Fixed - No SQL Needed)
+ /**
+   * 📝 REGISTER (Strict Capacity - No Waitlist)
    */
   async registerUserToActivity(userId, activityId) {
     // 1. Fetch Activity Details
@@ -468,49 +471,46 @@ export const apiRegistrations = {
 
     if (!activity) return [null, "Activity not found."];
 
-    // 2. Identify all IDs to register for (Series logic)
+    // 2. Identify IDs (Series Logic)
     let idsToRegister = [activity.id];
-
     if (activity.series_id) {
-      const { data: seriesActivities } = await supabase
+      const { data: seriesActs } = await supabase
         .from("activities")
         .select("id")
         .eq("series_id", activity.series_id);
       
-      if (seriesActivities) {
-        idsToRegister = seriesActivities.map(a => a.id);
-      }
+      if (seriesActs) idsToRegister = seriesActs.map(a => a.id);
     }
 
-    // 3. Determine Status
-    const isApprovalNeeded = activity.requires_approval;
+    // 3. Check Capacity (Strict Block)
     const current = activity.current_participants || 0;
     const max = activity.max_participants || 0;
-    const isFull = current >= max;
+    
+    if (current >= max) {
+      return [null, "הפעילות מלאה (The activity is full)"];
+    }
 
-    let initialStatus = 'approved';
-    let initialConfirmed = !isFull;
+    // 4. Determine Status (Approval vs Confirmed)
+    const isApprovalNeeded = activity.requires_approval;
+    let initialStatus = isApprovalNeeded ? 'pending' : 'approved';
+    let initialConfirmed = !isApprovalNeeded;
     let message = "Successfully registered! ✅";
 
     if (isApprovalNeeded) {
-      initialStatus = 'pending';
-      initialConfirmed = false;
       message = "Request sent to admin for approval ⏳";
-    } else if (isFull) {
-      message = "Activity is full. You are on the waitlist ⏳";
     }
 
-    // 4. Check for existing registration (Fixes 406 Error)
+    // 5. Check for existing registration
     const { data: existing } = await supabase
       .from("registrations")
       .select("id")
       .eq("user_id", userId)
       .eq("activity_id", idsToRegister[0])
-      .maybeSingle(); // 👈 Uses maybeSingle to avoid errors if no row exists
+      .maybeSingle();
 
     if (existing) return [null, "User is already registered"];
 
-    // 5. Insert Registrations
+    // 6. Insert Registrations
     const registrationsToInsert = idsToRegister.map(id => ({
       user_id: userId,
       activity_id: id,
@@ -525,11 +525,9 @@ export const apiRegistrations = {
 
     if (regError) return [null, regError.message];
 
-    // 6. Update Participant Counts (Fixes 404 & 400 Errors)
-    // We update manually in a loop instead of calling a missing SQL function
-    if (initialConfirmed && !isApprovalNeeded) {
+    // 7. Update Participant Counts (Only if confirmed immediately)
+    if (initialConfirmed) {
       for (const id of idsToRegister) {
-        // A. Get fresh count for this specific session
         const { data: freshAct } = await supabase
           .from('activities')
           .select('current_participants')
@@ -537,7 +535,6 @@ export const apiRegistrations = {
           .single();
         
         if (freshAct) {
-          // B. Update correctly using .update()
           await supabase
             .from("activities")
             .update({ current_participants: (freshAct.current_participants || 0) + 1 })
@@ -549,10 +546,10 @@ export const apiRegistrations = {
     return [{ success: true }, { message }];
   },
   /**
-   * ❌ CANCEL
+   * ❌ CANCEL (Simple - Decrement Count)
    */
   async cancelRegistration(userId, activityId) {
-    // 1. Get info before delete (to check if it's a series and if user was confirmed)
+    // 1. Get info to check series and confirmation status
     const { data: regData } = await supabase
       .from("registrations")
       .select("if_confirmed, activities(series_id)")
@@ -562,10 +559,8 @@ export const apiRegistrations = {
 
     if (!regData) return [null, "Registration not found"];
 
-    // 2. Identify all IDs to delete (Series logic)
+    // 2. Identify IDs to delete
     let idsToDelete = [activityId];
-    
-    // If it's part of a group series, find all other session IDs
     if (regData.activities?.series_id) {
        const { data: seriesActs } = await supabase
         .from("activities")
@@ -584,11 +579,10 @@ export const apiRegistrations = {
 
     if (delError) return [null, delError.message];
 
-    // 4. Decrement Participant Count (Only if the user was actually confirmed)
-    // We update each session manually to be safe.
+    // 4. Decrement Participant Count
+    // Only if they were taking up a spot (if_confirmed = true)
     if (regData.if_confirmed) {
        for (const id of idsToDelete) {
-          // A. Fetch current count
           const { data: act } = await supabase
             .from('activities')
             .select('current_participants')
@@ -596,10 +590,7 @@ export const apiRegistrations = {
             .single();
           
           if (act) {
-            // B. Calculate new count (ensure it doesn't drop below 0)
             const newCount = Math.max(0, (act.current_participants || 0) - 1);
-            
-            // C. Update
             await supabase
               .from('activities')
               .update({ current_participants: newCount })
