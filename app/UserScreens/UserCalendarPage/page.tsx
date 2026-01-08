@@ -237,6 +237,7 @@ export default function UserCalendarPage() {
                 end_time={activity.end_time}
                 current_participants={activity.current_participants || 0}
                 max_participants={activity.max_participants}
+                waitlist_count={activity.waitlist_count || 0}
                 onRegistrationChange={fetchData}
               />
             ))

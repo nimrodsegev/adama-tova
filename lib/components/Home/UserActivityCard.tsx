@@ -34,6 +34,7 @@ export default function UserActivityCard({
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
     "none"
   );
+  const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -58,20 +59,22 @@ export default function UserActivityCard({
   const checkRegistrationStatus = async () => {
     if (!user || !id) return;
     try {
-      const [status, error] = await apiRegistrations.getRegistrationStatus(
+      const [statusData, error] = await apiRegistrations.getRegistrationStatus(
         user.id,
         id
       );
-      if (!error && status) {
-        if (
-          status === "confirmed" ||
-          status === "waitlist" ||
-          status === "none"
-        ) {
+      if (!error && statusData) {
+        const { status, wait_list_place } = statusData;
+        if (status === "confirmed" || status === "waitlist") {
           setRegStatus(status);
+          setWaitlistPosition(wait_list_place);
         } else {
           setRegStatus("none");
+          setWaitlistPosition(null);
         }
+      } else {
+        setRegStatus("none");
+        setWaitlistPosition(null);
       }
     } catch (error) {
       console.error("Error checking registration:", error);
@@ -94,23 +97,21 @@ export default function UserActivityCard({
     setLoading(true);
 
     try {
-      const [res, error] = await apiRegistrations.registerUserToActivity(
+      const [res] = await apiRegistrations.registerUserToActivity(
         user.id,
         id
       );
 
-      if (res) {
-        const isWaitlist =
-          res.if_confirmed === false ||
-          (error && error.message && error.message.includes("waitlist"));
-
+      if (res && typeof res === 'object' && 'success' in res) {
+        const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
+        setWaitlistPosition(res.wait_list_place || null);
 
         // Show success modal - DO NOT refresh data yet
         setIsSuccessModalOpen(true);
       }
     } catch (error) {
-      console.error("💥 Registration exception:", error);
+      console.error("Registration exception:", error);
     } finally {
       setLoading(false);
     }
@@ -125,12 +126,13 @@ export default function UserActivityCard({
       const [_, error] = await apiRegistrations.cancelRegistration(user.id, id);
       if (!error) {
         setRegStatus("none");
+        setWaitlistPosition(null);
 
         await new Promise((resolve) => setTimeout(resolve, 300));
         onRegistrationChange?.();
       }
     } catch (error) {
-      console.error("💥 Unregistration error:", error);
+      console.error("Unregistration error:", error);
     } finally {
       setLoading(false);
     }
@@ -243,6 +245,8 @@ export default function UserActivityCard({
         activityTitle={title}
         activityDate={dayMonth}
         activityTime={formattedTime}
+        isWaitlist={regStatus === "waitlist"}
+        waitlistPosition={waitlistPosition}
       />
     </>
   );
