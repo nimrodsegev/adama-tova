@@ -161,6 +161,7 @@ const styles: { [key: string]: CSSProperties } = {
     alignItems: "flex-end",
     gap: "0.375rem", // 6px gap between text and progress bar
     marginBottom: "0.5rem",
+    minWidth: "10rem", // Fixed min-width to prevent shifting when waitlist text appears
   },
 
   // Capacity text (10/10) - ABOVE RIGHT SIDE OF BAR
@@ -182,7 +183,7 @@ const styles: { [key: string]: CSSProperties } = {
     height: "0.375rem", // 6px
     position: "relative",
     flex: "none",
-    alignSelf: "flex-end",
+    alignSelf: "flex-start", // Changed from flex-end to match text alignment in RTL
   },
 
   // Progress bar background - EXACT MATCH: Light border only, NO backgroundColor
