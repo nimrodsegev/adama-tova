@@ -1,35 +1,683 @@
 @import url("reset.css");
-/* This is a custom font from google fonts */
-@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
-* {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+
+/* ============================================
+   FONT DECLARATIONS
+   ============================================ */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* what is :root? https://developer.mozilla.org/en-US/docs/Web/CSS/:root */
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arfilit";
+  src: url("/fonts/Arfilit-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-UltraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ezer Shemesh TRIAL ONLY";
+  src: url("/fonts/EzerShemeshTRIALONLY-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ============================================ */
 :root {
-  /* Define design variables */
+  /* Brand Colors */
   --color-primary: #2b2d42;
   --color-secondary: #bfc6d2;
   --color-background: #f28130;
   --color-accent: #535bf2;
   --color-auth-background: #f28130;
 
-  --border-radius: 0.5rem;
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f9f9f9;
+  --color-text-tertiary: rgba(255, 245, 245, 0.7);
+  --color-text-muted: rgba(255, 255, 255, 0.7);
 
+  /* Background Colors */
+  --color-bg-glass: rgba(255, 255, 255, 0.7);
+  --color-bg-glass-light: rgba(255, 255, 255, 0.6);
+
+  /* Border Colors */
+  --color-border-light: rgba(189, 161, 201, 0.2);
+  --color-border-glass: rgba(255, 255, 255, 0.3);
+
+  /* Decoration Colors */
+  --color-purple: rgba(189, 161, 201, 0.9);
+  --color-terracotta: rgba(173, 78, 52, 0.85);
+  --color-peach: rgba(212, 137, 106, 0.8);
+  --color-cream: rgba(255, 245, 245, 0.75);
+
+  /* Typography */
+  --font-primary: "Arfilit", sans-serif;
+  --font-secondary: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  --font-system: system-ui, sans-serif;
   --font-titles: "Rubik", serif;
-  --font-body: system-ui, sans-serif; /* system-ui matches the user's system font */
+
+  /* Font Sizes - Mobile First */
+  --font-size-xs: 0.725rem; /* 11.6px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-md: 1.0625rem; /* 17px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem; /* 36px */
+
+  /* Font Weights */
+  --font-weight-ultralight: 200;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  /* Line Heights */
+  --line-height-tight: 1;
+  --line-height-snug: 1.15;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing - Mobile Optimized */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 0.75rem; /* 12px */
+  --spacing-lg: 1rem; /* 16px */
+  --spacing-xl: 1.25rem; /* 20px */
+  --spacing-2xl: 1.5rem; /* 24px */
+  --spacing-3xl: 2rem; /* 32px */
+  --spacing-4xl: 3rem; /* 48px */
+  --spacing-5xl: 6.25rem; /* 100px */
+
+  /* Border Radius */
+  --radius-sm: 0.5rem; /* 8px */
+  --radius-md: 1.25rem; /* 20px */
+  --radius-lg: 1.5rem; /* 24px */
+  --radius-full: 50%;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* Backdrop Filters */
+  --blur-sm: blur(0.4rem); /* 6.4px */
+  --blur-md: blur(0.625rem); /* 10px */
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* Layout - Mobile Container */
+  --container-max-width: 24.5625rem; /* 393px */
+  --container-min-height: 53.25rem; /* 852px */
+
+  /* Z-index Scale */
+  --z-background: -1;
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 500;
+  --z-fixed: 900;
+  --z-modal-backdrop: 1000;
+  --z-modal: 1100;
+  --z-tooltip: 1200;
+}
+
+/* ============================================
+   GLOBAL RESETS & BASE STYLES
+   ============================================ */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
 }
 
 body {
   color: var(--color-primary);
   background-color: var(--color-background);
-  font-family: var(--font-body);
+  font-family: var(--font-system);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* Layout */
+/* ============================================
+   RTL SUPPORT
+   ============================================ */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ============================================
+   MOBILE CONTAINER SYSTEM
+   ============================================ */
+.mobile-container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  min-height: var(--container-min-height);
+  margin: 0 auto;
+  background-color: var(--color-background);
+  position: relative;
+  overflow-x: hidden;
+  direction: rtl;
+  padding-bottom: var(--spacing-5xl);
+}
+
+/* ============================================
+   BACKGROUND DECORATIONS
+   ============================================ */
+.vector-background {
+  position: absolute;
+  width: 150%;
+  height: 40%;
+  top: 2.5%;
+  left: -25%;
+  border: 0.125rem solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+  z-index: var(--z-background);
+}
+
+/* ============================================
+   TYPOGRAPHY SYSTEM
+   ============================================ */
+
+/* Headers - Arfilit Font */
+.header-primary {
+  font-family: var(--font-primary);
+  font-size: clamp(2rem, 6vw, 2.25rem);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.875rem;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.header-secondary {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.8125rem;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Body Text - Ezer Shemesh Font */
+.text-subtitle {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.text-body {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-light);
+  color: var(--color-text-muted);
+}
+
+.text-small {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+.text-section-title {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.text-loading {
+  color: white;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg);
+  text-align: center;
+  padding-top: var(--spacing-4xl);
+}
+
+.text-empty {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-light);
+  color: var(--color-text-muted);
+  text-align: center;
+  width: 100%;
+  padding: var(--spacing-3xl) 0;
+}
+
+/* ============================================
+   LAYOUT UTILITIES
+   ============================================ */
+
+/* Absolute Positioning Helpers */
+.absolute-header {
+  position: absolute;
+  width: 22rem;
+  left: var(--spacing-xl);
+  top: 5.6875rem;
+  text-align: right;
+}
+
+.absolute-header-right {
+  position: absolute;
+  width: auto;
+  right: var(--spacing-xl);
+  left: auto;
+  top: 5.5625rem;
+  text-align: right;
+}
+
+.absolute-subtitle {
+  position: absolute;
+  width: 22rem;
+  left: var(--spacing-xl);
+  top: 8rem;
+  text-align: right;
+}
+
+.absolute-status {
+  position: absolute;
+  width: 22rem;
+  left: var(--spacing-xl);
+  top: 10.25rem;
+  text-align: right;
+}
+
+/* Main Content Areas */
+.main-content {
+  margin-top: 13rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  padding: 0 var(--spacing-xl);
+}
+
+.main-content-high {
+  margin-top: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: 0 var(--spacing-xl);
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ============================================
+   SCROLLABLE CONTAINERS
+   ============================================ */
+
+/* Horizontal Scroll */
+.horizontal-scroll {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.625rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-glass) transparent;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  height: 0.375rem;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border-glass);
+  border-radius: var(--radius-sm);
+}
+
+/* Vertical Scroll */
+.vertical-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-height: 33rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-glass) transparent;
+  margin-bottom: var(--spacing-sm);
+}
+
+.vertical-scroll::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.vertical-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vertical-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border-glass);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   GLASS MORPHISM CARDS
+   ============================================ */
+.glass-card {
+  min-width: 10.4375rem;
+  height: 9.625rem;
+  max-height: 9.625rem;
+  background: var(--color-bg-glass);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.glass-card-auto {
+  background: var(--color-bg-glass);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  overflow: hidden;
+}
+
+/* ============================================
+   FILTER SYSTEM
+   ============================================ */
+.filter-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.filter-button {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-light);
+  line-height: var(--font-size-md);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm) 0;
+  text-align: left;
+  transition: all var(--transition-normal);
+}
+
+.filter-button:hover {
+  opacity: 0.8;
+}
+
+.filter-button-active {
+  text-decoration: underline;
+  font-weight: var(--font-weight-normal);
+}
+
+/* ============================================
+   NAVIGATION BAR
+   ============================================ */
+.nav-bar {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 22.0625rem;
+  height: 3.8125rem;
+  background: var(--color-bg-glass-light);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: var(--z-fixed);
+}
+
+.nav-item {
+  font-size: var(--font-size-2xl);
+  cursor: pointer;
+  transition: transform var(--transition-normal);
+  color: var(--color-text-primary);
+}
+
+.nav-item:hover {
+  transform: scale(1.1);
+}
+
+.nav-item:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  text-align: center;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.2);
+}
+
+.btn-primary:active {
+  filter: brightness(0.8);
+}
+
+.counter-button {
+  background-color: var(--color-accent);
+  width: 2rem;
+  height: 2rem;
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.counter-button:hover {
+  filter: brightness(1.2);
+}
+
+.counter-button:active {
+  filter: brightness(0.8);
+}
+
+/* ============================================
+   SPACING UTILITIES
+   ============================================ */
+
+/* Margin Top */
+.mt-xs {
+  margin-top: var(--spacing-xs);
+}
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+.mt-xl {
+  margin-top: var(--spacing-xl);
+}
+.mt-2xl {
+  margin-top: var(--spacing-2xl);
+}
+
+/* Margin Bottom */
+.mb-xs {
+  margin-bottom: var(--spacing-xs);
+}
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+.mb-xl {
+  margin-bottom: var(--spacing-xl);
+}
+.mb-2xl {
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* Padding */
+.p-xs {
+  padding: var(--spacing-xs);
+}
+.p-sm {
+  padding: var(--spacing-sm);
+}
+.p-md {
+  padding: var(--spacing-md);
+}
+.p-lg {
+  padding: var(--spacing-lg);
+}
+.p-xl {
+  padding: var(--spacing-xl);
+}
+.p-2xl {
+  padding: var(--spacing-2xl);
+}
+
+/* Gap */
+.gap-xs {
+  gap: var(--spacing-xs);
+}
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+.gap-md {
+  gap: var(--spacing-md);
+}
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+.gap-xl {
+  gap: var(--spacing-xl);
+}
+
+/* ============================================
+   LEGACY SUPPORT (for gradual migration)
+   ============================================ */
 main {
   max-width: 60rem;
   padding: 2rem;
@@ -43,25 +691,25 @@ header {
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
+}
 
-  a {
-    text-decoration: none;
-    color: var(--color-background);
+header a {
+  text-decoration: none;
+  color: var(--color-background);
+}
 
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+header a:hover {
+  text-decoration: underline;
+}
 
-  h1 {
-    margin: 0;
-  }
+header h1 {
+  margin: 0;
+}
 
-  nav {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-  }
+header nav {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 footer {
@@ -70,11 +718,6 @@ footer {
   text-align: center;
 }
 
-.rtl {
-  direction: rtl;
-}
-
-/* Text */
 p {
   margin: 1rem 0;
 }
@@ -103,23 +746,18 @@ h6 {
 h1 {
   font-size: 2.5em;
 }
-
 h2 {
   font-size: 2em;
 }
-
 h3 {
   font-size: 1.5em;
 }
-
 h4 {
   font-size: 1.2em;
 }
-
 h5 {
   font-size: 1em;
 }
-
 h6 {
   font-size: 0.83em;
 }
@@ -129,57 +767,37 @@ blockquote {
   border-left: 2px solid var(--color-secondary);
 }
 
-/* Links */
 a {
   color: var(--color-accent);
   text-decoration: underline;
 }
+
 a:hover {
   text-decoration: none;
 }
 
-/* Tables */
 table {
   margin-top: 1.5rem;
   border-spacing: 0px;
   border-collapse: collapse;
 }
+
 table td,
 table th {
   padding: 0.5rem;
   border: 1px solid var(--color-secondary);
 }
 
-/* Forms */
 input,
 button,
 textarea,
 select {
   padding: 0.2em 0.5em;
   border: 1px solid var(--color-secondary);
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-sm);
 }
 
 fieldset {
   margin-top: 1.5rem;
   border: 1px solid var(--color-secondary);
-}
-
-.counter-button {
-  background-color: var(--color-accent);
-  width: 2rem;
-  height: 2rem;
-  color: white;
-  border: none;
-  border-radius: 1000px; /* Make the button round */
-  cursor: pointer;
-  font-weight: bold;
-
-  &:hover {
-    filter: brightness(120%);
-  }
-
-  &:active {
-    filter: brightness(80%);
-  }
 }
