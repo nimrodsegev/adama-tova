@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
@@ -7,6 +8,42 @@ import styles from './page.module.css';
 export default function PendingApprovalPage() {
   const router = useRouter();
   const supabase = createClient();
+
+  // Poll for approval status changes
+  useEffect(() => {
+    const checkApprovalStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from('users')
+          .select('is_approved, role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile?.is_approved) {
+          // User has been approved - redirect to home
+          if (profile.role === 'admin') {
+            router.replace('/AdminScreens/HomePage');
+          } else {
+            router.replace('/UserScreens/HomePage');
+          }
+        }
+      } catch (error) {
+        // Silently ignore errors - will retry on next poll
+      }
+    };
+
+    // Check immediately on mount
+    checkApprovalStatus();
+
+    // Then check every 5 seconds
+    const interval = setInterval(checkApprovalStatus, 5000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleBackToLogin = async () => {
     await supabase.auth.signOut();
@@ -47,7 +84,7 @@ export default function PendingApprovalPage() {
           onClick={handleBackToLogin}
           className={styles.backButton}
         >
-          סיום
+          יציאה
         </button>
       </div>
     </div>

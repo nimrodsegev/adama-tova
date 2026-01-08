@@ -274,6 +274,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   onChange={(e) => setProximity(e.target.value)}
                   className={styles.input}
                   dir="rtl"
+                  placeholder="מקום לפירוט נוסף (לא חובה)"
                 />
                 <span className={styles.inputLabel}>קרבה</span>
               </div>
