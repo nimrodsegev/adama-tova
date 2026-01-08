@@ -182,7 +182,7 @@ const styles: { [key: string]: CSSProperties } = {
     height: "0.375rem", // 6px
     position: "relative",
     flex: "none",
-    alignSelf: "flex-end",
+    alignSelf: "flex-start", // Changed from flex-end to match text alignment in RTL
   },
 
   // Progress bar background - EXACT MATCH: Light border only, NO backgroundColor

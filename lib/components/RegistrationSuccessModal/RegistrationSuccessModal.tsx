@@ -10,6 +10,8 @@ type RegistrationSuccessModalProps = {
   activityDate: string;
   activityTime: string;
   isGroup?: boolean;
+  isWaitlist?: boolean;
+  waitlistPosition?: number | null;
 };
 
 export default function RegistrationSuccessModal({
@@ -18,6 +20,8 @@ export default function RegistrationSuccessModal({
   activityTitle,
   activityDate,
   activityTime,
+  isWaitlist = false,
+  waitlistPosition = null,
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -75,16 +79,30 @@ export default function RegistrationSuccessModal({
           <div style={styles.iconContainer}>
             <img
               src="/icons/successful_registration_icon.svg"
-              alt="Success"
+              alt={isWaitlist ? "Waitlist" : "Success"}
               style={styles.successIcon}
             />
           </div>
 
           {/* Success message text - TWO LINES */}
           <p style={styles.messageText}>
-            נרשמת בהצלחה לסדנת {activityTitle}
-            <br />
-            בתאריך {activityDate} בשעה {activityTime}
+            {isWaitlist ? (
+              <>
+                הפעילות מלאה - נרשמת לרשימת ההמתנה
+                <br />
+                מקום #{waitlistPosition} לפעילות {activityTitle}
+                <br />
+                <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>
+                  נעדכן אותך כשיתפנה מקום
+                </span>
+              </>
+            ) : (
+              <>
+                נרשמת בהצלחה לסדנת {activityTitle}
+                <br />
+                בתאריך {activityDate} בשעה {activityTime}
+              </>
+            )}
           </p>
         </div>
       </div>

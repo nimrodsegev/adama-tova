@@ -25,6 +25,43 @@ async function safeRequest(request) {
   }
 }
 
+/**
+ * COUNT CONFIRMED REGISTRATIONS
+ * Returns the actual count of confirmed registrations for an activity
+ */
+async function getConfirmedCount(activityId) {
+  const { count, error } = await supabase
+    .from("registrations")
+    .select("*", { count: "exact", head: true })
+    .eq("activity_id", activityId)
+    .eq("if_confirmed", true);
+
+  if (error) {
+    console.error("Error counting registrations:", error.message);
+    return 0;
+  }
+  return count || 0;
+}
+
+/**
+ * COUNT WAITLIST
+ * Returns the count of users on waitlist for an activity
+ */
+async function getWaitlistCount(activityId) {
+  const { count, error } = await supabase
+    .from("registrations")
+    .select("*", { count: "exact", head: true })
+    .eq("activity_id", activityId)
+    .eq("if_confirmed", false)
+    .not("wait_list_place", "is", null);
+
+  if (error) {
+    console.error("Error counting waitlist:", error.message);
+    return 0;
+  }
+  return count || 0;
+}
+
 // ==========================================================
 // 1. ACTIVITIES FUNCTIONS
 // ==========================================================
@@ -52,46 +89,6 @@ export const apiActivities = {
         .order("date", { ascending: true })
     );
   },
-  async getByUserPreferences(userId) {
-    // 1. Get User's Interests from the 'quiz' JSON column
-    const { data: user, error: userError } = await supabase
-      .from("users")
-      .select("quiz")
-      .eq("id", userId)
-      .single();
-
-    // Check if user exists and has interests
-    if (
-      userError ||
-      !user ||
-      !user.quiz ||
-      !user.quiz.interests ||
-      user.quiz.interests.length === 0
-    ) {
-      console.log("No interests found for user.");
-      return [[], null]; // Return empty list if no interests found
-    }
-
-    const userInterests = user.quiz.interests; // Example: ["Music", "Technology"]
-
-    // 2. Fetch Activities matching those categories
-    return safeRequest(
-      supabase
-        .from("activities")
-        .select("*")
-        .in("category", userInterests) // 👈 Magic line: Checks if category is inside the array
-        .gte("date", new Date().toISOString()) // Optional: Only show future events
-        .order("date", { ascending: true })
-    );
-  },
-
-  // GET a single activity by ID
-  async getById(id) {
-    return safeRequest(
-      supabase.from("activities").select("*").eq("id", id).single()
-    );
-  },
-
   // GET activities by category
   async getByCategory(category) {
     return safeRequest(
@@ -195,13 +192,32 @@ export const apiActivities = {
     );
   },
   async getByDate(dateString) {
-    return safeRequest(
+    const [activities, error] = await safeRequest(
       supabase
         .from("activities")
         .select("*")
         .eq("date", dateString)
-        .order("start_time", { ascending: true }) // Shows 09:00 before 14:00
+        .order("start_time", { ascending: true })
     );
+
+    if (error || !activities) {
+      return [null, error];
+    }
+
+    // Get actual counts for each activity
+    const activitiesWithCounts = await Promise.all(
+      activities.map(async (activity) => {
+        const confirmedCount = await getConfirmedCount(activity.id);
+        const waitlistCount = await getWaitlistCount(activity.id);
+        return {
+          ...activity,
+          current_participants: confirmedCount,
+          waitlist_count: waitlistCount
+        };
+      })
+    );
+
+    return [activitiesWithCounts, null];
   },
   async getParticipants(activityId) {
     return safeRequest(
@@ -223,12 +239,14 @@ export const apiActivities = {
     );
   },
   async update(activityId, updates) {
-    // --- STEP 1: Fetch Info (Title & Participants) ---
+    // --- STEP 1: Fetch Info (Title, Old max_participants & Participants) ---
     const { data: activity } = await supabase
       .from('activities')
-      .select('title, registrations(user_id)')
+      .select('title, max_participants, registrations(user_id)')
       .eq('id', activityId)
       .single();
+
+    const oldMaxParticipants = activity?.max_participants || 0;
 
     // --- STEP 2: Perform the Update ---
     const updateResult = await safeRequest(
@@ -239,20 +257,78 @@ export const apiActivities = {
         .select()
     );
 
-    const [data, error] = updateResult;
+    const [, error] = updateResult;
     if (error) return updateResult;
 
-    // --- STEP 3: Notify Participants ---
+    // --- STEP 3: Auto-promote waitlist if capacity increased ---
+    const newMaxParticipants = updates.max_participants;
+    if (newMaxParticipants && newMaxParticipants > oldMaxParticipants) {
+      // Get current confirmed count
+      const confirmedCount = await getConfirmedCount(activityId);
+      const availableSlots = newMaxParticipants - confirmedCount;
+
+      if (availableSlots > 0) {
+        // Get waitlist users ordered by position
+        const { data: waitlistUsers } = await supabase
+          .from("registrations")
+          .select("id, user_id, users(email, full_name)")
+          .eq("activity_id", activityId)
+          .eq("if_confirmed", false)
+          .not("wait_list_place", "is", null)
+          .order("wait_list_place", { ascending: true })
+          .limit(availableSlots);
+
+        if (waitlistUsers && waitlistUsers.length > 0) {
+          console.log(`Auto-promoting ${waitlistUsers.length} users from waitlist...`);
+
+          for (const waitlistUser of waitlistUsers) {
+            // Promote user
+            await supabase
+              .from("registrations")
+              .update({ if_confirmed: true, wait_list_place: null })
+              .eq("id", waitlistUser.id);
+
+            // Send in-app notification
+            await supabase.from('notifications').insert({
+              user_id: waitlistUser.user_id,
+              title: "התפנה מקום בפעילות! 🎉",
+              message: `התפנה מקום בפעילות "${activity?.title || 'פעילות'}". נרשמת אוטומטית!`,
+              is_read: false,
+              created_at: new Date().toISOString(),
+              linked_activity_id: activityId
+            });
+
+            // Send email (fire-and-forget)
+            if (waitlistUser.users?.email) {
+              fetch('/api/send-waitlist-promotion-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: waitlistUser.users.email,
+                  name: waitlistUser.users.full_name,
+                  activityTitle: activity?.title || 'פעילות'
+                })
+              }).catch(err => console.error("Failed to send promotion email:", err));
+            }
+          }
+
+          // Reorder remaining waitlist
+          await apiRegistrations.reorderWaitlist(activityId);
+        }
+      }
+    }
+
+    // --- STEP 4: Notify Participants about activity changes ---
     if (activity && activity.registrations && activity.registrations.length > 0) {
       console.log(`Notify ${activity.registrations.length} users about update...`);
-      
+
       const alerts = activity.registrations.map(reg => ({
         user_id: reg.user_id,
         title: "פרטי הפעילות שונו ✏️",
         message: `פרטי הפעילות "${activity.title}" עודכנו על ידי המנחה.`,
         is_read: false,
         created_at: new Date().toISOString(),
-        linked_activity_id: activityId 
+        linked_activity_id: activityId
       }));
 
       await supabase.from('notifications').insert(alerts);
@@ -327,9 +403,27 @@ export const apiActivities = {
     );
   },
   async getById(id) {
-    return safeRequest(
-      supabase.from("activities").select("*").eq("id", id).single()
+    const [activity, error] = await safeRequest(
+      supabase
+        .from("activities")
+        .select("*")
+        .eq("id", id)
+        .single()
     );
+
+    if (error || !activity) {
+      return [null, error];
+    }
+
+    // Get actual counts (source of truth)
+    const confirmedCount = await getConfirmedCount(id);
+    const waitlistCount = await getWaitlistCount(id);
+
+    return [{
+      ...activity,
+      current_participants: confirmedCount,
+      waitlist_count: waitlistCount
+    }, null];
   },
   /**
    * 📢 NOTIFY PARTICIPANTS
@@ -444,28 +538,31 @@ export const apiActivities = {
 export const apiRegistrations = {
   /**
    * 🔍 CHECK STATUS
-   * Returns 'confirmed', 'waitlist', or null
+   * Returns { status: 'confirmed' | 'waitlist', wait_list_place: number | null } or null
    */
   async getRegistrationStatus(userId, activityId) {
     const { data } = await supabase
       .from("registrations")
-      .select("if_confirmed")
+      .select("if_confirmed, wait_list_place")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
       .maybeSingle();
 
     if (!data) return [null, null]; // Not registered
-    return [data.if_confirmed ? "confirmed" : "waitlist", null];
+    return [{
+      status: data.if_confirmed ? "confirmed" : "waitlist",
+      wait_list_place: data.wait_list_place
+    }, null];
   },
 
- /**
-   * 📝 REGISTER (Strict Capacity - No Waitlist)
+  /**
+   * 📝 REGISTER (With Waiting List Support)
    */
   async registerUserToActivity(userId, activityId) {
     // 1. Fetch Activity Details
     const { data: activity } = await supabase
       .from("activities")
-      .select("id, series_id, requires_approval, max_participants, current_participants")
+      .select("id, series_id, requires_approval, max_participants, current_participants, title")
       .eq("id", activityId)
       .single();
 
@@ -478,29 +575,11 @@ export const apiRegistrations = {
         .from("activities")
         .select("id")
         .eq("series_id", activity.series_id);
-      
+
       if (seriesActs) idsToRegister = seriesActs.map(a => a.id);
     }
 
-    // 3. Check Capacity (Strict Block)
-    const current = activity.current_participants || 0;
-    const max = activity.max_participants || 0;
-    
-    if (current >= max) {
-      return [null, "הפעילות מלאה (The activity is full)"];
-    }
-
-    // 4. Determine Status (Approval vs Confirmed)
-    const isApprovalNeeded = activity.requires_approval;
-    let initialStatus = isApprovalNeeded ? 'pending' : 'approved';
-    let initialConfirmed = !isApprovalNeeded;
-    let message = "Successfully registered! ✅";
-
-    if (isApprovalNeeded) {
-      message = "Request sent to admin for approval ⏳";
-    }
-
-    // 5. Check for existing registration
+    // 3. Check for existing registration
     const { data: existing } = await supabase
       .from("registrations")
       .select("id")
@@ -510,12 +589,52 @@ export const apiRegistrations = {
 
     if (existing) return [null, "User is already registered"];
 
+    // 4. Check Capacity (use actual count, not cached counter)
+    const current = await getConfirmedCount(activityId);
+    const max = activity.max_participants || 0;
+    const isFull = max > 0 && current >= max;
+
+    // 5. Determine Status
+    const isApprovalNeeded = activity.requires_approval;
+    let initialStatus = 'approved';
+    let initialConfirmed = true;
+    let waitListPlace = null;
+    let message = "Successfully registered! ✅";
+
+    if (isApprovalNeeded) {
+      // Group activities requiring approval
+      initialStatus = 'pending';
+      initialConfirmed = false;
+      message = "Request sent to admin for approval ⏳";
+    } else if (isFull) {
+      // Activity is full - add to waiting list
+      initialConfirmed = false;
+
+      // Get the next available wait_list_place for this activity
+      const { data: waitlistEntries } = await supabase
+        .from("registrations")
+        .select("wait_list_place")
+        .eq("activity_id", activityId)
+        .eq("if_confirmed", false)
+        .not("wait_list_place", "is", null)
+        .order("wait_list_place", { ascending: false })
+        .limit(1);
+
+      // Next position is max + 1, or 1 if no waitlist entries exist
+      waitListPlace = (waitlistEntries && waitlistEntries.length > 0)
+        ? (waitlistEntries[0].wait_list_place + 1)
+        : 1;
+
+      message = `הפעילות מלאה. נרשמת לרשימת המתנה במקום #${waitListPlace}`;
+    }
+
     // 6. Insert Registrations
     const registrationsToInsert = idsToRegister.map(id => ({
       user_id: userId,
       activity_id: id,
       if_confirmed: initialConfirmed,
       status: initialStatus,
+      wait_list_place: isFull ? waitListPlace : null,
       created_at: new Date().toISOString(),
     }));
 
@@ -526,14 +645,14 @@ export const apiRegistrations = {
     if (regError) return [null, regError.message];
 
     // 7. Update Participant Counts (Only if confirmed immediately)
-    if (initialConfirmed) {
+    if (initialConfirmed && !isApprovalNeeded) {
       for (const id of idsToRegister) {
         const { data: freshAct } = await supabase
           .from('activities')
           .select('current_participants')
           .eq('id', id)
           .single();
-        
+
         if (freshAct) {
           await supabase
             .from("activities")
@@ -543,31 +662,38 @@ export const apiRegistrations = {
       }
     }
 
-    return [{ success: true }, { message }];
+    return [{
+      success: true,
+      if_confirmed: initialConfirmed,
+      wait_list_place: waitListPlace
+    }, { message }];
   },
   /**
-   * ❌ CANCEL (Simple - Decrement Count)
+   * ❌ CANCEL (With Waitlist Promotion)
    */
   async cancelRegistration(userId, activityId) {
-    // 1. Get info to check series and confirmation status
+    // 1. Get info to check series, confirmation status, and waitlist position
     const { data: regData } = await supabase
       .from("registrations")
-      .select("if_confirmed, activities(series_id)")
+      .select("if_confirmed, wait_list_place, activities(series_id, title)")
       .eq("user_id", userId)
       .eq("activity_id", activityId)
       .single();
 
     if (!regData) return [null, "Registration not found"];
 
+    const wasConfirmed = regData.if_confirmed;
+    const wasOnWaitlist = !wasConfirmed && regData.wait_list_place !== null;
+
     // 2. Identify IDs to delete
     let idsToDelete = [activityId];
     if (regData.activities?.series_id) {
-       const { data: seriesActs } = await supabase
+      const { data: seriesActs } = await supabase
         .from("activities")
         .select("id")
         .eq("series_id", regData.activities.series_id);
-       
-       if (seriesActs) idsToDelete = seriesActs.map(a => a.id);
+
+      if (seriesActs) idsToDelete = seriesActs.map(a => a.id);
     }
 
     // 3. Delete Registrations
@@ -579,27 +705,123 @@ export const apiRegistrations = {
 
     if (delError) return [null, delError.message];
 
-    // 4. Decrement Participant Count
-    // Only if they were taking up a spot (if_confirmed = true)
-    if (regData.if_confirmed) {
-       for (const id of idsToDelete) {
-          const { data: act } = await supabase
+    // 4. Handle based on what type of registration was cancelled
+    if (wasConfirmed) {
+      // A confirmed user cancelled - need to promote from waitlist
+      for (const id of idsToDelete) {
+        // Decrement participant count
+        const { data: act } = await supabase
+          .from('activities')
+          .select('current_participants')
+          .eq('id', id)
+          .single();
+
+        if (act) {
+          const newCount = Math.max(0, (act.current_participants || 0) - 1);
+          await supabase
+            .from('activities')
+            .update({ current_participants: newCount })
+            .eq('id', id);
+        }
+
+        // Find first person on waitlist for this activity
+        const { data: firstInWaitlist } = await supabase
+          .from("registrations")
+          .select("id, user_id, users(email, full_name)")
+          .eq("activity_id", id)
+          .eq("if_confirmed", false)
+          .not("wait_list_place", "is", null)
+          .order("wait_list_place", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (firstInWaitlist) {
+          // Promote this user
+          await supabase
+            .from("registrations")
+            .update({
+              if_confirmed: true,
+              wait_list_place: null
+            })
+            .eq("id", firstInWaitlist.id);
+
+          // Increment participant count back up
+          const { data: freshAct } = await supabase
             .from('activities')
             .select('current_participants')
             .eq('id', id)
             .single();
-          
-          if (act) {
-            const newCount = Math.max(0, (act.current_participants || 0) - 1);
+
+          if (freshAct) {
             await supabase
-              .from('activities')
-              .update({ current_participants: newCount })
+              .from("activities")
+              .update({ current_participants: (freshAct.current_participants || 0) + 1 })
               .eq('id', id);
           }
-       }
+
+          // Send in-app notification to promoted user
+          await supabase.from('notifications').insert({
+            user_id: firstInWaitlist.user_id,
+            title: "התפנה מקום בפעילות! 🎉",
+            message: `התפנה מקום בפעילות "${regData.activities?.title || 'פעילות'}". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`,
+            is_read: false,
+            created_at: new Date().toISOString(),
+            linked_activity_id: id
+          });
+
+          // Send email notification (fire-and-forget - don't block main flow)
+          if (firstInWaitlist.users?.email) {
+            fetch('/api/send-waitlist-promotion-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: firstInWaitlist.users.email,
+                name: firstInWaitlist.users.full_name,
+                activityTitle: regData.activities?.title || 'פעילות'
+              })
+            }).catch(err => console.error("Failed to send waitlist promotion email:", err));
+          }
+
+          // Reorder remaining waitlist for this activity
+          await this.reorderWaitlist(id);
+        }
+      }
+    } else if (wasOnWaitlist) {
+      // A waitlist user cancelled - just reorder the waitlist
+      for (const id of idsToDelete) {
+        await this.reorderWaitlist(id);
+      }
     }
 
     return [true, null];
+  },
+
+  /**
+   * 🔄 REORDER WAITLIST
+   * Updates wait_list_place for all waitlist entries to be sequential (1, 2, 3...)
+   */
+  async reorderWaitlist(activityId) {
+    // Get all waitlist entries ordered by current position
+    const { data: waitlistEntries } = await supabase
+      .from("registrations")
+      .select("id, wait_list_place")
+      .eq("activity_id", activityId)
+      .eq("if_confirmed", false)
+      .not("wait_list_place", "is", null)
+      .order("wait_list_place", { ascending: true });
+
+    if (!waitlistEntries || waitlistEntries.length === 0) return;
+
+    // Update each entry with sequential position
+    for (let i = 0; i < waitlistEntries.length; i++) {
+      const newPosition = i + 1;
+      if (waitlistEntries[i].wait_list_place !== newPosition) {
+        await supabase
+          .from("registrations")
+          .update({ wait_list_place: newPosition })
+          .eq("id", waitlistEntries[i].id);
+      }
+    }
   },
   /**
    * 🕵️ GET PENDING REGISTRATIONS (For Admin)

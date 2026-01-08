@@ -31,9 +31,11 @@ export default function ActivityDetailsModal({
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
     "none"
   );
+  const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [registrationCount, setRegistrationCount] = useState({
     confirmed: 0,
     total: 10,
+    waitlist: 0,
   });
   const [mounted, setMounted] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -70,6 +72,7 @@ export default function ActivityDetailsModal({
         setRegistrationCount({
           confirmed: activityData.current_participants || 0,
           total: activityData.max_participants || 10,
+          waitlist: activityData.waitlist_count || 0,
         });
       }
     } catch (error) {
@@ -82,20 +85,22 @@ export default function ActivityDetailsModal({
   const checkRegistrationStatus = async () => {
     if (!user || !activityId) return;
     try {
-      const [status, error] = await apiRegistrations.getRegistrationStatus(
+      const [statusData, error] = await apiRegistrations.getRegistrationStatus(
         user.id,
         activityId
       );
-      if (!error && status) {
-        if (
-          status === "confirmed" ||
-          status === "waitlist" ||
-          status === "none"
-        ) {
+      if (!error && statusData) {
+        const { status, wait_list_place } = statusData;
+        if (status === "confirmed" || status === "waitlist") {
           setRegStatus(status);
+          setWaitlistPosition(wait_list_place);
         } else {
           setRegStatus("none");
+          setWaitlistPosition(null);
         }
+      } else {
+        setRegStatus("none");
+        setWaitlistPosition(null);
       }
     } catch (error) {
       console.error("Error checking registration:", error);
@@ -115,17 +120,15 @@ export default function ActivityDetailsModal({
     // If not registered, proceed with registration
     setLoading(true);
     try {
-      const [res, error] = await apiRegistrations.registerUserToActivity(
+      const [res] = await apiRegistrations.registerUserToActivity(
         user.id,
         activityId
       );
 
-      if (res) {
-        const isWaitlist =
-          res.if_confirmed === false ||
-          (error && error.message && error.message.includes("waitlist"));
-
+      if (res && typeof res === 'object' && 'success' in res) {
+        const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
+        setWaitlistPosition(res.wait_list_place || null);
 
         // Show success modal - DO NOT refresh or close main modal yet
         setIsSuccessModalOpen(true);
@@ -150,6 +153,7 @@ export default function ActivityDetailsModal({
       );
       if (!error) {
         setRegStatus("none");
+        setWaitlistPosition(null);
         await new Promise((resolve) => setTimeout(resolve, 300));
         onRegistrationChange?.();
         fetchActivityDetails();
@@ -242,6 +246,10 @@ export default function ActivityDetailsModal({
         </button>
 
         <div style={styles.contentFrame}>
+          {loading ? (
+            <p style={{ textAlign: "center", padding: "3rem", color: "#F9F9F9", fontSize: "1rem", width: "100%" }}>טוען...</p>
+          ) : (
+          <>
           {/* Image */}
           {activity?.image_url && (
             <div style={styles.imageContainer}>
@@ -278,6 +286,7 @@ export default function ActivityDetailsModal({
             <div style={styles.capacityFrame}>
               <p style={styles.capacityText}>
                 {registrationCount.confirmed}/{registrationCount.total}
+                {registrationCount.waitlist > 0 && ` (${registrationCount.waitlist} בהמתנה)`}
               </p>
 
               <div style={styles.progressBarContainer}>
@@ -289,6 +298,13 @@ export default function ActivityDetailsModal({
                   }}
                 />
               </div>
+
+              {/* Show waitlist position if user is on waitlist */}
+              {regStatus === "waitlist" && waitlistPosition && (
+                <p style={{ fontSize: "0.875rem", color: "#F9F9F9", marginTop: "0.5rem", opacity: 0.9 }}>
+                  {t("[את|אתה]")} במקום {waitlistPosition} ברשימת ההמתנה
+                </p>
+              )}
             </div>
 
             {/* Action buttons - LEFT SIDE in RTL */}
@@ -310,11 +326,15 @@ export default function ActivityDetailsModal({
                   onClick={handleRegistrationToggle}
                   disabled={loading}
                 >
-                  {regStatus !== "none" ? "ביטול" : "הרשמה"}
+                  {regStatus === "none"
+                    ? "הרשמה"
+                    : "ביטול"}
                 </Button>
               )}
             </div>
           </div>
+          </>
+          )}
         </div>
       </div>
 
@@ -338,6 +358,8 @@ export default function ActivityDetailsModal({
           activityTitle={activity?.title || ""}
           activityDate={dayMonth}
           activityTime={formattedTime}
+          isWaitlist={regStatus === "waitlist"}
+          waitlistPosition={waitlistPosition}
         />
       )}
     </>
