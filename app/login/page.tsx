@@ -68,20 +68,8 @@ export default function LoginPage() {
     checkAuthUser();
   }, []);
 
-  const validatePassword = (password: string): string | null => {
-    if (password.length < 8) {
-      return "הסיסמה חייבת להכיל לפחות 8 תווים";
-    }
-    if (!/[A-Z]/.test(password)) {
-      return "הסיסמה חייבת להכיל לפחות אות גדולה אחת באנגלית";
-    }
-    if (!/[a-z]/.test(password)) {
-      return "הסיסמה חייבת להכיל לפחות אות קטנה אחת באנגלית";
-    }
-    if (!/[0-9]/.test(password)) {
-      return "הסיסמה חייבת להכיל לפחות ספרה אחת";
-    }
-    return null;
+  const validatePassword = (password: string): boolean => {
+    return password.length < 6;
   };
 
   const validateEmail = (email: string): string | null => {
@@ -282,6 +270,7 @@ export default function LoginPage() {
                   passwordError ? styles.inputError : ""
                 }`}
                 dir="rtl"
+                placeholder="6 תווים או יותר"
               />
               <span className={styles.inputLabel}>סיסמה</span>
               {passwordError && (

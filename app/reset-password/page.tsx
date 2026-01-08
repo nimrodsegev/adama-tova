@@ -10,47 +10,29 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [success, setSuccess] = useState(false);
 
   // NO useEffect - let the session exist for password update
 
-  const validatePassword = (password: string): string | null => {
-    if (password.length < 8) {
-      return 'הסיסמה חייבת להכיל לפחות 8 תווים';
-    }
-    if (!/[A-Z]/.test(password)) {
-      return 'הסיסמה חייבת להכיל לפחות אות גדולה אחת באנגלית';
-    }
-    if (!/[a-z]/.test(password)) {
-      return 'הסיסמה חייבת להכיל לפחות אות קטנה אחת באנגלית';
-    }
-    if (!/[0-9]/.test(password)) {
-      return 'הסיסמה חייבת להכיל לפחות ספרה אחת';
-    }
-    return null;
+  const validatePassword = (password: string): boolean => {
+    return password.length < 6;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    setError('');
+
     setPasswordError('');
     setConfirmPasswordError('');
 
-    const passwordValidation = validatePassword(password);
-    if (passwordValidation) {
+    if (validatePassword(password)) {
       setPasswordError('סיסמה חלשה');
-      setConfirmPasswordError('סיסמה חלשה');
-      setError(passwordValidation);
       return;
     }
 
     if (password !== confirmPassword) {
       setConfirmPasswordError('הסיסמאות אינן תואמות');
-      setError('הסיסמאות אינן תואמות');
       return;
     }
 
@@ -73,7 +55,8 @@ export default function ResetPasswordPage() {
         router.push('/login');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'שגיאה בשינוי הסיסמה');
+      console.error('Password reset error:', err);
+      setPasswordError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
     } finally {
       setLoading(false);
     }
@@ -117,6 +100,7 @@ export default function ResetPasswordPage() {
               required
               className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
               dir="rtl"
+              placeholder="6 תווים או יותר"
             />
             <span className={styles.inputLabel}>סיסמה חדשה</span>
             {passwordError && (
@@ -135,14 +119,13 @@ export default function ResetPasswordPage() {
               required
               className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
               dir="rtl"
+              placeholder="6 תווים או יותר"
             />
             <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
             {confirmPasswordError && (
               <span className={styles.fieldError}>{confirmPasswordError}</span>
             )}
           </div>
-
-          {error && <p className={styles.error}>{error}</p>}
 
           <button
             type="submit"
