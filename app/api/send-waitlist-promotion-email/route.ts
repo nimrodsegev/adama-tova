@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       html: `
         <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
           <h2>שלום ${name || ""},</h2>
-          <p>יש לנו בשורות טובות! 🎉</p>
+          <p>יש לנו בשורות טובות! </p>
           <p>התפנה מקום בפעילות <strong>"${activityTitle}"</strong> ורשמנו אותך אליה אוטומטית.</p>
           <br/>
           <p>אם אינך מעוניין/ת להשתתף, אנא היכנס/י לאתר ובטל/י את ההרשמה כדי לפנות את המקום למישהו אחר.</p>
