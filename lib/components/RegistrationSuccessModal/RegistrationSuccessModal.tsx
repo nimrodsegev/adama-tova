@@ -1,7 +1,7 @@
 "use client";
 import { createPortal } from "react-dom";
 import { useState, useEffect } from "react";
-import styles from "./RegistrationSuccessModal.styles";
+import styles from "./RegistrationSuccessModal.module.css";
 
 type RegistrationSuccessModalProps = {
   isOpen: boolean;
@@ -47,12 +47,12 @@ export default function RegistrationSuccessModal({
   const modalContent = (
     <>
       {/* Overlay backdrop */}
-      <div style={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={onClose} />
 
       {/* Modal container */}
-      <div style={styles.modalContainer}>
+      <div className={styles.modalContainer}>
         {/* Close button */}
-        <button style={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={onClose}>
           <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
             <line
               x1="2"
@@ -74,25 +74,25 @@ export default function RegistrationSuccessModal({
         </button>
 
         {/* Content Frame */}
-        <div style={styles.contentFrame}>
+        <div className={styles.contentFrame}>
           {/* Icon Container */}
-          <div style={styles.iconContainer}>
+          <div className={styles.iconContainer}>
             <img
               src="/icons/successful_registration_icon.svg"
               alt={isWaitlist ? "Waitlist" : "Success"}
-              style={styles.successIcon}
+              className={styles.successIcon}
             />
           </div>
 
           {/* Success message text - TWO LINES */}
-          <p style={styles.messageText}>
+          <p className={styles.messageText}>
             {isWaitlist ? (
               <>
                 הפעילות מלאה - נרשמת לרשימת ההמתנה
                 <br />
                 מקום #{waitlistPosition} לפעילות {activityTitle}
                 <br />
-                <span style={{ fontSize: "0.875rem", opacity: 0.8 }}>
+                <span className={styles.subMessage}>
                   נעדכן אותך כשיתפנה מקום
                 </span>
               </>

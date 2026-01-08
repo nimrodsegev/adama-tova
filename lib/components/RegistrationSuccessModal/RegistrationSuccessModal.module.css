@@ -1,0 +1,131 @@
+/* RegistrationSuccessModal.module.css - Success modal styles */
+
+/* Overlay backdrop - Transparent */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: 1999;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Modal container - FULL SCREEN FROM TOP TO NAVBAR */
+.modalContainer {
+  position: fixed;
+  top: 0;
+  bottom: 6.8125rem; /* 61px for navbar */
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100vw;
+  background-color: var(--color-background); /* Orange background */
+  z-index: 2000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: slideUp 0.3s ease-out;
+  direction: rtl;
+  margin: 0 auto;
+}
+
+/* Close button (top right) */
+.closeButton {
+  position: absolute;
+  width: 2.75rem; /* 44px */
+  height: 2.75rem; /* 44px */
+  right: 1.25rem; /* 20px */
+  top: 1.25rem; /* 20px */
+  border: 1px solid var(--color-text-secondary);
+  border-radius: 1.5625rem; /* 25px */
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0.3125rem; /* 5px */
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+/* Content Frame - centered vertically and horizontally */
+.contentFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  gap: 1rem; /* 16px gap (closer to icon) */
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Icon container */
+.iconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 5.53625rem; /* 88.58px */
+  height: 4.7125rem; /* 75.4px */
+}
+
+/* Success icon (IMG tag) */
+.successIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Message text - centered symmetrically with TWO LINES */
+.messageText {
+  width: 100%;
+  max-width: 18rem; /* Limit width for better readability */
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.5rem; /* 24px line height for better spacing between lines */
+  text-align: center;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Sub-message (smaller text for waitlist) */
+.subMessage {
+  font-size: var(--font-size-sm); /* 14px */
+  opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

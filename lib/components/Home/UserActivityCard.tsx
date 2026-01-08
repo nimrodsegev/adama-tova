@@ -6,7 +6,7 @@ import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
-import styles from "./UserActivityCard.styles";
+import styles from "./UserActivityCard.module.css";
 
 type UserActivityCardProps = {
   id: string;
@@ -97,12 +97,9 @@ export default function UserActivityCard({
     setLoading(true);
 
     try {
-      const [res] = await apiRegistrations.registerUserToActivity(
-        user.id,
-        id
-      );
+      const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
 
-      if (res && typeof res === 'object' && 'success' in res) {
+      if (res && typeof res === "object" && "success" in res) {
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
@@ -159,14 +156,14 @@ export default function UserActivityCard({
 
   return (
     <>
-      <div onClick={handleCardClick} style={styles.cardContainer}>
-        <div style={styles.frame224}>
+      <div onClick={handleCardClick} className={styles.cardContainer}>
+        <div className={styles.frame224}>
           {/* Title */}
-          <h3 style={styles.titleText}>{title}</h3>
+          <h3 className={styles.titleText}>{title}</h3>
 
           {/* Date and Time - NO LOCATION */}
-          <div style={styles.frame266}>
-            <p style={styles.bodyM}>
+          <div className={styles.frame266}>
+            <p className={styles.bodyM}>
               {dayName} {dayMonth}
               <br />
               בשעה {formattedTime}
@@ -175,48 +172,49 @@ export default function UserActivityCard({
         </div>
 
         {showRegisterButton && (
-          <Button
-            size="icon"
-            onClick={handleRegistrationToggle}
-            disabled={loading}
-            style={styles.registerButton}
-          >
-            {regStatus !== "none" ? (
-              <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
-                <line
-                  x1="11.25"
-                  y1="22.5"
-                  x2="33.75"
-                  y2="22.5"
-                  stroke="#681F02"
-                  strokeWidth="1"
-                />
-              </svg>
-            ) : (
-              <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
-                <line
-                  x1="11.25"
-                  y1="22.5"
-                  x2="33.75"
-                  y2="22.5"
-                  stroke="#681F02"
-                  strokeWidth="1"
-                />
-                <line
-                  x1="22.5"
-                  y1="11.25"
-                  x2="22.5"
-                  y2="33.75"
-                  stroke="#681F02"
-                  strokeWidth="1"
-                />
-              </svg>
-            )}
-          </Button>
+          <div className={styles.registerButton}>
+            <Button
+              size="icon"
+              onClick={handleRegistrationToggle}
+              disabled={loading}
+            >
+              {regStatus !== "none" ? (
+                <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+                  <line
+                    x1="11.25"
+                    y1="22.5"
+                    x2="33.75"
+                    y2="22.5"
+                    stroke="#681F02"
+                    strokeWidth="1"
+                  />
+                </svg>
+              ) : (
+                <svg width="45" height="45" viewBox="0 0 45 45" fill="none">
+                  <line
+                    x1="11.25"
+                    y1="22.5"
+                    x2="33.75"
+                    y2="22.5"
+                    stroke="#681F02"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="22.5"
+                    y1="11.25"
+                    x2="22.5"
+                    y2="33.75"
+                    stroke="#681F02"
+                    strokeWidth="1"
+                  />
+                </svg>
+              )}
+            </Button>
+          </div>
         )}
 
-        <div style={styles.arrowButton}>
-          <span style={styles.arrowIcon}>›</span>
+        <div className={styles.arrowButton}>
+          <span className={styles.arrowIcon}>›</span>
         </div>
       </div>
 
