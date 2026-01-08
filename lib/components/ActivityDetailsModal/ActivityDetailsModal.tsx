@@ -8,7 +8,7 @@ import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
-import styles from "./ActivityDetailsModal.styles";
+import styles from "./ActivityDetailsModal.module.css";
 
 type ActivityDetailsModalProps = {
   activityId: string;
@@ -125,7 +125,7 @@ export default function ActivityDetailsModal({
         activityId
       );
 
-      if (res && typeof res === 'object' && 'success' in res) {
+      if (res && typeof res === "object" && "success" in res) {
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
@@ -219,12 +219,12 @@ export default function ActivityDetailsModal({
   const modalContent = (
     <>
       {/* Overlay backdrop */}
-      <div style={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={onClose} />
 
       {/* Modal container */}
-      <div style={styles.modalContainer}>
+      <div className={styles.modalContainer}>
         {/* Close button */}
-        <button style={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={onClose}>
           <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
             <line
               x1="2"
@@ -245,95 +245,98 @@ export default function ActivityDetailsModal({
           </svg>
         </button>
 
-        <div style={styles.contentFrame}>
+        <div className={styles.contentFrame}>
           {loading ? (
-            <p style={{ textAlign: "center", padding: "3rem", color: "#F9F9F9", fontSize: "1rem", width: "100%" }}>טוען...</p>
+            <p className={styles.loadingText}>טוען...</p>
           ) : (
-          <>
-          {/* Image */}
-          {activity?.image_url && (
-            <div style={styles.imageContainer}>
-              <img
-                src={activity.image_url}
-                alt={activity.title}
-                style={styles.activityImage}
-              />
-            </div>
-          )}
+            <>
+              {/* Image */}
+              {activity?.image_url && (
+                <div className={styles.imageContainer}>
+                  <img
+                    src={activity.image_url}
+                    alt={activity.title}
+                    className={styles.activityImage}
+                  />
+                </div>
+              )}
 
-          {/* Title */}
-          <h2 style={styles.titleText}>{activity?.title || ""}</h2>
+              {/* Title */}
+              <h2 className={styles.titleText}>{activity?.title || ""}</h2>
 
-          {/* Date/Time/Location */}
-          <div style={styles.dateInfoFrame}>
-            <p style={styles.dateText}>
-              יום {dayName} {dayMonth} בשעה {formattedTime}
-              <br />
-              {activity?.location || ""}
-              <br />
-              {activity?.instructor || ""}
-            </p>
-          </div>
-
-          {/* Description */}
-          <div style={styles.descriptionFrame}>
-            <p style={styles.descriptionText}>{activity?.description || ""}</p>
-          </div>
-
-          {/* Bottom bar */}
-          <div style={styles.bottomBar}>
-            {/* Capacity info - RIGHT SIDE in RTL */}
-            <div style={styles.capacityFrame}>
-              <p style={styles.capacityText}>
-                {registrationCount.confirmed}/{registrationCount.total}
-                {registrationCount.waitlist > 0 && ` (${registrationCount.waitlist} בהמתנה)`}
-              </p>
-
-              <div style={styles.progressBarContainer}>
-                <div style={styles.progressBarBackground} />
-                <div
-                  style={{
-                    ...styles.progressBarFill,
-                    width: `${progressPercentage}%`,
-                  }}
-                />
+              {/* Date/Time/Location */}
+              <div className={styles.dateInfoFrame}>
+                <p className={styles.dateText}>
+                  יום {dayName} {dayMonth} בשעה {formattedTime}
+                  <br />
+                  {activity?.location || ""}
+                  <br />
+                  {activity?.instructor || ""}
+                </p>
               </div>
 
-              {/* Show waitlist position if user is on waitlist */}
-              {regStatus === "waitlist" && waitlistPosition && (
-                <p style={{ fontSize: "0.875rem", color: "#F9F9F9", marginTop: "0.5rem", opacity: 0.9 }}>
-                  {t("[את|אתה]")} במקום {waitlistPosition} ברשימת ההמתנה
+              {/* Description */}
+              <div className={styles.descriptionFrame}>
+                <p className={styles.descriptionText}>
+                  {activity?.description || ""}
                 </p>
-              )}
-            </div>
+              </div>
 
-            {/* Action buttons - LEFT SIDE in RTL */}
-            <div style={styles.actionButtonsContainer}>
-              {isAdmin ? (
-                // ADMIN: Edit + Delete buttons
-                <>
-                  <Button size="M" onClick={handleEdit} disabled={loading}>
-                    {t("[ערוך|ערכי]")}
-                  </Button>
-                  <Button size="M" onClick={handleDelete} disabled={loading}>
-                    {loading ? "מוחק..." : t("מחק/י")}
-                  </Button>
-                </>
-              ) : (
-                // USER: Register button
-                <Button
-                  size="M"
-                  onClick={handleRegistrationToggle}
-                  disabled={loading}
-                >
-                  {regStatus === "none"
-                    ? "הרשמה"
-                    : "ביטול"}
-                </Button>
-              )}
-            </div>
-          </div>
-          </>
+              {/* Bottom bar */}
+              <div className={styles.bottomBar}>
+                {/* Capacity info - RIGHT SIDE in RTL */}
+                <div className={styles.capacityFrame}>
+                  <p className={styles.capacityText}>
+                    {registrationCount.confirmed}/{registrationCount.total}
+                    {registrationCount.waitlist > 0 &&
+                      ` (${registrationCount.waitlist} בהמתנה)`}
+                  </p>
+
+                  <div className={styles.progressBarContainer}>
+                    <div className={styles.progressBarBackground} />
+                    <div
+                      className={styles.progressBarFill}
+                      style={{ width: `${progressPercentage}%` }}
+                    />
+                  </div>
+
+                  {/* Show waitlist position if user is on waitlist */}
+                  {regStatus === "waitlist" && waitlistPosition && (
+                    <p className={styles.waitlistPosition}>
+                      {t("[את|אתה]")} במקום {waitlistPosition} ברשימת ההמתנה
+                    </p>
+                  )}
+                </div>
+
+                {/* Action buttons - LEFT SIDE in RTL */}
+                <div className={styles.actionButtonsContainer}>
+                  {isAdmin ? (
+                    // ADMIN: Edit + Delete buttons
+                    <>
+                      <Button size="M" onClick={handleEdit} disabled={loading}>
+                        {t("[ערוך|ערכי]")}
+                      </Button>
+                      <Button
+                        size="M"
+                        onClick={handleDelete}
+                        disabled={loading}
+                      >
+                        {loading ? "מוחק..." : t("מחק/י")}
+                      </Button>
+                    </>
+                  ) : (
+                    // USER: Register button
+                    <Button
+                      size="M"
+                      onClick={handleRegistrationToggle}
+                      disabled={loading}
+                    >
+                      {regStatus === "none" ? "הרשמה" : "ביטול"}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
