@@ -1,130 +1,101 @@
-/* Container - Full viewport height with proper bottom spacing */
-.container {
-  width: 100%;
-  max-width: 24.5625rem; /* 393px */
-  min-height: 100vh;
-  margin: 0 auto;
-  background: #f28130;
-  direction: rtl;
-  position: relative;
-  overflow-y: auto;
-}
+/* ProfilePage.module.css - Compact layout that fits in viewport */
 
-/* Content wrapper with bottom padding for navbar */
+/* Content wrapper - fits in viewport */
 .content {
-  padding: 2rem 1.25rem;
-  padding-bottom: calc(23vh + 1rem); /* 23vh for navbar + 1rem extra spacing */
-  max-width: 50rem; /* 800px */
-  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-md); /* 16px 12px */
+  padding-bottom: 5rem; /* Space for navbar */
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+  direction: rtl;
 }
 
-/* Loading Container */
-.loadingContainer {
-  padding: 2rem;
-  text-align: center;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  color: #ffffff;
-  font-size: 1.25rem;
-}
-
-/* Header */
+/* Header - Compact */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  margin-bottom: var(--spacing-md); /* 12px */
+  gap: var(--spacing-sm);
 }
 
 .pageTitle {
-  font-family: "Arfilit", sans-serif;
-  font-size: 2rem; /* 32px */
-  font-weight: 400;
-  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-2xl); /* 24px */
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-primary);
   margin: 0;
-  text-align: right;
 }
 
 .logoutButton {
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
+  padding: var(--spacing-sm) var(--spacing-lg); /* 8px 16px */
+  background: var(--color-bg-glass);
   color: #681f02;
   border: none;
-  border-radius: 1.5625rem; /* 25px */
+  border-radius: var(--button-radius);
   cursor: pointer;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-size: 0.9375rem; /* 15px */
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm); /* 14px */
+  font-weight: var(--font-weight-normal);
+  transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
 }
 
 .logoutButton:hover {
-  background: #ffffff;
-  transform: scale(1.02);
+  transform: scale(1.05);
 }
 
-/* Card Styles */
+/* Card - Compact spacing */
 .card {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(0.625rem); /* 10px */
-  -webkit-backdrop-filter: blur(0.625rem);
-  padding: 1.5rem;
-  border-radius: 1.25rem; /* 20px */
-  margin-bottom: 1.5rem;
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  padding: var(--spacing-md); /* 12px */
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md); /* 12px */
+  box-shadow: var(--shadow-sm);
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-sm); /* 8px */
 }
 
 .cardTitle {
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-size: 1.375rem; /* 22px */
-  font-weight: 700;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg); /* 18px */
+  font-weight: var(--font-weight-bold);
   color: #681f02;
   margin: 0;
 }
 
-.cardSubtitle {
-  color: #666;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-size: 0.9375rem; /* 15px */
-  margin-bottom: 1rem;
-  line-height: 1.4;
-}
-
-/* Edit Button */
+/* Edit Button - Compact */
 .editButton {
   background: none;
   border: none;
   color: #f28130;
   cursor: pointer;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  transition: opacity 0.2s ease;
+  font-size: var(--font-size-lg); /* 18px */
+  padding: 0;
+  transition: opacity var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
 }
 
 .editButton:hover {
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
-/* Detail Rows */
+/* Detail Rows - Compact */
 .detailRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
+  padding: var(--spacing-xs) 0; /* 4px 0 */
   border-bottom: 1px solid rgba(104, 31, 2, 0.1);
-  gap: 1rem;
+  gap: var(--spacing-sm);
   direction: rtl;
+  font-size: var(--font-size-sm); /* 14px */
 }
 
 .detailRow:last-child {
@@ -132,99 +103,93 @@
 }
 
 .detailLabel {
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 600;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
   color: #681f02;
-  font-size: 0.9375rem;
   flex-shrink: 0;
-  text-align: right;
 }
 
 .detailValue {
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-family: var(--font-secondary);
   color: #333;
-  font-size: 0.9375rem;
   text-align: right;
+  font-size: var(--font-size-sm); /* 14px */
 }
 
-/* Phone Edit Container */
+/* Phone Edit - Compact */
 .editPhoneContainer {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-xs); /* 4px */
   align-items: center;
-  flex-wrap: wrap;
   direction: rtl;
 }
 
 .phoneInput {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  padding: var(--spacing-xs) var(--spacing-sm); /* 4px 8px */
+  border-radius: var(--radius-sm);
   border: 1px solid #ccc;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-size: 0.9375rem;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
   flex: 1;
-  min-width: 8rem;
+  min-width: 6rem;
   text-align: right;
 }
 
-/* Branch Container */
+/* Branch Container - Compact */
 .branchContainer {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--spacing-sm); /* 8px */
+  margin-top: var(--spacing-sm);
   direction: rtl;
 }
 
 .branchButton {
   flex: 1;
-  padding: 1rem;
-  border-radius: 0.75rem;
+  padding: var(--spacing-sm); /* 8px */
+  border-radius: var(--radius-sm);
   border: 2px solid transparent;
   background: rgba(242, 129, 48, 0.1);
   color: #666;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 500;
-  font-size: 1rem;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm); /* 14px */
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
-  text-align: center;
 }
 
 .branchButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
 }
 
 .branchButtonSelected {
   border-color: #f28130;
   background: rgba(242, 129, 48, 0.2);
   color: #681f02;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
-/* Interests Grid */
+/* Interests Grid - Compact 3 columns */
 .interestsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: var(--spacing-xs); /* 4px */
+  margin-bottom: var(--spacing-sm);
   direction: rtl;
 }
 
 .interestButton {
-  padding: 1rem 0.75rem;
-  border-radius: 0.75rem;
+  padding: var(--spacing-sm); /* 8px */
+  border-radius: var(--radius-sm);
   border: none;
   background: rgba(242, 129, 48, 0.1);
   color: #4b5563;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
+  font-family: var(--font-secondary);
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  transition: all 0.2s ease;
+  font-weight: var(--font-weight-semibold);
+  font-size: 0.75rem; /* 12px - compact */
+  transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
-  text-align: center;
 }
 
 .interestButton:hover {
@@ -236,52 +201,50 @@
   color: white;
 }
 
-/* Interest Tags (View Mode) */
+/* Interest Tags - View Mode */
 .interestTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+  gap: var(--spacing-xs); /* 4px */
+  margin-top: var(--spacing-xs);
   direction: rtl;
 }
 
 .interestTag {
   background: rgba(242, 129, 48, 0.15);
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-size: 0.9375rem;
+  padding: var(--spacing-xs) var(--spacing-sm); /* 4px 8px */
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
   color: #681f02;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
-/* Action Buttons */
+/* Action Buttons - Compact */
 .actionButtons {
   display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: var(--spacing-xs); /* 4px */
+  margin-top: var(--spacing-sm);
   direction: rtl;
 }
 
 .saveButton {
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: var(--spacing-sm); /* 8px */
   background: #22c55e;
   color: white;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  transition: all 0.2s ease;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
-  text-align: center;
 }
 
 .saveButton:hover {
   background: #16a34a;
-  transform: translateY(-1px);
 }
 
 .saveButton:disabled {
@@ -290,143 +253,32 @@
 }
 
 .cancelButton {
-  padding: 0.75rem 1.5rem;
+  padding: var(--spacing-sm) var(--spacing-md); /* 8px 12px */
   background: #d1d5db;
   color: #374151;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  transition: all 0.2s ease;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
-  text-align: center;
 }
 
 .cancelButton:hover {
   background: #9ca3af;
 }
 
-/* Empty Text */
-.emptyText {
-  font-style: italic;
-  color: #666;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  margin: 0.5rem 0;
-}
-
-/* Quiz Info Section */
-.quizInfo {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid rgba(242, 129, 48, 0.2);
-  direction: rtl;
-}
-
-.freeTextContainer {
-  margin-top: 1rem;
-  direction: rtl;
-}
-
-.freeText {
-  margin-top: 0.5rem;
-  padding: 1rem;
-  background: rgba(242, 129, 48, 0.05);
-  border-radius: 0.75rem;
-  white-space: pre-wrap;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  color: #333;
-  line-height: 1.6;
-  text-align: right;
-  direction: rtl;
-}
-
-/* Admin Badge */
+/* Admin Badge - Compact */
 .adminBadge {
   background: rgba(255, 243, 205, 0.9);
   border: 2px solid #ffc107;
-  padding: 1rem;
-  border-radius: 1.25rem;
+  padding: var(--spacing-sm); /* 8px */
+  border-radius: var(--radius-md);
   text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.adminText {
-  margin: 0;
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 700;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-bold);
   color: #681f02;
-  font-size: 1rem;
-}
-
-/* About Link */
-.aboutLink {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  margin: 2rem auto 0;
-  width: fit-content;
-
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 1.5625rem; /* 25px */
-
-  font-family: "Ezer Shemesh TRIAL ONLY", sans-serif;
-  font-weight: 500;
-  font-size: 0.9375rem; /* 15px */
-  color: #ffffff;
-  text-decoration: none;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.aboutLink:hover {
-  background: rgba(255, 255, 255, 0.35);
-  border-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-2px);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 23.4375rem) {
-  /* 375px */
-  .content {
-    padding: 1.5rem 1rem;
-    padding-bottom: calc(23vh + 1rem);
-  }
-
-  .pageTitle {
-    font-size: 1.75rem;
-  }
-
-  .interestsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .branchContainer {
-    flex-direction: column;
-  }
-}
-
-@media (min-width: 48rem) {
-  /* 768px */
-  .container {
-    max-width: 100%;
-  }
-
-  .content {
-    max-width: 50rem;
-    padding-bottom: calc(23vh + 2rem);
-  }
-
-  .pageTitle {
-    font-size: 2.5rem;
-  }
-
-  .card {
-    padding: 2rem;
-  }
+  font-size: var(--font-size-sm);
 }

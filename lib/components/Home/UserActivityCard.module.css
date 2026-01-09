@@ -1,0 +1,132 @@
+/* UserActivityCard.module.css - Activity card component styles */
+
+/* Card Container */
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding: 0.25rem 0.5rem 1rem 1rem;
+  width: 100%;
+  max-width: 10.4375rem;
+  min-width: 9rem;
+  height: 9.625rem;
+  background: none;
+  text-decoration: none;
+  color: #681f02;
+  direction: rtl;
+  position: relative;
+  cursor: pointer;
+  flex: none;
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cardContainer:hover {
+  transform: scale(1.02);
+}
+
+.cardContainer:active {
+  transform: scale(0.98);
+}
+
+/* Frame 224 - Contains title and date/time with ABSOLUTE positioning */
+.frame224 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0;
+  gap: 0;
+  width: 100%;
+  max-width: 8.4375rem;
+  position: relative;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+  z-index: 0;
+  margin-top: 1rem;
+  height: 6rem;
+}
+
+/* Title text - FIXED ALLOCATED SPACE */
+.titleText {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 4.5rem;
+  height: 1.75rem;
+  min-height: 2.75rem;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-normal);
+  font-size: clamp(1.125rem, 4.5vw, 1.375rem);
+  line-height: 1.175rem;
+  display: block;
+  text-align: right;
+  color: #681f02;
+  margin-top: 0;
+  margin-left: 2rem;
+  overflow: hidden;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+/* Frame 266 - Contains date and time - FIXED POSITION */
+.frame266 {
+  position: absolute;
+  top: 1.25rem;
+  right: 0;
+  width: 100%;
+  max-width: 8.4375rem;
+  flex: none;
+}
+
+/* Body M - Date and time text */
+.bodyM {
+  width: 100%;
+  max-width: 8.4375rem;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
+  font-size: clamp(0.9375rem, 3.8vw, 1.0625rem);
+  line-height: 1.125rem;
+  text-align: right;
+  color: #681f02;
+  margin: 0;
+}
+
+/* Register button - Top left corner */
+.registerButton {
+  position: absolute;
+  left: 0.5rem;
+  top: 1rem;
+  z-index: 10;
+}
+
+/* Arrow button - Bottom left */
+.arrowButton {
+  position: absolute;
+  left: -0.1rem;
+  bottom: 1.25rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  border-radius: 50%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: none;
+  pointer-events: none;
+  transition: transform var(--transition-normal);
+}
+
+.arrowIcon {
+  color: var(--color-text-primary);
+  font-size: 2.5rem;
+  line-height: 1;
+}

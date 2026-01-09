@@ -4,7 +4,7 @@ import { useUser } from "@/app/contexts/UserContext";
 import { apiNotifications, supabase } from "@/app/services/db_api";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import styles from "./NotificationsPage.styles";
+import styles from "./NotificationsPage.module.css"; // ✅ Import as styles object
 
 type Notification = {
   id: number;
@@ -21,9 +21,11 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
-  
-  // 🔥 NEW: Modal state
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+
+  // Modal state
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Helper to convert DB record to UI object
@@ -31,7 +33,11 @@ export default function NotificationsPage() {
     let type: "info" | "warning" | "success" | "error" = "info";
     const text = (dbRecord.title + " " + dbRecord.message).toLowerCase();
 
-    if (text.includes("cancel") || text.includes("בוטל") || text.includes("ביטול")) {
+    if (
+      text.includes("cancel") ||
+      text.includes("בוטל") ||
+      text.includes("ביטול")
+    ) {
       type = "error";
     } else if (text.includes("warning") || text.includes("שינוי")) {
       type = "warning";
@@ -94,7 +100,7 @@ export default function NotificationsPage() {
     }
   };
 
-  // 🔥 NEW: Handle notification click
+  // Handle notification click
   const handleNotificationClick = (notif: Notification) => {
     if (notif.activityId) {
       setSelectedActivityId(notif.activityId);
@@ -102,7 +108,7 @@ export default function NotificationsPage() {
     }
   };
 
-  // 🔥 NEW: Close modal
+  // Close modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedActivityId(null);
@@ -115,52 +121,49 @@ export default function NotificationsPage() {
 
   if (!user)
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>אנא התחבר כדי לצפות בהודעות</p>
+      <div className="mobile-container">
+        <p className="text-loading">אנא התחבר כדי לצפות בהודעות</p>
       </div>
     );
 
   return (
-    <div style={styles.container}>
-      <div style={styles.vectorBackground} />
+    <div className="mobile-container">
+      <div className="vector-background" />
 
-      <h1 style={styles.headerText}>הודעות ועדכונים</h1>
+      <h1 className="header-secondary absolute-header-right">
+        הודעות ועדכונים
+      </h1>
 
-      <div style={styles.mainContentFrame}>
-        <div style={styles.filterContainer}>
+      <div className="main-content-high">
+        <div className="filter-container">
           <button
             onClick={() => setFilter("all")}
-            style={{
-              ...styles.filterButton,
-              ...(filter === "all" ? styles.filterButtonActive : {}),
-            }}
+            className={`filter-button ${
+              filter === "all" ? "filter-button-active" : ""
+            }`}
           >
             הכל
           </button>
           <button
             onClick={() => setFilter("unread")}
-            style={{
-              ...styles.filterButton,
-              ...(filter === "unread" ? styles.filterButtonActive : {}),
-            }}
+            className={`filter-button ${
+              filter === "unread" ? "filter-button-active" : ""
+            }`}
           >
             לא נקראו
           </button>
         </div>
 
         {loading ? (
-          <p style={styles.loadingText}>טוען הודעות...</p>
+          <p className="text-loading">טוען הודעות...</p>
         ) : (
-          <div style={styles.notificationsList} className="notifications-scrollable">
+          <div className="vertical-scroll">
             {filteredNotifications.length > 0 ? (
               filteredNotifications.map((notif) => (
-                // 🔥 CHANGED: Click handler instead of Link
-                <div 
-                  key={notif.id} 
-                  style={{ 
-                    marginBottom: '10px',
-                    cursor: notif.activityId ? 'pointer' : 'default'
-                  }}
+                <div
+                  key={notif.id}
+                  className={styles.notificationItem} // ✅ Use styles object for module CSS
+                  style={{ cursor: notif.activityId ? "pointer" : "default" }}
                   onClick={() => handleNotificationClick(notif)}
                 >
                   <NotificationCard
@@ -170,20 +173,20 @@ export default function NotificationsPage() {
                 </div>
               ))
             ) : (
-              <p style={styles.emptyText}>אין הודעות להצגה</p>
+              <p className="text-empty">אין הודעות להצגה</p>
             )}
           </div>
         )}
       </div>
 
-              {/* 🔥 NEW: Render Modal */}
-        {selectedActivityId && (
-          <ActivityDetailsModal
-            isOpen={isModalOpen}
-            activityId={selectedActivityId}
-            onClose={handleCloseModal}
-          />
-        )}
+      {/* Render Modal */}
+      {selectedActivityId && (
+        <ActivityDetailsModal
+          isOpen={isModalOpen}
+          activityId={selectedActivityId}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

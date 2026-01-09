@@ -9,7 +9,7 @@ import {
 } from "@/app/services/db_api";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
-import styles from "./UserCalendarPage.styles";
+import styles from "./UserCalendarPage.module.css";
 
 // Interests Mapping (same as HomePage)
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -149,30 +149,32 @@ export default function UserCalendarPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.mainFrame}>
+    <div className="mobile-container">
+      <div className={styles.mainFrame}>
         {/* Header Section */}
-        <div style={styles.headerSection}>
+        <div className={styles.headerSection}>
           {/* Top Row - Title RIGHT + Filter LEFT */}
-          <div style={styles.topRow}>
+          <div className={styles.topRow}>
             {/* Page Title (RIGHT side) */}
-            <h1 style={styles.pageTitle}>לוח פעילויות</h1>
+            <h1 className="header-secondary">לוח פעילויות</h1>
 
             {/* Filter Options (LEFT side) */}
-            <div style={styles.filterRow}>
+            <div className={styles.filterRow}>
               <span
-                style={
-                  filter === "all" ? styles.filterTextActive : styles.filterText
+                className={
+                  filter === "all"
+                    ? "filter-button filter-button-active"
+                    : "filter-button"
                 }
                 onClick={() => setFilter("all")}
               >
                 הכל
               </span>
               <span
-                style={
+                className={
                   filter === "foryou"
-                    ? styles.filterTextActive
-                    : styles.filterText
+                    ? "filter-button filter-button-active"
+                    : "filter-button"
                 }
                 onClick={() => setFilter("foryou")}
               >
@@ -182,10 +184,10 @@ export default function UserCalendarPage() {
           </div>
 
           {/* Week Navigation */}
-          <div style={styles.weekNavigation}>
+          <div className={styles.weekNavigation}>
             <button
+              className={styles.weekNavButton}
               style={{
-                ...styles.weekNavButton,
                 opacity: isCurrentWeek ? 0.5 : 1,
                 cursor: isCurrentWeek ? "not-allowed" : "pointer",
               }}
@@ -195,13 +197,13 @@ export default function UserCalendarPage() {
               ‹
             </button>
 
-            <span style={styles.weekDisplay}>
+            <span className={styles.weekDisplay}>
               {isCurrentWeek ? "השבוע" : "השבוע הבא"} ({getWeekDisplayText()})
             </span>
 
             <button
+              className={styles.weekNavButton}
               style={{
-                ...styles.weekNavButton,
                 opacity: isNextWeek ? 0.5 : 1,
                 cursor: isNextWeek ? "not-allowed" : "pointer",
               }}
@@ -221,11 +223,11 @@ export default function UserCalendarPage() {
         </div>
 
         {/* Activities List or Closed Message */}
-        <div style={styles.activitiesList}>
+        <div className={styles.activitiesList}>
           {isDayClosed ? (
-            <p style={styles.closedMessage}>המרחב סגור היום</p>
+            <p className={styles.closedMessage}>המרחב סגור היום</p>
           ) : loading ? (
-            <p style={styles.emptyText}>טוען...</p>
+            <p className="text-empty">טוען...</p>
           ) : filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => (
               <ScheduleActivityCard
@@ -242,7 +244,7 @@ export default function UserCalendarPage() {
               />
             ))
           ) : (
-            <p style={styles.emptyText}>אין פעילויות ליום זה</p>
+            <p className="text-empty">אין פעילויות ליום זה</p>
           )}
         </div>
       </div>

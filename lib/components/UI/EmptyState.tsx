@@ -78,50 +78,50 @@ export default function EmptyState({
 }
 
 const styles: { [key: string]: CSSProperties } = {
-  // Empty state container - EXACT from Figma
+  // Empty state container using CSS variables
   emptyStateContainer: {
     boxSizing: "border-box",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    padding: "0.75rem 1rem", // 12px 16px
-    gap: "0.75rem", // 12px
+    padding: "var(--spacing-md) var(--spacing-lg)", // 12px 16px
+    gap: "var(--spacing-md)", // 12px
     width: "100%",
     maxWidth: "22.0625rem", // 353px
     minHeight: "11.625rem", // 186px
-    background: "#F28130",
-    border: "0.0625rem solid #F9F9F9", // 1px
-    borderRadius: "1.25rem", // 20px
+    background: "var(--color-background)",
+    border: "0.0625rem solid var(--color-text-secondary)",
+    borderRadius: "var(--radius-md)",
   },
 
-  // Icon container
+  // Icon container using CSS variables
   iconContainer: {
-    width: "4.4375rem", // 71px
-    height: "4.5rem", // 72px
+    width: "var(--icon-size-md)", // 71px
+    height: "var(--icon-size-md-height)", // 72px
     flex: "none",
     flexGrow: 0,
   },
 
-  // Message text - EXACT from Figma
+  // Message text using CSS variables
   messageText: {
     width: "100%",
     maxWidth: "22.0625rem", // 353px
-    fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
+    fontFamily: "var(--font-secondary)",
     fontStyle: "normal",
-    fontWeight: "400",
-    fontSize: "1.25rem", // 20px
-    lineHeight: "1.25rem", // 20px
+    fontWeight: "var(--font-weight-normal)",
+    fontSize: "var(--font-size-xl)", // 20px
+    lineHeight: "var(--font-size-xl)", // 20px
     display: "flex",
     alignItems: "flex-end",
-    justifyContent: "center", // ✅ ADDED: Center text
+    justifyContent: "center",
     textAlign: "center",
-    color: "rgba(255, 245, 245, 0.7)", // LightGreyTypo
+    color: "var(--color-text-tertiary)", // rgba(255, 245, 245, 0.7)
     flex: "none",
     flexGrow: 0,
     margin: 0,
   },
 
-  // ✅ ADDED: Button container
+  // Button container
   buttonContainer: {
     flex: "none",
     flexGrow: 0,

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import { apiActivities } from "@/app/services/db_api";
 import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
-import styles from "./AdminCalendarPage.styles";
+import styles from "./AdminCalendarPage.module.css";
 
 export default function AdminCalendarPage() {
   const router = useRouter();
@@ -41,7 +41,6 @@ export default function AdminCalendarPage() {
     const dateString = `${year}-${month}-${day}`;
 
     const [data, error] = await apiActivities.getByDate(dateString);
-
     if (error) {
       console.error("Error fetching activities:", error);
       setActivities([]);
@@ -56,12 +55,12 @@ export default function AdminCalendarPage() {
   }, [selectedDayIndex]);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.mainFrame}>
+    <div className="mobile-container">
+      <div className={styles.mainFrame}>
         {/* Header Section */}
-        <div style={styles.headerSection}>
+        <div className={styles.headerSection}>
           {/* Page Title */}
-          <h1 style={styles.pageTitle}>לוח שבועי</h1>
+          <h1 className="header-secondary">{/* Using global */}לוח שבועי</h1>
 
           {/* Day Slider */}
           <DaySlider
@@ -72,9 +71,9 @@ export default function AdminCalendarPage() {
         </div>
 
         {/* Activities List */}
-        <div style={styles.activitiesList}>
+        <div className={styles.activitiesList}>
           {loading ? (
-            <p style={styles.emptyText}>טוען...</p>
+            <p className="text-empty">טוען...</p>
           ) : activities.length > 0 ? (
             activities.map((activity) => (
               <ScheduleActivityCard
@@ -91,7 +90,7 @@ export default function AdminCalendarPage() {
               />
             ))
           ) : (
-            <p style={styles.emptyText}>אין פעילויות ליום זה</p>
+            <p className="text-empty">אין פעילויות ליום זה</p>
           )}
         </div>
       </div>

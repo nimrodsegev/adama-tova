@@ -8,7 +8,6 @@ import BreathingCircles, {
   BreathingCirclesRef,
 } from "@/lib/components/BreathingCircles/BreathingCircles";
 import { calculateBreathingParams } from "@/app/utils/breathingParamsCalculator";
-import styles from "./HomePage.styles";
 
 // Interests Mapping
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -60,8 +59,6 @@ export default function HomePage() {
   const fetchData = async () => {
     setLoading(true);
 
-    // 🔵 Circles already breathing continuously, no need to start
-
     try {
       // 1. Fetch Registrations
       const { data: rawRegs, error: regError } = await supabase
@@ -103,22 +100,17 @@ export default function HomePage() {
         );
 
         // 👇 DEDUPLICATE REGISTERED LIST
-        // Only show the *next* meeting for each series.
         const uniqueRegisteredList: any[] = [];
         const seenRegisteredSeries = new Set();
 
         rawRegisteredList.forEach((act: any) => {
           if (!act.series_id) {
-            // Not a group, always show
             uniqueRegisteredList.push(act);
           } else {
-            // Is a group
             if (!seenRegisteredSeries.has(act.series_id)) {
-              // This is the first (earliest) session we've seen for this group
               seenRegisteredSeries.add(act.series_id);
               uniqueRegisteredList.push(act);
             }
-            // If seen, skip (it's a later session)
           }
         });
 
@@ -127,7 +119,7 @@ export default function HomePage() {
           (activity: any) => !allInteractedIds.includes(activity.id)
         );
 
-        // Deduplicate suggestions (show only 1 card per group)
+        // Deduplicate suggestions
         const uniqueSuggestions: any[] = [];
         const seenSuggestionSeries = new Set();
 
@@ -157,16 +149,13 @@ export default function HomePage() {
           );
         }
 
-        setRegisteredActivities(uniqueRegisteredList); // 👈 Set the filtered unique list
+        setRegisteredActivities(uniqueRegisteredList);
         setAllActivities(finalSuggestions);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setLoading(false);
-
-      // 🔵 Don't stop breathing - let it continue
-      // The circles should breathe continuously on the home page
     }
   };
 
@@ -214,7 +203,7 @@ export default function HomePage() {
     }
   };
 
-  // 🔵 Calculate breathing parameters based on user profile
+  // 🔵 Calculate breathing parameters
   const breathingParams = calculateBreathingParams(
     userProfile,
     registeredActivities.length
@@ -222,16 +211,16 @@ export default function HomePage() {
 
   if (userLoading || loading) {
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>טוען...</p>
+      <div className="mobile-container">
+        <p className="text-loading">טוען...</p>
       </div>
     );
   }
 
   if (!user || !userProfile) {
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>עליך להתחבר כדי לראות את הדף</p>
+      <div className="mobile-container">
+        <p className="text-loading">עליך להתחבר כדי לראות את הדף</p>
       </div>
     );
   }
@@ -239,19 +228,19 @@ export default function HomePage() {
   const possibleActivities = allActivities.slice(0, 4);
 
   return (
-    <div style={styles.container}>
+    <div className="mobile-container">
       {/* 🔵 Breathing Circles - Behind all content */}
       <BreathingCircles
         ref={breathingRef}
         speed={breathingParams.speed}
         complexity={breathingParams.complexity}
         smoothness={breathingParams.smoothness}
-        layers={breathingParams.layers} // ✅ Dynamic based on activity count
+        layers={breathingParams.layers}
         opacity={0.6}
         thickness={0.5}
-        position={{ x: 0.3, y: 0.15 }} // Top left, near the name
-        size={0.25} // Medium size (25% of screen)
-        startBreathing={true} // ✅ Start breathing immediately
+        position={{ x: 0.3, y: 0.15 }}
+        size={0.25}
+        startBreathing={true}
         colors={[
           "rgba(189, 161, 201, 0.9)",
           "rgba(173, 78, 52, 0.85)",
@@ -260,24 +249,24 @@ export default function HomePage() {
         ]}
       />
 
-      <div style={styles.vectorBackground} />
+      <div className="vector-background" />
 
-      <h1 style={styles.headerText}>
+      <h1 className="header-primary absolute-header">
         היי {userProfile?.full_name?.split(" ")[0] || ""},
       </h1>
 
-      <p style={styles.subtitle}>המרחב כאן בשבילך.</p>
+      <p className="text-subtitle absolute-subtitle">המרחב כאן בשבילך.</p>
 
-      <p style={styles.statusMessage}>{getStatusMessage()}</p>
+      <p className="text-small absolute-status">{getStatusMessage()}</p>
 
-      <div style={styles.mainContentFrame}>
+      <div className="main-content">
         {/* Registered Activities Section */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>המפגשים הבאים שלך:</h2>
+        <section className="section">
+          <h2 className="text-section-title">המפגשים הבאים שלך:</h2>
           {registeredActivities.length > 0 ? (
-            <div style={styles.horizontalScroll}>
+            <div className="horizontal-scroll">
               {registeredActivities.map((activity) => (
-                <div key={activity.id} style={styles.glassCard}>
+                <div key={activity.id} className="glass-card">
                   <UserActivityCard
                     id={activity.id}
                     title={activity.title}
@@ -300,12 +289,12 @@ export default function HomePage() {
         </section>
 
         {/* Suggested Activities Section */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>חשבנו שיעניין אותך:</h2>
+        <section className="section">
+          <h2 className="text-section-title">חשבנו שיעניין אותך:</h2>
           {possibleActivities.length > 0 ? (
-            <div style={styles.horizontalScroll}>
+            <div className="horizontal-scroll">
               {possibleActivities.map((activity) => (
-                <div key={activity.id} style={styles.glassCard}>
+                <div key={activity.id} className="glass-card">
                   <UserActivityCard
                     id={activity.id}
                     title={activity.title}

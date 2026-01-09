@@ -1,18 +1,25 @@
 import "@/styles/global.css";
 import "./fonts.css";
-
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 // import Navbar from "@/lib/components/Navbar";
 import Footer from "@/lib/components/Footer";
 import { AppProviders } from "@/app/providers/AppProviders";
-
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Adama Tova",
   description: "Activity registration and management for Adama Tova",
+};
+
+// ✅ Viewport configuration - Prevents zoom and ensures mobile-first experience
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover", // For iPhone X+ notched screens
 };
 
 export default async function RootLayout({
@@ -23,13 +30,12 @@ export default async function RootLayout({
   // 🔑 SERVER: get user from Supabase cookie
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   return (
-    <html>
+    <html lang="he" dir="rtl">
       <head>
         <link rel="icon" href="/icons/favicon.png" />
         <link

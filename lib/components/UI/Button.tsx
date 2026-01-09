@@ -1,27 +1,27 @@
 import { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 
-// Button variant styles
+// Button variant styles using CSS variables
 const buttonVariants: { [key: string]: CSSProperties } = {
   // Button S - Small circular (44x44px)
   S: {
-    width: "2.75rem", // 44px
-    height: "2.75rem", // 44px
-    minWidth: "2.75rem",
-    minHeight: "2.75rem",
-    background: "#F9F9F9",
-    borderRadius: "1.5625rem", // 25px
+    width: "var(--button-size-s)",
+    height: "var(--button-size-s)",
+    minWidth: "var(--button-size-s)",
+    minHeight: "var(--button-size-s)",
+    background: "var(--button-bg)",
+    borderRadius: "var(--button-radius)",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     padding: "0.3125rem", // 5px
-    gap: "0.625rem", // 10px
+    gap: "var(--spacing-sm)", // 10px
     border: "none",
     cursor: "pointer",
     textDecoration: "none",
     flexShrink: 0,
-    transition: "all 0.2s ease",
+    transition: "all var(--transition-normal)",
   },
 
   // Button M - Medium (117x44px)
@@ -30,27 +30,27 @@ const buttonVariants: { [key: string]: CSSProperties } = {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    padding: "0.25rem 1rem", // 4px 16px
-    gap: "0.625rem", // 10px
-    width: "7.3125rem", // 117px
-    height: "2.75rem", // 44px
-    background: "#F9F9F9",
-    borderRadius: "1.5625rem", // 25px
+    padding: "0.25rem var(--spacing-lg)", // 4px 16px
+    gap: "var(--spacing-sm)", // 10px
+    width: "var(--button-size-m-width)",
+    height: "var(--button-size-m-height)",
+    background: "var(--button-bg)",
+    borderRadius: "var(--button-radius)",
     border: "none",
     cursor: "pointer",
     textDecoration: "none",
-    transition: "all 0.2s ease",
+    transition: "all var(--transition-normal)",
     flexShrink: 0,
   },
 
-  // ✅ NEW: Icon button - Small circular for icons (28x28px)
+  // Icon button - Small circular for icons (44x44px)
   icon: {
-    width: "2.75rem", // 28px
-    height: "2.75rem", // 28px
-    minWidth: "1.75rem",
-    minHeight: "1.75rem",
-    background: "#F9F9F9",
-    borderRadius: "50%",
+    width: "var(--button-size-icon)",
+    height: "var(--button-size-icon)",
+    minWidth: "1.75rem", // 28px min
+    minHeight: "1.75rem", // 28px min
+    background: "var(--button-bg)",
+    borderRadius: "var(--button-radius-full)",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
@@ -59,20 +59,20 @@ const buttonVariants: { [key: string]: CSSProperties } = {
     cursor: "pointer",
     textDecoration: "none",
     flexShrink: 0,
-    transition: "all 0.2s ease",
-    boxShadow: "0 0.125rem 0.25rem rgba(0,0,0,0.1)",
+    transition: "all var(--transition-normal)",
+    boxShadow: "var(--shadow-sm)",
   },
 };
 
-// Text styles
+// Text styles using CSS variables
 const textStyle: CSSProperties = {
-  fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
+  fontFamily: "var(--font-secondary)",
   fontStyle: "normal",
-  fontWeight: "400",
-  fontSize: "0.875rem", // 14px
-  lineHeight: "1.25rem", // 20px
+  fontWeight: "var(--font-weight-normal)",
+  fontSize: "var(--font-size-sm)", // 14px
+  lineHeight: "var(--font-size-xl)", // 20px
   textAlign: "center",
-  color: "#681F02",
+  color: "var(--button-text)",
   flex: "none",
   order: 0,
   flexGrow: 0,
@@ -108,7 +108,7 @@ export default function Button({
     ...style,
   };
 
-  // ✅ For icon size, don't wrap in span with text styles
+  // For icon size, don't wrap in span with text styles
   const content =
     typeof children === "string" && size !== "icon" ? (
       <span style={textStyle}>{children}</span>

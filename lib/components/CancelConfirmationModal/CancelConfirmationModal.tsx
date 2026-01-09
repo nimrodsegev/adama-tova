@@ -2,8 +2,8 @@
 import { createPortal } from "react-dom";
 import { useState, useEffect } from "react";
 import Button from "@/lib/components/UI/Button";
-import styles from "./CancelConfirmationModal.styles";
-import { useIvrita } from '@/app/contexts/IvritaContext';
+import styles from "./CancelConfirmationModal.module.css";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 
 type CancelConfirmationModalProps = {
   isOpen: boolean;
@@ -40,33 +40,33 @@ export default function CancelConfirmationModal({
   const modalContent = (
     <>
       {/* Overlay backdrop */}
-      <div style={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={onClose} />
 
       {/* Modal container */}
-      <div style={styles.modalContainer}>
+      <div className={styles.modalContainer}>
         {/* Content Frame */}
-        <div style={styles.contentFrame}>
+        <div className={styles.contentFrame}>
           {/* Question text */}
-          <p style={styles.questionText}>
-            {t('?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה')}
+          <p className={styles.questionText}>
+            {t("?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה")}
           </p>
 
           {/* Activity details text */}
-          <p style={styles.detailsText}>
+          <p className={styles.detailsText}>
             ל{activityTitle} ב{activityDate} בשעה {activityTime}
           </p>
         </div>
 
         {/* Buttons Frame */}
-        <div style={styles.buttonsFrame}>
+        <div className={styles.buttonsFrame}>
           {/* Cancel button (left) */}
-          <Button size="S" onClick={onClose} style={styles.cancelButton}>
-            <span style={styles.cancelButtonText}>לא</span>
+          <Button size="S" onClick={onClose}>
+            לא
           </Button>
 
           {/* Confirm button (right) */}
-          <Button size="M" onClick={handleConfirm} style={styles.confirmButton}>
-            <span style={styles.confirmButtonText}>כן, לבטל</span>
+          <Button size="M" onClick={handleConfirm}>
+            <span className={styles.confirmButtonText}>כן, לבטל</span>
           </Button>
         </div>
       </div>

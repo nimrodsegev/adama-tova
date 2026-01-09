@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiNotifications, supabase } from "@/app/services/db_api";
-import Link from "next/link";
+import Button from "@/lib/components/UI/Button";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
-import styles from "./NotificationsPage.styles";
+import styles from "./NotificationsPage.module.css";
 
 type Notification = {
   id: number;
@@ -103,64 +103,61 @@ export default function NotificationsPage() {
 
   if (!user)
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>אנא התחבר כדי לצפות בהודעות</p>
+      <div className="mobile-container">
+        <p className="text-loading">אנא התחבר כדי לצפות בהודעות</p>
       </div>
     );
 
   return (
-    <div style={styles.container}>
-      <div style={styles.vectorBackground} />
+    <div className="mobile-container">
+      <div className="vector-background" />
 
-      <h1 style={styles.headerText}>הודעות ועדכונים</h1>
+      <h1 className="header-secondary absolute-header-right">
+        הודעות ועדכונים
+      </h1>
 
-      <div style={styles.mainContentFrame}>
-        <div style={styles.filterContainer}>
+      <div className="main-content-high">
+        <div className="filter-container">
           <button
             onClick={() => setFilter("all")}
-            style={{
-              ...styles.filterButton,
-              ...(filter === "all" ? styles.filterButtonActive : {}),
-            }}
+            className={`filter-button ${
+              filter === "all" ? "filter-button-active" : ""
+            }`}
           >
             הכל
           </button>
           <button
             onClick={() => setFilter("unread")}
-            style={{
-              ...styles.filterButton,
-              ...(filter === "unread" ? styles.filterButtonActive : {}),
-            }}
+            className={`filter-button ${
+              filter === "unread" ? "filter-button-active" : ""
+            }`}
           >
             לא נקראו
           </button>
         </div>
 
         {loading ? (
-          <p style={styles.loadingText}>טוען הודעות...</p>
+          <p className="text-loading">טוען הודעות...</p>
         ) : (
-          <div
-            style={styles.notificationsList}
-            className="notifications-scrollable"
-          >
+          <div className={styles.notificationsList}>
             {filteredNotifications.length > 0 ? (
               filteredNotifications.map((notif) => (
                 <NotificationCard
                   key={notif.id}
                   notification={notif}
-                  onMarkAsRead={handleMarkAsRead} // ✅ Pass handler
+                  onMarkAsRead={handleMarkAsRead}
                 />
               ))
             ) : (
-              <p style={styles.emptyText}>אין הודעות להצגה</p>
+              <p className="text-empty">אין הודעות להצגה</p>
             )}
           </div>
         )}
 
-        <div style={styles.buttonContainer}>
-          <Link href="/AdminScreens/addNotification" style={styles.addButton}>
+        <div className={styles.buttonContainer}>
+          <Button size="M" href="/AdminScreens/addNotification">
             + הודעה חדשה
-          </Link>
+          </Button>
         </div>
       </div>
     </div>

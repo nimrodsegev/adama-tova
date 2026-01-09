@@ -1,0 +1,186 @@
+/* AdminActivityCard.module.css - Admin card component styles */
+
+/* Card Container */
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding: 0.25rem 0.5rem 1rem 1rem;
+  width: 100%;
+  max-width: 10.4375rem;
+  min-width: 9rem;
+  height: 9.625rem;
+  background: none;
+  text-decoration: none;
+  color: #681f02;
+  direction: rtl;
+  position: relative;
+  cursor: pointer;
+  flex: none;
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cardContainer:hover {
+  transform: scale(1.02);
+}
+
+.cardContainer:active {
+  transform: scale(0.98);
+}
+
+/* Frame 224 - Contains title, date, participants, progress bar */
+.frame224 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0;
+  gap: 0.375rem;
+  width: 100%;
+  max-width: 8.4375rem;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+  z-index: 0;
+}
+
+/* Title Text */
+.titleText {
+  width: 100%;
+  max-width: 8.4375rem;
+  height: auto;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-normal);
+  font-size: clamp(1.125rem, 4.5vw, 1.375rem);
+  line-height: 1.175rem;
+  display: flex;
+  align-items: flex-end;
+  text-align: right;
+  color: #681f02;
+  margin-top: -0.25rem;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Frame 266 - Date and Time */
+.frame266 {
+  width: 100%;
+  max-width: 8.4375rem;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+  position: relative;
+}
+
+/* Body M - Date and Time Text */
+.bodyM {
+  width: 100%;
+  max-width: 8.4375rem;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
+  font-size: clamp(0.9375rem, 3.8vw, 1.0625rem);
+  line-height: 1.125rem;
+  text-align: right;
+  color: #681f02;
+  margin: 0.1rem 0rem;
+}
+
+/* Frame 265 - Participants Container */
+.frame265 {
+  width: 100%;
+  max-width: 8.4375rem;
+  height: 1.1875rem;
+  flex: none;
+  order: 2;
+  flex-grow: 0;
+  position: relative;
+}
+
+/* Body L - Participants Text (10/10) */
+.bodyL {
+  position: absolute;
+  width: 100%;
+  max-width: 8.4375rem;
+  height: 1.1875rem;
+  left: 0;
+  top: 0;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-normal);
+  font-size: clamp(0.9375rem, 3.8vw, 1.0625rem);
+  line-height: 1.25rem;
+  text-align: right;
+  color: #681f02;
+  margin: 0;
+}
+
+/* Progress Bar Container */
+.progressBarContainer {
+  width: 5rem;
+  height: 0.375rem;
+  position: relative;
+  flex: none;
+  order: 3;
+  flex-grow: 0;
+  align-self: flex-start;
+  margin-top: -0.25rem;
+}
+
+/* Progress Bar Background - Orange border */
+.progressBarBackground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 0.375rem;
+  border: 0.1875rem solid #f28130; /* Orange border */
+  border-radius: 0.1875rem;
+  background-color: transparent;
+}
+
+/* Progress Bar Fill - Dark red/brown border */
+.progressBarFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 0.375rem;
+  border: 0.1875rem solid #681f02; /* Dark red/brown border - this is the "fill" */
+  border-radius: 0.1875rem;
+  background-color: transparent;
+  transition: width var(--transition-slow);
+}
+
+/* Arrow Button - Bottom Left Corner */
+.arrowButton {
+  position: absolute;
+  left: -0.1rem;
+  bottom: 1.25rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  border-radius: 50%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: none;
+  pointer-events: none;
+  transition: transform var(--transition-normal);
+}
+
+/* Arrow Icon */
+.arrowIcon {
+  color: var(--color-text-primary);
+  font-size: 2.5rem;
+  line-height: 1;
+}
