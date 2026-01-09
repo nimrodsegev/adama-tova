@@ -8,6 +8,7 @@ import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
+import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
 import styles from "./ActivityDetailsModal.module.css";
 
 type ActivityDetailsModalProps = {
@@ -224,6 +225,8 @@ export default function ActivityDetailsModal({
       ? (registrationCount.confirmed / registrationCount.total) * 100
       : 0;
 
+  const isGroup = activity?.is_group || !!activity?.series_id;
+  
   const modalContent = (
     <>
       {/* Overlay backdrop */}
@@ -363,15 +366,25 @@ export default function ActivityDetailsModal({
 
       {/* Success Modal */}
       {isSuccessModalOpen && (
-        <RegistrationSuccessModal
-          isOpen={isSuccessModalOpen}
-          onClose={handleSuccessModalClose}
-          activityTitle={activity?.title || ""}
-          activityDate={dayMonth}
-          activityTime={formattedTime}
-          isWaitlist={regStatus === "waitlist"}
-          waitlistPosition={waitlistPosition}
-        />
+        isGroup ? (
+          <GroupRegistrationSuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleSuccessModalClose}
+            activityTitle={activity?.title || ""}
+            startDate={dayMonth}
+            startTime={formattedTime}
+          />
+        ) : (
+          <RegistrationSuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleSuccessModalClose}
+            activityTitle={activity?.title || ""}
+            activityDate={dayMonth}
+            activityTime={formattedTime}
+            isWaitlist={regStatus === "waitlist"}
+            waitlistPosition={waitlistPosition}
+          />
+        )
       )}
     </>
   );

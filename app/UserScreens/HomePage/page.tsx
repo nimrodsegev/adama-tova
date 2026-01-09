@@ -286,6 +286,7 @@ export default function HomePage() {
                     start_time={activity.start_time}
                     location={activity.location}
                     description={activity.description}
+                    isGroup={activity.is_group || !!activity.series_id}
                     onRegistrationChange={() => handleRegistrationChange(false)}
                   />
                 </div>
@@ -314,6 +315,7 @@ export default function HomePage() {
                     start_time={activity.start_time}
                     location={activity.location}
                     description={activity.description}
+                    isGroup={activity.is_group || !!activity.series_id}
                     onRegistrationChange={() => handleRegistrationChange(true)}
                   />
                 </div>

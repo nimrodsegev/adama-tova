@@ -6,6 +6,7 @@ import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
+import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
 import styles from "./ScheduleActivityCard.styles";
 
 type ScheduleActivityCardProps = {
@@ -18,6 +19,7 @@ type ScheduleActivityCardProps = {
   max_participants: number;
   waitlist_count?: number;
   onRegistrationChange?: () => void;
+  isGroup: boolean;
 };
 
 export default function ScheduleActivityCard({
@@ -30,6 +32,7 @@ export default function ScheduleActivityCard({
   max_participants,
   waitlist_count = 0,
   onRegistrationChange,
+  isGroup,
 }: ScheduleActivityCardProps) {
   const { user, userProfile } = useUser();
   const isAdmin = userProfile?.role === "admin";
@@ -290,15 +293,27 @@ export default function ScheduleActivityCard({
       />
 
       {/* Success Modal */}
-      <RegistrationSuccessModal
-        isOpen={isSuccessModalOpen}
-        onClose={handleSuccessModalClose}
-        activityTitle={title}
-        activityDate={dayMonth}
-        activityTime={formattedStartTime}
-        isWaitlist={regStatus === "waitlist"}
-        waitlistPosition={waitlistPosition}
-      />
+      {isSuccessModalOpen && (
+        isGroup ? (
+          <GroupRegistrationSuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleSuccessModalClose}
+            activityTitle={title}
+            startDate={dayMonth}
+            startTime={formattedStartTime}
+          />
+        ) : (
+          <RegistrationSuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleSuccessModalClose}
+            activityTitle={title}
+            activityDate={dayMonth}
+            activityTime={formattedStartTime}
+            isWaitlist={regStatus === "waitlist"}
+            waitlistPosition={waitlistPosition}
+          />
+        )
+      )}
     </>
   );
 }
