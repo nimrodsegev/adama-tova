@@ -26,8 +26,20 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   // Show loading while checking auth
   if (loading) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>טוען...</p>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#F28130",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#EFEFEF",
+          fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
+          fontSize: "1.25rem",
+        }}
+        dir="rtl"
+      >
+        טוען...
       </div>
     );
   }
