@@ -17,7 +17,7 @@ type UserActivityCardProps = {
   location: string;
   description: string;
   onRegistrationChange?: () => void;
-  isGroup: boolean;
+  isGroup?: boolean;
 };
 
 export default function UserActivityCard({
@@ -28,7 +28,7 @@ export default function UserActivityCard({
   location,
   description,
   onRegistrationChange,
-  isGroup,
+  isGroup = false,
 }: UserActivityCardProps) {
   const { user, userProfile } = useUser();
 
