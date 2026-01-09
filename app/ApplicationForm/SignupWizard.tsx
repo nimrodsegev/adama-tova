@@ -32,7 +32,7 @@ const INTEREST_OPTIONS = [
   'אומנות',
   'כתיבה',
   'יצירה',
-  'מינדפולנס',
+  'מיינדפולנס',
 ];
 
 // 👇 New Branch Options
