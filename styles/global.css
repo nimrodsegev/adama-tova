@@ -818,3 +818,23 @@ fieldset {
   margin-top: 1.5rem;
   border: 1px solid var(--color-secondary);
 }
+
+/* ============================================
+   ADMIN PAGE SPECIFIC UTILITIES
+   ============================================ */
+
+/* CTA Row - Button Container */
+.cta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0;
+  gap: var(--spacing-md); /* 12px gap between buttons */
+}
+
+/* Notifications List - Scrollable container */
+.notifications-list {
+  max-height: 25rem; /* 400px */
+  margin-bottom: 0.7rem;
+  padding-right: 0.25rem; /* Space for scrollbar */
+}

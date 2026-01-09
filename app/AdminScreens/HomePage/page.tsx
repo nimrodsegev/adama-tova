@@ -7,7 +7,6 @@ import AdminActivityCard from "@/lib/components/Home/AdminActivityCard";
 import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
 import Button from "@/lib/components/UI/Button";
-import styles from "./AdminHomePage.styles";
 
 export default function AdminHomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
@@ -56,31 +55,31 @@ export default function AdminHomePage() {
 
   if (userLoading || loading)
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>טוען...</p>
+      <div className="mobile-container">
+        <p className="text-loading">טוען...</p>
       </div>
     );
 
   return (
-    <div style={styles.container}>
+    <div className="mobile-container">
       {/* Background Decorative Vectors */}
-      <div style={styles.vectorBackground} />
+      <div className="vector-background" />
 
       {/* Header */}
-      <h1 style={styles.headerText}>
+      <h1 className="header-primary absolute-header">
         היי {userProfile?.full_name?.split(" ")[0] || "מנהל"},
       </h1>
 
-      <div style={styles.mainContentFrame}>
+      <div className="main-content">
         {/* Section 1: Activities */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>סטטוס הרשמה לפעילויות</h2>
+        <section className="section">
+          <h2 className="text-section-title">סטטוס הרשמה לפעילויות</h2>
 
           {todayActivities.length > 0 ? (
             <>
-              <div style={styles.horizontalScroll}>
+              <div className="horizontal-scroll">
                 {todayActivities.map((activity) => (
-                  <div key={activity.id} style={styles.glassCard}>
+                  <div key={activity.id} className="glass-card">
                     <AdminActivityCard
                       id={activity.id}
                       title={activity.title}
@@ -94,7 +93,7 @@ export default function AdminHomePage() {
               </div>
 
               {/* Activity Buttons CTA */}
-              <div style={styles.ctaRow}>
+              <div className="cta-row">
                 <Button size="M" href="/AdminScreens/AddActivityPage">
                   + הוספת פעילות
                 </Button>
@@ -114,23 +113,20 @@ export default function AdminHomePage() {
         </section>
 
         {/* Section 2: Recent Notifications */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>הודעות אחרונות</h2>
+        <section className="section">
+          <h2 className="text-section-title">הודעות אחרונות</h2>
 
           {notifications.length > 0 ? (
             <>
               {/* Show notifications list */}
-              <div
-                style={styles.notificationsList}
-                className="notifications-scrollable"
-              >
+              <div className="vertical-scroll notifications-list">
                 {notifications.map((notif) => (
                   <NotificationCard key={notif.id} notification={notif} />
                 ))}
               </div>
 
               {/* Notification Buttons CTA */}
-              <div style={styles.ctaRow}>
+              <div className="cta-row">
                 <Button size="M" href="/AdminScreens/addNotification">
                   + הודעה חדשה
                 </Button>
