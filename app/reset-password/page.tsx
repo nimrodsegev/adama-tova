@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
           setSessionError('הקישור פג תוקף. אנא בקשו קישור חדש.');
         } else {
           // No tokens at all - direct navigation to page
-          setSessionError('אנא השתמשו בקישור שנשלח למייל.');
+          setSessionError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
         }
       }
 
@@ -143,8 +143,16 @@ export default function ResetPasswordPage() {
     return (
       <div className={styles.container}>
         <div className={styles.content}>
-          <div className={styles.greeting}>
-            <h1 className={styles.title}>טוען...</h1>
+          <div
+            style={{
+              color: "#EFEFEF",
+              fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
+              fontSize: "1.25rem",
+              textAlign: "center",
+            }}
+            dir="rtl"
+          >
+            טוען...
           </div>
         </div>
       </div>
