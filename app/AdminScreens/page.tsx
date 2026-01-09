@@ -19,10 +19,11 @@ export default function AdminPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: "#FFFFFF",
-        fontFamily: "'Ezer Shemesh TRIAL ONLY', sans-serif",
+        color: "#EFEFEF",
+        fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
         fontSize: "1.25rem",
       }}
+      dir="rtl"
     >
       טוען...
     </div>

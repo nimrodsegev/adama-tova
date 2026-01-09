@@ -211,8 +211,20 @@ export default function HomePage() {
 
   if (userLoading || loading) {
     return (
-      <div className="mobile-container">
-        <p className="text-loading">טוען...</p>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#F28130",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#EFEFEF",
+          fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
+          fontSize: "1.25rem",
+        }}
+        dir="rtl"
+      >
+        טוען...
       </div>
     );
   }
