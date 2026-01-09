@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
           <h2>שלום ${name || ""},</h2>
           <p>אנחנו שמחים לבשר לך שהבקשה שלך להצטרף לאדמה טובה <strong>אושרה!</strong></p>
           <p>כעת תוכל/י להיכנס לאתר ולהירשם לפעילויות.</p>
+          <p><a href="https://adama-tova.vercel.app/login">לחצ/י כאן להתחברות</a></p>
           <br/>
           <p>בברכה,<br/>צוות אדמה טובה</p>
         </div>

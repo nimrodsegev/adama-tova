@@ -46,9 +46,13 @@
   
   /* Step 2: slightly HIGHER (title + options + קרבה) */
   .step2 {
-    padding-top: 2.0rem;
+    padding-top: 1rem;
   }
-  
+
+  .step2 .optionsContainer {
+    max-height: 23.5rem;
+  }
+
   /* Step 3: slightly HIGHER + future scroll */
   .step3 {
     padding-top: 1.5rem;
@@ -144,6 +148,13 @@
 
 .input:focus {
   border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.input::placeholder {
+  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: rgba(255, 245, 245, 0.7);
 }
 
 /* Floating label */
