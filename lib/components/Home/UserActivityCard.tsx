@@ -6,6 +6,7 @@ import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
+import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
 import styles from "./UserActivityCard.module.css";
 
 type UserActivityCardProps = {
@@ -16,6 +17,7 @@ type UserActivityCardProps = {
   location: string;
   description: string;
   onRegistrationChange?: () => void;
+  isGroup: boolean;
 };
 
 export default function UserActivityCard({
@@ -26,6 +28,7 @@ export default function UserActivityCard({
   location,
   description,
   onRegistrationChange,
+  isGroup,
 }: UserActivityCardProps) {
   const { user, userProfile } = useUser();
 
@@ -242,15 +245,27 @@ export default function UserActivityCard({
       />
 
       {/* Success Modal */}
-      <RegistrationSuccessModal
-        isOpen={isSuccessModalOpen}
-        onClose={handleSuccessModalClose}
-        activityTitle={title}
-        activityDate={dayMonth}
-        activityTime={formattedTime}
-        isWaitlist={regStatus === "waitlist"}
-        waitlistPosition={waitlistPosition}
-      />
+      {isSuccessModalOpen && (
+        isGroup ? (
+          <GroupRegistrationSuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleSuccessModalClose}
+            activityTitle={title}
+            startDate={dayMonth}
+            startTime={formattedTime}
+          />
+        ) : (
+          <RegistrationSuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleSuccessModalClose}
+            activityTitle={title}
+            activityDate={dayMonth}
+            activityTime={formattedTime}
+            isWaitlist={regStatus === "waitlist"}
+            waitlistPosition={waitlistPosition}
+          />
+        )
+      )}
     </>
   );
 }

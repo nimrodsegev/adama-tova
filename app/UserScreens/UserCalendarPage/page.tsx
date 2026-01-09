@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-// 👇 Added apiUser to imports
 import {
   apiActivities,
   apiRegistrations,
@@ -241,6 +240,7 @@ export default function UserCalendarPage() {
                 max_participants={activity.max_participants}
                 waitlist_count={activity.waitlist_count || 0}
                 onRegistrationChange={fetchData}
+                isGroup={activity.is_group || !!activity.series_id}
               />
             ))
           ) : (
