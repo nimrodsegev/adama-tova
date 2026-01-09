@@ -79,6 +79,19 @@ export const authService = {
 
     if (error) {
       recordAuthError();
+
+      // Handle invalid refresh token - clear bad session to prevent 429 cascade
+      const errorCode = (error as any)?.code;
+      if (errorCode === 'refresh_token_not_found' || errorCode === 'invalid_grant') {
+        console.warn('Invalid refresh token detected, clearing session');
+        try {
+          await supabase.auth.signOut();
+        } catch {
+          // Ignore signOut errors - we just want to clear local storage
+        }
+        return null; // Return null instead of throwing - user will be redirected to login
+      }
+
       throw error;
     }
     return user;

@@ -245,6 +245,7 @@ export function UserProvider({
               fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
               fontSize: "1.25rem",
             }}
+            dir="rtl"
           >
             טוען...
           </div>
