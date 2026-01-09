@@ -10,6 +10,8 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [sessionError, setSessionError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -27,28 +29,48 @@ export default function ResetPasswordPage() {
       const hashParams = new URLSearchParams(url.hash.replace(/^#/, ''));
       const accessToken = hashParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token');
-      let handled = false;
+      let exchangeError = null;
 
+      // Try to establish session from URL tokens
       if (code) {
-        handled = true;
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (error) {
           console.error('Password reset code exchange error:', error);
+          exchangeError = error;
         }
+        // Clean URL
+        window.history.replaceState({}, document.title, url.pathname);
       } else if (accessToken && refreshToken) {
-        handled = true;
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
         if (error) {
           console.error('Password reset session error:', error);
+          exchangeError = error;
+        }
+        // Clean URL
+        window.history.replaceState({}, document.title, url.pathname);
+      }
+
+      // Verify we have a valid session
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        // No valid session - show error
+        if (exchangeError) {
+          // Code exchange failed - likely opened on different device or private browsing
+          setSessionError('הקישור לא תקף. יש לפתוח את הקישור מאותו מכשיר בו ביקשת לאפס את הסיסמה, ולוודא שאינך בגלישה פרטית.');
+        } else if (code || accessToken) {
+          // Had tokens but still no session - expired or invalid
+          setSessionError('הקישור פג תוקף. אנא בקשו קישור חדש.');
+        } else {
+          // No tokens at all - direct navigation to page
+          setSessionError('אנא השתמשו בקישור שנשלח למייל.');
         }
       }
 
-      if (handled) {
-        window.history.replaceState({}, document.title, url.pathname);
-      }
+      setCheckingSession(false);
     };
 
     void initSessionFromUrl();
@@ -78,17 +100,33 @@ export default function ResetPasswordPage() {
 
     try {
       const supabase = createClient();
-      
+
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check for specific error types
+        const errorMessage = error.message?.toLowerCase() || '';
+
+        if (errorMessage.includes('same') || errorMessage.includes('different') ||
+            error.message?.includes('should be different')) {
+          // Same password error
+          setPasswordError('הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית');
+        } else if (errorMessage.includes('session') || errorMessage.includes('not authenticated')) {
+          // Session expired
+          setPasswordError('פג תוקף החיבור. אנא בקשו קישור חדש.');
+        } else {
+          // Generic error
+          setPasswordError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
+        }
+        return;
+      }
 
       await supabase.auth.signOut();
 
       setSuccess(true);
-      
+
       setTimeout(() => {
         router.push('/login');
       }, 2000);
@@ -100,14 +138,47 @@ export default function ResetPasswordPage() {
     }
   };
 
-  if (success) {
+  // Loading state while checking session
+  if (checkingSession) {
     return (
-    <div className={styles.pageBackground}>
       <div className={styles.container}>
         <div className={styles.content}>
           <div className={styles.greeting}>
-            <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
-            <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
+            <h1 className={styles.title}>טוען...</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Session error - show message with button to go back to login
+  if (sessionError) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.content}>
+          <div className={styles.greeting}>
+            <h1 className={styles.title}>שגיאה</h1>
+            <p className={styles.subtitle}>{sessionError}</p>
+          </div>
+          <button
+            onClick={() => router.push('/login')}
+            className={styles.primaryButton}
+          >
+            חזרה לדף ההתחברות
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className={styles.pageBackground}>
+        <div className={styles.container}>
+          <div className={styles.content}>
+            <div className={styles.greeting}>
+              <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
+              <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
             </div>
           </div>
         </div>
@@ -170,7 +241,7 @@ export default function ResetPasswordPage() {
             disabled={loading}
             className={styles.primaryButton}
           >
-            {loading ? '...משנה' : 'שינוי סיסמה'}
+            {loading ? 'משנה...' : 'שינוי סיסמה'}
           </button>
         </form>
       </div>

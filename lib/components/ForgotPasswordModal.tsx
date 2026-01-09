@@ -55,6 +55,9 @@ export default function ForgotPasswordModal({ email, onClose }: ForgotPasswordMo
         <p className={styles.message}>
           אתה בטוח? תקבל מייל עם לינק לשינוי הסיסמה
         </p>
+        <p className={styles.recommendation}>
+          מומלץ לבצע את הפעולה במחשב או בדפדפן בסמארטפון שאינו בגלישה פרטית
+        </p>
         <p className={styles.email}>{email}</p>
         
         <div className={styles.buttons}>
