@@ -1,0 +1,407 @@
+/* UserManagementPage.module.css - White background with section selector */
+
+/* Page Container - White background, no scroll */
+.pageContainer {
+  position: relative;
+  height: 100vh;
+
+  direction: rtl;
+  padding: var(--spacing-lg); /* 16px */
+  padding-bottom: 5rem; /* Space for navbar */
+  overflow: hidden; /* Page doesn't scroll */
+}
+
+/* Content wrapper */
+.content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md); /* 12px */
+  max-width: 75rem;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-2xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  color: #1f2937;
+  margin: 0;
+}
+
+.backButton {
+  color: #2563eb;
+  background: none;
+  border: none;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  transition: opacity var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backButton:hover {
+  opacity: 0.7;
+}
+
+/* Tabs - User Type Selector */
+.tabsContainer {
+  display: flex;
+  gap: var(--spacing-xs); /* 4px */
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab:hover {
+  background: #f3f4f6;
+}
+
+.tabActive {
+  background: #f28130; /* Orange active */
+  color: white;
+  border-color: #f28130;
+  transform: scale(1.02);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Section Selector - Pending vs Approved */
+.sectionSelector {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.sectionButton {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  border: 2px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sectionButton:hover {
+  background: #f9fafb;
+}
+
+.sectionButtonActive {
+  background: #dbeafe; /* Light blue active */
+  color: #1e40af;
+  border-color: #3b82f6;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Scrollable Area - Limited height, scrolls internally */
+.scrollableArea {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: var(--spacing-xs);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  min-height: 0; /* Important for flex shrinking */
+}
+
+.scrollableArea::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.scrollableArea::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-full);
+}
+
+.scrollableArea::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Section Header */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: #374151;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.searchInput {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  width: 10rem;
+  background: white;
+  text-align: right;
+}
+
+/* Card List */
+.cardList {
+  background: #f9fafb;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+/* Pending Card */
+.pendingCard {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  border-left: 3px solid #f97316;
+  border-bottom: 1px solid #e5e7eb;
+  gap: var(--spacing-sm);
+  background: white;
+  transition: background var(--transition-normal);
+}
+
+.pendingCard:hover {
+  background: #fffbeb;
+}
+
+.pendingCard:last-child {
+  border-bottom: none;
+}
+
+/* Approved Card */
+.approvedCard {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid #e5e7eb;
+  gap: var(--spacing-sm);
+  background: white;
+  transition: background var(--transition-normal);
+}
+
+.approvedCard:hover {
+  background: #f9fafb;
+}
+
+.approvedCard:last-child {
+  border-bottom: none;
+}
+
+/* Card Info */
+.cardInfo {
+  flex: 1;
+}
+
+.cardTitle {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.adminBadge {
+  background: #f3e8ff;
+  color: #7c3aed;
+  font-size: var(--font-size-xs);
+  padding: 0.125rem var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cardSubtitle {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  color: #6b7280;
+  margin-bottom: 0.125rem;
+}
+
+.cardDate {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xs);
+  color: #9ca3af;
+}
+
+/* Card Actions */
+.cardActions {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.viewButton {
+  background: #f3f4f6;
+  color: #4b5563;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background var(--transition-normal);
+  flex: 1;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viewButton:hover {
+  background: #e5e7eb;
+}
+
+.approveButton {
+  background: #10b981;
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  flex: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.approveButton:hover {
+  background: #059669;
+}
+
+.approveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rejectButton {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  flex: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rejectButton:hover {
+  background: #fee2e2;
+}
+
+.rejectButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.linkButton {
+  color: #2563eb;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: color var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.linkButton:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+.deleteButton {
+  color: #dc2626;
+  background: #fef2f2;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.deleteButton:hover {
+  background: #fee2e2;
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Add Admin Link */
+.addAdminLink {
+  display: block;
+  text-align: center;
+  color: #2563eb;
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  padding: var(--spacing-sm);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.addAdminLink:hover {
+  color: #1e40af;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .pendingCard,
+  .approvedCard {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cardActions {
+    flex: none;
+  }
+}
