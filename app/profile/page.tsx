@@ -133,14 +133,16 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className={styles.loadingContainer}>טוען...</div>
+        <div className="mobile-container">
+          <p className="text-loading">טוען...</p>
+        </div>
       </ProtectedRoute>
     );
   }
 
   return (
     <ProtectedRoute>
-      <div className={styles.container}>
+      <div className="mobile-container">
         <div className={styles.content}>
           {/* HEADER */}
           <div className={styles.header}>
@@ -159,13 +161,13 @@ export default function ProfilePage() {
                   onClick={() => setIsEditingDetails(true)}
                   className={styles.editButton}
                 >
-                  ✏️ עריכה
+                  ✏️
                 </button>
               )}
             </div>
 
             <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>שם מלא:</span>
+              <span className={styles.detailLabel}>שם:</span>
               <span className={styles.detailValue}>
                 {userProfile?.full_name || "לא צוין"}
               </span>
@@ -194,7 +196,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className={styles.saveButton}
                   >
-                    ✓ שמור
+                    ✓
                   </button>
                   <button
                     onClick={() => {
@@ -203,7 +205,7 @@ export default function ProfilePage() {
                     }}
                     className={styles.cancelButton}
                   >
-                    ביטול
+                    ✕
                   </button>
                 </div>
               ) : (
@@ -216,10 +218,7 @@ export default function ProfilePage() {
 
           {/* 2. BRANCH PREFERENCES */}
           <div className={styles.card}>
-            <h2 className={styles.cardTitle}>סניף מועדף</h2>
-            <p className={styles.cardSubtitle}>
-              {t("בחר/י את הסניפים בהם תרצה/י לראות פעילויות:")}
-            </p>
+            <h2 className={styles.cardTitle}>סניף</h2>
 
             <div className={styles.branchContainer}>
               {["nahalal", "satria"].map((branch) => {
@@ -249,7 +248,7 @@ export default function ProfilePage() {
                   onClick={() => setIsEditingInterests(true)}
                   className={styles.editButton}
                 >
-                  ✏️ עריכה
+                  ✏️
                 </button>
               )}
             </div>
@@ -257,7 +256,6 @@ export default function ProfilePage() {
             {isEditingInterests ? (
               // --- EDIT MODE ---
               <div>
-                <p className={styles.cardSubtitle}>בחר/י תחומים:</p>
                 <div className={styles.interestsGrid}>
                   {AVAILABLE_INTERESTS.map((tag) => {
                     const isSelected = selectedInterests.includes(tag);
@@ -280,7 +278,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className={styles.saveButton}
                   >
-                    {saving ? "שומר..." : "שמור שינויים"}
+                    {saving ? "..." : "שמור"}
                   </button>
                   <button
                     onClick={() => {
@@ -306,29 +304,7 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <p className={styles.emptyText}>לא נבחרו תחומי עניין.</p>
-                )}
-              </div>
-            )}
-
-            {/* Extra Quiz Info (Read Only) */}
-            {userProfile?.quiz && (
-              <div className={styles.quizInfo}>
-                {userProfile.quiz.circle && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>מעגל:</span>
-                    <span className={styles.detailValue}>
-                      {userProfile.quiz.circle}
-                    </span>
-                  </div>
-                )}
-                {userProfile.quiz.free_text && (
-                  <div className={styles.freeTextContainer}>
-                    <strong className={styles.detailLabel}>טקסט חופשי:</strong>
-                    <p className={styles.freeText}>
-                      {userProfile.quiz.free_text}
-                    </p>
-                  </div>
+                  <p className="text-empty">לא נבחרו.</p>
                 )}
               </div>
             )}
@@ -336,15 +312,8 @@ export default function ProfilePage() {
 
           {/* Admin Badge */}
           {userProfile?.role === "admin" && (
-            <div className={styles.adminBadge}>
-              <p className={styles.adminText}>🔑 יש לך הרשאות מנהל</p>
-            </div>
+            <div className={styles.adminBadge}>🔑 מנהל</div>
           )}
-
-          {/* Link to About Page */}
-          <a href="/login/about" className={styles.aboutLink}>
-            אודות העמותה
-          </a>
         </div>
       </div>
     </ProtectedRoute>
