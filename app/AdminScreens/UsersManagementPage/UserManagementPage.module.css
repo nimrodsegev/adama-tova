@@ -33,7 +33,7 @@
   font-family: var(--font-primary);
   font-size: var(--font-size-2xl); /* 24px */
   font-weight: var(--font-weight-bold);
-  color: #1f2937;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -69,8 +69,8 @@
   font-size: var(--font-size-sm);
   text-align: center;
   border: 2px solid #e5e7eb;
-  background: #f9fafb;
-  color: #6b7280;
+  background: var(--color-bg-glass);
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
@@ -104,8 +104,8 @@
   font-size: var(--font-size-sm);
   text-align: center;
   border: 2px solid #e5e7eb;
-  background: white;
-  color: #6b7280;
+  background: var(--color-bg-glass);
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
@@ -160,7 +160,7 @@
   font-family: var(--font-secondary);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: #374151;
+  color: var(--color-text-primary);
   margin: 0 0 var(--spacing-md) 0;
 }
 
@@ -177,7 +177,7 @@
 
 /* Card List */
 .cardList {
-  background: #f9fafb;
+  background: var(--color-bg-glass-light);
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid #e5e7eb;
@@ -191,7 +191,7 @@
   border-left: 3px solid #f97316;
   border-bottom: 1px solid #e5e7eb;
   gap: var(--spacing-sm);
-  background: white;
+  background: var(--color-bg-glass-light);
   transition: background var(--transition-normal);
 }
 
@@ -210,7 +210,7 @@
   padding: var(--spacing-md);
   border-bottom: 1px solid #e5e7eb;
   gap: var(--spacing-sm);
-  background: white;
+  background: var(--color-bg-glass);
   transition: background var(--transition-normal);
 }
 
@@ -343,6 +343,8 @@
   text-decoration: none;
   transition: color var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
+  margin-right: 7rem;
+  margin-bottom: 2rem;
 }
 
 .linkButton:hover {

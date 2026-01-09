@@ -5,6 +5,7 @@ import Link from "next/link";
 import { apiUser, apiRegistrations } from "@/app/services/db_api";
 import { useUser } from "@/app/contexts/UserContext";
 import styles from "./UserManagementPage.module.css";
+import Button from "@/lib/components/UI/Button";
 
 export default function UserManagementPage() {
   const { userProfile, loading: authLoading } = useUser();
@@ -152,7 +153,7 @@ export default function UserManagementPage() {
               activeTab === "users" ? styles.tabActive : ""
             }`}
           >
-            👥 משתמשים
+            משתמשים
           </button>
           <button
             onClick={() => setActiveTab("admins")}
@@ -160,7 +161,7 @@ export default function UserManagementPage() {
               activeTab === "admins" ? styles.tabActive : ""
             }`}
           >
-            🛡️ מנהלים
+            מנהלים
           </button>
           <button
             onClick={() => setActiveTab("groups")}
@@ -168,7 +169,7 @@ export default function UserManagementPage() {
               activeTab === "groups" ? styles.tabActive : ""
             }`}
           >
-            📅 קבוצות
+            קבוצות
           </button>
         </div>
 
@@ -181,7 +182,7 @@ export default function UserManagementPage() {
                 activeSection === "pending" ? styles.sectionButtonActive : ""
               }`}
             >
-              ⏳ ממתינים לאישור ({pendingUsers.length})
+              ממתינים לאישור ({pendingUsers.length})
             </button>
             <button
               onClick={() => setActiveSection("approved")}
@@ -189,7 +190,7 @@ export default function UserManagementPage() {
                 activeSection === "approved" ? styles.sectionButtonActive : ""
               }`}
             >
-              ✅ רשימה פעילה ({approvedUsers.length})
+              רשימה פעילה ({approvedUsers.length})
             </button>
           </div>
         )}
@@ -351,14 +352,13 @@ export default function UserManagementPage() {
         </div>
 
         {/* ADD ADMIN LINK */}
-        {!isGroupsTab && (
-          <Link
-            href="/AdminScreens/AddAdminPage"
-            className={styles.addAdminLink}
-          >
-            + הוספת אדמין
-          </Link>
-        )}
+        <div className={styles.linkButton}>
+          {!isGroupsTab && (
+            <Button size="M" href="/AdminScreens/AddAdminPage">
+              + הוספת אדמין
+            </Button>
+          )}
+        </div>
       </div>
     </main>
   );
