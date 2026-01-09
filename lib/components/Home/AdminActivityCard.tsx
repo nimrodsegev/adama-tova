@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import styles from "./AdminActivityCard.styles";
+import styles from "./AdminActivityCard.module.css";
 
 type AdminActivityCardProps = {
   id: string;
@@ -52,14 +52,14 @@ export default function AdminActivityCard({
 
   return (
     <>
-      <div onClick={handleCardClick} style={styles.cardContainer}>
-        <div style={styles.frame224}>
+      <div onClick={handleCardClick} className={styles.cardContainer}>
+        <div className={styles.frame224}>
           {/* Title */}
-          <h3 style={styles.titleText}>{title}</h3>
+          <h3 className={styles.titleText}>{title}</h3>
 
           {/* Date and Time - TWO LINES */}
-          <div style={styles.frame266}>
-            <p style={styles.bodyM}>
+          <div className={styles.frame266}>
+            <p className={styles.bodyM}>
               {dayName} {dayMonth}
               <br />
               בשעה {formattedTime}
@@ -67,27 +67,25 @@ export default function AdminActivityCard({
           </div>
 
           {/* Participants */}
-          <div style={styles.frame265}>
-            <p style={styles.bodyL}>
+          <div className={styles.frame265}>
+            <p className={styles.bodyL}>
               {current_participants}/{max_participants}
             </p>
           </div>
 
           {/* Progress Bar */}
-          <div style={styles.progressBarContainer}>
-            <div style={styles.progressBarBackground} />
+          <div className={styles.progressBarContainer}>
+            <div className={styles.progressBarBackground} />
             <div
-              style={{
-                ...styles.progressBarFill,
-                width: `${progressPercentage}%`,
-              }}
+              className={styles.progressBarFill}
+              style={{ width: `${progressPercentage}%` }}
             />
           </div>
         </div>
 
         {/* Arrow Button - Bottom Left Corner */}
-        <div style={styles.arrowButton}>
-          <span style={styles.arrowIcon}>›</span>
+        <div className={styles.arrowButton}>
+          <span className={styles.arrowIcon}>›</span>
         </div>
       </div>
 
