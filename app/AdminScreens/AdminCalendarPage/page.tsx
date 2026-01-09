@@ -87,6 +87,7 @@ export default function AdminCalendarPage() {
                 max_participants={activity.max_participants}
                 waitlist_count={activity.waitlist_count || 0}
                 onRegistrationChange={fetchActivities}
+                isGroup={activity.is_group}
               />
             ))
           ) : (
