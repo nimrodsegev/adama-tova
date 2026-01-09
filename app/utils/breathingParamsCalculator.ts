@@ -74,7 +74,7 @@ export function calculateBreathingParams(
   }
 
   // Calm/meditative interests decrease speed and increase smoothness
-  const calmInterests = ["מדיטציה", "Meditation", "מינדפולנס", "Mindfulness"];
+  const calmInterests = ["מדיטציה", "Meditation", "מיינדפולנס", "Mindfulness"];
   const hasCalmInterests = interests.some((i) => calmInterests.includes(i));
 
   if (hasCalmInterests) {
