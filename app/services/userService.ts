@@ -26,7 +26,7 @@ const INTRESTS_MAPPING: Record<string, string> = {
   'יוגה': 'Yoga',
   'אומנות': 'Art',
   'כתיבה': 'Writing',
-  'מינדפולנס': 'Mindfulness',
+  'מיינדפולנס': 'Mindfulness',
   'יצירה': 'Crafts',
 };
 const BRANCHES_MAPPING: Record<string, string> = {
