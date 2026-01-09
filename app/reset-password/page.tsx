@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
@@ -14,7 +14,45 @@ export default function ResetPasswordPage() {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // NO useEffect - let the session exist for password update
+  const didInitRef = useRef(false);
+
+  useEffect(() => {
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
+    const initSessionFromUrl = async () => {
+      const supabase = createClient();
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+      const hashParams = new URLSearchParams(url.hash.replace(/^#/, ''));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      let handled = false;
+
+      if (code) {
+        handled = true;
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error('Password reset code exchange error:', error);
+        }
+      } else if (accessToken && refreshToken) {
+        handled = true;
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (error) {
+          console.error('Password reset session error:', error);
+        }
+      }
+
+      if (handled) {
+        window.history.replaceState({}, document.title, url.pathname);
+      }
+    };
+
+    void initSessionFromUrl();
+  }, []);
 
   const validatePassword = (password: string): boolean => {
     return password.length < 6;
