@@ -104,7 +104,7 @@ export default function UserActivityCard({
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
 
-        // Show success modal - DO NOT refresh data yet
+        // Show success modal - refresh will happen when modal closes
         setIsSuccessModalOpen(true);
       }
     } catch (error) {
@@ -125,6 +125,10 @@ export default function UserActivityCard({
         setRegStatus("none");
         setWaitlistPosition(null);
 
+        // Close cancel modal
+        setIsCancelModalOpen(false);
+
+        // Refresh home page immediately
         await new Promise((resolve) => setTimeout(resolve, 300));
         onRegistrationChange?.();
       }
@@ -137,6 +141,7 @@ export default function UserActivityCard({
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
+    // Refresh home page when success modal closes
     onRegistrationChange?.();
   };
 

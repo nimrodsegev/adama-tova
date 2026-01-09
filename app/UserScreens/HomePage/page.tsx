@@ -9,10 +9,6 @@ import BreathingCircles, {
 } from "@/lib/components/BreathingCircles/BreathingCircles";
 import { calculateBreathingParams } from "@/app/utils/breathingParamsCalculator";
 
-// ❌ REMOVE THIS LINE IF YOU HAVE IT:
-// import styles from "./HomePage.styles";
-import "./HomePage.module.css";
-
 // Interests Mapping
 const INTRESTS_MAPPING: Record<string, string> = {
   מדיטציה: "Meditation",
@@ -166,11 +162,14 @@ export default function HomePage() {
   // 🔵 Handle registration changes with breath animation
   const handleRegistrationChange = (isRegistering: boolean) => {
     if (isRegistering) {
+      // ✅ Inhale when registering
       breathingRef.current?.triggerInhale();
     } else {
+      // ❌ Exhale when unregistering
       breathingRef.current?.triggerExhale();
     }
 
+    // Refresh data after animation
     setTimeout(() => {
       fetchData();
     }, 300);

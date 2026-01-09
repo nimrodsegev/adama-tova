@@ -130,7 +130,7 @@ export default function ActivityDetailsModal({
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
 
-        // Show success modal - DO NOT refresh or close main modal yet
+        // Show success modal
         setIsSuccessModalOpen(true);
       }
     } catch (error) {
@@ -154,9 +154,14 @@ export default function ActivityDetailsModal({
       if (!error) {
         setRegStatus("none");
         setWaitlistPosition(null);
+
+        // Close all modals
+        setIsCancelModalOpen(false);
+        onClose();
+
+        // Refresh home page
         await new Promise((resolve) => setTimeout(resolve, 300));
         onRegistrationChange?.();
-        fetchActivityDetails();
       }
     } catch (error) {
       console.error("Unregistration error:", error);
@@ -165,12 +170,15 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // USER: Handle success modal close - refresh data AFTER modal closes
+  // USER: Handle success modal close - close details modal and refresh
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
-    // Refresh data after modal closes
-    onRegistrationChange?.();
-    fetchActivityDetails();
+    onClose();
+
+    // Refresh home page
+    setTimeout(() => {
+      onRegistrationChange?.();
+    }, 300);
   };
 
   // ADMIN: Handle edit
