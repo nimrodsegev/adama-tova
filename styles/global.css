@@ -197,6 +197,23 @@
   --z-modal-backdrop: 1000;
   --z-modal: 1100;
   --z-tooltip: 1200;
+
+  /* Button Sizes */
+  --button-size-s: 2.75rem; /* 44px - small circular */
+  --button-size-icon: 2.75rem; /* 44px - icon button */
+  --button-size-m-width: 7.3125rem; /* 117px - medium width */
+  --button-size-m-height: 2.75rem; /* 44px - medium height */
+
+  /* Button Colors */
+  --button-bg: #f9f9f9;
+  --button-text: #681f02;
+  --button-radius: 1.5625rem; /* 25px */
+  --button-radius-full: 50%;
+
+  /* Icon Sizes */
+  --icon-size-sm: 1.25rem; /* 20px */
+  --icon-size-md: 4.4375rem; /* 71px - empty state icon width */
+  --icon-size-md-height: 4.5rem; /* 72px - empty state icon height */
 }
 
 /* ============================================
