@@ -165,7 +165,6 @@ export default function ResetPasswordPage() {
       <div className={styles.container}>
         <div className={styles.content}>
           <div className={styles.greeting}>
-            <h1 className={styles.title}>שגיאה</h1>
             <p className={styles.subtitle}>{sessionError}</p>
           </div>
           <button

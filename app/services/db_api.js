@@ -239,86 +239,174 @@ export const apiActivities = {
     );
   },
   async update(activityId, updates) {
-    // --- STEP 1: Fetch Info (Title, Old max_participants & Participants) ---
+    // --- STEP 1: Fetch Info (Title, Old max_participants, requires_approval, series_id & Participants) ---
     const { data: activity } = await supabase
       .from('activities')
-      .select('title, max_participants, registrations(user_id)')
+      .select('title, max_participants, requires_approval, series_id, registrations(user_id)')
       .eq('id', activityId)
       .single();
 
     const oldMaxParticipants = activity?.max_participants || 0;
+    const needsApproval = activity?.requires_approval === true;
+    const seriesId = activity?.series_id;
 
-    // --- STEP 2: Perform the Update ---
-    const updateResult = await safeRequest(
-      supabase
-        .from('activities')
-        .update(updates)
-        .eq('id', activityId)
-        .select()
-    );
+    // --- STEP 2: Get all activity IDs to update (single or series) ---
+    let idsToUpdate = [activityId];
+    if (seriesId) {
+      const { data: seriesActs } = await supabase
+        .from("activities")
+        .select("id")
+        .eq("series_id", seriesId);
+      if (seriesActs) idsToUpdate = seriesActs.map(a => a.id);
+    }
+
+    // --- STEP 3: Perform the Update ---
+    // For series: separate updates into shared fields (apply to all) and unique fields (apply only to this activity)
+    // Fields like 'date' are unique per activity in a series
+    const uniqueFields = ['date'];
+    const sharedUpdates = { ...updates };
+    const uniqueUpdates = {};
+
+    // Extract unique fields from shared updates
+    uniqueFields.forEach(field => {
+      if (field in sharedUpdates) {
+        uniqueUpdates[field] = sharedUpdates[field];
+        delete sharedUpdates[field];
+      }
+    });
+
+    let updateResult;
+
+    if (seriesId && idsToUpdate.length > 1) {
+      // For series: update shared fields on all activities
+      if (Object.keys(sharedUpdates).length > 0) {
+        await supabase
+          .from('activities')
+          .update(sharedUpdates)
+          .in('id', idsToUpdate);
+      }
+
+      // Update unique fields only on the specific activity being edited
+      if (Object.keys(uniqueUpdates).length > 0) {
+        await supabase
+          .from('activities')
+          .update(uniqueUpdates)
+          .eq('id', activityId);
+      }
+
+      // Fetch the updated activities for the result
+      updateResult = await safeRequest(
+        supabase
+          .from('activities')
+          .select()
+          .in('id', idsToUpdate)
+      );
+    } else {
+      // For single activity: update all fields
+      updateResult = await safeRequest(
+        supabase
+          .from('activities')
+          .update(updates)
+          .eq('id', activityId)
+          .select()
+      );
+    }
 
     const [, error] = updateResult;
     if (error) return updateResult;
 
-    // --- STEP 3: Auto-promote waitlist if capacity increased ---
+    // --- STEP 4: Auto-promote waitlist if capacity increased (for ALL activities in series) ---
     const newMaxParticipants = updates.max_participants;
     if (newMaxParticipants && newMaxParticipants > oldMaxParticipants) {
-      // Get current confirmed count
-      const confirmedCount = await getConfirmedCount(activityId);
-      const availableSlots = newMaxParticipants - confirmedCount;
+      // Track which users have been notified (to avoid duplicate notifications for series)
+      const notifiedUsers = new Set();
 
-      if (availableSlots > 0) {
-        // Get waitlist users ordered by position
-        const { data: waitlistUsers } = await supabase
-          .from("registrations")
-          .select("id, user_id, users(email, full_name)")
-          .eq("activity_id", activityId)
-          .eq("if_confirmed", false)
-          .not("wait_list_place", "is", null)
-          .order("wait_list_place", { ascending: true })
-          .limit(availableSlots);
+      for (const id of idsToUpdate) {
+        // Get current confirmed count for this specific activity
+        const confirmedCount = await getConfirmedCount(id);
+        const availableSlots = newMaxParticipants - confirmedCount;
 
-        if (waitlistUsers && waitlistUsers.length > 0) {
-          console.log(`Auto-promoting ${waitlistUsers.length} users from waitlist...`);
+        if (availableSlots > 0) {
+          // Get waitlist users ordered by position for THIS activity
+          const { data: waitlistUsers } = await supabase
+            .from("registrations")
+            .select("id, user_id, users(email, full_name)")
+            .eq("activity_id", id)
+            .eq("if_confirmed", false)
+            .not("wait_list_place", "is", null)
+            .order("wait_list_place", { ascending: true })
+            .limit(availableSlots);
 
-          for (const waitlistUser of waitlistUsers) {
-            // Promote user
-            await supabase
-              .from("registrations")
-              .update({ if_confirmed: true, wait_list_place: null })
-              .eq("id", waitlistUser.id);
+          if (waitlistUsers && waitlistUsers.length > 0) {
+            console.log(`Auto-promoting ${waitlistUsers.length} users from waitlist for activity ${id}...`);
 
-            // Send in-app notification
-            await supabase.from('notifications').insert({
-              user_id: waitlistUser.user_id,
-              title: "התפנה מקום בפעילות! 🎉",
-              message: `התפנה מקום בפעילות "${activity?.title || 'פעילות'}". נרשמת אוטומטית!`,
-              is_read: false,
-              created_at: new Date().toISOString(),
-              linked_activity_id: activityId
-            });
-
-            // Send email (fire-and-forget)
-            if (waitlistUser.users?.email) {
-              fetch('/api/send-waitlist-promotion-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: waitlistUser.users.email,
-                  name: waitlistUser.users.full_name,
-                  activityTitle: activity?.title || 'פעילות'
+            for (const waitlistUser of waitlistUsers) {
+              // Promote user - if requires_approval, set status to pending for admin review
+              await supabase
+                .from("registrations")
+                .update({
+                  if_confirmed: true,
+                  wait_list_place: null,
+                  status: needsApproval ? 'pending' : 'approved'
                 })
-              }).catch(err => console.error("Failed to send promotion email:", err));
-            }
-          }
+                .eq("id", waitlistUser.id);
 
-          // Reorder remaining waitlist
-          await apiRegistrations.reorderWaitlist(activityId);
+              // Increment participant count (they now have a reserved spot)
+              const { data: freshAct } = await supabase
+                .from('activities')
+                .select('current_participants')
+                .eq('id', id)
+                .single();
+
+              if (freshAct) {
+                await supabase
+                  .from("activities")
+                  .update({ current_participants: (freshAct.current_participants || 0) + 1 })
+                  .eq('id', id);
+              }
+
+              // Only send notification/email once per user (not for each session in series)
+              if (!notifiedUsers.has(waitlistUser.user_id)) {
+                notifiedUsers.add(waitlistUser.user_id);
+
+                // Send in-app notification
+                const notificationMessage = needsApproval
+                  ? `התפנה מקום בפעילות "${activity?.title || 'פעילות'}". בקשתך ממתינה לאישור המנהל.`
+                  : `התפנה מקום בפעילות "${activity?.title || 'פעילות'}". נרשמת אוטומטית!`;
+
+                await supabase.from('notifications').insert({
+                  user_id: waitlistUser.user_id,
+                  title: "התפנה מקום בפעילות! 🎉",
+                  message: notificationMessage,
+                  is_read: false,
+                  created_at: new Date().toISOString(),
+                  linked_activity_id: id
+                });
+
+                // Send email (fire-and-forget)
+                if (waitlistUser.users?.email) {
+                  fetch('/api/send-waitlist-promotion-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email: waitlistUser.users.email,
+                      name: waitlistUser.users.full_name,
+                      activityTitle: activity?.title || 'פעילות',
+                      needsApproval: needsApproval
+                    })
+                  }).catch(err => console.error("Failed to send promotion email:", err));
+                }
+              }
+            }
+
+            // Reorder remaining waitlist for this activity
+            await apiRegistrations.reorderWaitlist(id);
+          }
         }
       }
     }
 
-    // --- STEP 4: Notify Participants about activity changes ---
+    // --- STEP 5: Notify Participants about activity changes ---
     if (activity && activity.registrations && activity.registrations.length > 0) {
       console.log(`Notify ${activity.registrations.length} users about update...`);
 
@@ -595,18 +683,14 @@ export const apiRegistrations = {
     const isFull = max > 0 && current >= max;
 
     // 5. Determine Status
-    const isApprovalNeeded = activity.requires_approval;
-    let initialStatus = 'approved';
+    // Status is either 'approved' (regular activities) or 'pending' (groups needing approval)
+    const isApprovalNeeded = activity.requires_approval === true;
+    let initialStatus = isApprovalNeeded ? 'pending' : 'approved';
     let initialConfirmed = true;
     let waitListPlace = null;
     let message = "Successfully registered! ✅";
 
-    if (isApprovalNeeded) {
-      // Group activities requiring approval
-      initialStatus = 'pending';
-      initialConfirmed = false;
-      message = "Request sent to admin for approval ⏳";
-    } else if (isFull) {
+    if (isFull) {
       // Activity is full - add to waiting list
       initialConfirmed = false;
 
@@ -625,8 +709,18 @@ export const apiRegistrations = {
         ? (waitlistEntries[0].wait_list_place + 1)
         : 1;
 
-      message = `הפעילות מלאה. נרשמת לרשימת המתנה במקום #${waitListPlace}`;
+      if (isApprovalNeeded) {
+        // Group on waitlist - will need approval when promoted (admin doesn't see yet because if_confirmed=false)
+        message = `הפעילות מלאה. נרשמת לרשימת המתנה במקום #${waitListPlace}. כשיתפנה מקום, בקשתך תועבר לאישור.`;
+      } else {
+        // Regular activity on waitlist - auto-promoted when space opens
+        message = `הפעילות מלאה. נרשמת לרשימת המתנה במקום #${waitListPlace}`;
+      }
+    } else if (isApprovalNeeded) {
+      // Group with space available - needs admin approval, count will be incremented
+      message = "בקשתך להצטרף לקבוצה נשלחה לאישור";
     }
+    // else: Regular activity with space - immediate confirmation (status='approved')
 
     // 6. Insert Registrations
     const registrationsToInsert = idsToRegister.map(id => ({
@@ -644,8 +738,9 @@ export const apiRegistrations = {
 
     if (regError) return [null, regError.message];
 
-    // 7. Update Participant Counts (Only if confirmed immediately)
-    if (initialConfirmed && !isApprovalNeeded) {
+    // 7. Update Participant Counts (For all confirmed registrations, including pending groups)
+    // if_confirmed=true means they have a reserved spot
+    if (initialConfirmed) {
       for (const id of idsToRegister) {
         const { data: freshAct } = await supabase
           .from('activities')
@@ -665,7 +760,8 @@ export const apiRegistrations = {
     return [{
       success: true,
       if_confirmed: initialConfirmed,
-      wait_list_place: waitListPlace
+      wait_list_place: waitListPlace,
+      status: initialStatus
     }, { message }];
   },
   /**
@@ -736,16 +832,26 @@ export const apiRegistrations = {
           .maybeSingle();
 
         if (firstInWaitlist) {
-          // Promote this user
+          // Check if activity requires approval (for groups)
+          const { data: activityInfo } = await supabase
+            .from("activities")
+            .select("requires_approval")
+            .eq("id", id)
+            .single();
+
+          const needsApproval = activityInfo?.requires_approval === true;
+
+          // Promote this user - if requires_approval, set status to pending for admin review
           await supabase
             .from("registrations")
             .update({
               if_confirmed: true,
-              wait_list_place: null
+              wait_list_place: null,
+              status: needsApproval ? 'pending' : 'approved'
             })
             .eq("id", firstInWaitlist.id);
 
-          // Increment participant count back up
+          // Always increment participant count when promoting (they now have a reserved spot)
           const { data: freshAct } = await supabase
             .from('activities')
             .select('current_participants')
@@ -760,10 +866,14 @@ export const apiRegistrations = {
           }
 
           // Send in-app notification to promoted user
+          const notificationMessage = needsApproval
+            ? `התפנה מקום בפעילות "${regData.activities?.title || 'פעילות'}". בקשתך ממתינה לאישור המנהל.`
+            : `התפנה מקום בפעילות "${regData.activities?.title || 'פעילות'}". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`;
+
           await supabase.from('notifications').insert({
             user_id: firstInWaitlist.user_id,
             title: "התפנה מקום בפעילות! 🎉",
-            message: `התפנה מקום בפעילות "${regData.activities?.title || 'פעילות'}". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`,
+            message: notificationMessage,
             is_read: false,
             created_at: new Date().toISOString(),
             linked_activity_id: id
@@ -777,7 +887,8 @@ export const apiRegistrations = {
               body: JSON.stringify({
                 email: firstInWaitlist.users.email,
                 name: firstInWaitlist.users.full_name,
-                activityTitle: regData.activities?.title || 'פעילות'
+                activityTitle: regData.activities?.title || 'פעילות',
+                needsApproval: needsApproval
               })
             }).catch(err => console.error("Failed to send waitlist promotion email:", err));
           }
@@ -829,17 +940,20 @@ export const apiRegistrations = {
    * ✅ FIXED: Filters out duplicates so Admin only sees 1 request per Group Series.
    */
   async getPendingRegistrations() {
+    // Only show pending registrations where if_confirmed=true
+    // Waitlist users (if_confirmed=false) are NOT shown until promoted
     const { data, error } = await supabase
       .from("registrations")
       .select(`
         id,
         created_at,
         status,
-        user_id, 
+        user_id,
         users (id, full_name, email, phone),
         activities (id, title, start_time, date, series_id)
       `)
       .eq("status", "pending")
+      .eq("if_confirmed", true)
       .order("created_at", { ascending: true });
 
     if (error) return [null, error.message];
@@ -875,13 +989,13 @@ export const apiRegistrations = {
 
   /**
    * ✅ APPROVE REGISTRATION (Admin Action)
-   * Approves this registration AND increments participant counts for all sessions.
+   * Approves this registration and sends notification/email to user.
    */
   async approveRegistration(registrationId) {
-    // 1. Get details of the request
+    // 1. Get details of the request including user info and activity title
     const { data: reg } = await supabase
       .from("registrations")
-      .select("user_id, activity_id, activities(series_id)")
+      .select("user_id, activity_id, users(email, full_name), activities(title, series_id)")
       .eq("id", registrationId)
       .single();
 
@@ -889,44 +1003,48 @@ export const apiRegistrations = {
 
     // 2. Identify all related Activity IDs (if it's a series)
     let idsToApprove = [reg.activity_id];
-    
+
     if (reg.activities?.series_id) {
        const { data: seriesActs } = await supabase
         .from("activities")
         .select("id")
         .eq("series_id", reg.activities.series_id);
-       
+
        if (seriesActs) idsToApprove = seriesActs.map(a => a.id);
     }
 
     // 3. Update Registration Status (Approve User)
+    // Note: if_confirmed is already true (set when registering or promoted from waitlist)
+    // We just change status from 'pending' to 'approved'
     const { error: updateError } = await supabase
         .from("registrations")
-        .update({ status: 'approved', if_confirmed: true })
+        .update({ status: 'approved' })
         .eq("user_id", reg.user_id)
         .in("activity_id", idsToApprove);
 
     if (updateError) return [null, updateError.message];
 
-    // 4. 👇 NEW: Increment Participant Count for ALL sessions
-    // We loop through to ensure every single session date gets updated.
-    for (const id of idsToApprove) {
-      // A. Fetch current count
-      const { data: activity } = await supabase
-        .from("activities")
-        .select("current_participants")
-        .eq("id", id)
-        .single();
-      
-      if (activity) {
-        const newCount = (activity.current_participants || 0) + 1;
-        
-        // B. Update with new count
-        await supabase
-          .from("activities")
-          .update({ current_participants: newCount })
-          .eq("id", id);
-      }
+    // 4. Send in-app notification to user
+    await supabase.from('notifications').insert({
+      user_id: reg.user_id,
+      title: "בקשתך אושרה! 🎉",
+      message: `בקשתך להצטרף ל"${reg.activities?.title || 'פעילות'}" אושרה. נתראה!`,
+      is_read: false,
+      created_at: new Date().toISOString(),
+      linked_activity_id: reg.activity_id
+    });
+
+    // 5. Send email notification (fire-and-forget)
+    if (reg.users?.email) {
+      fetch('/api/send-registration-approval-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: reg.users.email,
+          name: reg.users.full_name,
+          activityTitle: reg.activities?.title || 'פעילות'
+        })
+      }).catch(err => console.error("Failed to send registration approval email:", err));
     }
 
     return [{ success: true }, null];
@@ -934,12 +1052,136 @@ export const apiRegistrations = {
 
   /**
    * ❌ REJECT REGISTRATION
+   * If the user had if_confirmed=true (reserved spot), decrement the count and promote from waitlist
    */
   async rejectRegistration(registrationId) {
-    // We simply delete the request so they can try again or it disappears
-    return safeRequest(
-      supabase.from("registrations").delete().eq("id", registrationId)
-    );
+    // 1. Get registration info to check if we need to decrement count
+    const { data: reg } = await supabase
+      .from("registrations")
+      .select("if_confirmed, user_id, activity_id, activities(series_id, title, requires_approval)")
+      .eq("id", registrationId)
+      .single();
+
+    if (!reg) return [null, "Registration not found"];
+
+    const needsApproval = reg.activities?.requires_approval === true;
+
+    // 2. Get all activity IDs (for series/groups)
+    let idsToUpdate = [reg.activity_id];
+    if (reg.activities?.series_id) {
+      const { data: seriesActs } = await supabase
+        .from("activities")
+        .select("id")
+        .eq("series_id", reg.activities.series_id);
+      if (seriesActs) idsToUpdate = seriesActs.map(a => a.id);
+    }
+
+    // 3. Delete all registrations for this user in the series
+    const { error: delError } = await supabase
+      .from("registrations")
+      .delete()
+      .eq("user_id", reg.user_id)
+      .in("activity_id", idsToUpdate);
+
+    if (delError) return [null, delError.message];
+
+    // 4. If user had a confirmed spot, decrement participant count and promote from waitlist
+    if (reg.if_confirmed) {
+      // Track which users have been notified (to avoid duplicate notifications for series)
+      const notifiedUsers = new Set();
+
+      for (const id of idsToUpdate) {
+        // Decrement participant count
+        const { data: activity } = await supabase
+          .from("activities")
+          .select("current_participants")
+          .eq("id", id)
+          .single();
+
+        if (activity) {
+          const newCount = Math.max(0, (activity.current_participants || 0) - 1);
+          await supabase
+            .from("activities")
+            .update({ current_participants: newCount })
+            .eq("id", id);
+        }
+
+        // Find first person on waitlist for this activity
+        const { data: firstInWaitlist } = await supabase
+          .from("registrations")
+          .select("id, user_id, users(email, full_name)")
+          .eq("activity_id", id)
+          .eq("if_confirmed", false)
+          .not("wait_list_place", "is", null)
+          .order("wait_list_place", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (firstInWaitlist) {
+          // Promote this user - if requires_approval, set status to pending for admin review
+          await supabase
+            .from("registrations")
+            .update({
+              if_confirmed: true,
+              wait_list_place: null,
+              status: needsApproval ? 'pending' : 'approved'
+            })
+            .eq("id", firstInWaitlist.id);
+
+          // Increment participant count (they now have a reserved spot)
+          const { data: freshAct } = await supabase
+            .from('activities')
+            .select('current_participants')
+            .eq('id', id)
+            .single();
+
+          if (freshAct) {
+            await supabase
+              .from("activities")
+              .update({ current_participants: (freshAct.current_participants || 0) + 1 })
+              .eq('id', id);
+          }
+
+          // Only send notification/email once per user (not for each session in series)
+          if (!notifiedUsers.has(firstInWaitlist.user_id)) {
+            notifiedUsers.add(firstInWaitlist.user_id);
+
+            // Send in-app notification to promoted user
+            const notificationMessage = needsApproval
+              ? `התפנה מקום בפעילות "${reg.activities?.title || 'פעילות'}". בקשתך ממתינה לאישור המנהל.`
+              : `התפנה מקום בפעילות "${reg.activities?.title || 'פעילות'}". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`;
+
+            await supabase.from('notifications').insert({
+              user_id: firstInWaitlist.user_id,
+              title: "התפנה מקום בפעילות! 🎉",
+              message: notificationMessage,
+              is_read: false,
+              created_at: new Date().toISOString(),
+              linked_activity_id: id
+            });
+
+            // Send email notification (fire-and-forget)
+            if (firstInWaitlist.users?.email) {
+              fetch('/api/send-waitlist-promotion-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: firstInWaitlist.users.email,
+                  name: firstInWaitlist.users.full_name,
+                  activityTitle: reg.activities?.title || 'פעילות',
+                  needsApproval: needsApproval
+                })
+              }).catch(err => console.error("Failed to send waitlist promotion email:", err));
+            }
+          }
+
+          // Reorder remaining waitlist for this activity
+          await this.reorderWaitlist(id);
+        }
+      }
+    }
+
+    return [{ success: true }, null];
   },
 };
 

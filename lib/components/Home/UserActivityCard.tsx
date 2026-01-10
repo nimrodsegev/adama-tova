@@ -42,6 +42,7 @@ export default function UserActivityCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<string | null>(null);
 
   const formattedTime = start_time.slice(0, 5);
 
@@ -106,6 +107,7 @@ export default function UserActivityCard({
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
+        setRegistrationBackendStatus(res.status || null);
 
         // Show success modal - refresh will happen when modal closes
         setIsSuccessModalOpen(true);
@@ -246,7 +248,8 @@ export default function UserActivityCard({
 
       {/* Success Modal */}
       {isSuccessModalOpen && (
-        isGroup ? (
+        // Group with space AND pending approval (not waitlist)
+        registrationBackendStatus === 'pending' && regStatus !== 'waitlist' ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -255,12 +258,14 @@ export default function UserActivityCard({
             startTime={formattedTime}
           />
         ) : (
+          // Waitlist or regular confirmed
           <RegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
             activityTitle={title}
             activityDate={dayMonth}
             activityTime={formattedTime}
+            isGroup={isGroup}
             isWaitlist={regStatus === "waitlist"}
             waitlistPosition={waitlistPosition}
           />

@@ -20,6 +20,7 @@ export default function RegistrationSuccessModal({
   activityTitle,
   activityDate,
   activityTime,
+  isGroup = false,
   isWaitlist = false,
   waitlistPosition = null,
 }: RegistrationSuccessModalProps) {
@@ -90,10 +91,13 @@ export default function RegistrationSuccessModal({
               <>
                 הפעילות מלאה - נרשמת לרשימת ההמתנה
                 <br />
-                מקום #{waitlistPosition} לפעילות {activityTitle}
+                מקום #{waitlistPosition} {isGroup ? `לקבוצת` : `לפעילות`} {activityTitle}
                 <br />
                 <span className={styles.subMessage}>
-                  נעדכן אותך כשיתפנה מקום
+                  {isGroup
+                    ? "כשיתפנה מקום, בקשתך תועבר לאישור המנהל"
+                    : "נעדכן אותך כשיתפנה מקום"
+                  }
                 </span>
               </>
             ) : (

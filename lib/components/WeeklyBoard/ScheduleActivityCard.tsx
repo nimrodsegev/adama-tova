@@ -45,6 +45,7 @@ export default function ScheduleActivityCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<string | null>(null);
 
   const formattedStartTime = start_time.slice(0, 5);
   const formattedEndTime = end_time.slice(0, 5);
@@ -117,6 +118,7 @@ export default function ScheduleActivityCard({
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
+        setRegistrationBackendStatus(res.status || null);
 
         // Show success modal - DO NOT refresh data yet
         setIsSuccessModalOpen(true);
@@ -294,7 +296,8 @@ export default function ScheduleActivityCard({
 
       {/* Success Modal */}
       {isSuccessModalOpen && (
-        isGroup ? (
+        // Group with space AND pending approval (not waitlist)
+        registrationBackendStatus === 'pending' && regStatus !== 'waitlist' ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -303,12 +306,14 @@ export default function ScheduleActivityCard({
             startTime={formattedStartTime}
           />
         ) : (
+          // Waitlist or regular confirmed
           <RegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
             activityTitle={title}
             activityDate={dayMonth}
             activityTime={formattedStartTime}
+            isGroup={isGroup}
             isWaitlist={regStatus === "waitlist"}
             waitlistPosition={waitlistPosition}
           />
