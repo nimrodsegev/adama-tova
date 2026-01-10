@@ -1,15 +1,12 @@
-/* Container */
-.container {
-  position: relative;
-  width: 100%;
-  max-width: 24.5625rem; /* 393px */
-  min-height: 100vh;
-  margin: 0 auto;
-  background: #F28130;
+/* Container - Inherits base style from mobile-container */
+.wizardContainer {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
+  justify-content: center; /* ✅ Vertically center the content */
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+  padding-bottom: 4rem; /* Space for bottom navigation */
 }
 
 /* Content wrapper */
@@ -17,107 +14,53 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem; /* 24px */
+  justify-content: center; /* Center content internally */
+  gap: var(--spacing-lg);
   width: 100%;
-  max-width: 19.9375rem; /* 319px */
+  max-width: 19.9375rem; /* ~320px */
   position: relative;
-  min-height: 35rem; /* 🔥 CHANGED: Increased height for more space */
+  /* Removed min-height to allow natural centering */
 }
 
-/* Step container */
+/* Step container base */
 .stepContainer {
   display: flex;
   flex-direction: column;
   align-items: flex-end; /* RTL alignment */
-  gap: 0.8125rem; /* 13px */
+  justify-content: center; /* Vertically center inputs */
+  gap: var(--spacing-md);
   width: 100%;
-  flex: 1; /* Takes available space */
-  padding-top: 6.25rem; /* 🔥 NEW: Push content down */
+  flex: 1;
+  padding-top: 0; /* ✅ Reset padding */
 }
 
 /* ===============================
    Step-specific vertical control
+   (Resetting these to 0 so Flexbox handles centering)
    =============================== */
-
-/* Step 1: slightly LOWER */
-.step1 {
-    padding-top: 8.25rem; /* was effectively 6.25rem via stepContainer */
-  }
-  
-  /* Step 2: slightly HIGHER (title + options + קרבה) */
-  .step2 {
-    padding-top: 1rem;
-  }
-
-  .step2 .optionsContainer {
-    max-height: 23.5rem;
-  }
-
-  /* Step 3: slightly HIGHER + future scroll */
-  .step3 {
-    padding-top: 1.5rem;
-  }
-  
-  /* Step 4: slightly LOWER */
-  .step4 {
-    padding-top: 8.75rem;
-  }
-  
-  
-  /* Allow scrolling ONLY in interests step */
-.step3 .optionsContainer {
-    max-height: 18rem;
-    overflow-y: auto;
-    padding-right: 0.25rem; /* small RTL scroll comfort */
-  }
-
-  
-  .container {
-    overflow-y: auto;
-    scrollbar-width: thin;                 /* Firefox */
-    scrollbar-color: rgba(120,120,120,0.6) transparent;
-  }
-  
-  /* Chrome / Edge / Safari */
-  .container::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .container::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .container::-webkit-scrollbar-thumb {
-    background-color: rgba(120,120,120,0.6);
-    border-radius: 999px;
-  }
-  
-  .container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(120,120,120,0.8);
-  }
-  
+.step1, .step2, .step3, .step4 {
+  padding-top: 0 !important;
+}
 
 /* Step title */
 .stepTitle {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem; /* 20px */
-  line-height: 1.25rem; /* 20px */
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-xl);
+  line-height: var(--font-size-xl);
   text-align: right;
-  color: #FFFFFF;
+  color: var(--color-text-primary);
   margin: 0;
-  margin-bottom: 0.0rem; /* 🔥 NEW: More space below title */
-  margin-right: 0.5rem;
+  margin-bottom: var(--spacing-xs);
   width: 100%;
   direction: rtl;
 }
 
-/* Inputs container (for step 1) */
+/* Inputs container */
 .inputsContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* 12px */
+  gap: var(--spacing-md);
   width: 100%;
 }
 
@@ -127,21 +70,23 @@
   width: 100%;
 }
 
-/* Input field */
+/* Standard Input - Matches Login */
 .input {
   box-sizing: border-box;
   width: 100%;
   height: 3.75rem; /* 60px */
-  padding: 0.5rem 1.625rem; /* 8px 26px */
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 2rem;
+  
+  background: var(--color-background);
+  border: 1px solid var(--color-border-glass);
   border-radius: 1.875rem; /* 30px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 300;
-  font-size: 1rem; /* 16px */
-  line-height: 1.0625rem; /* 17px */
+  
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base);
+  
   text-align: right;
-  color: rgba(249, 249, 249, 0.8);
+  color: var(--color-text-secondary);
   direction: rtl;
   outline: none;
 }
@@ -151,33 +96,26 @@
 }
 
 .input::placeholder {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 400;
-  font-size: 0.875rem;
-  color: rgba(255, 245, 245, 0.7);
+  color: var(--color-text-tertiary);
 }
 
 /* Floating label */
 .inputLabel {
   position: absolute;
-  right: 1.625rem; /* 26px */
-  top: -0.5625rem; /* -9px */
+  right: 1.625rem;
+  top: -0.5625rem;
   
   display: flex;
   align-items: center;
-  padding: 0.0625rem 0.5rem; /* 1px 8px */
+  padding: 0.0625rem 0.5rem;
+  height: 1.0625rem;
   
-  height: 1.0625rem; /* 17px */
+  background: var(--color-background);
   
-  background: #F28130;
-  
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 0.875rem; /* 14px */
-  line-height: 1.25rem; /* 20px */
-  text-align: right;
-  color: rgba(255, 245, 245, 0.7);
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
   
   pointer-events: none;
   z-index: 1;
@@ -191,46 +129,57 @@
 /* Field error text */
 .fieldError {
   position: absolute;
-  right: 6.5rem; /* 🔥 CHANGED: 88px (was 72px) - much more to the right */
+  right: 6.5rem;
   top: -0.5625rem;
   padding: 0.0625rem 0.5rem;
-  background: #F28130;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 400;
+  background: var(--color-background);
+  
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
   color: #FF0000;
   white-space: nowrap;
   z-index: 2;
 }
 
-/* Options container (for circles and interests) */
+/* Options container (Circles, Interests, Branches) */
 .optionsContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* 12px */
+  gap: var(--spacing-md);
   width: 100%;
-  max-height: 22rem; /* Scrollable if needed */
+  max-height: 22rem;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-glass) transparent;
 }
 
-/* Option button */
+.optionsContainer::-webkit-scrollbar {
+  width: 6px;
+}
+.optionsContainer::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-glass);
+  border-radius: 99px;
+}
+
+/* Option Button (Pill shape) */
 .optionButton {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.3125rem 4.625rem; /* 5px 74px */
+  padding: 0.3125rem 2rem;
   width: 100%;
   height: 2.9375rem; /* 47px */
-  background: #EFEFEF;
-  border-radius: 1.5625rem; /* 25px */
+  
+  background: var(--color-text-secondary);
+  border-radius: 1.5625rem;
   border: none;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.1875rem; /* 19px */
+  
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
   text-align: center;
-  color: #681F02;
+  color: var(--button-text);
+  
   cursor: pointer;
   transition: all 0.2s;
   -webkit-tap-highlight-color: transparent;
@@ -240,14 +189,10 @@
   opacity: 0.9;
 }
 
-.optionButton:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Selected option (semi-transparent) */
 .optionButton.selected {
   background: rgba(239, 239, 239, 0.7);
+  font-weight: var(--font-weight-bold);
+  border: 2px solid var(--button-text);
 }
 
 /* Textarea wrapper */
@@ -258,15 +203,17 @@
 /* Textarea */
 .textarea {
   width: 100%;
-  height: 3.75rem; /* 60px */
+  height: auto;
+  min-height: 3.75rem;
   padding: 1rem 1.625rem;
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 1.875rem; /* 30px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(249, 249, 249, 0.8);
+  
+  background: var(--color-background);
+  border: 1px solid var(--color-border-glass);
+  border-radius: 1.875rem;
+  
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
   direction: rtl;
   resize: none;
   outline: none;
@@ -276,47 +223,46 @@
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-/* Navigation section - FIXED POSITION */
+/* Navigation section - Relative to Content */
 .navigation {
-  position: absolute;
-  bottom: -5.5rem; /* 🔥 CHANGED: 88px (was 48px) - much lower like Figma */
-  left: 50%;
-  transform: translateX(-50%);
-  
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.5rem; /* 40px */
+  gap: 2.5rem;
   width: 100%;
   max-width: 19.9375rem;
+  margin-top: 2rem; /* Add spacing between form and nav */
 }
 
-/* Navigation buttons */
+/* Nav buttons container */
 .navButtons {
   display: flex;
-  gap: 0.4375rem; /* 7px */
+  gap: var(--spacing-sm);
   justify-content: center;
 }
 
-/* Single nav button */
+/* Circular Nav Button (Arrows) */
 .navButton {
   width: 2.75rem; /* 44px */
-  height: 2.75rem; /* 44px */
-  background: #F9F9F9;
+  height: 2.75rem;
+  
+  background: var(--color-text-secondary);
   border-radius: 50%;
   border: none;
+  
   display: flex;
   justify-content: center;
   align-items: center;
+  
   font-size: 1.25rem;
-  color: #681F02;
+  color: var(--button-text);
+  
   cursor: pointer;
   transition: all 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .navButton:hover:not(:disabled) {
-  opacity: 0.9;
   transform: scale(1.05);
 }
 
@@ -325,15 +271,10 @@
   cursor: not-allowed;
 }
 
-.navButton:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Progress dots */
+/* Progress dots container */
 .progressDots {
   display: flex;
-  gap: 1.75rem; /* 28px */
+  gap: 1.75rem;
   justify-content: center;
   align-items: center;
 }
@@ -341,9 +282,9 @@
 /* Single dot */
 .dot {
   width: 0.9375rem; /* 15px */
-  height: 0.9375rem; /* 15px */
+  height: 0.9375rem;
   border-radius: 50%;
-  border: 1px solid #F9F9F9;
+  border: 1px solid var(--color-text-secondary);
   background: transparent;
   transition: all 0.3s;
 }
@@ -351,7 +292,7 @@
 /* Active dot */
 .activeDot {
   background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #F9F9F9;
+  border-color: var(--color-text-primary);
 }
 
 /* Error message */
@@ -360,17 +301,17 @@
   padding: 0.75rem;
   background: rgba(255, 0, 0, 0.15);
   border: 1px solid #FF0000;
-  border-radius: 0.5rem;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
   color: #FF0000;
   text-align: center;
   direction: rtl;
   margin-top: 1rem;
 }
 
-
-/* Gender selector dropdown */
+/* Gender Selector Dropdown */
 .genderSelector {
   width: 100%;
   position: relative;
@@ -379,35 +320,27 @@
 .genderToggle {
   box-sizing: border-box;
   width: 100%;
-  height: 3.75rem; /* 60px */
-  padding: 0.5rem 1.625rem; /* 8px 26px */
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 1.875rem; /* 30px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 300;
-  font-size: 1rem; /* 16px */
-  line-height: 1.0625rem; /* 17px */
+  height: 3.75rem;
+  padding: 0.5rem 1.625rem;
+  background: var(--color-background);
+  border: 1px solid var(--color-border-glass);
+  border-radius: 1.875rem;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base);
   text-align: right;
-  color: rgba(249, 249, 249, 0.8);
+  color: var(--color-text-secondary);
   direction: rtl;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
   transition: border-radius 0.2s;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .genderToggle.open {
   border-radius: 1.875rem 1.875rem 0 0;
-  border: 1px solid rgba(255, 255, 255, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.genderToggle:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .genderToggleArrow {
@@ -424,8 +357,8 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--color-background);
+  border: 1px solid var(--color-border-glass);
   border-top: none;
   border-radius: 0 0 1.875rem 1.875rem;
   overflow: hidden;
@@ -437,61 +370,42 @@
   padding: 1rem 1.625rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 300;
-  font-size: 1rem;
+  border-bottom: 1px solid var(--color-border-glass);
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base);
   text-align: right;
-  color: rgba(249, 249, 249, 0.9);
+  color: var(--color-text-secondary);
   direction: rtl;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s;
 }
 
 .genderOption:hover {
   background: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-}
-
-.genderOption:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+  color: var(--color-text-primary);
 }
 
 .genderOption.selected {
   background: rgba(255, 255, 255, 0.2);
-  font-weight: 400;
-  color: #FFFFFF;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-normal);
 }
 
 .genderOption:last-child {
   border-bottom: none;
-  border-radius: 0 0 1.875rem 1.875rem;
 }
 
-/* Responsive */
-@media (min-width: 48rem) {
-  .container {
-    max-width: 100%;
-  }
-  
-  .content {
-    max-width: 28rem;
-  }
-  
-  .stepTitle {
-    font-size: 1.5rem;
-  }
-  
-  .input,
-  .textarea {
-    font-size: 1.125rem;
-  }
-  
-  .optionButton {
-    font-size: 1.125rem;
-    height: 3.25rem;
-  }
-
+/* ============================================
+   AUTOFILL FIX
+   ============================================ */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-background) inset !important;
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+  caret-color: var(--color-text-primary);
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }

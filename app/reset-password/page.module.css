@@ -1,291 +1,194 @@
+/* Container specifically for centering content within the global mobile-container */
+.resetContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  padding-bottom: 7rem; /* Extra bottom padding for mobile keyboard spacing */
+}
 
+/* Content wrapper */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3.25rem; /* ~52px */
+  width: 100%;
+  max-width: 19.875rem; 
+}
 
-/* Base container */
-.container {
-    position: relative;
-    width: 100%;
-    max-width: 24.5625rem; /* 393px */
-    min-height: 100vh;
-    margin: 0 auto;
-    background: #F28130; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    padding-bottom: 7rem;
-  }
+/* Form container */
+.formContent {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/* Input wrapper */
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Input styles - Matching Login Page */
+.input {
+  width: 100%;
+  height: 3.75rem; /* 60px */
+  padding: 0.5rem 2rem;
   
+  background: var(--color-background);
+  border: 1px solid var(--color-border-glass);
+  border-radius: 1.875rem; /* 30px */
   
-  /* Content wrapper */
+  color: var(--color-text-primary);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  
+  outline: none;
+  direction: rtl;
+}
+
+.input::placeholder {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  text-align: right;
+}
+
+.input:focus {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Floating label above input */
+.inputLabel {
+  position: absolute;
+  right: 1.8125rem;
+  top: -0.5rem;
+
+  display: flex;
+  align-items: center;
+  padding: 0.0625rem 0.5rem;
+
+  height: 1.0625rem;
+  background: var(--color-background);
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Input error state */
+.inputError {
+  border: 2px solid #ff0000 !important;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Field error text */
+.fieldError {
+  position: absolute;
+  right: 1.8125rem;
+  top: -0.5625rem;
+
+  padding: 0.0625rem 0.3125rem;
+  background: var(--color-background);
+
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: #ff0000;
+
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* Primary button */
+.primaryButton {
+  width: 100%;
+  height: 2.9375rem;
+  padding: 0.3125rem 1rem;
+  
+  background: var(--color-text-secondary); /* #f9f9f9 */
+  border-radius: 1.5625rem;
+  border: none;
+
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base);
+  color: var(--button-text); /* #681F02 */
+
+  cursor: pointer;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   AUTOFILL FIX (Matches Login Page)
+   ============================================ */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-background) inset !important;
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+  caret-color: var(--color-text-primary);
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Responsive Scaling */
+@media (min-width: 48rem) {
   .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem; /* 52px */
-    width: 100%;
-    max-width: 19.875rem; /* 318px */
+    max-width: 28rem;
+    gap: 4rem;
   }
-  
-  /* Greeting section */
-  .greeting {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    text-align: center;
+
+  .formContent {
+    width: 28rem;
   }
-  
-  .title {
-    font-family: 'Arfilit', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 400;
-    line-height: 1.875rem;
-    color: #EFEFEF;
-    margin: 0;
-    width: 100%;
-    text-align: center;
-    direction: rtl;
-  }
-  
-  .subtitle {
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-size: 1.15rem;
-    line-height: 1.25rem;
-    color: #FFFFFF;
-    margin: 0;
-    width: 100%;
-    text-align: center;
-    direction: rtl;
-  }
-  
-  /* Form container */
-  .loginContent {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.7rem;
-    width: 19.875rem;
-  }
-  
-  /* Input wrapper */
-  .inputWrapper {
-    position: relative;
-    width: 100%;
-  }
-  
-  /* Input */
+
   .input {
-    width: 100%;
-    height: 3.75rem;
-    padding: 0.5rem 2rem;
-    background: #F28130;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1.875rem;
-    color: #FFFFFF;
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    outline: none;
-    direction: rtl;
+    height: 4.5rem;
+    font-size: 1.125rem;
+    padding: 0.625rem 2.5rem;
   }
-  
-  .input::placeholder {
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-weight: 400;
-    font-size: 0.875rem;
-    color: rgba(255, 245, 245, 0.7);
-    text-align: right;
-  }
-  
-  .input:focus {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-  }
-  
-  /* Floating label */
-  .inputLabel {
-    position: absolute;
-    right: 1.8125rem;
-    top: -0.5rem;
-  
-    display: flex;
-    align-items: center;
-    padding: 0.0625rem 0.5rem;
-  
-    height: 1.0625rem;
-    background: #F28130;
-  
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-weight: 400;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: rgba(255, 245, 245, 0.7);
-  
-    pointer-events: none;
-    z-index: 1;
-  }
-  
-  /* Input error */
-  .inputError {
-    border: 2px solid #FF0000 !important;
-    box-shadow: 0 0 0.03125rem rgba(249, 249, 249, 0.5);
-  }
-  
-  /* Field error label */
-  .fieldError {
-    position: absolute;
-    right: 1.8125rem;
-    top: -0.5625rem;
-  
-    padding: 0.0625rem 0.3125rem;
-    background: #F28130;
-  
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 400;
-    color: #FF0000;
-  
-    white-space: nowrap;
-    z-index: 3;
-  }
-  
-  /* Bottom error message */
-  .error {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    margin-top: 0.5rem;
-  
-    background: rgba(255, 107, 107, 0.12);
-    border: 1px solid rgba(255, 107, 107, 0.4);
-    border-radius: 0.75rem;
-  
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: #ff6b6b;
-  
-    text-align: center;
-    direction: rtl;
-  }
-  
-  /* Primary button */
+
   .primaryButton {
-    width: 100%;
-    height: 2.9375rem;
-    padding: 0.3125rem 4.625rem;
-    background: #EFEFEF;
-    border-radius: 1.5625rem;
-    border: none;
-
-    font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-    font-size: 1rem;
-    line-height: 1.1875rem;
-    color: #681F02;
-
-    cursor: pointer;
-    transition: opacity 0.2s;
-    -webkit-tap-highlight-color: transparent;
+    height: 3.5rem;
+    font-size: 1.25rem;
   }
-  
-  .primaryButton:hover {
-    opacity: 0.9;
-  }
-  
-  .primaryButton:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+}
+
+@media (min-width: 64rem) {
+  .content {
+    max-width: 32rem;
   }
 
-  .primaryButton:focus {
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
+  .formContent {
+    width: 32rem;
   }
 
-  /* Autofill (saved password) */
-  .input:-webkit-autofill,
-  .input:-webkit-autofill:hover,
-  .input:-webkit-autofill:focus,
-  .input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px #F28130 inset !important;
-    -webkit-text-fill-color: #EFEFEF !important;
-    caret-color: #EFEFEF;
-    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  .input {
+    height: 5rem;
+    font-size: 1.25rem;
   }
-  
-  .input:-moz-autofill {
-    background-color: transparent !important;
-    color: #EFEFEF !important;
-    border: 2px solid rgba(255, 255, 255, 0.4) !important;
-  }
-  
-  /* Responsive */
-  @media (min-width: 48rem) {
-    .content {
-      max-width: 28rem;
-      gap: 4rem;
-    }
-  
-    .loginContent {
-      width: 28rem;
-    }
-  
-    .title {
-      font-size: 2.75rem;
-      line-height: 2.25rem;
-    }
-  
-    .subtitle {
-      font-size: 1.5rem;
-      line-height: 1.5rem;
-    }
-  
-    .input {
-      height: 4.5rem;
-      font-size: 1.125rem;
-      padding: 0.625rem 2.5rem;
-    }
-  
-    .primaryButton {
-      height: 3.5rem;
-      font-size: 1.25rem;
-    }
-  }
-  
-  @media (min-width: 64rem) {
-    .content {
-      max-width: 32rem;
-    }
-  
-    .loginContent {
-      width: 32rem;
-    }
-  
-    .title {
-      font-size: 3rem;
-      line-height: 2.5rem;
-    }
-  
-    .subtitle {
-      font-size: 1.625rem;
-      line-height: 1.625rem;
-    }
-  
-    .input {
-      height: 5rem;
-      font-size: 1.25rem;
-    }
-  
-    .primaryButton {
-      height: 4rem;
-      font-size: 1.375rem;
-    }
-  }
-  
 
-  @media (min-width: 48rem) {
-    .container {
-      max-width: 100%;
-    }
+  .primaryButton {
+    height: 4rem;
+    font-size: 1.375rem;
   }
-  
+}

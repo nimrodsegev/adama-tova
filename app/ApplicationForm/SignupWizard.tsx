@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -35,10 +35,9 @@ const INTEREST_OPTIONS = [
   'מיינדפולנס',
 ];
 
-// 👇 New Branch Options
 const BRANCH_OPTIONS = [
   { value: 'nahalal', label: 'נהלל' },
-  { value: 'satria', label: 'סטריה' },
+  { value: 'satria', label: 'סתריה' },
 ];
 
 const GENDER_OPTIONS: { value: 'male' | 'female' | 'prefer_not_to_say'; label: string }[] = [
@@ -62,10 +61,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [circle, setCircle] = useState('');
   const [proximity, setProximity] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
-  
-  // 👇 New State for Branches
   const [branches, setBranches] = useState<string[]>([]);
-  
   const [freeText, setFreeText] = useState('');
 
   // Field errors
@@ -104,7 +100,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       if (!validateStep1()) return;
     }
 
-    // 👇 Check for last step (Now step 4)
+    // Step 4 is the last step
     if (currentStep === 4) {
       await handleSubmit();
     } else {
@@ -146,7 +142,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
         circle: circle || undefined,
         proximity: proximity || undefined,
         interests: interests.length ? interests : undefined,
-        // 👇 Submit branches to DB
         branches: branches.length ? branches : undefined,
         free_text: freeText || undefined,
       });
@@ -167,7 +162,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     );
   };
 
-  // 👇 Helper for Branch Toggling
   const toggleBranch = (branchValue: string) => {
     setBranches(prev => 
       prev.includes(branchValue)
@@ -177,7 +171,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`mobile-container ${styles.wizardContainer}`}>
       <div className={styles.content}>
         
         {/* Step 0: Name + Phone */}
@@ -185,7 +179,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           <div className={`${styles.stepContainer} ${styles.step1}`}>
             <h2 className={styles.stepTitle}>{t('השלם/י את הפרטים הבאים:')}</h2>
             <div className={styles.inputsContainer}>
-              {/* ... Same inputs ... */}
               <div className={styles.inputWrapper}>
                 <input
                   type="text"
@@ -266,7 +259,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 </button>
               ))}
             </div>
-            <div className={styles.inputsContainer}>
+            <div className={styles.inputsContainer} style={{ marginTop: '1rem' }}>
               <div className={styles.inputWrapper}>
                 <input
                   type="text"
@@ -300,11 +293,11 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         )}
 
-        {/* 👇 NEW STEP 3: Branch Selection */}
+        {/* Step 3: Branch Selection */}
         {currentStep === 3 && (
           <div className={`${styles.stepContainer} ${styles.step3}`}>
             <h2 className={styles.stepTitle}>{t('באיזה סניף תרצה/י לפעול?')}</h2>
-            <p className={styles.stepSubtitle} style={{textAlign: 'center', marginBottom: '1rem', opacity: 0.8}}>
+            <p className="text-body" style={{textAlign: 'center', marginBottom: '1rem', width: '100%', color: 'var(--color-text-secondary)' }}>
               ניתן לבחור יותר מאחד
             </p>
             <div className={styles.optionsContainer}>
@@ -321,7 +314,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         )}
 
-        {/* Step 4: Free Text (Updated index from 3 to 4) */}
+        {/* Step 4: Free Text */}
         {currentStep === 4 && (
           <div className={`${styles.stepContainer} ${styles.step4}`}>
             <h2 className={styles.stepTitle}>כל דבר אחר שתרצה שנדע:</h2>
@@ -350,7 +343,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
               className={styles.navButton}
               disabled={loading}
             >
-              {/* Update logic for last step check (4) */}
               {currentStep === 4 ? (loading ? '...' : '✓') : '←'}
             </button>
 
@@ -363,7 +355,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
             </button>
           </div>
 
-          {/* Update Progress Dots for 5 steps (4 down to 0) */}
+          {/* Progress Dots */}
           <div className={styles.progressDots}>
             {[4, 3, 2, 1, 0].map((step) => (
               <div

@@ -1,32 +1,35 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import styles from './ForgotPasswordModal.module.css';
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import styles from "./ForgotPasswordModal.module.css";
 
 interface ForgotPasswordModalProps {
   email: string;
   onClose: () => void;
 }
 
-export default function ForgotPasswordModal({ email, onClose }: ForgotPasswordModalProps) {
+export default function ForgotPasswordModal({
+  email,
+  onClose,
+}: ForgotPasswordModalProps) {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
   const handleSendEmail = async () => {
     setLoading(true);
-    
+
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-      
+
       if (error) throw error;
       setSent(true);
     } catch (err) {
-      console.error('Error sending reset email:', err);
-      alert('שגיאה בשליחת המייל');
+      console.error("Error sending reset email:", err);
+      alert("שגיאה בשליחת המייל");
     } finally {
       setLoading(false);
     }
@@ -56,17 +59,18 @@ export default function ForgotPasswordModal({ email, onClose }: ForgotPasswordMo
           אתה בטוח? תקבל מייל עם לינק לשינוי הסיסמה
         </p>
         <p className={styles.email}>{email}</p>
+        
         <p className={styles.recommendation}>
-          מומלץ לבצע את הפעולה במחשב
-         או דרך דפדפן בסמארטפון (שאינו בגלישה פרטית) 
-        </p>        
+          מומלץ לבצע את הפעולה במחשב או דרך דפדפן בסמארטפון (שאינו בגלישה פרטית)
+        </p>
+
         <div className={styles.buttons}>
-          <button 
-            onClick={handleSendEmail} 
+          <button
+            onClick={handleSendEmail}
             disabled={loading}
             className={styles.primaryButton}
           >
-            {loading ? 'שולח...' : 'כן, שלח מייל'}
+            {loading ? "שולח..." : "כן, שלח מייל"}
           </button>
           <button onClick={onClose} className={styles.secondaryButton}>
             ביטול
