@@ -41,17 +41,14 @@ export default function LoginPage() {
         const currentUser = await authService.getCurrentUser();
 
         if (currentUser && mode === "choice") {
-          // User is authenticated via Google - check if they have a profile
           const supabase = createClient();
-
           const { data: profile } = await supabase
             .from("users")
             .select("*")
             .eq("id", currentUser.id)
-            .maybeSingle(); // ✅ FIXED: Returns null instead of throwing 406
+            .maybeSingle();
 
           if (!profile || !profile.quiz?.completed_at) {
-            // Google user without profile or incomplete quiz - show wizard
             setSignupType("google");
             setGoogleUserId(currentUser.id);
             setSignupEmail(currentUser.email || "");
@@ -83,7 +80,6 @@ export default function LoginPage() {
     return null;
   };
 
-  // 🔥 FIXED: Handle no rows gracefully
   const checkUserExists = async (email: string): Promise<boolean> => {
     try {
       const supabase = createClient();
@@ -91,7 +87,7 @@ export default function LoginPage() {
         .from("users")
         .select("email")
         .eq("email", email)
-        .maybeSingle(); // ✅ FIXED: Returns null instead of throwing 406
+        .maybeSingle();
 
       return !!data;
     } catch {
@@ -131,28 +127,24 @@ export default function LoginPage() {
             .maybeSingle();
 
           if (profile) {
-            // Check approval status first
             if (!profile.is_approved && profile.role === "participant") {
               router.replace("/pending-approval");
               setLoading(false);
               return;
             }
 
-            // Check quiz completion
             if (!profile.quiz?.completed_at) {
-              router.replace("/login"); // Show wizard
+              router.replace("/login");
               setLoading(false);
               return;
             }
 
-            // 🔥 FIXED: Navigate to correct dashboard
             if (profile.role === "admin") {
               router.replace("/AdminScreens/HomePage");
             } else {
               router.replace("/UserScreens/HomePage");
             }
           } else {
-            // No profile exists - should not happen for existing users
             setEmailError("שגיאה בטעינת פרופיל");
           }
         }
@@ -166,7 +158,6 @@ export default function LoginPage() {
     }
   };
 
-  // Just validate and show wizard (DON'T create auth account yet)
   const handleSignupClick = async () => {
     setEmailError("");
     setPasswordError("");
@@ -192,18 +183,14 @@ export default function LoginPage() {
       return;
     }
 
-    // Store email/password and show wizard (don't create account yet)
     setSignupType("email");
     setSignupEmail(email);
     setSignupPassword(password);
     setMode("signup");
   };
 
-  // Handle back from wizard
   const handleBackToLogin = async () => {
     setMode("choice");
-
-    // If it was a Google signup, sign them out
     if (signupType === "google") {
       await authService.signOut();
     }
@@ -211,17 +198,9 @@ export default function LoginPage() {
 
   if (!initialCheckDone) {
     return (
-      <div className={styles.container}>
+      <div className={`mobile-container ${styles.loginContainer}`}>
         <div className={styles.content}>
-          <div
-            style={{
-              color: "#EFEFEF",
-              fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
-              fontSize: "1.25rem",
-              textAlign: "center",
-            }}
-            dir="rtl"
-          >
+          <div className="text-section-title" style={{ textAlign: "center", color: "var(--color-text-primary)" }}>
             טוען...
           </div>
         </div>
@@ -232,14 +211,18 @@ export default function LoginPage() {
   // LOGIN SCREEN
   if (mode === "choice") {
     return (
-      <div className={styles.container}>
+      <div className={`mobile-container ${styles.loginContainer}`}>
         <div className={styles.content}>
+          
+          {/* ✅ Using Global Typography Classes */}
           <div className={styles.greeting}>
-            <h1 className={styles.title}>ברוכה הבאה</h1>
-            <p className={styles.subtitle}>להרשמה או התחברות הכניסו פרטים</p>
+            <h1 className="header-primary" style={{ color: "var(--color-text-secondary)" }}>ברוכה הבאה</h1>
+            <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>להרשמה או התחברות הכניסו פרטים</p>
           </div>
 
           <div className={styles.loginContent}>
+            
+            {/* Input Wrapper - Email */}
             <div className={styles.inputWrapper}>
               <input
                 type="email"
@@ -259,6 +242,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Input Wrapper - Password */}
             <div className={styles.inputWrapper}>
               <input
                 type="password"
@@ -287,6 +271,7 @@ export default function LoginPage() {
               </button>
             </div>
 
+            {/* Action Buttons */}
             <div className={styles.buttonSection}>
               <button
                 className={styles.primaryButton}
@@ -314,7 +299,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Link to About Page */}
+          {/* About Link */}
           <a href="/login/about" className={styles.aboutLink}>
             אודות העמותה
           </a>
