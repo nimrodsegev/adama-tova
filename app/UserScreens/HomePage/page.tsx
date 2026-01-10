@@ -4,10 +4,21 @@ import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import UserActivityCard from "@/lib/components/Home/UserActivityCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
-import BreathingCircles, {
-  BreathingCirclesRef,
-} from "@/lib/components/BreathingCircles/BreathingCircles";
-import { calculateBreathingParams } from "@/app/utils/breathingParamsCalculator";
+import OrganicCircles, {
+  OrganicCirclesRef,
+} from "@/lib/components/OrganicCircles/OrganicCircles";
+import {
+  calculateMotionParams,
+  type MotionMode,
+} from "@/app/utils/motionParamsCalculator";
+// 🎨 Import modular configs for direct access to settings
+// To customize Splash: edit /lib/components/OrganicCircles/modeConfigs.ts (SPLASH_CONFIG)
+// To customize timing: edit /lib/components/OrganicCircles/splashMode.ts (SPLASH_BEHAVIOR)
+import {
+  SPLASH_CONFIG,
+  LOADING_CONFIG,
+} from "@/lib/components/OrganicCircles/modeConfigs";
+import { SPLASH_BEHAVIOR } from "@/lib/components/OrganicCircles/splashMode";
 
 // Interests Mapping
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -32,20 +43,25 @@ export default function HomePage() {
   const [allActivities, setAllActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔵 Breathing circles ref
-  const breathingRef = useRef<BreathingCirclesRef>(null);
+  // 🔵 NEW: Organic Circles ref and mode state
+  const circlesRef = useRef<OrganicCirclesRef>(null);
   const mountedRef = useRef(false);
 
-  // ✅ Update circle layers when activity count changes
-  useEffect(() => {
-    if (breathingRef.current && !loading) {
-      const newLayers = calculateBreathingParams(
-        userProfile,
-        registeredActivities.length
-      ).layers;
-      breathingRef.current.updateLayers(newLayers);
+  // 🎨 Current mode - Spouting for continuous flow animation
+  const [currentMode, setCurrentMode] = useState<MotionMode>("spouting");
+
+  // 🎨 Calculate motion parameters based on user profile AND current mode
+  // This ensures each mode keeps its identity while adjusting for user context
+  const motionParams = calculateMotionParams(userProfile, currentMode);
+
+  // ✅ Update mode when button is clicked
+  const handleModeChange = (newMode: MotionMode) => {
+    setCurrentMode(newMode);
+    // Use ref to change mode immediately
+    if (circlesRef.current) {
+      circlesRef.current.setMode(newMode);
     }
-  }, [registeredActivities.length, userProfile, loading]);
+  };
 
   useEffect(() => {
     // Only fetch on initial mount when user is available
@@ -159,14 +175,16 @@ export default function HomePage() {
     }
   };
 
-  // 🔵 Handle registration changes with breath animation
+  // 🔵 Handle registration changes with motion animation
   const handleRegistrationChange = (isRegistering: boolean) => {
     if (isRegistering) {
-      // ✅ Inhale when registering
-      breathingRef.current?.triggerInhale();
-    } else {
-      // ❌ Exhale when unregistering
-      breathingRef.current?.triggerExhale();
+      // ✨ Show spouting animation on successful registration
+      circlesRef.current?.setMode("spouting");
+
+      // Return to breathing after 3 seconds
+      setTimeout(() => {
+        circlesRef.current?.setMode("breathing");
+      }, 3000);
     }
 
     // Refresh data after animation
@@ -203,12 +221,6 @@ export default function HomePage() {
     }
   };
 
-  // 🔵 Calculate breathing parameters
-  const breathingParams = calculateBreathingParams(
-    userProfile,
-    registeredActivities.length
-  );
-
   if (userLoading || loading) {
     return (
       <div
@@ -224,6 +236,18 @@ export default function HomePage() {
         }}
         dir="rtl"
       >
+        {/* 🔵 Show loading mode during data fetch */}
+        <OrganicCircles
+          mode="loading"
+          speed={9}
+          complexity={2}
+          smoothness={9}
+          layers={5}
+          opacity={0.4}
+          baseColor="#FFFFFF"
+          position={{ x: 0.5, y: 0.5 }}
+          radius={0.2}
+        />
         טוען...
       </div>
     );
@@ -241,25 +265,57 @@ export default function HomePage() {
 
   return (
     <div className="mobile-container">
-      {/* 🔵 Breathing Circles - Behind all content */}
-      <BreathingCircles
-        ref={breathingRef}
-        speed={breathingParams.speed}
-        complexity={breathingParams.complexity}
-        smoothness={breathingParams.smoothness}
-        layers={breathingParams.layers}
-        opacity={0.6}
-        thickness={0.5}
+      {/* 🔵 Organic Circles - Background animation */}
+      {/* Mode settings come from modeConfigs.ts, adjusted by user profile */}
+      <OrganicCircles
+        ref={circlesRef}
+        mode={currentMode}
+        speed={motionParams.speed}
+        complexity={motionParams.complexity}
+        smoothness={motionParams.smoothness}
+        layers={motionParams.layers}
+        opacity={motionParams.opacity}
+        radius={0.15} // 🎨 SIZE: Fixed small size
+        amplitude={motionParams.amplitude}
+        strokeWidth={1} // 🎨 LINE THICKNESS: Control stroke width here (1.0=thin, 1.5=medium, 2.0=thick)
+        baseColor="#FFFFFF"
         position={{ x: 0.3, y: 0.15 }}
-        size={0.25}
-        startBreathing={true}
-        colors={[
-          "rgba(189, 161, 201, 0.9)",
-          "rgba(173, 78, 52, 0.85)",
-          "rgba(212, 137, 106, 0.8)",
-          "rgba(255, 245, 245, 0.75)",
-        ]}
       />
+
+      {/* 🎨 TESTING CONTROL - Spouting Mode */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 90,
+          right: 20,
+          background: "rgba(0, 0, 0, 0.9)",
+          padding: "12px 16px",
+          borderRadius: "12px",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <span
+          style={{
+            color: "#D4896A",
+            fontSize: "11px",
+            fontWeight: 600,
+          }}
+        >
+          💧 SPOUTING MODE
+        </span>
+        <div
+          style={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: currentMode === "spouting" ? "#4CAF50" : "#666",
+            boxShadow: currentMode === "spouting" ? "0 0 8px #4CAF50" : "none",
+          }}
+        />
+      </div>
 
       <div className="vector-background" />
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import {
   apiActivities,
@@ -8,6 +8,13 @@ import {
 } from "@/app/services/db_api";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
+import OrganicCircles, {
+  OrganicCirclesRef,
+} from "@/lib/components/OrganicCircles/OrganicCircles";
+import {
+  calculateMotionParams,
+  type MotionMode,
+} from "@/app/utils/motionParamsCalculator";
 import styles from "./UserCalendarPage.module.css";
 
 // Interests Mapping (same as HomePage)
@@ -27,6 +34,12 @@ export default function UserCalendarPage() {
   const [filter, setFilter] = useState<"all" | "foryou">("all");
   const [loading, setLoading] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = current week, 1 = next week
+
+  // 🔵 Organic Circles ref for loading animation
+  const circlesRef = useRef<OrganicCirclesRef>(null);
+
+  // 🎨 Calculate motion parameters for loading mode
+  const motionParams = calculateMotionParams(userProfile, "loading");
 
   // Closed days: Monday(1), Thursday(4), Friday(5), Saturday(6)
   const closedDays = [1, 4, 5, 6];
@@ -82,6 +95,9 @@ export default function UserCalendarPage() {
     const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
     const day = String(selectedDateObj.getDate()).padStart(2, "0");
     const dateString = `${year}-${month}-${day}`;
+
+    // 👇 Force 0.75 second delay to see loading animation
+    await new Promise((resolve) => setTimeout(resolve, 750));
 
     // 👇 1. Fetch Activities AND User Branches in parallel
     const [[actData, actError], [userBranches, branchError]] =
@@ -149,6 +165,36 @@ export default function UserCalendarPage() {
 
   return (
     <div className="mobile-container">
+      {/* 🔵 Organic Circles - Shows during loading */}
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
+            pointerEvents: "none", // Allow clicks through when not loading
+          }}
+        >
+          <OrganicCircles
+            ref={circlesRef}
+            mode="loading"
+            speed={motionParams.speed}
+            complexity={motionParams.complexity}
+            smoothness={motionParams.smoothness}
+            layers={motionParams.layers}
+            opacity={motionParams.opacity}
+            radius={0.15}
+            amplitude={motionParams.amplitude}
+            strokeWidth={1.0} // 🎨 LINE THICKNESS: Thin for loading (1.0=thin, 1.5=medium, 2.0=thick)
+            baseColor="#FFFFFF"
+            position={{ x: 0.5, y: 0.5 }} // Center of screen
+          />
+        </div>
+      )}
+
       <div className={styles.mainFrame}>
         {/* Header Section */}
         <div className={styles.headerSection}>
@@ -226,7 +272,8 @@ export default function UserCalendarPage() {
           {isDayClosed ? (
             <p className={styles.closedMessage}>המרחב סגור היום</p>
           ) : loading ? (
-            <p className="text-empty">טוען...</p>
+            // 🔵 Show nothing during loading - just the circles animation
+            <div style={{ minHeight: "200px" }} />
           ) : filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => (
               <ScheduleActivityCard
