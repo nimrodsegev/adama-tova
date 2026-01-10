@@ -5,7 +5,15 @@ let lastAuthError: { time: number; count: number } = { time: 0, count: 0 };
 const BACKOFF_WINDOW_MS = 10000; // 10 second window
 const MAX_ERRORS_IN_WINDOW = 3;
 
+// Circuit breaker: when true, all auth calls immediately return null
+let isSessionInvalid = false;
+
 function checkRateLimit(): boolean {
+  // Circuit breaker takes priority
+  if (isSessionInvalid) {
+    return false;
+  }
+
   const now = Date.now();
   if (now - lastAuthError.time > BACKOFF_WINDOW_MS) {
     // Reset if outside window
@@ -17,6 +25,18 @@ function checkRateLimit(): boolean {
     return false;
   }
   return true;
+}
+
+// Check if error is an invalid refresh token (checks both code and message)
+function isInvalidTokenError(error: any): boolean {
+  const code = (error?.code || '').toLowerCase();
+  const msg = (error?.message || '').toLowerCase();
+  return (
+    code === 'refresh_token_not_found' ||
+    code === 'invalid_grant' ||
+    msg.includes('refresh token not found') ||
+    msg.includes('invalid refresh token')
+  );
 }
 
 function recordAuthError() {
@@ -50,13 +70,18 @@ export const authService = {
   // Sign in with email/password
   async signIn(email: string, password: string) {
     const supabase = createClient();
-    
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    
+
     if (error) throw error;
+
+    // Reset circuit breaker on successful sign in
+    isSessionInvalid = false;
+    lastAuthError = { time: 0, count: 0 };
+
     return data;
   },
 
@@ -80,16 +105,19 @@ export const authService = {
     if (error) {
       recordAuthError();
 
-      // Handle invalid refresh token - clear bad session to prevent 429 cascade
-      const errorCode = (error as any)?.code;
-      if (errorCode === 'refresh_token_not_found' || errorCode === 'invalid_grant') {
-        console.warn('Invalid refresh token detected, clearing session');
+      // Handle invalid refresh token - activate circuit breaker to stop the loop
+      if (isInvalidTokenError(error)) {
+        // [DEBUG LOG - safe to delete]
+        console.warn('[AuthService] Invalid token detected, activating circuit breaker');
+
+        isSessionInvalid = true;
+
         try {
-          await supabase.auth.signOut();
+          await supabase.auth.signOut({ scope: 'local' });
         } catch {
-          // Ignore signOut errors - we just want to clear local storage
+          // Ignore signOut errors
         }
-        return null; // Return null instead of throwing - user will be redirected to login
+        return null;
       }
 
       throw error;
@@ -97,12 +125,29 @@ export const authService = {
     return user;
   },
 
-  // Listen to auth changes
+  // Listen to auth changes (with debouncing)
   onAuthStateChange(callback: (user: any) => void) {
     const supabase = createClient();
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        callback(session?.user ?? null);
+      (event, session) => {
+        // If circuit breaker active, just return null once
+        if (isSessionInvalid) {
+          callback(null);
+          return;
+        }
+
+        // Debounce to prevent rapid-fire callbacks
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          // Reset circuit breaker on successful sign in
+          if (event === 'SIGNED_IN' && session?.user) {
+            isSessionInvalid = false;
+            lastAuthError = { time: 0, count: 0 };
+          }
+          callback(session?.user ?? null);
+        }, 100);
       }
     );
     return subscription;
