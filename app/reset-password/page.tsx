@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -57,15 +57,11 @@ export default function ResetPasswordPage() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        // No valid session - show error
         if (exchangeError) {
-          // Code exchange failed - likely opened on different device or private browsing
           setSessionError('הקישור לא תקף. יש לפתוח את הקישור מאותו מכשיר בו ביקשת לאפס את הסיסמה, ולוודא שאינך בגלישה פרטית.');
         } else if (code || accessToken) {
-          // Had tokens but still no session - expired or invalid
           setSessionError('הקישור פג תוקף. אנא בקשו קישור חדש.');
         } else {
-          // No tokens at all - direct navigation to page
           setSessionError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
         }
       }
@@ -100,33 +96,24 @@ export default function ResetPasswordPage() {
 
     try {
       const supabase = createClient();
-
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
 
       if (error) {
-        // Check for specific error types
         const errorMessage = error.message?.toLowerCase() || '';
-
-        if (errorMessage.includes('same') || errorMessage.includes('different') ||
-            error.message?.includes('should be different')) {
-          // Same password error
+        if (errorMessage.includes('same') || errorMessage.includes('different') || error.message?.includes('should be different')) {
           setPasswordError('הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית');
         } else if (errorMessage.includes('session') || errorMessage.includes('not authenticated')) {
-          // Session expired
           setPasswordError('פג תוקף החיבור. אנא בקשו קישור חדש.');
         } else {
-          // Generic error
           setPasswordError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
         }
         return;
       }
 
       await supabase.auth.signOut();
-
       setSuccess(true);
-
       setTimeout(() => {
         router.push('/login');
       }, 2000);
@@ -138,20 +125,12 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Loading state while checking session
+  // LOADING STATE
   if (checkingSession) {
     return (
-      <div className={styles.container}>
+      <div className={`mobile-container ${styles.resetContainer}`}>
         <div className={styles.content}>
-          <div
-            style={{
-              color: "#EFEFEF",
-              fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
-              fontSize: "1.25rem",
-              textAlign: "center",
-            }}
-            dir="rtl"
-          >
+          <div className="text-section-title" style={{ textAlign: "center", color: "var(--color-text-primary)" }}>
             טוען...
           </div>
         </div>
@@ -159,13 +138,13 @@ export default function ResetPasswordPage() {
     );
   }
 
-  // Session error - show message with button to go back to login
+  // ERROR STATE
   if (sessionError) {
     return (
-      <div className={styles.container}>
+      <div className={`mobile-container ${styles.resetContainer}`}>
         <div className={styles.content}>
-          <div className={styles.greeting}>
-            <p className={styles.subtitle}>{sessionError}</p>
+          <div className="section gap-sm" style={{ textAlign: "center" }}>
+             <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>{sessionError}</p>
           </div>
           <button
             onClick={() => router.push('/login')}
@@ -178,32 +157,35 @@ export default function ResetPasswordPage() {
     );
   }
 
+  // SUCCESS STATE
   if (success) {
     return (
-      <div className={styles.pageBackground}>
-        <div className={styles.container}>
-          <div className={styles.content}>
-            <div className={styles.greeting}>
-              <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
-              <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
-            </div>
+      <div className={`mobile-container ${styles.resetContainer}`}>
+        <div className={styles.content}>
+          <div className="section gap-sm" style={{ textAlign: "center" }}>
+            <h1 className="header-primary" style={{ color: "var(--color-text-secondary)" }}>סיסמה שונתה בהצלחה!</h1>
+            <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>מעביר אותך לדף ההתחברות...</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // MAIN FORM STATE
   return (
-    <div className={styles.container}>
+    <div className={`mobile-container ${styles.resetContainer}`}>
       <div className={styles.content}>
-        <div className={styles.greeting}>
-          <h1 className={styles.title}>שינוי סיסמה</h1>
-          <p className={styles.subtitle}>
+        
+        {/* Header Section */}
+        <div className="section gap-sm" style={{ textAlign: "center" }}>
+          <h1 className="header-primary" style={{ color: "var(--color-text-secondary)" }}>שינוי סיסמה</h1>
+          <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>
             הכנס את סיסמה החדשה על מנת לקבל שוב גישה למערכת.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className={styles.loginContent}>
+        <form onSubmit={handleSubmit} className={styles.formContent}>
+          {/* Password Input */}
           <div className={styles.inputWrapper}>
             <input
               type="password"
@@ -224,6 +206,7 @@ export default function ResetPasswordPage() {
             )}
           </div>
 
+          {/* Confirm Password Input */}
           <div className={styles.inputWrapper}>
             <input
               type="password"
