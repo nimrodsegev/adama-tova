@@ -113,7 +113,7 @@ export const authService = {
         isSessionInvalid = true;
 
         try {
-          await supabase.auth.signOut({ scope: 'local' });
+          await supabase.auth.signOut();
         } catch {
           // Ignore signOut errors
         }
@@ -129,12 +129,16 @@ export const authService = {
   onAuthStateChange(callback: (user: any) => void) {
     const supabase = createClient();
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    let hasEmittedNull = false;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // If circuit breaker active, just return null once
+        // If circuit breaker active, emit null only once
         if (isSessionInvalid) {
-          callback(null);
+          if (!hasEmittedNull) {
+            hasEmittedNull = true;
+            callback(null);
+          }
           return;
         }
 
@@ -144,6 +148,7 @@ export const authService = {
           // Reset circuit breaker on successful sign in
           if (event === 'SIGNED_IN' && session?.user) {
             isSessionInvalid = false;
+            hasEmittedNull = false;
             lastAuthError = { time: 0, count: 0 };
           }
           callback(session?.user ?? null);
