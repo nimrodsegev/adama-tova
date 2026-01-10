@@ -147,7 +147,8 @@ export const apiActivities = {
       weeks = 1, 
       requires_approval = false,
       whatsapp_group_url = null,
-      is_group = false, 
+      is_group = false,
+      circle = null, 
       ...baseData 
     } = activityData;
 
@@ -171,7 +172,8 @@ export const apiActivities = {
         end_time: baseData.end_time,
         max_participants: baseData.max_participants,
         status: baseData.status,
-        category: baseData.category,
+        category: is_group ? null : baseData.category, 
+        circle: is_group ? circle : null,
         location: baseData.location,
         instructor: baseData.instructor,
         image_url: baseData.image_url,
