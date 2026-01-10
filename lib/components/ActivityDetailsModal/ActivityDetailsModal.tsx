@@ -41,6 +41,7 @@ export default function ActivityDetailsModal({
   const [mounted, setMounted] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<string | null>(null);
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -130,6 +131,7 @@ export default function ActivityDetailsModal({
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
+        setRegistrationBackendStatus(res.status || null);
 
         // Show success modal
         setIsSuccessModalOpen(true);
@@ -366,7 +368,8 @@ export default function ActivityDetailsModal({
 
       {/* Success Modal */}
       {isSuccessModalOpen && (
-        isGroup ? (
+        // Group with space AND pending approval (not waitlist)
+        registrationBackendStatus === 'pending' && regStatus !== 'waitlist' ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -375,12 +378,14 @@ export default function ActivityDetailsModal({
             startTime={formattedTime}
           />
         ) : (
+          // Waitlist or regular confirmed
           <RegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
             activityTitle={activity?.title || ""}
             activityDate={dayMonth}
             activityTime={formattedTime}
+            isGroup={isGroup}
             isWaitlist={regStatus === "waitlist"}
             waitlistPosition={waitlistPosition}
           />
