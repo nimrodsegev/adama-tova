@@ -16,7 +16,6 @@ export {
   STATIC_CONFIG,
   MODE_CONFIGS,
   getModeConfig,
-  overrideModeConfig,
   type ModeConfig,
   type MotionMode,
 } from "./modeConfigs";
