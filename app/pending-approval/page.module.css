@@ -247,3 +247,12 @@
     left: 2rem;
   }
 }
+
+/* ============================================
+   PWA STANDALONE MODE - iOS Home Screen App Fix
+   ============================================ */
+@media (display-mode: standalone) {
+  .container {
+    padding-top: calc(1rem + env(safe-area-inset-top, 0));
+  }
+}

@@ -1006,3 +1006,53 @@
     padding-bottom: 2.5rem;
   }
 }
+
+/* ============================================
+   PWA STANDALONE MODE - iOS Home Screen App Fix
+   ============================================ */
+@media (display-mode: standalone) {
+  .wizardContainer {
+    padding-top: calc(2vh + env(safe-area-inset-top, 0));
+  }
+
+  .decorativeCircles {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+  }
+
+  .stepContainer {
+    margin-top: 0.5rem;
+  }
+
+  .optionsContainer {
+    margin-top: 1rem;
+  }
+
+  .stepContainerLower .inputsContainer {
+    margin-top: 1rem;
+  }
+
+  .navigation {
+    padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* PWA on taller phones */
+@media (display-mode: standalone) and (min-height: 800px) {
+  .wizardContainer {
+    padding-top: calc(2vh + env(safe-area-inset-top, 0));
+  }
+
+  .decorativeCircles {
+    margin-top: 3vh;
+    margin-bottom: 2vh;
+  }
+
+  .stepContainer {
+    margin-top: 0.5rem;
+  }
+
+  .optionsContainer {
+    margin-top: 1rem;
+  }
+}

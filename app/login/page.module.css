@@ -412,3 +412,12 @@
     max-width: 24rem;
   }
 }
+
+/* ============================================
+   PWA STANDALONE MODE - iOS Home Screen App Fix
+   ============================================ */
+@media (display-mode: standalone) {
+  .loginContainer {
+    padding-top: calc(1rem + env(safe-area-inset-top, 0));
+  }
+}
