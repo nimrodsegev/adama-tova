@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/app/services/authService';
 import { userService } from '@/app/services/userService';
@@ -46,12 +46,14 @@ const GENDER_OPTIONS: { value: 'male' | 'female' | 'prefer_not_to_say'; label: s
   { value: 'prefer_not_to_say', label: 'מעדיפ/ה לא לציין' },
 ];
 
+const TOTAL_STEPS = 5;
+
 export default function SignupWizard({ signupType, email, password, googleUserId, onBack }: SignupWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { t, setGender: setIvritaGender } = useIvrita();
+  const { setGender: setIvritaGender, t } = useIvrita();
 
   // Form data
   const [fullName, setFullName] = useState('');
@@ -59,6 +61,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [gender, setGender] = useState<'male' | 'female' | 'prefer_not_to_say' | null>(null);
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
   const [circle, setCircle] = useState('');
+  const [circleDropdownOpen, setCircleDropdownOpen] = useState(false);
   const [proximity, setProximity] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [branches, setBranches] = useState<string[]>([]);
@@ -68,10 +71,15 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
+  // Swipe handling
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  const minSwipeDistance = 50;
+
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
   const isValidIsraeliMobile = (p: string) => /^05\d{8}$/.test(p.replace(/[-\s]/g, ''));
 
-  const validateStep1 = (): boolean => {
+  const validateStep0 = (): boolean => {
     setNameError('');
     setPhoneError('');
 
@@ -97,11 +105,10 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
   const handleNext = async () => {
     if (currentStep === 0) {
-      if (!validateStep1()) return;
+      if (!validateStep0()) return;
     }
 
-    // Step 4 is the last step
-    if (currentStep === 4) {
+    if (currentStep === TOTAL_STEPS - 1) {
       await handleSubmit();
     } else {
       setCurrentStep(currentStep + 1);
@@ -116,6 +123,41 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     }
   };
 
+  // Swipe handlers
+  const onTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = null; // Reset end position
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    // Only process swipe if both start and end positions are set
+    // (meaning there was actual movement, not just a tap/click)
+    if (touchStartX.current === null || touchEndX.current === null) {
+      touchStartX.current = null;
+      touchEndX.current = null;
+      return;
+    }
+
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    // Swipe right = next (forward), swipe left = back
+    if (isRightSwipe) {
+      handleNext();
+    } else if (isLeftSwipe) {
+      handleBack();
+    }
+
+    // Reset for next swipe
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
@@ -126,7 +168,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       if (signupType === 'email') {
         await authService.signUp(email, password);
         const user = await authService.getCurrentUser();
-        
+
         if (!user) throw new Error('שגיאה ביצירת חשבון');
         userId = user.id;
       } else {
@@ -156,214 +198,285 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
   const toggleInterest = (interest: string) => {
     setInterests(prev =>
-      prev.includes(interest) 
-        ? prev.filter(i => i !== interest) 
+      prev.includes(interest)
+        ? prev.filter(i => i !== interest)
         : [...prev, interest]
     );
   };
 
   const toggleBranch = (branchValue: string) => {
-    setBranches(prev => 
+    setBranches(prev =>
       prev.includes(branchValue)
         ? prev.filter(b => b !== branchValue)
         : [...prev, branchValue]
     );
   };
 
+  // Get dot class based on step state
+  const getDotClass = (stepIndex: number) => {
+    if (stepIndex < currentStep) return `${styles.dot} ${styles.completedDot}`;
+    if (stepIndex === currentStep) return `${styles.dot} ${styles.activeDot}`;
+    return styles.dot;
+  };
+
   return (
-    <div className={`mobile-container ${styles.wizardContainer}`}>
+    <div
+      className={styles.wizardContainer}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <div className={styles.content}>
-        
-        {/* Step 0: Name + Phone */}
+
+        {/* Step 0: Personal Details */}
         {currentStep === 0 && (
-          <div className={`${styles.stepContainer} ${styles.step1}`}>
-            <h2 className={styles.stepTitle}>{t('השלם/י את הפרטים הבאים:')}</h2>
-            <div className={styles.inputsContainer}>
-              <div className={styles.inputWrapper}>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => {
-                    setFullName(e.target.value);
-                    setNameError('');
-                  }}
-                  className={`${styles.input} ${nameError ? styles.inputError : ''}`}
-                  dir="rtl"
-                />
-                <span className={styles.inputLabel}>שם מלא</span>
-                {nameError && <span className={styles.fieldError}>{nameError}</span>}
-              </div>
+          <>
+            <div className={styles.headerSection}>
+              <h2 className={styles.stepTitle}>{t('השלם/י פרטים אישיים')}</h2>
+            </div>
 
-              <div className={styles.inputWrapper}>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    setPhoneError('');
-                  }}
-                  className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
-                  dir="rtl"
-                />
-                <span className={styles.inputLabel}>טלפון</span>
-                {phoneError && <span className={styles.fieldError}>{phoneError}</span>}
-              </div>
+            {/* Decorative circle placeholder */}
+            <div className={styles.decorativeCircles}>
+              <span className={styles.circlePlaceholder}></span>
+            </div>
 
-              <div className={styles.genderSelector}>
+            <div className={styles.stepContainer}>
+              <div className={styles.inputsContainer}>
+                {/* Full Name */}
                 <div className={styles.inputWrapper}>
-                  <button
-                    type="button"
-                    onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
-                    className={`${styles.genderToggle} ${genderDropdownOpen ? styles.open : ''}`}
-                  >
-                    <span>{gender ? GENDER_OPTIONS.find(g => g.value === gender)?.label : 'בחר/י'}</span>
-                    <span className={`${styles.genderToggleArrow} ${genderDropdownOpen ? styles.open : ''}`}>▼</span>
-                  </button>
-                  <span className={styles.inputLabel}>מגדר (אופציונלי)</span>
+                  <span className={styles.inputLabel}>שם מלא</span>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      setNameError('');
+                    }}
+                    className={`${styles.input} ${nameError ? styles.inputError : ''}`}
+                    dir="rtl"
+                  />
+                  {nameError && <span className={styles.fieldError}>{nameError}</span>}
                 </div>
-                {genderDropdownOpen && (
-                  <div className={styles.genderDropdown}>
-                    {GENDER_OPTIONS.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => {
-                          setGender(option.value);
-                          setIvritaGender(option.value);
-                          setGenderDropdownOpen(false);
-                        }}
-                        className={`${styles.genderOption} ${gender === option.value ? styles.selected : ''}`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
+
+                {/* Phone */}
+                <div className={styles.inputWrapper}>
+                  <span className={styles.inputLabel}>מספר טלפון</span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      setPhoneError('');
+                    }}
+                    className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
+                    dir="rtl"
+                  />
+                  {phoneError && <span className={styles.fieldError}>{phoneError}</span>}
+                </div>
+
+                {/* Gender Accordion */}
+                <div className={styles.genderSelector}>
+                  <div className={styles.inputWrapper}>
+                    <span className={styles.inputLabel}>מין</span>
+                    <button
+                      type="button"
+                      onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
+                      className={`${styles.genderToggle} ${genderDropdownOpen ? styles.open : ''}`}
+                    >
+                      <span className={!gender ? styles.accordionPlaceholder : ''}>
+                        {gender ? GENDER_OPTIONS.find(g => g.value === gender)?.label : t('בחר/י')}
+                      </span>
+                      <span className={`${styles.genderToggleArrow} ${genderDropdownOpen ? styles.open : ''}`}>▼</span>
+                    </button>
                   </div>
-                )}
+                  {genderDropdownOpen && (
+                    <div className={styles.genderDropdown}>
+                      {GENDER_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            setGender(option.value);
+                            setIvritaGender(option.value);
+                            setGenderDropdownOpen(false);
+                          }}
+                          className={`${styles.genderOption} ${gender === option.value ? styles.selected : ''}`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
-        {/* Step 1: Circle Selection */}
+        {/* Step 1: Branch Selection */}
         {currentStep === 1 && (
-          <div className={`${styles.stepContainer} ${styles.step2}`}>
-            <h2 className={styles.stepTitle}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</h2>
-            <div className={styles.optionsContainer}>
-              {CIRCLE_OPTIONS.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => setCircle(prev => (prev === option ? '' : option))}
-                  className={`${styles.optionButton} ${circle === option ? styles.selected : ''}`}
-                >
-                  {option}
-                </button>
-              ))}
+          <>
+            <div className={styles.headerSection}>
+              <h2 className={styles.stepTitle}>{t('הסניף הקרוב [אליך|אלייך]')}</h2>
+              <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
-            <div className={styles.inputsContainer} style={{ marginTop: '1rem' }}>
-              <div className={styles.inputWrapper}>
-                <input
-                  type="text"
-                  value={proximity}
-                  onChange={(e) => setProximity(e.target.value)}
-                  className={styles.input}
-                  dir="rtl"
-                  placeholder="מקום לפירוט נוסף (לא חובה)"
-                />
-                <span className={styles.inputLabel}>קרבה</span>
+
+            {/* Decorative circle placeholder */}
+            <div className={styles.decorativeCircles}>
+              <span className={styles.circlePlaceholder}></span>
+            </div>
+
+            <div className={styles.stepContainerLower}>
+              <div className={styles.optionsContainer}>
+                {BRANCH_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => toggleBranch(option.value)}
+                    className={`${styles.optionButton} ${branches.includes(option.value) ? styles.selected : ''}`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Step 2: Interests */}
         {currentStep === 2 && (
-          <div className={`${styles.stepContainer} ${styles.step3}`}>
-            <h2 className={styles.stepTitle}>מה מעניין אותך?</h2>
-            <div className={styles.optionsContainer}>
-              {INTEREST_OPTIONS.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => toggleInterest(option)}
-                  className={`${styles.optionButton} ${interests.includes(option) ? styles.selected : ''}`}
-                >
-                  {option}
-                </button>
-              ))}
+          <>
+            <div className={styles.headerSection}>
+              <h2 className={styles.stepTitle}>{t('מה מעניין אותך?')}</h2>
+              <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
-          </div>
+
+            {/* Decorative circle placeholder */}
+            <div className={styles.decorativeCircles}>
+              <span className={styles.circlePlaceholder}></span>
+            </div>
+
+            <div className={styles.stepContainerLower}>
+              <div className={styles.optionsContainer}>
+                {INTEREST_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => toggleInterest(option)}
+                    className={`${styles.optionButton} ${interests.includes(option) ? styles.selected : ''}`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
         )}
 
-        {/* Step 3: Branch Selection */}
+        {/* Step 3: Circle Selection (Personal Background) */}
         {currentStep === 3 && (
-          <div className={`${styles.stepContainer} ${styles.step3}`}>
-            <h2 className={styles.stepTitle}>{t('באיזה סניף תרצה/י לפעול?')}</h2>
-            <p className="text-body" style={{textAlign: 'center', marginBottom: '1rem', width: '100%', color: 'var(--color-text-secondary)' }}>
-              ניתן לבחור יותר מאחד
-            </p>
-            <div className={styles.optionsContainer}>
-              {BRANCH_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => toggleBranch(option.value)}
-                  className={`${styles.optionButton} ${branches.includes(option.value) ? styles.selected : ''}`}
-                >
-                  {option.label}
-                </button>
-              ))}
+          <>
+            <div className={styles.headerSection}>
+              <h2 className={styles.stepTitle}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</h2>
+              <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
-          </div>
+
+            {/* Decorative circle placeholder */}
+            <div className={styles.decorativeCircles}>
+              <span className={styles.circlePlaceholder}></span>
+            </div>
+
+            <div className={styles.stepContainerLower}>
+              <div className={styles.inputsContainer}>
+                {/* Circle Accordion */}
+                <div className={styles.accordionContainer}>
+                  <div className={styles.inputWrapper}>
+                    <span className={styles.inputLabel}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</span>
+                    <button
+                      type="button"
+                      onClick={() => setCircleDropdownOpen(!circleDropdownOpen)}
+                      className={`${styles.accordionHeader} ${circleDropdownOpen ? styles.open : ''}`}
+                    >
+                      <span className={!circle ? styles.accordionPlaceholder : ''}>
+                        {circle || t('בחר/י')}
+                      </span>
+                      <span className={`${styles.accordionArrow} ${circleDropdownOpen ? styles.open : ''}`}></span>
+                    </button>
+                  </div>
+                  {circleDropdownOpen && (
+                    <div className={styles.accordionDropdown}>
+                      {CIRCLE_OPTIONS.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => {
+                            setCircle(prev => prev === option ? '' : option);
+                            setCircleDropdownOpen(false);
+                          }}
+                          className={`${styles.accordionOption} ${circle === option ? styles.selected : ''}`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Other/Proximity text field */}
+                <div className={styles.inputWrapper}>
+                  <span className={styles.inputLabel}>אחר</span>
+                  <input
+                    type="text"
+                    value={proximity}
+                    onChange={(e) => setProximity(e.target.value)}
+                    className={styles.input}
+                    dir="rtl"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
-        {/* Step 4: Free Text */}
+        {/* Step 4: Free Text - No circle, centered layout */}
         {currentStep === 4 && (
-          <div className={`${styles.stepContainer} ${styles.step4}`}>
-            <h2 className={styles.stepTitle}>כל דבר אחר שתרצה שנדע:</h2>
-            <div className={styles.textareaWrapper}>
+          <div className={styles.lastStepContainer}>
+            <div className={styles.lastStepContent}>
+              <h2 className={styles.lastStepTitle}>{t('*כל דבר אחר שתרצה/י שנדע:')}</h2>
+
               <div className={styles.inputWrapper}>
+                <span className={styles.inputLabel}>אחר</span>
                 <textarea
                   value={freeText}
                   onChange={(e) => setFreeText(e.target.value)}
                   className={styles.textarea}
-                  rows={6}
+                  rows={1}
                   dir="rtl"
                 />
-                <span className={styles.inputLabel}>אחר</span>
               </div>
+
+              {/* Submit button for last step */}
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className={styles.submitButton}
+              >
+                {loading ? '...' : 'סיום'}
+              </button>
             </div>
           </div>
         )}
 
         {error && <p className={styles.error}>{error}</p>}
+      </div>
 
-        {/* Navigation */}
-        <div className={styles.navigation}>
-          <div className={styles.navButtons}>
-            <button
-              onClick={handleNext}
-              className={styles.navButton}
-              disabled={loading}
-            >
-              {currentStep === 4 ? (loading ? '...' : '✓') : '←'}
-            </button>
-
-            <button
-              onClick={handleBack}
-              className={styles.navButton}
-              disabled={loading}
-            >
-              →
-            </button>
-          </div>
-
-          {/* Progress Dots */}
-          <div className={styles.progressDots}>
-            {[4, 3, 2, 1, 0].map((step) => (
-              <div
-                key={step}
-                className={`${styles.dot} ${currentStep === step ? styles.activeDot : ''}`}
-              />
-            ))}
-          </div>
+      {/* Progress Diamonds - Fixed at bottom */}
+      <div className={styles.navigation}>
+        <div className={styles.progressDots}>
+          {[0, 1, 2, 3, 4].map((step) => (
+            <div
+              key={step}
+              className={getDotClass(step)}
+            />
+          ))}
         </div>
       </div>
     </div>

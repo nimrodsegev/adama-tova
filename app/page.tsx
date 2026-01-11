@@ -30,9 +30,11 @@ export default function Home() {
   return (
     <div
       style={{
-        position: "relative",
-        minHeight: "100vh",
-        background: "#F28130",
+        minHeight: "100dvh",
+        paddingTop: "env(safe-area-inset-top, 0)",
+        paddingBottom: "env(safe-area-inset-bottom, 0)",
+        background:
+          "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

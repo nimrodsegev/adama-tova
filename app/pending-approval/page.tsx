@@ -70,7 +70,9 @@ export default function PendingApprovalPage() {
         {/* Main message */}
         <div className={styles.messageBox}>
           <p className={styles.mainText}>
-            כמעט שם... הפרטים שלך בבדיקה, נעדכן כשהגישה תיפתח
+            <span>כמעט שם...</span>
+            <span>הפרטים שלך בבדיקה,</span>
+            <span>נעדכן כשהגישה תיפתח.</span>
           </p>
         </div>
 
@@ -79,12 +81,13 @@ export default function PendingApprovalPage() {
           [לסיוע ויצירת קשר: [להשלים כתובת מייל
         </p>
 
-        {/* Logout button */}
+        {/* Back to registration button */}
         <button
           onClick={handleBackToLogin}
           className={styles.backButton}
         >
-          יציאה
+          לעמוד ההרשמה
+          <span className={styles.backButtonArrow}></span>
         </button>
       </div>
     </div>

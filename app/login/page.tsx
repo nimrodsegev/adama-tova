@@ -15,7 +15,7 @@ type SignupType = "email" | "google";
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("choice");
-  const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<"login" | "signup" | null>(null);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   // Auth fields
@@ -103,14 +103,14 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true);
+    setLoadingAction("login");
 
     try {
       const userExists = await checkUserExists(email);
 
       if (!userExists) {
         setEmailError("אימייל לא נמצא");
-        setLoading(false);
+        setLoadingAction(null);
         return;
       }
 
@@ -129,13 +129,13 @@ export default function LoginPage() {
           if (profile) {
             if (!profile.is_approved && profile.role === "participant") {
               router.replace("/pending-approval");
-              setLoading(false);
+              setLoadingAction(null);
               return;
             }
 
             if (!profile.quiz?.completed_at) {
               router.replace("/login");
-              setLoading(false);
+              setLoadingAction(null);
               return;
             }
 
@@ -154,7 +154,7 @@ export default function LoginPage() {
     } catch (err: any) {
       // Error handled
     } finally {
-      setLoading(false);
+      setLoadingAction(null);
     }
   };
 
@@ -174,9 +174,9 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true);
+    setLoadingAction("signup");
     const userExists = await checkUserExists(email);
-    setLoading(false);
+    setLoadingAction(null);
 
     if (userExists) {
       setEmailError("אימייל קיים במערכת");
@@ -198,10 +198,10 @@ export default function LoginPage() {
 
   if (!initialCheckDone) {
     return (
-      <div className={`mobile-container ${styles.loginContainer}`}>
+      <div className={styles.loginContainer}>
         <div className={styles.content}>
-          <div className="text-section-title" style={{ textAlign: "center", color: "var(--color-text-primary)" }}>
-            טוען...
+          <div className={styles.greeting}>
+            <p>טוען...</p>
           </div>
         </div>
       </div>
@@ -211,97 +211,104 @@ export default function LoginPage() {
   // LOGIN SCREEN
   if (mode === "choice") {
     return (
-      <div className={`mobile-container ${styles.loginContainer}`}>
+      <div className={styles.loginContainer}>
         <div className={styles.content}>
-          
-          {/* ✅ Using Global Typography Classes */}
-          <div className={styles.greeting}>
-            <h1 className="header-primary" style={{ color: "var(--color-text-secondary)" }}>ברוכה הבאה</h1>
-            <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>להרשמה או התחברות הכניסו פרטים</p>
-          </div>
-
-          <div className={styles.loginContent}>
-            
-            {/* Input Wrapper - Email */}
-            <div className={styles.inputWrapper}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError("");
-                }}
-                className={`${styles.input} ${styles.inputLtr} ${
-                  emailError ? styles.inputError : ""
-                }`}
-                dir="rtl"
-              />
-              <span className={styles.inputLabel}>אימייל</span>
-              {emailError && (
-                <span className={styles.fieldError}>{emailError}</span>
-              )}
+          <div className={styles.mainSection}>
+            {/* Greeting section */}
+            <div className={styles.greeting}>
+              <h1>ברוכה הבאה</h1>
+              <p>להרשמה או התחברות הכניסו פרטים</p>
             </div>
 
-            {/* Input Wrapper - Password */}
-            <div className={styles.inputWrapper}>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError("");
-                }}
-                className={`${styles.input} ${
-                  passwordError ? styles.inputError : ""
-                }`}
-                dir="rtl"
-                placeholder="6 תווים או יותר"
-              />
-              <span className={styles.inputLabel}>סיסמה</span>
-              {passwordError && (
-                <span className={styles.fieldError}>{passwordError}</span>
-              )}
-
-              <button
-                className={styles.forgotPassword}
-                onClick={() => setShowForgotPassword(true)}
-                type="button"
-              >
-                שכחתי סיסמה
-              </button>
-            </div>
-
-            {/* Action Buttons */}
-            <div className={styles.buttonSection}>
-              <button
-                className={styles.primaryButton}
-                onClick={handleLogin}
-                disabled={loading}
-              >
-                {loading ? "מתחבר..." : "התחבר"}
-              </button>
-
-              <button
-                className={styles.secondaryButton}
-                onClick={handleSignupClick}
-                disabled={loading}
-              >
-                יצירת משתמש
-              </button>
-
-              <div className={styles.orSeparator}>
-                <span className={styles.orLine}></span>
-                <span className={styles.orText}>או</span>
-                <span className={styles.orLine}></span>
+            <div className={styles.loginContent}>
+              {/* Input Wrapper - Email (first) */}
+              <div className={styles.inputWrapper}>
+                <span className={styles.inputLabel}>אימייל</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError("");
+                  }}
+                  placeholder="adama_tova@gmail.com"
+                  className={`${styles.input} ${styles.inputLtr} ${
+                    emailError ? styles.inputError : ""
+                  }`}
+                  dir="ltr"
+                />
+                {emailError && (
+                  <span className={styles.fieldError}>{emailError}</span>
+                )}
               </div>
 
-              <GoogleLoginButton className={styles.googleButton} />
+              {/* Input Wrapper - Password (second) */}
+              <div className={styles.inputWrapper}>
+                <span className={styles.inputLabel}>סיסמה</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError("");
+                  }}
+                  placeholder="6 תווים או יותר"
+                  className={`${styles.input} ${
+                    passwordError ? styles.inputError : ""
+                  }`}
+                  dir="rtl"
+                />
+                {passwordError && (
+                  <span className={styles.fieldError}>{passwordError}</span>
+                )}
+              </div>
+
+              {/* Action Buttons - New order per Image 1 */}
+              <div className={styles.buttonSection}>
+                {/* 1. התחבר (Login) */}
+                <button
+                  className={styles.primaryButton}
+                  onClick={handleLogin}
+                  disabled={loadingAction !== null}
+                >
+                  {loadingAction === "login" ? "מתחבר..." : "התחבר"}
+                </button>
+
+                {/* 2. או (OR separator) */}
+                <div className={styles.orSeparator}>
+                  <span className={styles.orLine}></span>
+                  <span className={styles.orText}>או</span>
+                  <span className={styles.orLine}></span>
+                </div>
+
+                {/* 3. התחבר עם גוגל (Google) */}
+                <GoogleLoginButton className={styles.googleButton} />
+
+                {/* 4. יצירת משתמש (Create User) */}
+                <button
+                  className={styles.secondaryButton}
+                  onClick={handleSignupClick}
+                  disabled={loadingAction !== null}
+                >
+                  {loadingAction === "signup" ? "טוען..." : "צור משתמש"}
+                </button>
+
+                {/* 5. שכחתי סיסמה (Forgot Password) - Outside, at bottom with arrow */}
+                <button
+                  className={styles.forgotPassword}
+                  onClick={() => setShowForgotPassword(true)}
+                  type="button"
+                >
+                  שכחתי סיסמה
+                  <span className={styles.forgotPasswordArrow}></span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* About Link */}
+          {/* About Link - "מי אנחנו?" */}
           <a href="/login/about" className={styles.aboutLink}>
-            אודות העמותה
+            מי אנחנו?
           </a>
         </div>
 
