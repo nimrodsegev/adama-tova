@@ -1,78 +1,173 @@
-/* Position buttons at the bottom */
-.bottomActions {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+/* About Page Container */
+.aboutContainer {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-2xl) var(--spacing-xl); /* Add bottom padding */
-  
-  /* Ensure background matches if it overlaps content */
-  background: linear-gradient(to top, var(--color-background) 80%, transparent); 
-  z-index: var(--z-fixed);
+  padding: 0 1.5rem; /* 24px */
+  gap: 2rem; /* 32px */
+  min-height: 100vh;
+  width: 100%;
+  background: var(--color-background);
+  background-attachment: fixed;
+  position: relative;
+  direction: rtl;
 }
 
-/* White Pill Button (Unique to About Page) */
-.actionButton {
+/* Content Frame - Centered */
+.contentFrame {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 2rem; /* 32px */
+
+  width: 21.5rem; /* 344px */
+  max-width: 100%;
+
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 1.5rem); /* Moved down a bit */
+  transform: translate(-50%, -50%);
+}
+
+/* Title */
+.title {
+  width: 100%;
+  margin: 0;
+
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-normal);
+  font-size: 2rem; /* 32px */
+  line-height: 2.125rem; /* 34px */
+  text-align: right;
+  letter-spacing: 0.02em;
+
+  color: var(--color-text-primary);
+}
+
+/* Content Sections Container */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 1rem; /* 16px */
+  width: 100%;
+}
+
+/* Section (Our Story / Treatment Plan) */
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 0.5rem; /* 8px */
+  width: 100%;
+}
+
+/* Section Header */
+.sectionHeader {
+  width: 100%;
+  margin: 0;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-bold);
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.75rem; /* 28px */
+  text-align: right;
+
+  color: var(--color-text-primary);
+}
+
+/* Section Body Text */
+.sectionText {
+  width: 100%;
+  margin: 0;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1rem; /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  text-align: right;
+
+  color: var(--color-text-secondary);
+}
+
+/* Bottom Buttons Container */
+.bottomButtons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  gap: 1rem; /* 16px */
+
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 2.5rem; /* 40px from bottom */
+}
+
+/* Button - לאתר (Purple filled) */
+.websiteButton {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 0.75rem 2.5rem; /* Wider padding like original */
-  width: auto;
-  min-width: 140px;
+  padding: 0.5rem 1rem; /* 8px 16px */
+  gap: 0.5rem;
 
-  background: #f9f9f9; 
-  border-radius: 1.5625rem; /* 25px */
+  min-width: 4.375rem; /* 70px */
+  height: 2.25rem; /* 36px */
+
+  background: #b37eb3; /* purple */
+  border-radius: var(--radius-xs); /* 5px */
   border: none;
 
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-base);
-  text-align: center;
-  color: #681f02; /* Deep brown text */
+  font-weight: var(--font-weight-normal);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.25rem; /* 20px */
+  color: var(--color-text-secondary); /* white */
   text-decoration: none;
 
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
+  transition: opacity var(--transition-normal);
 }
 
-.actionButton:hover {
-  background: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+.websiteButton:hover {
+  opacity: 0.9;
 }
 
-/* Back Button (Transparent Outline) */
-.backButton {
+/* Button - ניווט למרחב (Light with purple border) */
+.navigationButton {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 1rem; /* 8px 16px */
+  gap: 0.5rem;
+
+  height: 2.25rem; /* 36px */
+  white-space: nowrap; /* Keep text on one line */
+
+  background: var(--button-bg-light); /* rgba(247, 247, 247, 0.9) */
+  border: 0.0625rem solid #b37eb3; /* 1px purple border */
+  border-radius: var(--radius-xs); /* 5px */
+
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
-  text-align: center;
-  color: var(--color-text-muted);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.25rem; /* 20px */
+  color: #b37eb3; /* purple */
   text-decoration: none;
 
-  padding: 0.5rem 1.5rem;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 1.25rem;
-
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity var(--transition-normal);
 }
 
-.backButton:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #ffffff;
-  color: #ffffff;
-}
-
-@media (min-width: 28rem) {
-  .actionButton {
-    font-size: var(--font-size-lg);
-    padding: 0.875rem 2.75rem;
-  }
+.navigationButton:hover {
+  opacity: 0.9;
 }

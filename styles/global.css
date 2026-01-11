@@ -136,9 +136,9 @@ body {
   /* Brand Colors */
   --color-primary: #2b2d42;
   --color-secondary: #bfc6d2;
-  --color-background: #f28130;
+  --color-background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  --color-background-solid: #de6930; /* Solid color for labels/masks on gradient */
   --color-accent: #535bf2;
-  --color-auth-background: #f28130;
 
   /* Text Colors */
   --color-text-primary: #ffffff;
@@ -203,8 +203,9 @@ body {
   --spacing-5xl: 6.25rem; /* 100px */
 
   /* Border Radius */
-  --radius-sm: 0.5rem; /* 8px */
-  --radius-md: 1.25rem; /* 20px */
+  --radius-xs: 0.3125rem; /* 5px */
+  --radius-sm: 0.5625rem; /* 9px */
+  --radius-md: 0.875rem; /* 14px */
   --radius-lg: 1.5rem; /* 24px */
   --radius-full: 50%;
 
@@ -244,8 +245,9 @@ body {
 
   /* Button Colors */
   --button-bg: #f9f9f9;
-  --button-text: #681f02;
-  --button-radius: 1.5625rem; /* 25px */
+  --button-bg-light: rgba(247, 247, 247, 0.9);
+  --button-text: #e74e1c;
+  --button-radius: 0.5625rem; /* 9px */
   --button-radius-full: 50%;
 
   /* Icon Sizes */
@@ -267,7 +269,7 @@ body {
 
 body {
   color: var(--color-primary);
-  background-color: var(--color-background);
+  background: var(--color-background);
   font-family: var(--font-system);
   margin: 0;
   padding: 0;
@@ -290,7 +292,7 @@ body {
   max-width: var(--container-max-width);
   min-height: var(--container-min-height);
   margin: 0 auto;
-  background-color: var(--color-background);
+  background: var(--color-background);
   position: relative;
   overflow-x: hidden;
   direction: rtl;
@@ -647,6 +649,248 @@ body {
 
 .counter-button:active {
   filter: brightness(0.8);
+}
+
+/* ============================================
+   CLOSE BUTTON (Double Circle with X)
+   ============================================ */
+.close-button {
+  position: absolute;
+  width: 2.5625rem; /* 41px */
+  height: 2.5rem; /* 40px */
+  right: 1.5rem; /* 24px from right */
+  top: 3.1875rem; /* 51px */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #e74e1c; /* button orange */
+  border: 0.044rem solid rgba(247, 247, 247, 0.9); /* 0.7px */
+  border-radius: 50%;
+
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+  z-index: 10;
+  text-decoration: none;
+}
+
+.close-button:hover {
+  opacity: 0.8;
+}
+
+/* Inner circle outline */
+.close-button-inner {
+  position: absolute;
+  left: 9.37%;
+  right: 9.43%;
+  top: 9.42%;
+  bottom: 10.03%;
+
+  border: 0.044rem solid rgba(247, 247, 247, 0.9); /* 0.7px */
+  border-radius: 50%;
+}
+
+/* X icon inside close button */
+.close-icon {
+  position: relative;
+  width: 0.75rem; /* 12px */
+  height: 0.75rem; /* 12px */
+  z-index: 1;
+}
+
+.close-icon::before,
+.close-icon::after {
+  content: '';
+  position: absolute;
+  width: 140%;
+  height: 0.0625rem; /* 1px */
+  background: var(--color-text-secondary);
+  top: 50%;
+  left: -20%;
+  transform-origin: center;
+}
+
+.close-icon::before {
+  transform: rotate(45deg);
+}
+
+.close-icon::after {
+  transform: rotate(-45deg);
+}
+
+/* ============================================
+   FORM INPUTS (Gradient Background Style)
+   ============================================ */
+
+/* Input wrapper - for positioning label and error */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Input field - transparent with border */
+.input-field {
+  box-sizing: border-box;
+  width: 100%;
+  height: 3.75rem; /* 60px */
+  padding: 0 1.625rem; /* 26px horizontal */
+
+  background: transparent;
+  border: 0.0625rem solid var(--color-text-secondary); /* 1px solid #F9F9F9 */
+  border-radius: var(--radius-sm); /* 9px */
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.0625rem; /* 17px */
+  text-align: right;
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  direction: rtl;
+  outline: none;
+}
+
+.input-field::placeholder {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.input-field:focus {
+  border-color: var(--color-text-primary);
+}
+
+/* For email/LTR inputs - LTR text but RTL alignment */
+.input-field-ltr {
+  direction: ltr;
+  text-align: right;
+}
+
+/* Floating label - cuts the border */
+.input-label {
+  position: absolute;
+  right: 1.8125rem; /* 29px */
+  top: -0.5rem; /* -8px */
+
+  display: flex;
+  align-items: center;
+  padding: 0.0625rem 0.5rem; /* 1px 8px */
+
+  background: var(--color-background); /* gradient */
+  background-attachment: fixed; /* aligns with container gradient */
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  text-align: right;
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Input error state */
+.input-error {
+  border: 0.125rem solid #ff0000 !important;
+}
+
+/* Field error text */
+.field-error {
+  position: absolute;
+  right: 5rem;
+  top: -0.5rem;
+
+  padding: 0 0.3125rem;
+  background: var(--color-background);
+  background-attachment: fixed;
+
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: #ff0000;
+
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* Autofill fix for gradient backgrounds */
+.input-field:-webkit-autofill,
+.input-field:-webkit-autofill:hover,
+.input-field:-webkit-autofill:focus,
+.input-field:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+  border: 0.0625rem solid var(--color-text-secondary) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ============================================
+   PRIMARY & SECONDARY BUTTONS (Login Style)
+   ============================================ */
+.btn-primary-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 3.375rem; /* 54px */
+  padding: 1rem 2rem; /* 16px 32px */
+
+  background: var(--color-text-secondary); /* #F9F9F9 */
+  border-radius: var(--radius-sm); /* 9px */
+  border: none;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.25rem; /* 20px */
+  color: var(--button-text); /* #E74E1C */
+
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+}
+
+.btn-primary-login:hover {
+  opacity: 0.9;
+}
+
+.btn-primary-login:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 3.375rem; /* 54px */
+  padding: 1rem 2rem; /* 16px 32px */
+
+  background: var(--button-text); /* #E74E1C */
+  border-radius: var(--radius-sm); /* 9px */
+  border: none;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.25rem; /* 20px */
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+}
+
+.btn-secondary-login:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary-login:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ============================================
