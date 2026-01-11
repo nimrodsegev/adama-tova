@@ -270,6 +270,7 @@ body {
 body {
   color: var(--color-primary);
   background: var(--color-background);
+  background-attachment: fixed;
   font-family: var(--font-system);
   margin: 0;
   padding: 0;

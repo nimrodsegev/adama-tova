@@ -22,7 +22,7 @@ export default function Home() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F28130",
+        background: "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
