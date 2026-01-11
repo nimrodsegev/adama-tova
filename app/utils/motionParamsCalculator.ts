@@ -1,26 +1,16 @@
 /**
  * ORGANIC CIRCLES MOTION PARAMETERS CALCULATOR
+ * Controls shape parameters based on user profile.
+ * All outputs are in Engine-native ranges.
  */
 
-// Import mode configs as single source of truth
-import {
-  MODE_CONFIGS,
-  type MotionMode,
-} from "@/lib/components/OrganicCircles/modeConfigs";
-
-export type { MotionMode };
-
-export interface MotionParams {
+export interface ShapeParams {
   layers: number;
-  smoothness: number;
-  complexity: number;
-  elongation: number;
-  opacity: number;
-  strokeWidth: number;
-  speed: number;
-  radius: number;
-  amplitude: number;
-  defaultMode: MotionMode;
+  smoothness: number; // 0.0 to 1.0
+  complexity: number; // 0.0 to 5.0
+  elongation: number; // 1.0 to 2.0
+  opacity: number; // 0.0 to 1.0
+  strokeWidth: number; // 0.5 to 3.0 (pixels)
 }
 
 export interface UserProfile {
@@ -34,139 +24,69 @@ export interface UserProfile {
   role?: "participant" | "admin";
 }
 
-// 🛠️ TypeScript Interfaces to fix the "Property does not exist" errors
-interface BaseAdjustments {
-  layersIncrease?: number;
-  smoothness?: number;
-  complexity?: number;
-  elongation?: number;
-  opacity?: number;
-  strokeWidth?: number;
-  layersMax?: boolean;
-}
-
-type InterestType =
-  | "mindfulness"
-  | "body_motion"
-  | "music_sound"
-  | "creation_material";
-type CircleType =
-  | "Nova Survivor"
-  | "Support Group"
-  | "Rescue Forces"
-  | "Area/Bereavement";
-
-/**
- * Default values
- */
-const DEFAULTS = {
+const DEFAULTS: ShapeParams = {
   layers: 4,
-  smoothness: 8,
-  complexity: 1,
-  elongation: 10,
-  opacity: 8,
-  strokeWidth: 10,
+  smoothness: 0.8,
+  complexity: 0.1,
+  elongation: 1.0,
+  opacity: 0.8,
+  strokeWidth: 1.0,
 };
 
-/**
- * Interest-based adjustments - Explicitly typed to allow optional properties
- */
-const INTEREST_ADJUSTMENTS: Record<InterestType, BaseAdjustments> = {
-  mindfulness: {
-    elongation: 14.5,
-    smoothness: 10,
-    layersIncrease: 1,
-  },
-  body_motion: {
-    complexity: 3,
-    smoothness: 5,
-    layersIncrease: 1,
-  },
-  music_sound: {
-    smoothness: 0,
-    layersIncrease: 1,
-  },
+const INTEREST_ADJUSTMENTS: Record<
+  string,
+  Partial<ShapeParams> & { layersIncrease?: number }
+> = {
+  mindfulness: { elongation: 1.4, smoothness: 1.0, layersIncrease: 1 },
+  body_motion: { complexity: 0.3, smoothness: 0.5, layersIncrease: 1 },
+  music_sound: { smoothness: 0.0, layersIncrease: 1 },
   creation_material: {
-    complexity: 3,
-    elongation: 8.5,
-    strokeWidth: 7,
+    complexity: 0.3,
+    elongation: 0.8,
+    strokeWidth: 0.7,
     layersIncrease: 1,
   },
 };
 
-/**
- * Circle-based adjustments - Explicitly typed
- */
-const CIRCLE_ADJUSTMENTS: Record<CircleType, BaseAdjustments> = {
-  "Nova Survivor": {
-    strokeWidth: 15,
-    opacity: 6,
-  },
-  "Rescue Forces": {
-    smoothness: 10,
-    strokeWidth: 30,
-    opacity: 9,
-  },
-  "Area/Bereavement": {
-    layersMax: true,
-  },
-  "Support Group": {
-    layersIncrease: 1,
-  },
+const CIRCLE_ADJUSTMENTS: Record<
+  string,
+  Partial<ShapeParams> & { layersMax?: boolean; layersIncrease?: number }
+> = {
+  "Nova Survivor": { strokeWidth: 1.5, opacity: 0.6 },
+  "Rescue Forces": { smoothness: 1.0, strokeWidth: 3.0, opacity: 0.9 },
+  "Area/Bereavement": { layersMax: true },
+  "Support Group": { layersIncrease: 1 },
 };
 
-/**
- * Map Hebrew interests to English types
- */
-function mapInterestToType(interest: string): InterestType | null {
-  const interestMap: Record<string, InterestType> = {
+function mapInterestToType(interest: string): string | null {
+  const map: Record<string, string> = {
     מדיטציה: "mindfulness",
-    Meditation: "mindfulness",
     מיינדפולנס: "mindfulness",
-    Mindfulness: "mindfulness",
     הרפיה: "mindfulness",
-    Relaxation: "mindfulness",
     טבע: "mindfulness",
-    Nature: "mindfulness",
     יוגה: "body_motion",
-    Yoga: "body_motion",
     ריצה: "body_motion",
-    Running: "body_motion",
     כושר: "body_motion",
-    Fitness: "body_motion",
     ספורט: "body_motion",
-    Sports: "body_motion",
     ריקוד: "body_motion",
-    Dance: "body_motion",
     תנועה: "body_motion",
-    Movement: "body_motion",
     מוזיקה: "music_sound",
-    Music: "music_sound",
     שירה: "music_sound",
-    Singing: "music_sound",
     נגינה: "music_sound",
-    Playing: "music_sound",
     קול: "music_sound",
-    Sound: "music_sound",
     אומנות: "creation_material",
-    Art: "creation_material",
     כתיבה: "creation_material",
-    Writing: "creation_material",
     יצירה: "creation_material",
-    Crafts: "creation_material",
     צילום: "creation_material",
-    Photography: "creation_material",
     עיצוב: "creation_material",
-    Design: "creation_material",
     ציור: "creation_material",
-    Painting: "creation_material",
   };
-  return interestMap[interest] || null;
+  return map[interest] || null;
 }
 
-function mapCircleToType(circle: string | undefined): CircleType | null {
+function mapCircleToType(circle: string | undefined): string | null {
   if (!circle) return null;
-  const circleMap: Record<string, CircleType> = {
+  const map: Record<string, string> = {
     "שורדי ושורדות המסיבות": "Nova Survivor",
     "מעגל שני ושלישי של משפחות השכול": "Support Group",
     "משפחות וקרובים של פצועים טראומה בגופם ובנפשם": "Support Group",
@@ -176,33 +96,15 @@ function mapCircleToType(circle: string | undefined): CircleType | null {
     "אחים.ות שכולים": "Area/Bereavement",
     "תושבי העוטף ומפונים": "Area/Bereavement",
   };
-  return circleMap[circle] || null;
+  return map[circle] || null;
 }
 
-export function calculateMotionParams(
-  userProfile: UserProfile | null,
-  mode: MotionMode = "breathing"
-): MotionParams {
-  const modeConfig = MODE_CONFIGS[mode];
+export function calculateShapeParams(
+  userProfile: UserProfile | null
+): ShapeParams {
+  if (!userProfile) return { ...DEFAULTS };
 
-  let layers = DEFAULTS.layers;
-  let smoothness = DEFAULTS.smoothness;
-  let complexity = DEFAULTS.complexity;
-  let elongation = DEFAULTS.elongation;
-  let opacity = DEFAULTS.opacity;
-  let strokeWidth = DEFAULTS.strokeWidth;
-
-  if (!userProfile) {
-    return {
-      ...DEFAULTS,
-      speed: modeConfig.speed,
-      radius: modeConfig.radius,
-      amplitude: modeConfig.amplitude,
-      defaultMode: mode,
-    };
-  }
-
-  const valuesToAverage: Record<string, number[]> = {
+  const vals: Record<keyof Omit<ShapeParams, "layers">, number[]> = {
     smoothness: [DEFAULTS.smoothness],
     complexity: [DEFAULTS.complexity],
     elongation: [DEFAULTS.elongation],
@@ -210,97 +112,39 @@ export function calculateMotionParams(
     strokeWidth: [DEFAULTS.strokeWidth],
   };
 
-  let layersIncrease = 0;
-  let layersSetToMax = false;
+  let layersInc = 0;
+  let layersMax = false;
 
-  const interests = userProfile.quiz?.interests || [];
-  const userInterestTypes = new Set<InterestType>();
-
-  interests.forEach((interest) => {
-    const type = mapInterestToType(interest);
-    if (type && !userInterestTypes.has(type)) {
-      userInterestTypes.add(type);
-      const adj = INTEREST_ADJUSTMENTS[type];
-      if (adj.elongation !== undefined)
-        valuesToAverage.elongation.push(adj.elongation);
-      if (adj.smoothness !== undefined)
-        valuesToAverage.smoothness.push(adj.smoothness);
-      if (adj.complexity !== undefined)
-        valuesToAverage.complexity.push(adj.complexity);
-      if (adj.strokeWidth !== undefined)
-        valuesToAverage.strokeWidth.push(adj.strokeWidth);
-      if (adj.layersIncrease) layersIncrease += adj.layersIncrease;
+  (userProfile.quiz?.interests || []).forEach((i) => {
+    const adj = INTEREST_ADJUSTMENTS[mapInterestToType(i) || ""];
+    if (adj) {
+      if (adj.smoothness !== undefined) vals.smoothness.push(adj.smoothness);
+      if (adj.complexity !== undefined) vals.complexity.push(adj.complexity);
+      if (adj.elongation !== undefined) vals.elongation.push(adj.elongation);
+      if (adj.strokeWidth !== undefined) vals.strokeWidth.push(adj.strokeWidth);
+      if (adj.layersIncrease) layersInc += adj.layersIncrease;
     }
   });
 
-  const circleType = mapCircleToType(userProfile.quiz?.circle);
-  if (circleType) {
-    const adj = CIRCLE_ADJUSTMENTS[circleType];
-    if (adj.strokeWidth !== undefined)
-      valuesToAverage.strokeWidth.push(adj.strokeWidth);
-    if (adj.opacity !== undefined) valuesToAverage.opacity.push(adj.opacity);
-    if (adj.smoothness !== undefined)
-      valuesToAverage.smoothness.push(adj.smoothness);
-    if (adj.layersIncrease) layersIncrease += adj.layersIncrease;
-    if (adj.layersMax) layersSetToMax = true;
+  const cAdj =
+    CIRCLE_ADJUSTMENTS[mapCircleToType(userProfile.quiz?.circle) || ""];
+  if (cAdj) {
+    if (cAdj.strokeWidth !== undefined) vals.strokeWidth.push(cAdj.strokeWidth);
+    if (cAdj.opacity !== undefined) vals.opacity.push(cAdj.opacity);
+    if (cAdj.layersMax) layersMax = true;
+    if (cAdj.layersIncrease) layersInc += cAdj.layersIncrease;
   }
 
-  // Calculate Averages
-  const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
-
-  smoothness = avg(valuesToAverage.smoothness);
-  complexity = avg(valuesToAverage.complexity);
-  elongation = avg(valuesToAverage.elongation);
-  opacity = avg(valuesToAverage.opacity);
-  strokeWidth = avg(valuesToAverage.strokeWidth);
-
-  if (layersSetToMax) layers = 7;
-  else layers = DEFAULTS.layers + layersIncrease;
+  const avg = (a: number[]) => a.reduce((x, y) => x + y, 0) / a.length;
 
   return {
-    layers: Math.max(4, Math.min(7, Math.round(layers))),
-    smoothness: Math.max(0, Math.min(10, Math.round(smoothness * 10) / 10)),
-    complexity: Math.max(0, Math.min(50, Math.round(complexity * 10) / 10)),
-    elongation: Math.max(5, Math.min(20, Math.round(elongation * 10) / 10)),
-    opacity: Math.max(0, Math.min(10, Math.round(opacity * 10) / 10)),
-    strokeWidth: Math.max(1, Math.min(100, Math.round(strokeWidth * 10) / 10)),
-    speed: modeConfig.speed,
-    radius: modeConfig.radius,
-    amplitude: modeConfig.amplitude,
-    defaultMode: mode,
+    layers: layersMax
+      ? 7
+      : Math.max(4, Math.min(7, DEFAULTS.layers + layersInc)),
+    smoothness: Math.max(0, Math.min(1, avg(vals.smoothness))),
+    complexity: Math.max(0, Math.min(5, avg(vals.complexity))),
+    elongation: Math.max(0.5, Math.min(3, avg(vals.elongation))),
+    opacity: Math.max(0, Math.min(1, avg(vals.opacity))),
+    strokeWidth: Math.max(0.5, Math.min(5, avg(vals.strokeWidth))),
   };
-}
-
-export function getContextualMode(
-  userProfile: UserProfile | null,
-  context: {
-    isLoading?: boolean;
-    isOnboarding?: boolean;
-    isCompleting?: boolean;
-    isIdle?: boolean;
-  }
-): MotionMode {
-  if (context.isLoading) return "loading";
-  if (context.isOnboarding) return "splash";
-  if (context.isCompleting) return "spouting";
-  if (context.isIdle) return "static";
-  return "breathing";
-}
-
-export function getMotionStyleDescription(params: MotionParams): string {
-  const { complexity, smoothness, strokeWidth } = params;
-  let style = "";
-  if (complexity >= 20) style += "צורות אורגניות ומורכבות מאוד";
-  else if (complexity >= 10) style += "צורות אורגניות";
-  else if (complexity >= 3) style += "צורות מאוזנות";
-  else style += "צורות גיאומטריות פשוטות";
-  style += ", ";
-  if (smoothness >= 8) style += "זרימה חלקה ורכה";
-  else if (smoothness >= 4) style += "זרימה טבעית";
-  else style += "זרימה דינמית עם זוויות";
-  style += ", ";
-  if (strokeWidth >= 20) style += "קווים עבים ובולטים";
-  else if (strokeWidth >= 10) style += "קווים מאוזנים";
-  else style += "קווים דקים ועדינים";
-  return style;
 }

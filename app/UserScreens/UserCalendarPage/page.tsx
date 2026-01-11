@@ -11,10 +11,7 @@ import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityC
 import OrganicCircles, {
   OrganicCirclesRef,
 } from "@/lib/components/OrganicCircles/OrganicCircles";
-import {
-  calculateMotionParams,
-  type MotionMode,
-} from "@/app/utils/motionParamsCalculator";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import styles from "./UserCalendarPage.module.css";
 
 // Interests Mapping (same as HomePage)
@@ -38,8 +35,8 @@ export default function UserCalendarPage() {
   // 🔵 Organic Circles ref for loading animation
   const circlesRef = useRef<OrganicCirclesRef>(null);
 
-  // 🎨 Calculate motion parameters for loading mode
-  const motionParams = calculateMotionParams(userProfile, "loading");
+  // 🎨 Calculate shape parameters based on user profile
+  const shapeParams = calculateShapeParams(userProfile);
 
   // Closed days: Monday(1), Thursday(4), Friday(5), Saturday(6)
   const closedDays = [1, 4, 5, 6];
@@ -181,14 +178,9 @@ export default function UserCalendarPage() {
           <OrganicCircles
             ref={circlesRef}
             mode="loading"
-            speed={motionParams.speed}
-            complexity={motionParams.complexity}
-            smoothness={motionParams.smoothness}
-            layers={motionParams.layers}
-            opacity={motionParams.opacity}
-            radius={0.15}
-            amplitude={motionParams.amplitude}
-            strokeWidth={1.0} // 🎨 LINE THICKNESS: Thin for loading (1.0=thin, 1.5=medium, 2.0=thick)
+            radius={0.08}
+            // Shape parameters from user profile
+            {...shapeParams}
             baseColor="#FFFFFF"
             position={{ x: 0.5, y: 0.5 }} // Center of screen
           />

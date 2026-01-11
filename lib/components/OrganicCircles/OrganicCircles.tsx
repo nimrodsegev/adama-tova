@@ -1,17 +1,14 @@
 "use client";
 import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
+import { getModeConfig, SPLASH_CONFIG, type MotionMode } from "./modeConfigs";
 
-// Perlin-like noise implementation
 class NoiseGenerator {
   private perm: Uint8Array;
-
   constructor() {
     this.perm = new Uint8Array(512);
-    for (let i = 0; i < 512; i++) {
+    for (let i = 0; i < 512; i++)
       this.perm[i] = Math.floor(Math.random() * 256);
-    }
   }
-
   noise2D(x: number, y: number): number {
     const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
     const lerp = (a: number, b: number, t: number) => a + t * (b - a);
@@ -21,16 +18,14 @@ class NoiseGenerator {
       const v = h < 4 ? y : x;
       return (h & 1 ? -u : u) + (h & 2 ? -v : v);
     };
-
-    const X = Math.floor(x) & 255;
-    const Y = Math.floor(y) & 255;
+    const X = Math.floor(x) & 255,
+      Y = Math.floor(y) & 255;
     x -= Math.floor(x);
     y -= Math.floor(y);
-    const u = fade(x);
-    const v = fade(y);
-    const A = this.perm[X] + Y;
-    const B = this.perm[X + 1] + Y;
-
+    const u = fade(x),
+      v = fade(y);
+    const A = this.perm[X] + Y,
+      B = this.perm[X + 1] + Y;
     return lerp(
       lerp(grad(this.perm[A], x, y), grad(this.perm[B], x - 1, y), u),
       lerp(
@@ -43,13 +38,7 @@ class NoiseGenerator {
   }
 }
 
-export type MotionMode =
-  | "breathing"
-  | "splash"
-  | "spouting"
-  | "loading"
-  | "static";
-
+export type { MotionMode };
 export interface OrganicCirclesRef {
   setMode: (mode: MotionMode) => void;
   updateLayers: (count: number) => void;
@@ -57,266 +46,170 @@ export interface OrganicCirclesRef {
 }
 
 export interface OrganicCirclesProps {
-  // Motion mode
   mode?: MotionMode;
-
-  // Adjustable parameters (from calculator)
-  layers?: number; // 4-7 (default: 4)
-  smoothness?: number; // 0-10 (default: 8)
-  complexity?: number; // 0-50 (default: 1)
-  elongation?: number; // 5-20 (default: 10) - NOT IMPLEMENTED YET
-  opacity?: number; // 0-10 (default: 5)
-  strokeWidth?: number; // 1-100 (default: 10)
-
-  // Mode-specific (from modeConfigs.ts, not adjustable by user)
-  speed?: number; // Motion speed
-  radius?: number; // Base size
-  amplitude?: number; // Breathing depth
-
-  // Position and color
-  position?: { x: number; y: number }; // Position as percentage (0-1, default: center)
-  baseColor?: string; // Stroke color (default: white)
-
-  // Callbacks
+  radius: number;
+  layers?: number;
+  smoothness?: number;
+  complexity?: number;
+  elongation?: number;
+  opacity?: number;
+  strokeWidth?: number;
+  position?: { x: number; y: number };
+  baseColor?: string;
   onModeComplete?: (mode: MotionMode) => void;
 }
 
 const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
-  (
-    {
+  (props, ref) => {
+    const {
       mode = "breathing",
+      radius,
       layers = 4,
-      smoothness = 8,
-      complexity = 1,
-      elongation = 10, // Not used yet, but accepted
-      opacity = 5,
-      strokeWidth = 10,
-      speed = 5,
-      radius = 0.15,
-      amplitude = 0.08,
+      smoothness = 0.8,
+      complexity = 0.1,
+      elongation = 1.0,
+      opacity = 0.8,
+      strokeWidth = 1.5,
       position = { x: 0.5, y: 0.5 },
       baseColor = "#FFFFFF",
       onModeComplete,
-    },
-    ref
-  ) => {
+    } = props;
     const svgRef = useRef<SVGSVGElement>(null);
     const engineRef = useRef<any>(null);
 
     useEffect(() => {
       if (!svgRef.current) return;
-
       const noise = new NoiseGenerator();
       const ns = "http://www.w3.org/2000/svg";
 
       class OrganicCirclesEngine {
         svg: SVGSVGElement;
-        paths: SVGPathElement[] = [];
         width: number;
         height: number;
-
-        // Animation State
+        paths: SVGPathElement[] = [];
         animState = {
-          // Visual parameters (interpolated)
           radius: 0,
           amplitude: 0,
           noiseSpeed: 0,
-          complexity: 0, // 0-5 internal range (maps from 0-50)
-          smoothness: 0, // 0-1 internal range (maps from 0-10)
-          opacity: 0, // 0-1 internal range (maps from 0-10)
-
-          // Animation state
+          complexity: 0,
+          smoothness: 0,
+          opacity: 0,
+          elongation: 1.0,
+          centerXOffset: 0,
+          centerYOffset: 0,
           time: 0,
           breathPhase: 0,
           breathCycleSeconds: 5.0,
           splashProgress: 0,
           emitPhase: 0,
+          rollingStartTime: 0,
+          splashCallbackTriggered: false,
         };
-
-        // Targets for smooth interpolation
-        targets: any = {};
-
-        // Current mode
+        targets: any = {
+          radius: 0,
+          amplitude: 0,
+          noiseSpeed: 0,
+          complexity: 0.1,
+          smoothness: 0.8,
+          opacity: 0.8,
+          elongation: 1.0,
+        };
         currentMode: MotionMode = "breathing";
-
-        // Config
         config = {
           layerCount: 4,
           baseColor: "#FFFFFF",
-          strokeWidth: 10, // 1-100 range
+          strokeWidth: 1.5,
           position: { x: 0.5, y: 0.5 },
         };
-
-        // Mode definitions (from modeConfigs.ts)
-        modes = {
-          splash: {
-            radius: 0.28,
-            amplitude: 0.01,
-            noiseSpeed: 0.3,
-            complexity: 0.2,
-            smoothness: 0.85,
-            opacity: 0.6,
-          },
-          breathing: {
-            radius: 0.15,
-            amplitude: 0.08,
-            noiseSpeed: 0.4,
-            complexity: 0.5,
-            smoothness: 0.5,
-            opacity: 0.5,
-          },
-          loading: {
-            radius: 0.15,
-            amplitude: 0.01,
-            noiseSpeed: 1.2,
-            complexity: 0.2,
-            smoothness: 0.9,
-            opacity: 0.4,
-          },
-          spouting: {
-            radius: 0.15,
-            amplitude: 0.0,
-            noiseSpeed: 0.4,
-            complexity: 0.3,
-            smoothness: 0.7,
-            opacity: 0.7,
-          },
-          static: {
-            radius: 0.15,
-            amplitude: 0.0,
-            noiseSpeed: 0.0,
-            complexity: 0.3,
-            smoothness: 0.8,
-            opacity: 0.6,
-          },
-        };
-
         animationFrameId: number | null = null;
         onModeComplete?: (mode: MotionMode) => void;
 
-        constructor(svg: SVGSVGElement, initialConfig: any) {
+        constructor(svg: SVGSVGElement, initial: any) {
           this.svg = svg;
           this.width = window.innerWidth;
           this.height = window.innerHeight;
-
-          // Apply initial config
-          this.updateConfig(initialConfig);
-
-          // Set initial targets
-          this.targets = { ...this.modes[this.currentMode] };
-
-          // Create paths
+          this.currentMode = initial.mode || "breathing";
+          this.updateTargetsForMode(this.currentMode, initial.radius);
+          this.updateConfig(initial);
           this.createLayers();
-
-          // Start animation loop
           this.animate = this.animate.bind(this);
-          this.start();
-
-          // Handle resize
-          window.addEventListener("resize", this.handleResize);
+          this.animate();
+          window.addEventListener("resize", () => {
+            this.width = window.innerWidth;
+            this.height = window.innerHeight;
+          });
         }
 
-        handleResize = () => {
-          this.width = window.innerWidth;
-          this.height = window.innerHeight;
-        };
-
-        updateConfig(config: any) {
-          // Update layer count
-          if (config.layers !== undefined) {
-            this.config.layerCount = Math.max(4, Math.min(7, config.layers));
-          }
-
-          // Update visual config
-          if (config.baseColor !== undefined) {
-            this.config.baseColor = config.baseColor;
-          }
-
-          // Update stroke width (1-100 range, convert to reasonable pixel value)
-          if (config.strokeWidth !== undefined) {
-            // Map 1-100 to 0.5-3.0 pixels for reasonable visual thickness
-            this.config.strokeWidth = 0.5 + (config.strokeWidth / 100) * 2.5;
-          }
-
-          if (config.position !== undefined) {
-            this.config.position = config.position;
-          }
-
-          // Update mode-specific parameters
-          const currentModeConfig = { ...this.modes[this.currentMode] };
-
-          // Mode-specific (from modeConfigs.ts)
-          if (config.radius !== undefined) {
-            currentModeConfig.radius = config.radius;
-          }
-          if (config.amplitude !== undefined) {
-            currentModeConfig.amplitude = config.amplitude;
-          }
-          if (config.speed !== undefined) {
-            const speedNormalized = config.speed / 10;
-            currentModeConfig.noiseSpeed = speedNormalized * 2;
-            this.animState.breathCycleSeconds =
-              5.0 / Math.max(0.1, speedNormalized);
-          }
-
-          // User-adjustable parameters
-          if (config.complexity !== undefined) {
-            // Map 0-50 to 0-5 internal range
-            currentModeConfig.complexity = config.complexity / 10;
-          }
-          if (config.smoothness !== undefined) {
-            // Map 0-10 to 0-1 internal range
-            currentModeConfig.smoothness = config.smoothness / 10;
-          }
-          if (config.opacity !== undefined) {
-            // Map 0-10 to 0-1 internal range
-            currentModeConfig.opacity = config.opacity / 10;
-          }
-
-          this.modes[this.currentMode] = currentModeConfig;
-          this.targets = { ...currentModeConfig };
-        }
-
-        setMode(modeName: MotionMode) {
-          if (!this.modes[modeName]) {
-            console.warn(`Unknown mode: ${modeName}`);
+        updateConfig(c: any) {
+          if (this.currentMode === "splash") {
+            if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
+            if (c.position !== undefined) this.config.position = c.position;
             return;
           }
+          if (c.layers !== undefined)
+            this.config.layerCount = Math.max(4, Math.min(7, c.layers));
+          if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
+          if (c.strokeWidth !== undefined)
+            this.config.strokeWidth = c.strokeWidth;
+          if (c.position !== undefined) this.config.position = c.position;
+          if (c.complexity !== undefined)
+            this.targets.complexity = c.complexity;
+          if (c.smoothness !== undefined)
+            this.targets.smoothness = c.smoothness;
+          if (c.opacity !== undefined) this.targets.opacity = c.opacity;
+          if (c.elongation !== undefined)
+            this.targets.elongation = c.elongation;
+          if (c.radius !== undefined) this.targets.radius = c.radius;
+        }
 
-          this.currentMode = modeName;
-          const modeConfig = this.modes[modeName];
-
-          // Update targets
-          this.targets = { ...modeConfig };
-
-          // Special logic for splash - reset progress
-          if (modeName === "splash") {
-            Object.assign(this.animState, {
-              radius: 0,
-              splashProgress: 0,
-            });
+        updateTargetsForMode(m: MotionMode, r: number) {
+          const conf = getModeConfig(m);
+          this.currentMode = m;
+          if (m === "splash") {
+            this.targets = {
+              radius: SPLASH_CONFIG.radius,
+              amplitude: SPLASH_CONFIG.amplitude,
+              noiseSpeed: SPLASH_CONFIG.speed,
+              elongation: SPLASH_CONFIG.elongation,
+              complexity: SPLASH_CONFIG.complexity,
+              smoothness: SPLASH_CONFIG.smoothness,
+              opacity: SPLASH_CONFIG.opacity,
+            };
+            this.config.layerCount = SPLASH_CONFIG.layers;
+            this.animState.breathCycleSeconds =
+              5.0 / Math.max(0.1, SPLASH_CONFIG.speed);
+            this.animState.splashCallbackTriggered = false; // Reset trigger for new splash
           } else {
-            this.animState.splashProgress = 1;
+            this.targets.radius = r;
+            this.targets.amplitude = conf.amplitude;
+            this.targets.noiseSpeed = conf.speed;
+            this.targets.elongation = conf.elongation;
+            this.animState.breathCycleSeconds = 5.0 / Math.max(0.1, conf.speed);
           }
+        }
 
-          // Reset emit phase for spouting
-          if (modeName === "spouting") {
-            this.animState.emitPhase = 0;
+        setMode(m: MotionMode, r: number) {
+          this.updateTargetsForMode(m, r);
+          if (m === "splash") {
+            this.animState.radius = 0;
+            this.animState.splashProgress = 0;
+            this.animState.splashCallbackTriggered = false;
+            this.createLayers();
+          } else if (m === "rolling") {
+            this.animState.rollingStartTime = Date.now();
           }
         }
 
         createLayers() {
           this.svg.innerHTML = "";
           this.paths = [];
-
           for (let i = 0; i < this.config.layerCount; i++) {
-            const path = document.createElementNS(ns, "path");
-            path.setAttribute("fill", "none");
-            path.setAttribute("stroke", this.config.baseColor);
-            path.setAttribute("stroke-linecap", "round");
-            path.setAttribute("stroke-linejoin", "round");
-            this.svg.appendChild(path);
-            this.paths.push(path);
+            const p = document.createElementNS(ns, "path");
+            p.setAttribute("fill", "none");
+            p.setAttribute("stroke", this.config.baseColor);
+            p.setAttribute("stroke-width", this.config.strokeWidth.toString());
+            this.svg.appendChild(p);
+            this.paths.push(p);
           }
         }
 
@@ -326,157 +219,122 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           layerIndex: number
         ): number {
           const noiseScale = 2.5 - this.animState.smoothness * 2.0;
-          const timeOff = this.animState.time * 0.5;
-          const layerOff = layerIndex * 10;
-
-          const nx = Math.cos(angle) * noiseScale + timeOff;
-          const ny = Math.sin(angle) * noiseScale + layerOff;
-
-          let n = noise.noise2D(nx, ny);
-          n += 0.5 * noise.noise2D(nx * 2, ny * 2);
-          n = n / 1.5;
-
+          const nx =
+            (Math.cos(angle) * noiseScale) /
+              Math.max(0.1, this.animState.elongation) +
+            this.animState.time * 0.5;
+          const ny = Math.sin(angle) * noiseScale + layerIndex * 10;
+          let n =
+            (noise.noise2D(nx, ny) + 0.5 * noise.noise2D(nx * 2, ny * 2)) / 1.5;
           return baseR * (1 + n * this.animState.complexity * 0.3);
         }
 
         updatePhysics(dt: number) {
           const ease = 0.05;
+          const keys = [
+            "radius",
+            "amplitude",
+            "noiseSpeed",
+            "complexity",
+            "smoothness",
+            "opacity",
+            "elongation",
+          ];
+          keys.forEach((k) => {
+            if (this.targets[k] !== undefined)
+              (this.animState as any)[k] +=
+                (this.targets[k] - (this.animState as any)[k]) * ease;
+          });
 
-          // Smooth interpolation
-          this.animState.radius +=
-            (this.targets.radius - this.animState.radius) * ease;
-          this.animState.amplitude +=
-            (this.targets.amplitude - this.animState.amplitude) * ease;
-          this.animState.noiseSpeed +=
-            (this.targets.noiseSpeed - this.animState.noiseSpeed) * ease;
-          this.animState.complexity +=
-            (this.targets.complexity - this.animState.complexity) * ease;
-          this.animState.smoothness +=
-            (this.targets.smoothness - this.animState.smoothness) * ease;
-          this.animState.opacity +=
-            (this.targets.opacity - this.animState.opacity) * ease;
-
-          // Update time
           this.animState.time += dt * this.animState.noiseSpeed;
 
-          // Splash logic - SLOW BUILD WITH LOOPING
+          // FIXED SPLASH LOGIC: Increment and trigger callback once
           if (this.currentMode === "splash") {
-            this.animState.splashProgress += dt * 0.15;
-
-            // When complete, loop back to start
-            if (this.animState.splashProgress >= 1) {
-              this.animState.splashProgress = 0;
-
-              if (this.onModeComplete) {
-                this.onModeComplete("splash");
+            if (this.animState.splashProgress < 1) {
+              this.animState.splashProgress += dt * 0.15; // Animation Speed
+              if (this.animState.splashProgress >= 1) {
+                this.animState.splashProgress = 1;
+                if (
+                  this.onModeComplete &&
+                  !this.animState.splashCallbackTriggered
+                ) {
+                  this.animState.splashCallbackTriggered = true;
+                  this.onModeComplete("splash");
+                }
               }
             }
           }
 
-          // Spouting logic - CONTINUOUS (emitPhase grows infinitely)
-          if (this.currentMode === "spouting") {
-            this.animState.emitPhase += dt * 0.1;
+          this.animState.emitPhase +=
+            this.currentMode === "spouting" ? dt * 0.1 : 0;
+          let tx = 0,
+            ty = 0;
+          if (this.currentMode === "rolling") {
+            const elapsed = Date.now() - this.animState.rollingStartTime;
+            tx = -this.width * 0.3 + ((elapsed * 0.08) % (this.width * 1.3));
+            ty = Math.sin(elapsed * 0.002) * 20;
           }
-
-          // Breathing logic
-          const cycleSpeed = (Math.PI * 2) / this.animState.breathCycleSeconds;
-          this.animState.breathPhase += dt * cycleSpeed;
+          this.animState.centerXOffset +=
+            (tx - this.animState.centerXOffset) * ease;
+          this.animState.centerYOffset +=
+            (ty - this.animState.centerYOffset) * ease;
+          this.animState.breathPhase +=
+            dt *
+            ((Math.PI * 2) / Math.max(0.1, this.animState.breathCycleSeconds));
         }
 
         draw() {
-          const centerX = this.width * this.config.position.x;
-          const centerY = this.height * this.config.position.y;
-          const minDim = Math.min(this.width, this.height);
-
-          // Breathing factor
-          const breathFactor = Math.sin(this.animState.breathPhase);
+          const cx =
+            this.width * this.config.position.x + this.animState.centerXOffset;
+          const cy =
+            this.height * this.config.position.y + this.animState.centerYOffset;
+          const dim = Math.min(this.width, this.height);
+          const breath = Math.sin(this.animState.breathPhase);
 
           this.paths.forEach((path, i) => {
-            let layerRadius: number;
-            let layerOpacity: number;
-
-            // SPOUTING MODE - FIXED FOR CONTINUOUS FLOW
+            let r, op;
             if (this.currentMode === "spouting") {
-              // Each layer is offset by a fraction of the total cycle
-              // This ensures layers are evenly distributed and continuous
-              const layerOffset = i / this.config.layerCount;
-
-              // Progress wraps continuously from 0 to 1 using modulo
-              // This is the KEY to continuous flow - no gaps!
-              const progress = (this.animState.emitPhase + layerOffset) % 1;
-
-              // Radius grows from center outward
-              layerRadius = this.animState.radius * minDim * progress;
-
-              // Fade in quickly at start
-              const fadeIn = Math.min(progress * 8, 1);
-
-              // Fade out as it reaches edge (cubic for smooth disappearance)
-              const fadeOut = 1 - Math.pow(progress, 3);
-
-              // Combined opacity
-              layerOpacity = this.animState.opacity * fadeOut * fadeIn;
-            }
-            // ALL OTHER MODES (breathing, splash, loading, static)
-            else {
-              // Splash visibility - LAYER BY LAYER
-              let splashVisibility = 1;
+              const prog =
+                (this.animState.emitPhase + i / this.config.layerCount) % 1;
+              r = this.animState.radius * dim * prog;
+              op =
+                this.animState.opacity *
+                (1 - Math.pow(prog, 3)) *
+                Math.min(prog * 8, 1);
+            } else {
+              let sVis = 1;
               if (this.currentMode === "splash") {
-                const layerStart = i / this.config.layerCount;
-                const layerEnd = (i + 1) / this.config.layerCount;
-
-                if (this.animState.splashProgress < layerStart) {
-                  splashVisibility = 0;
-                } else if (this.animState.splashProgress >= layerEnd) {
-                  splashVisibility = 1;
-                } else {
-                  const layerProgress =
-                    (this.animState.splashProgress - layerStart) /
-                    (layerEnd - layerStart);
-                  splashVisibility =
-                    layerProgress * layerProgress * (3 - 2 * layerProgress);
-                }
+                const start = i / this.config.layerCount,
+                  end = (i + 1) / this.config.layerCount;
+                sVis =
+                  this.animState.splashProgress < start
+                    ? 0
+                    : this.animState.splashProgress >= end
+                    ? 1
+                    : (this.animState.splashProgress - start) / (end - start);
               }
-
-              if (splashVisibility <= 0) {
-                path.setAttribute("opacity", "0");
-                return;
-              }
-
-              // Calculate radius with breathing
-              const layerBaseSize =
-                this.animState.radius * minDim * (1 + i * 0.25);
-              const breathingRadius =
-                layerBaseSize * (1 + breathFactor * this.animState.amplitude);
-              layerRadius = breathingRadius;
-
-              // Calculate opacity
-              layerOpacity =
-                this.animState.opacity * (1 - i * 0.12) * splashVisibility;
+              r =
+                this.animState.radius *
+                dim *
+                (1 + i * 0.25) *
+                (1 + breath * this.animState.amplitude);
+              op = this.animState.opacity * (1 - i * 0.12) * sVis;
             }
-
-            // Generate organic shape
-            if (layerOpacity <= 0.01) {
+            if (op <= 0.01 || r <= 0) {
               path.setAttribute("opacity", "0");
               return;
             }
-
-            const points: [number, number][] = [];
-            const numPoints = 80;
-
-            for (let j = 0; j < numPoints; j++) {
-              const angle = (j / numPoints) * Math.PI * 2;
-              const r = this.getDeformedRadius(angle, layerRadius, i);
-              points.push([
-                centerX + Math.cos(angle) * r,
-                centerY + Math.sin(angle) * r,
-              ]);
+            const pts: [number, number][] = [];
+            const rot = this.currentMode === "rolling" ? Date.now() * 0.004 : 0;
+            for (let j = 0; j < 80; j++) {
+              const a = (j / 80) * Math.PI * 2;
+              const rad = this.getDeformedRadius(a + rot, r, i);
+              pts.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]);
             }
-
-            // Create smooth curve
-            const d = this.solveCurve(points);
-            path.setAttribute("d", d);
-            path.setAttribute("opacity", layerOpacity.toString());
+            path.setAttribute("d", this.solveCurve(pts));
+            path.setAttribute("opacity", op.toString());
+            path.setAttribute("stroke", this.config.baseColor);
+            path.setAttribute("fill", "none");
             path.setAttribute(
               "stroke-width",
               this.config.strokeWidth.toString()
@@ -484,99 +342,75 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           });
         }
 
-        solveCurve(points: [number, number][]): string {
-          if (points.length < 2) return "";
-
-          const len = points.length;
-          let d = `M ${points[0][0]} ${points[0][1]} `;
-
-          for (let i = 0; i < len; i++) {
-            const p0 = points[i];
-            const p1 = points[(i + 1) % len];
-            const midX = (p0[0] + p1[0]) / 2;
-            const midY = (p0[1] + p1[1]) / 2;
-            d += `Q ${p0[0]} ${p0[1]} ${midX} ${midY} `;
+        solveCurve(pts: [number, number][]): string {
+          if (pts.length < 2) return "";
+          let d = `M ${pts[0][0]} ${pts[0][1]} `;
+          for (let i = 0; i < pts.length; i++) {
+            const p0 = pts[i],
+              p1 = pts[(i + 1) % pts.length];
+            d += `Q ${p0[0]} ${p0[1]} ${(p0[0] + p1[0]) / 2} ${
+              (p0[1] + p1[1]) / 2
+            } `;
           }
-
-          d += "Z";
-          return d;
+          return d + "Z";
         }
 
         animate() {
-          this.updatePhysics(0.016); // Assume 60fps
+          this.updatePhysics(0.016);
           this.draw();
           this.animationFrameId = requestAnimationFrame(this.animate);
         }
-
-        start() {
-          if (this.animationFrameId === null) {
-            this.animate();
-          }
-        }
-
         stop() {
-          if (this.animationFrameId !== null) {
+          if (this.animationFrameId)
             cancelAnimationFrame(this.animationFrameId);
-            this.animationFrameId = null;
-          }
-          window.removeEventListener("resize", this.handleResize);
+          window.removeEventListener("resize", () => {});
         }
       }
 
       const engine = new OrganicCirclesEngine(svgRef.current, {
+        mode,
         layers,
         baseColor,
         strokeWidth,
         position,
-        speed,
         complexity,
         smoothness,
         radius,
-        amplitude,
         opacity,
+        elongation,
       });
-
-      engine.currentMode = mode;
-      engine.setMode(mode);
-      engine.onModeComplete = onModeComplete;
-
+      engine.onModeComplete = onModeComplete; // Assign the callback
       engineRef.current = engine;
+      return () => engine.stop();
+    }, []);
 
-      return () => {
-        engine.stop();
-        engineRef.current = null;
-      };
-    }, []); // Only run once on mount
-
-    // Update parameters when props change
+    // Update dependencies - ensure onModeComplete is included
     useEffect(() => {
       if (engineRef.current) {
-        // Check if layers will change (before updating)
-        const currentLayers = engineRef.current.config.layerCount;
-        const newLayers = Math.max(4, Math.min(7, layers));
-        const layersChanged = currentLayers !== newLayers;
+        engineRef.current.onModeComplete = onModeComplete;
+      }
+    }, [onModeComplete]);
 
-        // Update all config
+    useEffect(() => {
+      if (engineRef.current) {
         engineRef.current.updateConfig({
           layers,
           baseColor,
           strokeWidth,
           position,
-          speed,
           complexity,
           smoothness,
           radius,
-          amplitude,
           opacity,
+          elongation,
         });
-
-        // Recreate paths if layer count changed
-        if (layersChanged) {
+        if (
+          engineRef.current.config.layerCount !== layers &&
+          engineRef.current.currentMode !== "splash"
+        )
           engineRef.current.createLayers();
-        }
       }
     }, [
-      speed,
       complexity,
       smoothness,
       layers,
@@ -584,41 +418,29 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
       strokeWidth,
       position,
       radius,
-      amplitude,
       baseColor,
+      elongation,
     ]);
 
-    // Update mode when it changes
     useEffect(() => {
-      if (engineRef.current && engineRef.current.currentMode !== mode) {
-        engineRef.current.setMode(mode);
-      }
-    }, [mode]);
+      if (engineRef.current && engineRef.current.currentMode !== mode)
+        engineRef.current.setMode(mode, radius);
+    }, [mode, radius]);
 
-    // Expose methods via ref
     useImperativeHandle(ref, () => ({
-      setMode: (newMode: MotionMode) => {
+      setMode: (m) => engineRef.current?.setMode(m, radius),
+      updateLayers: (c) => {
         if (engineRef.current) {
-          engineRef.current.setMode(newMode);
-        }
-      },
-      updateLayers: (count: number) => {
-        if (engineRef.current) {
-          engineRef.current.config.layerCount = count;
+          engineRef.current.config.layerCount = c;
           engineRef.current.createLayers();
         }
       },
-      updateParams: (params: Partial<OrganicCirclesProps>) => {
-        if (engineRef.current) {
-          engineRef.current.updateConfig(params);
-        }
-      },
+      updateParams: (p) => engineRef.current?.updateConfig(p),
     }));
 
     return (
       <svg
         ref={svgRef}
-        xmlns="http://www.w3.org/2000/svg"
         style={{
           position: "absolute",
           top: 0,
@@ -632,7 +454,5 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
     );
   }
 );
-
-OrganicCircles.displayName = "OrganicCircles";
 
 export default OrganicCircles;
