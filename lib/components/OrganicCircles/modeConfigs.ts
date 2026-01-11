@@ -22,8 +22,8 @@ export const SPLASH_CONFIG: ModeConfig & {
 };
 
 export const BREATHING_CONFIG: ModeConfig = {
-  speed: 0.8,
-  amplitude: 0.03,
+  speed: 1.2,
+  amplitude: 0.12,
   elongation: 1.0,
 };
 
@@ -46,9 +46,9 @@ export const STATIC_CONFIG: ModeConfig = {
 };
 
 export const ROLLING_CONFIG: ModeConfig = {
-  speed: 0.8,
+  speed: 1,
   amplitude: 0.08,
-  elongation: 1.6,
+  elongation: 1.9,
 };
 
 export const MODE_CONFIGS = {

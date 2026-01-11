@@ -14,7 +14,7 @@ interface PageTransitionContextType {
 
 const PageTransitionContext = createContext<PageTransitionContextType>({
   isTransitioning: false,
-  currentTransitionMode: "spouting",
+  currentTransitionMode: "breathing",
   setTransitionMode: () => {},
 });
 
@@ -37,7 +37,7 @@ export function PageTransitionProvider({
   children,
 }: PageTransitionProviderProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionMode, setTransitionMode] = useState<MotionMode>("spouting");
+  const [transitionMode, setTransitionMode] = useState<MotionMode>("breathing");
   const pathname = usePathname();
   const previousPathname = useRef<string | null>(null);
   const { userProfile } = useUser();
@@ -81,7 +81,7 @@ export function PageTransitionProvider({
       // Hide transition after 750ms
       const timer = setTimeout(() => {
         setIsTransitioning(false);
-      }, 750);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -117,7 +117,7 @@ export function PageTransitionProvider({
         >
           <OrganicCircles
             mode={transitionMode}
-            radius={0.45}
+            radius={0.15}
             {...shapeParams}
             baseColor="#FFFFFF"
             position={{ x: 0.5, y: 0.5 }}

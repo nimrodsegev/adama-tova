@@ -27,7 +27,7 @@ export interface UserProfile {
 const DEFAULTS: ShapeParams = {
   layers: 4,
   smoothness: 0.8,
-  complexity: 0.1,
+  complexity: 0.3,
   elongation: 1.0,
   opacity: 0.8,
   strokeWidth: 1.0,

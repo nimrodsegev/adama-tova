@@ -39,6 +39,8 @@ class NoiseGenerator {
 }
 
 export type { MotionMode };
+
+// 🛠 ADDED 'export' HERE SO THE CALENDAR PAGE CAN ACCESS THE TYPE
 export interface OrganicCirclesRef {
   setMode: (mode: MotionMode) => void;
   updateLayers: (count: number) => void;
@@ -141,11 +143,13 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
         }
 
         updateConfig(c: any) {
+          // SPLASH MODE IS DECOUPLED FROM EXTERNAL UPDATES
           if (this.currentMode === "splash") {
             if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
             if (c.position !== undefined) this.config.position = c.position;
             return;
           }
+
           if (c.layers !== undefined)
             this.config.layerCount = Math.max(4, Math.min(7, c.layers));
           if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
@@ -178,7 +182,7 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             this.config.layerCount = SPLASH_CONFIG.layers;
             this.animState.breathCycleSeconds =
               5.0 / Math.max(0.1, SPLASH_CONFIG.speed);
-            this.animState.splashCallbackTriggered = false; // Reset trigger for new splash
+            this.animState.splashCallbackTriggered = false;
           } else {
             this.targets.radius = r;
             this.targets.amplitude = conf.amplitude;
@@ -197,6 +201,10 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             this.createLayers();
           } else if (m === "rolling") {
             this.animState.rollingStartTime = Date.now();
+            this.animState.centerXOffset = -this.width * 0.3;
+          } else {
+            this.animState.centerXOffset = 0;
+            this.animState.centerYOffset = 0;
           }
         }
 
@@ -248,36 +256,37 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
 
           this.animState.time += dt * this.animState.noiseSpeed;
 
-          // FIXED SPLASH LOGIC: Increment and trigger callback once
-          if (this.currentMode === "splash") {
-            if (this.animState.splashProgress < 1) {
-              this.animState.splashProgress += dt * 0.15; // Animation Speed
-              if (this.animState.splashProgress >= 1) {
-                this.animState.splashProgress = 1;
-                if (
-                  this.onModeComplete &&
-                  !this.animState.splashCallbackTriggered
-                ) {
-                  this.animState.splashCallbackTriggered = true;
-                  this.onModeComplete("splash");
-                }
+          if (
+            this.currentMode === "splash" &&
+            this.animState.splashProgress < 1
+          ) {
+            this.animState.splashProgress += dt * 0.15;
+            if (this.animState.splashProgress >= 1) {
+              this.animState.splashProgress = 1;
+              if (
+                this.onModeComplete &&
+                !this.animState.splashCallbackTriggered
+              ) {
+                this.animState.splashCallbackTriggered = true;
+                this.onModeComplete("splash");
               }
             }
           }
 
-          this.animState.emitPhase +=
-            this.currentMode === "spouting" ? dt * 0.1 : 0;
           let tx = 0,
             ty = 0;
           if (this.currentMode === "rolling") {
             const elapsed = Date.now() - this.animState.rollingStartTime;
-            tx = -this.width * 0.3 + ((elapsed * 0.08) % (this.width * 1.3));
+            const totalWidth = this.width * 1.3;
+            tx = -this.width * 0.3 + ((elapsed * 0.08) % totalWidth);
             ty = Math.sin(elapsed * 0.002) * 20;
           }
+
+          const currentEase = this.currentMode === "rolling" ? 0.8 : ease;
           this.animState.centerXOffset +=
-            (tx - this.animState.centerXOffset) * ease;
+            (tx - this.animState.centerXOffset) * currentEase;
           this.animState.centerYOffset +=
-            (ty - this.animState.centerYOffset) * ease;
+            (ty - this.animState.centerYOffset) * currentEase;
           this.animState.breathPhase +=
             dt *
             ((Math.PI * 2) / Math.max(0.1, this.animState.breathCycleSeconds));
@@ -293,32 +302,28 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
 
           this.paths.forEach((path, i) => {
             let r, op;
-            if (this.currentMode === "spouting") {
-              const prog =
-                (this.animState.emitPhase + i / this.config.layerCount) % 1;
-              r = this.animState.radius * dim * prog;
-              op =
-                this.animState.opacity *
-                (1 - Math.pow(prog, 3)) *
-                Math.min(prog * 8, 1);
-            } else {
-              let sVis = 1;
-              if (this.currentMode === "splash") {
-                const start = i / this.config.layerCount,
-                  end = (i + 1) / this.config.layerCount;
-                sVis =
-                  this.animState.splashProgress < start
-                    ? 0
-                    : this.animState.splashProgress >= end
-                    ? 1
-                    : (this.animState.splashProgress - start) / (end - start);
-              }
+            if (this.currentMode === "splash") {
+              const start = i / this.config.layerCount,
+                end = (i + 1) / this.config.layerCount;
+              const sVis =
+                this.animState.splashProgress < start
+                  ? 0
+                  : this.animState.splashProgress >= end
+                  ? 1
+                  : (this.animState.splashProgress - start) / (end - start);
               r =
                 this.animState.radius *
                 dim *
                 (1 + i * 0.25) *
                 (1 + breath * this.animState.amplitude);
               op = this.animState.opacity * (1 - i * 0.12) * sVis;
+            } else {
+              r =
+                this.animState.radius *
+                dim *
+                (1 + i * 0.25) *
+                (1 + breath * this.animState.amplitude);
+              op = this.animState.opacity * (1 - i * 0.12);
             }
             if (op <= 0.01 || r <= 0) {
               path.setAttribute("opacity", "0");
@@ -379,17 +384,10 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
         opacity,
         elongation,
       });
-      engine.onModeComplete = onModeComplete; // Assign the callback
+      engine.onModeComplete = onModeComplete;
       engineRef.current = engine;
       return () => engine.stop();
     }, []);
-
-    // Update dependencies - ensure onModeComplete is included
-    useEffect(() => {
-      if (engineRef.current) {
-        engineRef.current.onModeComplete = onModeComplete;
-      }
-    }, [onModeComplete]);
 
     useEffect(() => {
       if (engineRef.current) {

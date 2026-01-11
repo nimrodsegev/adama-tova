@@ -76,7 +76,7 @@ export default function HomePage() {
             !activity.branch || userBranches.includes(activity.branch)
         );
 
-        // --- 4. REGISTERED LIST LOGIC (Updated) ---
+        // --- 4. REGISTERED LIST LOGIC ---
         const rawRegisteredList = branchFilteredActivities.filter(
           (activity: any) => approvedIds.includes(activity.id)
         );
@@ -141,7 +141,7 @@ export default function HomePage() {
     }
   };
 
-  const handleRegistrationChange = (isRegistering: boolean) => {
+  const handleRegistrationChange = () => {
     // Refresh data after registration change
     setTimeout(() => {
       fetchData();
@@ -204,8 +204,6 @@ export default function HomePage() {
     );
   }
 
-  const possibleActivities = allActivities.slice(0, 4);
-
   return (
     <div className="mobile-container">
       <div className="vector-background" />
@@ -227,14 +225,8 @@ export default function HomePage() {
               {registeredActivities.map((activity) => (
                 <div key={activity.id} className="glass-card">
                   <UserActivityCard
-                    id={activity.id}
-                    title={activity.title}
-                    date={activity.date}
-                    start_time={activity.start_time}
-                    location={activity.location}
-                    description={activity.description}
-                    isGroup={activity.is_group || !!activity.series_id}
-                    onRegistrationChange={() => handleRegistrationChange(false)}
+                    {...activity}
+                    onRegistrationChange={() => handleRegistrationChange()}
                   />
                 </div>
               ))}
@@ -251,19 +243,13 @@ export default function HomePage() {
         {/* Suggested Activities Section */}
         <section className="section">
           <h2 className="text-section-title">חשבנו שיעניין אותך:</h2>
-          {possibleActivities.length > 0 ? (
+          {allActivities.length > 0 ? (
             <div className="horizontal-scroll">
-              {possibleActivities.map((activity) => (
+              {allActivities.slice(0, 4).map((activity) => (
                 <div key={activity.id} className="glass-card">
                   <UserActivityCard
-                    id={activity.id}
-                    title={activity.title}
-                    date={activity.date}
-                    start_time={activity.start_time}
-                    location={activity.location}
-                    description={activity.description}
-                    isGroup={activity.is_group || !!activity.series_id}
-                    onRegistrationChange={() => handleRegistrationChange(true)}
+                    {...activity}
+                    onRegistrationChange={() => handleRegistrationChange()}
                   />
                 </div>
               ))}
