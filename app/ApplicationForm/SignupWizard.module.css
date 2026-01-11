@@ -923,34 +923,42 @@
    RESPONSIVE - Taller phones (iPhone 12 Pro, etc.)
    ============================================ */
 
-/* Taller screens (800px+) - add more top spacing */
+/* Taller screens (800px+) - slight adjustments */
 @media (min-height: 800px) {
   .wizardContainer {
-    padding-top: 5vh;
+    padding-top: 3vh;
   }
 
   .decorativeCircles {
-    margin-top: 6vh;
-    margin-bottom: 5vh;
+    margin-top: 4vh;
+    margin-bottom: 3vh;
   }
 
   .stepContainer {
-    margin-top: 2rem;
+    margin-top: 1rem;
+  }
+
+  .optionsContainer {
+    margin-top: 1.5rem;
   }
 }
 
 /* Very tall screens (900px+) */
 @media (min-height: 900px) {
   .wizardContainer {
-    padding-top: 6vh;
+    padding-top: 4vh;
   }
 
   .decorativeCircles {
-    margin-top: 7vh;
+    margin-top: 5vh;
   }
 
   .stepContainer {
-    margin-top: 3rem;
+    margin-top: 1.5rem;
+  }
+
+  .optionsContainer {
+    margin-top: 2rem;
   }
 }
 
