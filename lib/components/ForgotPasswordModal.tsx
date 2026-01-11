@@ -47,7 +47,7 @@ export default function ForgotPasswordModal({
               <p className={styles.message}>בדוק את תיבת הדואר שלך</p>
             </div>
             <div className={styles.buttons}>
-              <button onClick={onClose} className={styles.primaryButton}>
+              <button onClick={onClose} className={styles.closeButton}>
                 סגור
               </button>
             </div>
