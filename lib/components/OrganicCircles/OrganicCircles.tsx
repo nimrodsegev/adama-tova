@@ -262,7 +262,7 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           this.animState.time += dt * this.animState.noiseSpeed;
 
           // 💧 SPOUTING: Continuous phase increment for ripple effect
-          this.animState.emitPhase += dt * 0.2; // Speed of ripples
+          this.animState.emitPhase += dt * 0.1; // Speed of ripples
 
           if (
             this.currentMode === "splash" &&

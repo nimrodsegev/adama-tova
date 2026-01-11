@@ -143,7 +143,7 @@ export default function HomePage() {
       <div
         style={{
           minHeight: "100vh",
-          background: "#F28130",
+          background: "var(--color-background)", // Using CSS variable
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -171,7 +171,7 @@ export default function HomePage() {
             right: 0,
             bottom: 0,
             zIndex: 10001,
-            backgroundColor: "#F28130",
+            backgroundColor: "var(--color-background)", // Using CSS variable
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

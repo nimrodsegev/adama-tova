@@ -14,7 +14,7 @@ interface PageTransitionContextType {
 
 const PageTransitionContext = createContext<PageTransitionContextType>({
   isTransitioning: false,
-  currentTransitionMode: "breathing",
+  currentTransitionMode: "spouting",
   setTransitionMode: () => {},
 });
 
@@ -37,7 +37,7 @@ export function PageTransitionProvider({
   children,
 }: PageTransitionProviderProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [transitionMode, setTransitionMode] = useState<MotionMode>("breathing");
+  const [transitionMode, setTransitionMode] = useState<MotionMode>("spouting");
   const pathname = usePathname();
   const previousPathname = useRef<string | null>(null);
   const { userProfile } = useUser();
@@ -78,7 +78,7 @@ export function PageTransitionProvider({
       // Show transition
       setIsTransitioning(true);
 
-      // Hide transition after 750ms
+      // Hide transition after 1000ms
       const timer = setTimeout(() => {
         setIsTransitioning(false);
       }, 1000);
@@ -104,22 +104,22 @@ export function PageTransitionProvider({
             left: 0,
             width: "100vw",
             height: "100vh",
-            background: "#F28130",
+            background: "var(--color-background)", // Using CSS variable
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 99999,
-            color: "#EFEFEF",
-            fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
-            fontSize: "1.25rem",
+            zIndex: 99999, // Higher than modal backdrop
+            color: "var(--color-text-primary)", // Using CSS variable
+            fontFamily: "var(--font-secondary)", // Using CSS variable
+            fontSize: "var(--font-size-xl)", // Using CSS variable
           }}
           dir="rtl"
         >
           <OrganicCircles
             mode={transitionMode}
-            radius={0.15}
+            radius={0.35}
             {...shapeParams}
-            baseColor="#FFFFFF"
+            baseColor="#FFFFFF" // White circles on gradient background
             position={{ x: 0.5, y: 0.5 }}
           />
         </div>
