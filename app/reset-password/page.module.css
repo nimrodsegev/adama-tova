@@ -4,9 +4,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: 100vh;
+  min-height: 100dvh; /* Use dvh for PWA compatibility */
   width: 100%;
   padding: 0 1.5rem; /* 24px */
+  padding-top: env(safe-area-inset-top, 0); /* Safe area for notch */
+  padding-bottom: env(safe-area-inset-bottom, 0);
   background: var(--color-background);
   background-attachment: fixed;
   direction: rtl;

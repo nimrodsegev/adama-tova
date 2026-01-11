@@ -9,12 +9,11 @@
   flex-direction: column;
   align-items: center;
   padding: 0 1.5rem;
-  padding-top: 3vh;
+  padding-top: calc(3vh + env(safe-area-inset-top, 0)); /* Safe area for notch */
   padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0)); /* Space for fixed navigation */
 
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100dvh; /* Use dvh only for PWA compatibility */
 
   background: var(--color-background);
   background-attachment: fixed;
@@ -727,8 +726,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100dvh; /* Use dvh for PWA compatibility */
   width: 100%;
+  padding-top: env(safe-area-inset-top, 0); /* Safe area for notch */
+  padding-bottom: env(safe-area-inset-bottom, 0);
   background: var(--color-background);
   background-attachment: fixed;
   position: relative;
