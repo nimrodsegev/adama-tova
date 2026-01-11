@@ -128,10 +128,10 @@ export default function ResetPasswordPage() {
   // LOADING STATE
   if (checkingSession) {
     return (
-      <div className={`mobile-container ${styles.resetContainer}`}>
+      <div className={styles.resetContainer}>
         <div className={styles.content}>
-          <div className="text-section-title" style={{ textAlign: "center", color: "var(--color-text-primary)" }}>
-            טוען...
+          <div className={styles.greeting}>
+            <p className={styles.subtitle}>טוען...</p>
           </div>
         </div>
       </div>
@@ -141,11 +141,20 @@ export default function ResetPasswordPage() {
   // ERROR STATE
   if (sessionError) {
     return (
-      <div className={`mobile-container ${styles.resetContainer}`}>
+      <div className={styles.resetContainer}>
         <div className={styles.content}>
-          <div className="section gap-sm" style={{ textAlign: "center" }}>
-             <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>{sessionError}</p>
+          {/* Decorative Icon */}
+          <div className={styles.decorativeIcon}>
+            <span className={styles.vectorOuter}></span>
+            <span className={styles.vectorMiddle}></span>
+            <span className={styles.vectorInner}></span>
           </div>
+
+          <div className={styles.greeting}>
+            <h1 className={styles.title}>שגיאה</h1>
+            <p className={styles.subtitle}>{sessionError}</p>
+          </div>
+
           <button
             onClick={() => router.push('/login')}
             className={styles.primaryButton}
@@ -160,11 +169,18 @@ export default function ResetPasswordPage() {
   // SUCCESS STATE
   if (success) {
     return (
-      <div className={`mobile-container ${styles.resetContainer}`}>
+      <div className={styles.resetContainer}>
         <div className={styles.content}>
-          <div className="section gap-sm" style={{ textAlign: "center" }}>
-            <h1 className="header-primary" style={{ color: "var(--color-text-secondary)" }}>סיסמה שונתה בהצלחה!</h1>
-            <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>מעביר אותך לדף ההתחברות...</p>
+          {/* Decorative Icon */}
+          <div className={styles.decorativeIcon}>
+            <span className={styles.vectorOuter}></span>
+            <span className={styles.vectorMiddle}></span>
+            <span className={styles.vectorInner}></span>
+          </div>
+
+          <div className={styles.greeting}>
+            <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
+            <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
           </div>
         </div>
       </div>
@@ -173,57 +189,66 @@ export default function ResetPasswordPage() {
 
   // MAIN FORM STATE
   return (
-    <div className={`mobile-container ${styles.resetContainer}`}>
+    <div className={styles.resetContainer}>
       <div className={styles.content}>
-        
-        {/* Header Section */}
-        <div className="section gap-sm" style={{ textAlign: "center" }}>
-          <h1 className="header-primary" style={{ color: "var(--color-text-secondary)" }}>שינוי סיסמה</h1>
-          <p className="text-subtitle" style={{ color: "var(--color-text-primary)" }}>
-            הכנס את סיסמה החדשה על מנת לקבל שוב גישה למערכת.
+        {/* Decorative Icon */}
+        <div className={styles.decorativeIcon}>
+          <span className={styles.vectorOuter}></span>
+          <span className={styles.vectorMiddle}></span>
+          <span className={styles.vectorInner}></span>
+        </div>
+
+        {/* Greeting section */}
+        <div className={styles.greeting}>
+          <h1 className={styles.title}>שינוי סיסמה</h1>
+          <p className={styles.subtitle}>
+            הכנס את הסיסמה החדשה על מנת לקבל שוב גישה למערכת.
           </p>
         </div>
 
+        {/* Form Content */}
         <form onSubmit={handleSubmit} className={styles.formContent}>
-          {/* Password Input */}
-          <div className={styles.inputWrapper}>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordError('');
-                setConfirmPasswordError('');
-              }}
-              required
-              className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
-              dir="rtl"
-              placeholder="6 תווים או יותר"
-            />
-            <span className={styles.inputLabel}>סיסמה חדשה</span>
-            {passwordError && (
-              <span className={styles.fieldError}>{passwordError}</span>
-            )}
-          </div>
+          <div className={styles.inputsContainer}>
+            {/* Password Input */}
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputLabel}>סיסמה חדשה</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError('');
+                  setConfirmPasswordError('');
+                }}
+                required
+                className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
+                dir="rtl"
+                placeholder="6 תווים או יותר"
+              />
+              {passwordError && (
+                <span className={styles.fieldError}>{passwordError}</span>
+              )}
+            </div>
 
-          {/* Confirm Password Input */}
-          <div className={styles.inputWrapper}>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                setConfirmPasswordError('');
-              }}
-              required
-              className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
-              dir="rtl"
-              placeholder="6 תווים או יותר"
-            />
-            <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
-            {confirmPasswordError && (
-              <span className={styles.fieldError}>{confirmPasswordError}</span>
-            )}
+            {/* Confirm Password Input */}
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setConfirmPasswordError('');
+                }}
+                required
+                className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
+                dir="rtl"
+                placeholder="6 תווים או יותר"
+              />
+              {confirmPasswordError && (
+                <span className={styles.fieldError}>{confirmPasswordError}</span>
+              )}
+            </div>
           </div>
 
           <button
