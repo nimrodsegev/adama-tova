@@ -40,7 +40,6 @@ class NoiseGenerator {
 
 export type { MotionMode };
 
-// 🛠 ADDED 'export' HERE SO THE CALENDAR PAGE CAN ACCESS THE TYPE
 export interface OrganicCirclesRef {
   setMode: (mode: MotionMode) => void;
   updateLayers: (count: number) => void;
@@ -143,7 +142,6 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
         }
 
         updateConfig(c: any) {
-          // SPLASH MODE IS DECOUPLED FROM EXTERNAL UPDATES
           if (this.currentMode === "splash") {
             if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
             if (c.position !== undefined) this.config.position = c.position;
@@ -199,6 +197,9 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             this.animState.splashProgress = 0;
             this.animState.splashCallbackTriggered = false;
             this.createLayers();
+          } else if (m === "spouting") {
+            // Reset emit phase for continuous ripples
+            this.animState.emitPhase = 0;
           } else if (m === "rolling") {
             this.animState.rollingStartTime = Date.now();
             this.animState.centerXOffset = -this.width * 0.3;
@@ -234,6 +235,10 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           const ny = Math.sin(angle) * noiseScale + layerIndex * 10;
           let n =
             (noise.noise2D(nx, ny) + 0.5 * noise.noise2D(nx * 2, ny * 2)) / 1.5;
+
+          // ✅ NO DIRECTIONAL LOGIC - Continuous ripples for spouting
+          // The ripple effect is handled in the draw() method with radius/opacity
+
           return baseR * (1 + n * this.animState.complexity * 0.3);
         }
 
@@ -255,6 +260,9 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           });
 
           this.animState.time += dt * this.animState.noiseSpeed;
+
+          // 💧 SPOUTING: Continuous phase increment for ripple effect
+          this.animState.emitPhase += dt * 0.2; // Speed of ripples
 
           if (
             this.currentMode === "splash" &&
@@ -302,7 +310,29 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
 
           this.paths.forEach((path, i) => {
             let r, op;
-            if (this.currentMode === "splash") {
+
+            // 💧 SPOUTING MODE - CONTINUOUS RIPPLES
+            if (this.currentMode === "spouting") {
+              // Each layer offset creates staggered ripples
+              const layerOffset = i / this.config.layerCount;
+
+              // Progress wraps continuously (0 to 1 cycle)
+              const progress = (this.animState.emitPhase + layerOffset) % 1;
+
+              // Radius grows from center outward
+              r = this.animState.radius * dim * progress;
+
+              // Fade in quickly at start
+              const fadeIn = Math.min(progress * 8, 1);
+
+              // Fade out as it reaches edge
+              const fadeOut = 1 - Math.pow(progress, 3);
+
+              // Combined opacity for smooth ripple
+              op = this.animState.opacity * fadeOut * fadeIn;
+            }
+            // ALL OTHER MODES
+            else if (this.currentMode === "splash") {
               const start = i / this.config.layerCount,
                 end = (i + 1) / this.config.layerCount;
               const sVis =
@@ -325,10 +355,12 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
                 (1 + breath * this.animState.amplitude);
               op = this.animState.opacity * (1 - i * 0.12);
             }
+
             if (op <= 0.01 || r <= 0) {
               path.setAttribute("opacity", "0");
               return;
             }
+
             const pts: [number, number][] = [];
             const rot = this.currentMode === "rolling" ? Date.now() * 0.004 : 0;
             for (let j = 0; j < 80; j++) {
