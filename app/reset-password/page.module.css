@@ -194,7 +194,7 @@
 /* Field error text */
 .fieldError {
   position: absolute;
-  right: 5rem;
+  right: 1.8125rem; /* Same as inputLabel */
   top: -0.5rem;
 
   padding: 0 0.3125rem;

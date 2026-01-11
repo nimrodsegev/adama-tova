@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, TouchEvent } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/app/services/authService';
 import { userService } from '@/app/services/userService';
@@ -71,13 +71,27 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
-  // Swipe handling
+  // Scroll snap refs
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Touch tracking for back gesture on first page
   const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-  const minSwipeDistance = 50;
+  const touchStartScrollLeft = useRef<number | null>(null);
 
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
   const isValidIsraeliMobile = (p: string) => /^05\d{8}$/.test(p.replace(/[-\s]/g, ''));
+
+  // Computed validation - determines if scrolling is allowed
+  const isStep0Valid = useMemo(() => {
+    const trimmedName = fullName.trim();
+    const cleanPhone = phone.replace(/[-\s]/g, '');
+    return (
+      trimmedName !== '' &&
+      isHebrewName(trimmedName) &&
+      cleanPhone !== '' &&
+      isValidIsraeliMobile(cleanPhone)
+    );
+  }, [fullName, phone]);
 
   const validateStep0 = (): boolean => {
     setNameError('');
@@ -103,59 +117,129 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     return true;
   };
 
-  const handleNext = async () => {
-    if (currentStep === 0) {
-      if (!validateStep0()) return;
-    }
+  // Handle scroll to detect current step (works with RTL)
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-    if (currentStep === TOTAL_STEPS - 1) {
-      await handleSubmit();
-    } else {
-      setCurrentStep(currentStep + 1);
+    const slideWidth = container.offsetWidth;
+    // Use Math.abs for RTL compatibility (scrollLeft can be negative in RTL)
+    const scrollPosition = Math.abs(container.scrollLeft);
+    const newStep = Math.round(scrollPosition / slideWidth);
+
+    if (newStep >= 0 && newStep < TOTAL_STEPS) {
+      setCurrentStep(newStep);
+    }
+  }, []);
+
+  // Attach scroll listener
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // Use both scroll and scrollend for reliability
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    container.addEventListener('scrollend', handleScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener('scrollend', handleScroll);
+    };
+  }, [handleScroll]);
+
+  // Align label backgrounds with page gradient (frozen during keyboard to avoid iOS compositor bug)
+  const isKeyboardOpen = useRef(false);
+
+  useLayoutEffect(() => {
+    const updateLabelBackgrounds = () => {
+      // Don't update during keyboard animation - freeze at last good state
+      if (isKeyboardOpen.current) return;
+
+      const vh = window.innerHeight;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      const labels = container.querySelectorAll(
+        `.${styles.inputLabel}, .${styles.fieldError}`
+      ) as NodeListOf<HTMLElement>;
+
+      labels.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--bg-y', `${-rect.top}px`);
+      });
+    };
+
+    const onFocusIn = () => {
+      isKeyboardOpen.current = true;
+    };
+
+    const onFocusOut = () => {
+      isKeyboardOpen.current = false;
+      // Resume updates after keyboard closes
+      requestAnimationFrame(updateLabelBackgrounds);
+    };
+
+    updateLabelBackgrounds();
+    const raf = requestAnimationFrame(updateLabelBackgrounds);
+
+    window.addEventListener('resize', updateLabelBackgrounds);
+    window.addEventListener('orientationchange', updateLabelBackgrounds);
+    document.addEventListener('focusin', onFocusIn);
+    document.addEventListener('focusout', onFocusOut);
+
+    const container = scrollContainerRef.current;
+    container?.addEventListener('scroll', updateLabelBackgrounds, { passive: true });
+
+    const ro = new ResizeObserver(updateLabelBackgrounds);
+    ro.observe(document.body);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', updateLabelBackgrounds);
+      window.removeEventListener('orientationchange', updateLabelBackgrounds);
+      document.removeEventListener('focusin', onFocusIn);
+      document.removeEventListener('focusout', onFocusOut);
+      container?.removeEventListener('scroll', updateLabelBackgrounds);
+      ro.disconnect();
+    };
+  }, []);
+
+  // Touch handlers for back gesture on first page
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    if (scrollContainerRef.current) {
+      touchStartScrollLeft.current = scrollContainerRef.current.scrollLeft;
     }
   };
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    } else {
-      onBack();
-    }
-  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartScrollLeft.current === null) return;
 
-  // Swipe handlers
-  const onTouchStart = (e: TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-    touchEndX.current = null; // Reset end position
-  };
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-  const onTouchMove = (e: TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
+    const slideWidth = container.offsetWidth;
+    const startStep = Math.round(touchStartScrollLeft.current / slideWidth);
 
-  const onTouchEnd = () => {
-    // Only process swipe if both start and end positions are set
-    // (meaning there was actual movement, not just a tap/click)
-    if (touchStartX.current === null || touchEndX.current === null) {
-      touchStartX.current = null;
-      touchEndX.current = null;
-      return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchEndX - touchStartX.current;
+
+    // On step 0:
+    if (startStep === 0) {
+      // Swiped left (back) = go to login
+      if (diff < -50) {
+        onBack();
+      }
+      // Swiped right (forward) but form invalid = show errors
+      else if (diff > 50 && !isStep0Valid) {
+        validateStep0();
+      }
     }
 
-    const distance = touchStartX.current - touchEndX.current;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    // Swipe right = next (forward), swipe left = back
-    if (isRightSwipe) {
-      handleNext();
-    } else if (isLeftSwipe) {
-      handleBack();
-    }
-
-    // Reset for next swipe
     touchStartX.current = null;
-    touchEndX.current = null;
+    touchStartScrollLeft.current = null;
   };
 
   const handleSubmit = async () => {
@@ -220,29 +304,27 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   };
 
   return (
-    <div
-      className={styles.wizardContainer}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      <div className={styles.content}>
-
+    <div className={styles.wizardContainer}>
+      {/* Scroll Snap Container - locked until step 0 is valid */}
+      <div
+        ref={scrollContainerRef}
+        className={`${styles.scrollSnapContainer} ${!isStep0Valid ? styles.scrollLocked : ''}`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* Step 0: Personal Details */}
-        {currentStep === 0 && (
-          <>
+        <div className={styles.scrollSnapSlide}>
+          <div className={styles.content}>
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t('השלם/י פרטים אישיים')}</h2>
             </div>
 
-            {/* Decorative circle placeholder */}
             <div className={styles.decorativeCircles}>
               <span className={styles.circlePlaceholder}></span>
             </div>
 
             <div className={styles.stepContainer}>
               <div className={styles.inputsContainer}>
-                {/* Full Name */}
                 <div className={styles.inputWrapper}>
                   <span className={styles.inputLabel}>שם מלא</span>
                   <input
@@ -258,7 +340,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   {nameError && <span className={styles.fieldError}>{nameError}</span>}
                 </div>
 
-                {/* Phone */}
                 <div className={styles.inputWrapper}>
                   <span className={styles.inputLabel}>מספר טלפון</span>
                   <input
@@ -274,7 +355,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   {phoneError && <span className={styles.fieldError}>{phoneError}</span>}
                 </div>
 
-                {/* Gender Accordion */}
                 <div className={styles.genderSelector}>
                   <div className={styles.inputWrapper}>
                     <span className={styles.inputLabel}>מין</span>
@@ -310,18 +390,17 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 </div>
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
 
         {/* Step 1: Branch Selection */}
-        {currentStep === 1 && (
-          <>
+        <div className={styles.scrollSnapSlide}>
+          <div className={styles.content}>
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t('הסניף הקרוב [אליך|אלייך]')}</h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
-            {/* Decorative circle placeholder */}
             <div className={styles.decorativeCircles}>
               <span className={styles.circlePlaceholder}></span>
             </div>
@@ -339,18 +418,17 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 ))}
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
 
         {/* Step 2: Interests */}
-        {currentStep === 2 && (
-          <>
+        <div className={styles.scrollSnapSlide}>
+          <div className={styles.content}>
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t('מה מעניין אותך?')}</h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
-            {/* Decorative circle placeholder */}
             <div className={styles.decorativeCircles}>
               <span className={styles.circlePlaceholder}></span>
             </div>
@@ -368,25 +446,23 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 ))}
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
 
         {/* Step 3: Circle Selection (Personal Background) */}
-        {currentStep === 3 && (
-          <>
+        <div className={styles.scrollSnapSlide}>
+          <div className={styles.content}>
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
-            {/* Decorative circle placeholder */}
             <div className={styles.decorativeCircles}>
               <span className={styles.circlePlaceholder}></span>
             </div>
 
             <div className={styles.stepContainerLower}>
               <div className={styles.inputsContainer}>
-                {/* Circle Accordion */}
                 <div className={styles.accordionContainer}>
                   <div className={styles.inputWrapper}>
                     <span className={styles.inputLabel}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</span>
@@ -420,7 +496,6 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   )}
                 </div>
 
-                {/* Other/Proximity text field */}
                 <div className={styles.inputWrapper}>
                   <span className={styles.inputLabel}>אחר</span>
                   <input
@@ -433,40 +508,41 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                 </div>
               </div>
             </div>
-          </>
-        )}
+          </div>
+        </div>
 
-        {/* Step 4: Free Text - No circle, centered layout */}
-        {currentStep === 4 && (
-          <div className={styles.lastStepContainer}>
-            <div className={styles.lastStepContent}>
-              <h2 className={styles.lastStepTitle}>{t('*כל דבר אחר שתרצה/י שנדע:')}</h2>
+        {/* Step 4: Free Text */}
+        <div className={styles.scrollSnapSlide}>
+          <div className={styles.content}>
+            <div className={styles.lastStepContainer}>
+              <div className={styles.lastStepContent}>
+                <h2 className={styles.lastStepTitle}>{t('*כל דבר אחר שתרצה/י שנדע:')}</h2>
 
-              <div className={styles.inputWrapper}>
-                <span className={styles.inputLabel}>אחר</span>
-                <textarea
-                  value={freeText}
-                  onChange={(e) => setFreeText(e.target.value)}
-                  className={styles.textarea}
-                  rows={1}
-                  dir="rtl"
-                />
+                <div className={styles.inputWrapper}>
+                  <span className={styles.inputLabel}>אחר</span>
+                  <textarea
+                    value={freeText}
+                    onChange={(e) => setFreeText(e.target.value)}
+                    className={styles.textarea}
+                    rows={1}
+                    dir="rtl"
+                  />
+                </div>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className={styles.submitButton}
+                >
+                  {loading ? '...' : 'סיום'}
+                </button>
               </div>
-
-              {/* Submit button for last step */}
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className={styles.submitButton}
-              >
-                {loading ? '...' : 'סיום'}
-              </button>
             </div>
           </div>
-        )}
-
-        {error && <p className={styles.error}>{error}</p>}
+        </div>
       </div>
+
+      {error && <p className={styles.error}>{error}</p>}
 
       {/* Progress Diamonds - Fixed at bottom */}
       <div className={styles.navigation}>

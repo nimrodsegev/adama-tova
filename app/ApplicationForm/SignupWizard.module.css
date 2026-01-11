@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 1.5rem;
+  padding: 0;
   padding-top: calc(3vh + env(safe-area-inset-top, 0)); /* Safe area for notch */
   padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0)); /* Space for fixed navigation */
 
@@ -19,9 +19,48 @@
   background-attachment: fixed;
 
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   direction: rtl;
   position: relative;
+}
+
+/* Scroll Snap Container - horizontal scrolling */
+.scrollSnapContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scrollSnapContainer::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Lock scrolling until validation passes */
+.scrollLocked {
+  overflow-x: hidden !important;
+  touch-action: pan-y;
+}
+
+/* Each slide takes full width */
+.scrollSnapSlide {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem;
+  overflow: visible; /* Allow dropdowns to extend beyond */
 }
 
 /* Content wrapper */
@@ -113,7 +152,7 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
-  margin-top: 4rem;
+  margin-top: 3rem;
 }
 
 .stepContainerLower {
@@ -202,8 +241,11 @@
   right: 1.9531rem; /* 31.25px */
   top: -0.5rem; /* -8px */
 
-  background: var(--color-background);
-  background-attachment: fixed;
+  /* Gradient that aligns with page - position set via JS (frozen during keyboard) */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100% var(--vh, 100dvh);
+  background-position: 0 var(--bg-y, 0px);
 
   font-family: var(--font-secondary);
   font-style: normal;
@@ -224,11 +266,14 @@
 
 .fieldError {
   position: absolute;
-  right: 5rem;
+  right: 1.9531rem; /* Same as inputLabel */
   top: -0.5rem;
   padding: 0 0.3125rem;
-  background: var(--color-background);
-  background-attachment: fixed;
+  /* Gradient that aligns with page - position set via JS (frozen during keyboard) */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100% var(--vh, 100dvh);
+  background-position: 0 var(--bg-y, 0px);
   font-family: var(--font-secondary);
   font-size: 0.875rem;
   font-weight: var(--font-weight-normal);
