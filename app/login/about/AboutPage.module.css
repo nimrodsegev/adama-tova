@@ -171,3 +171,16 @@
 .navigationButton:hover {
   opacity: 0.9;
 }
+
+/* Taller phones - move content higher */
+@media (min-height: 800px) {
+  .contentFrame {
+    top: calc(50% - 4rem);
+  }
+}
+
+@media (min-height: 900px) {
+  .contentFrame {
+    top: calc(50% - 5rem);
+  }
+}

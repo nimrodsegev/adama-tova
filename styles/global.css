@@ -719,6 +719,13 @@ body {
   transform: rotate(-45deg);
 }
 
+/* Close button - higher on small phones only */
+@media (max-width: 26rem) {
+  .close-button {
+    top: 1rem; /* 16px - higher on small phones */
+  }
+}
+
 /* ============================================
    FORM INPUTS (Gradient Background Style)
    ============================================ */
