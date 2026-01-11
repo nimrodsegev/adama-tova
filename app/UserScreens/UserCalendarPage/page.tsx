@@ -139,7 +139,7 @@ export default function UserCalendarPage() {
 
   return (
     <div className="mobile-container">
-      {/* 🔵 Organic Circles Loading Overlay */}
+      {/* 🔵 Organic Circles Loading Overlay - Semi-transparent gradient */}
       {loading && (
         <div
           style={{
@@ -153,7 +153,9 @@ export default function UserCalendarPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(242, 129, 48, 0.3)", // Subtle orange tint to background while loading
+            // Using gradient colors from CSS variables with opacity
+            background:
+              "linear-gradient(180deg, rgba(231, 78, 28, 0.3) 0%, rgba(222, 105, 48, 0.3) 53%, rgba(231, 146, 103, 0.3) 87%)",
           }}
         >
           <OrganicCircles
