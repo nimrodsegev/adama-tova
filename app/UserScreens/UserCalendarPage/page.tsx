@@ -1,13 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import {
-  apiActivities,
-  apiRegistrations,
-  apiUser,
-} from "@/app/services/db_api";
+import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
 import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
+import OrganicCircles, {
+  OrganicCirclesRef,
+} from "@/lib/components/OrganicCircles/OrganicCircles";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import styles from "./UserCalendarPage.module.css";
 
 // Interests Mapping (same as HomePage)
@@ -28,33 +28,31 @@ export default function UserCalendarPage() {
   const [loading, setLoading] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0); // 0 = current week, 1 = next week
 
+  // 🔵 Organic Circles ref for imperative controls if needed
+  const circlesRef = useRef<OrganicCirclesRef>(null);
+
+  // 🎨 Calculate shape parameters based on user profile (Native Ranges: 0-1, 0-5)
+  const shapeParams = calculateShapeParams(userProfile);
+
   // Closed days: Monday(1), Thursday(4), Friday(5), Saturday(6)
   const closedDays = [1, 4, 5, 6];
   const isDayClosed = closedDays.includes(selectedDayIndex);
 
-  // Get current week's start date (Sunday) + offset
   const getWeekStartDate = () => {
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
-    const diff = -dayOfWeek; // Days to subtract to get to Sunday
+    const dayOfWeek = now.getDay();
+    const diff = -dayOfWeek;
     const sunday = new Date(now);
-    sunday.setDate(now.getDate() + diff + weekOffset * 7); // Add week offset
+    sunday.setDate(now.getDate() + diff + weekOffset * 7);
     sunday.setHours(0, 0, 0, 0);
     return sunday;
   };
 
-  // Navigation functions
   const goToPreviousWeek = () => {
-    if (weekOffset > 0) {
-      setWeekOffset(weekOffset - 1);
-    }
+    if (weekOffset > 0) setWeekOffset(weekOffset - 1);
   };
-
   const goToNextWeek = () => {
-    if (weekOffset < 1) {
-      // Only allow up to next week
-      setWeekOffset(weekOffset + 1);
-    }
+    if (weekOffset < 1) setWeekOffset(weekOffset + 1);
   };
 
   const isCurrentWeek = weekOffset === 0;
@@ -70,7 +68,6 @@ export default function UserCalendarPage() {
   const selectedDateObj = getSelectedDateObject();
 
   const fetchData = async () => {
-    // If closed day, clear and return
     if (isDayClosed) {
       setActivities([]);
       return;
@@ -83,81 +80,101 @@ export default function UserCalendarPage() {
     const day = String(selectedDateObj.getDate()).padStart(2, "0");
     const dateString = `${year}-${month}-${day}`;
 
-    // 👇 1. Fetch Activities AND User Branches in parallel
-    const [[actData, actError], [userBranches, branchError]] =
-      await Promise.all([
-        apiActivities.getByDate(dateString),
-        // Only fetch branches if we have a user, otherwise null
-        user ? apiUser.getUserBranches(user.id) : Promise.resolve([null, null]),
-      ]);
+    // Force delay to ensure the organic loading animation is visible
+    await new Promise((resolve) => setTimeout(resolve, 750));
 
-    if (actError) console.error("Error fetching activities:", actError);
-    if (branchError) console.error("Error fetching branches:", branchError);
+    try {
+      const [[actData, actError], [userBranches, branchError]] =
+        await Promise.all([
+          apiActivities.getByDate(dateString),
+          user
+            ? apiUser.getUserBranches(user.id)
+            : Promise.resolve([null, null]),
+        ]);
 
-    const rawActivities = actData || [];
-    const validBranches = userBranches || ["nahalal", "satria"]; // Default to both
+      if (actError) console.error("Error fetching activities:", actError);
 
-    // 👇 2. Filter by Branch
-    const branchFilteredActivities = rawActivities.filter((activity: any) => {
-      // Keep if: No branch defined OR branch is in user's list
-      return !activity.branch || validBranches.includes(activity.branch);
-    });
+      const rawActivities = actData || [];
+      const validBranches = userBranches || ["nahalal", "satria"];
 
-    setActivities(branchFilteredActivities);
-    setLoading(false);
+      const branchFilteredActivities = rawActivities.filter((activity: any) => {
+        return !activity.branch || validBranches.includes(activity.branch);
+      });
+
+      setActivities(branchFilteredActivities);
+    } catch (err) {
+      console.error("Fetch failed", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDayIndex, weekOffset, user]); // Added weekOffset to dependencies
+  }, [selectedDayIndex, weekOffset, user]);
 
-  // Filter activities based on selected filter ("All" vs "For You")
   const getFilteredActivities = () => {
     if (filter === "all") return activities;
-
-    // "For You" filter - based on user interests
     if (filter === "foryou" && userProfile?.quiz?.interests) {
       const myInterestsEnglish = userProfile.quiz.interests.map(
         (interest: string) => INTRESTS_MAPPING[interest] || interest
       );
-
       return activities.filter((activity: any) =>
         myInterestsEnglish.includes(activity.category)
       );
     }
-
     return activities;
   };
 
   const filteredActivities = getFilteredActivities();
 
-  // Format week display
   const getWeekDisplayText = () => {
     const weekStart = getWeekStartDate();
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
-
-    const formatDate = (date: Date) => {
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      return `${day}.${month}`;
-    };
-
+    const formatDate = (date: Date) =>
+      `${date.getDate()}.${date.getMonth() + 1}`;
     return `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
   };
 
   return (
     <div className="mobile-container">
+      {/* 🔵 Organic Circles Loading Overlay - Semi-transparent gradient */}
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
+            pointerEvents: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            // Using gradient colors from CSS variables with opacity
+            background:
+              "linear-gradient(180deg, rgba(231, 78, 28, 0.3) 0%, rgba(222, 105, 48, 0.3) 53%, rgba(231, 146, 103, 0.3) 87%)",
+          }}
+        >
+          <OrganicCircles
+            ref={circlesRef}
+            mode="loading"
+            radius={0.08}
+            // Spreading unified shape parameters (complexity, smoothness, elongation, opacity, strokeWidth)
+            {...shapeParams}
+            baseColor="#FFFFFF"
+            position={{ x: 0.5, y: 0.5 }}
+          />
+        </div>
+      )}
+
       <div className={styles.mainFrame}>
-        {/* Header Section */}
         <div className={styles.headerSection}>
-          {/* Top Row - Title RIGHT + Filter LEFT */}
           <div className={styles.topRow}>
-            {/* Page Title (RIGHT side) */}
             <h1 className="header-secondary">לוח פעילויות</h1>
 
-            {/* Filter Options (LEFT side) */}
             <div className={styles.filterRow}>
               <span
                 className={
@@ -182,14 +199,10 @@ export default function UserCalendarPage() {
             </div>
           </div>
 
-          {/* Week Navigation */}
           <div className={styles.weekNavigation}>
             <button
               className={styles.weekNavButton}
-              style={{
-                opacity: isCurrentWeek ? 0.5 : 1,
-                cursor: isCurrentWeek ? "not-allowed" : "pointer",
-              }}
+              style={{ opacity: isCurrentWeek ? 0.5 : 1 }}
               onClick={goToPreviousWeek}
               disabled={isCurrentWeek}
             >
@@ -202,10 +215,7 @@ export default function UserCalendarPage() {
 
             <button
               className={styles.weekNavButton}
-              style={{
-                opacity: isNextWeek ? 0.5 : 1,
-                cursor: isNextWeek ? "not-allowed" : "pointer",
-              }}
+              style={{ opacity: isNextWeek ? 0.5 : 1 }}
               onClick={goToNextWeek}
               disabled={isNextWeek}
             >
@@ -213,7 +223,6 @@ export default function UserCalendarPage() {
             </button>
           </div>
 
-          {/* Day Slider */}
           <DaySlider
             selectedDayIndex={selectedDayIndex}
             onDaySelect={setSelectedDayIndex}
@@ -221,24 +230,16 @@ export default function UserCalendarPage() {
           />
         </div>
 
-        {/* Activities List or Closed Message */}
         <div className={styles.activitiesList}>
           {isDayClosed ? (
             <p className={styles.closedMessage}>המרחב סגור היום</p>
           ) : loading ? (
-            <p className="text-empty">טוען...</p>
+            <div style={{ minHeight: "200px" }} />
           ) : filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => (
               <ScheduleActivityCard
                 key={activity.id}
-                id={activity.id}
-                title={activity.title}
-                date={activity.date}
-                start_time={activity.start_time}
-                end_time={activity.end_time}
-                current_participants={activity.current_participants || 0}
-                max_participants={activity.max_participants}
-                waitlist_count={activity.waitlist_count || 0}
+                {...activity}
                 onRegistrationChange={fetchData}
                 isGroup={activity.is_group || !!activity.series_id}
               />

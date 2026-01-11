@@ -16,7 +16,7 @@ type UserActivityCardProps = {
   start_time: string;
   location: string;
   description: string;
-  onRegistrationChange?: () => void;
+  onMotionChange?: (state: "start" | "end") => void;
   isGroup?: boolean;
 };
 
@@ -27,13 +27,11 @@ export default function UserActivityCard({
   start_time,
   location,
   description,
-  onRegistrationChange,
+  onMotionChange,
   isGroup = false,
 }: UserActivityCardProps) {
   const { user, userProfile } = useUser();
-
   const isAdmin = userProfile?.role === "admin";
-
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
     "none"
   );
@@ -42,10 +40,11 @@ export default function UserActivityCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<string | null>(null);
+  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<
+    string | null
+  >(null);
 
   const formattedTime = start_time.slice(0, 5);
-
   const dateObj = new Date(date);
   const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
   const dayMonth = `${dateObj.getDate().toString().padStart(2, "0")}.${(
@@ -55,90 +54,88 @@ export default function UserActivityCard({
     .padStart(2, "0")}`;
 
   useEffect(() => {
-    if (user && id) {
-      checkRegistrationStatus();
-    }
+    if (user && id) checkRegistrationStatus();
   }, [user, id]);
 
   const checkRegistrationStatus = async () => {
-    if (!user || !id) return;
-    try {
-      const [statusData, error] = await apiRegistrations.getRegistrationStatus(
-        user.id,
-        id
+    const [statusData, error] = await apiRegistrations.getRegistrationStatus(
+      user!.id,
+      id
+    );
+    if (!error && statusData) {
+      setRegStatus(
+        statusData.status === "confirmed" || statusData.status === "waitlist"
+          ? statusData.status
+          : "none"
       );
-      if (!error && statusData) {
-        const { status, wait_list_place } = statusData;
-        if (status === "confirmed" || status === "waitlist") {
-          setRegStatus(status);
-          setWaitlistPosition(wait_list_place);
-        } else {
-          setRegStatus("none");
-          setWaitlistPosition(null);
-        }
-      } else {
-        setRegStatus("none");
-        setWaitlistPosition(null);
-      }
-    } catch (error) {
-      console.error("Error checking registration:", error);
+      setWaitlistPosition(statusData.wait_list_place);
     }
   };
 
   const handleRegistrationToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (!user || loading || isAdmin) return;
 
-    // If already registered, show cancel confirmation modal
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
       return;
     }
 
-    // If not registered, proceed with registration
+    // 🚀 STEP 1: Show Motion Transition immediately
+    onMotionChange?.("start");
     setLoading(true);
 
     try {
       const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
 
       if (res && typeof res === "object" && "success" in res) {
+        // Update local state for the modal
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        // Show success modal - refresh will happen when modal closes
+        // 🎯 FIX 1: Wait 1.5 seconds before showing success modal
+        // This gives time for the spouting animation to play
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // 🚀 STEP 2: Open Success Modal
+        // The motion overlay is still visible in the background
         setIsSuccessModalOpen(true);
+      } else {
+        onMotionChange?.("end"); // API Failure
       }
     } catch (error) {
-      console.error("Registration exception:", error);
+      console.error(error);
+      onMotionChange?.("end"); // Exception Failure
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancelConfirm = async () => {
-    if (!user || loading) return;
-
+    setIsCancelModalOpen(false);
+    onMotionChange?.("start");
     setLoading(true);
 
     try {
-      const [_, error] = await apiRegistrations.cancelRegistration(user.id, id);
+      const [_, error] = await apiRegistrations.cancelRegistration(
+        user!.id,
+        id
+      );
       if (!error) {
         setRegStatus("none");
-        setWaitlistPosition(null);
 
-        // Close cancel modal
-        setIsCancelModalOpen(false);
-
-        // Refresh home page immediately
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        onRegistrationChange?.();
+        // Wait 1.5s for motion before refreshing
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        onMotionChange?.("end"); // Triggers fetchData in HomePage
+      } else {
+        onMotionChange?.("end");
       }
     } catch (error) {
-      console.error("Unregistration error:", error);
+      console.error(error);
+      onMotionChange?.("end");
     } finally {
       setLoading(false);
     }
@@ -146,32 +143,27 @@ export default function UserActivityCard({
 
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
-    // Refresh home page when success modal closes
-    onRegistrationChange?.();
-  };
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest("button")) {
-      return;
-    }
-    setIsModalOpen(true);
-  };
+    // 🎯 FIX 2: Show motion AGAIN when closing success modal
+    // Then trigger data refresh, which will hide motion when complete
+    onMotionChange?.("start");
 
-  const handleModalRegistrationChange = () => {
-    checkRegistrationStatus();
-    onRegistrationChange?.();
+    // Small delay to let motion start, then trigger end (which fetches data)
+    setTimeout(() => {
+      onMotionChange?.("end"); // This triggers fetchData in HomePage
+    }, 750);
   };
 
   const showRegisterButton = !isAdmin;
 
   return (
     <>
-      <div onClick={handleCardClick} className={styles.cardContainer}>
+      <div
+        onClick={() => setIsModalOpen(true)}
+        className={styles.cardContainer}
+      >
         <div className={styles.frame224}>
-          {/* Title */}
           <h3 className={styles.titleText}>{title}</h3>
-
-          {/* Date and Time - NO LOCATION */}
           <div className={styles.frame266}>
             <p className={styles.bodyM}>
               {dayName} {dayMonth}
@@ -228,15 +220,13 @@ export default function UserActivityCard({
         </div>
       </div>
 
-      {/* Activity Details Modal */}
       <ActivityDetailsModal
         activityId={id}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRegistrationChange={handleModalRegistrationChange}
+        onRegistrationChange={() => checkRegistrationStatus()}
       />
 
-      {/* Cancel Confirmation Modal */}
       <CancelConfirmationModal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
@@ -246,10 +236,8 @@ export default function UserActivityCard({
         activityTime={formattedTime}
       />
 
-      {/* Success Modal */}
-      {isSuccessModalOpen && (
-        // Group with space AND pending approval (not waitlist)
-        registrationBackendStatus === 'pending' && regStatus !== 'waitlist' ? (
+      {isSuccessModalOpen &&
+        (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -258,7 +246,6 @@ export default function UserActivityCard({
             startTime={formattedTime}
           />
         ) : (
-          // Waitlist or regular confirmed
           <RegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -269,8 +256,7 @@ export default function UserActivityCard({
             isWaitlist={regStatus === "waitlist"}
             waitlistPosition={waitlistPosition}
           />
-        )
-      )}
+        ))}
     </>
   );
 }

@@ -32,40 +32,25 @@ export default function CancelConfirmationModal({
 
   if (!isOpen || !mounted) return null;
 
-  const handleConfirm = () => {
-    onConfirm();
-    onClose();
-  };
-
   const modalContent = (
     <>
-      {/* Overlay backdrop */}
       <div className={styles.overlay} onClick={onClose} />
-
-      {/* Modal container */}
       <div className={styles.modalContainer}>
-        {/* Content Frame */}
         <div className={styles.contentFrame}>
-          {/* Question text */}
           <p className={styles.questionText}>
             {t("?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה")}
           </p>
-
-          {/* Activity details text */}
           <p className={styles.detailsText}>
             ל{activityTitle} ב{activityDate} בשעה {activityTime}
           </p>
         </div>
 
-        {/* Buttons Frame */}
         <div className={styles.buttonsFrame}>
-          {/* Cancel button (left) */}
           <Button size="S" onClick={onClose}>
             לא
           </Button>
 
-          {/* Confirm button (right) */}
-          <Button size="M" onClick={handleConfirm}>
+          <Button size="M" onClick={onConfirm}>
             <span className={styles.confirmButtonText}>כן, לבטל</span>
           </Button>
         </div>

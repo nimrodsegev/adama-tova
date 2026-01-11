@@ -46,7 +46,14 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const PUBLIC_ROUTES = ["/login", "/login/about", "/reset-password", "/pending-approval"];
+const PUBLIC_ROUTES = [
+  "/login",
+  "/login/about",
+  "/reset-password",
+  "/pending-approval",
+  "/(splash)",
+  "/",
+];
 
 // 🔑 Detect if user is in password recovery mode
 function isPasswordRecoverySession(user: User | null): boolean {
