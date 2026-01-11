@@ -3,8 +3,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100dvh; /* Use dvh for PWA compatibility */
   padding: 1.5rem 2.3125rem; /* 24px 37px */
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 0)); /* Safe area for notch */
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
   background: var(--color-background);
   background-attachment: fixed;
 }

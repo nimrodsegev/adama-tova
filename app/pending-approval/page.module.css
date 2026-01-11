@@ -5,8 +5,7 @@
 .container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100dvh; /* Use dvh only for PWA compatibility */
 
   background: var(--color-background);
   background-attachment: fixed;
@@ -15,6 +14,8 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
+  padding-top: calc(2rem + env(safe-area-inset-top, 0)); /* Safe area for notch */
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0));
   overflow: hidden;
 }
 
