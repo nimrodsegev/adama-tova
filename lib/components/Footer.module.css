@@ -1,0 +1,67 @@
+.footerWrapper {
+  /* Force the element to the viewport edges, ignoring parent padding/margins */
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important; /* Uses 100% of the Viewport Width */
+
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: var(--z-fixed);
+  display: flex;
+  justify-content: center;
+}
+
+.navBar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  /* 100% width of the 100vw wrapper */
+  width: 100%;
+  height: 4.5rem; /* 72px */
+  padding: 0 1.5rem;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+
+  /* Color: rgba(222, 105, 48, 1) */
+  background: #de6930;
+  border-top: 0.0625rem solid #f9f9f9;
+  border-radius: 0.5625rem 0.5625rem 0 0; /* 9px corners */
+
+  direction: rtl;
+}
+
+.iconsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  /* This keeps the icons centered and reachable on large screens */
+  max-width: var(--container-max-width);
+  height: 100%;
+}
+
+.navLink {
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.iconBox {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.iconImage {
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
