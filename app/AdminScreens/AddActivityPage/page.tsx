@@ -6,12 +6,10 @@ import styles from "./AddActivityPage.styles";
 
 type ActivityStatus = "open" | "closed" | "cancelled";
 type ActivityCategory =
-  | "Art"
-  | "Yoga"
-  | "Meditation"
-  | "Writing"
-  | "Crafts"
-  | "Mindfulness";
+  | "mindfulness"
+  | "body_motion"
+  | "music_sound"
+  | "creation_material";
 type ActivityBranch = "satria" | "nahalal";
 type GroupCircles = 
   |"Nova Survivor"
@@ -390,12 +388,10 @@ export default function AddActivityPage() {
                  required
                  style={styles.select}
                >
-                 <option value="Art">אמנות</option>
-                 <option value="Yoga">יוגה</option>
-                 <option value="Meditation">מדיטציה</option>
-                 <option value="Writing">כתיבה</option>
-                 <option value="Crafts">יצירה</option>
-                 <option value="Mindfulness">מיידנפולנס</option>
+                 <option value="mindfulness">מיינדפולנס</option>
+                 <option value="body_motion">גוף ותנועה</option>
+                 <option value="music_sound">מוזיקה</option>
+                 <option value="creation_material">יצירה וחומר</option>
                </select>
              </div>
           )}

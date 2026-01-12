@@ -27,12 +27,10 @@ const CIRCLE_OPTIONS = [
 ];
 
 const INTEREST_OPTIONS = [
-  'יוגה',
-  'מדיטציה',
-  'אומנות',
-  'כתיבה',
-  'יצירה',
   'מיינדפולנס',
+  'גוף ותנועה',
+  'מוזיקה',
+  'יצירה וחומר',
 ];
 
 const BRANCH_OPTIONS = [
