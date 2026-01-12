@@ -45,7 +45,9 @@ export default function ScheduleActivityCard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<string | null>(null);
+  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<
+    string | null
+  >(null);
 
   const formattedStartTime = start_time.slice(0, 5);
   const formattedEndTime = end_time.slice(0, 5);
@@ -109,12 +111,9 @@ export default function ScheduleActivityCard({
     setLoading(true);
 
     try {
-      const [res] = await apiRegistrations.registerUserToActivity(
-        user.id,
-        id
-      );
+      const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
 
-      if (res && typeof res === 'object' && 'success' in res) {
+      if (res && typeof res === "object" && "success" in res) {
         const isWaitlist = res.if_confirmed === false;
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
@@ -188,7 +187,7 @@ export default function ScheduleActivityCard({
         {/* Register/Unregister Button - RIGHT MOST SIDE */}
         {showRegisterButton && (
           <Button
-            size="icon"
+            size="S"
             onClick={handleRegistrationToggle}
             disabled={loading}
             style={styles.registerButton}
@@ -295,9 +294,9 @@ export default function ScheduleActivityCard({
       />
 
       {/* Success Modal */}
-      {isSuccessModalOpen && (
+      {isSuccessModalOpen &&
         // Group with space AND pending approval (not waitlist)
-        registrationBackendStatus === 'pending' && regStatus !== 'waitlist' ? (
+        (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -317,8 +316,7 @@ export default function ScheduleActivityCard({
             isWaitlist={regStatus === "waitlist"}
             waitlistPosition={waitlistPosition}
           />
-        )
-      )}
+        ))}
     </>
   );
 }
