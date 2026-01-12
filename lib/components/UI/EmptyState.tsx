@@ -1,11 +1,15 @@
-import { CSSProperties } from "react";
+"use client";
+
+import React from "react";
 import Button from "./Button";
+import styles from "./EmptyState.module.css";
 
 interface EmptyStateProps {
   message: string;
   buttonText?: string;
   buttonHref?: string;
   showIcon?: boolean;
+  onButtonClick?: () => void;
 }
 
 export default function EmptyState({
@@ -13,19 +17,26 @@ export default function EmptyState({
   buttonText,
   buttonHref,
   showIcon = true,
+  onButtonClick,
 }: EmptyStateProps) {
   return (
-    <div style={styles.emptyStateContainer}>
+    <div className={styles.emptyStateContainer}>
       {/* Icon - Dashed circle with plus */}
       {showIcon && (
-        <div style={styles.iconContainer}>
-          <svg width="71" height="72" viewBox="0 0 71 72" fill="none">
+        <div className={styles.iconContainer}>
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 71 72"
+            fill="none"
+            preserveAspectRatio="xMidYMid meet"
+          >
             {/* Outer dashed circle */}
             <circle
               cx="35.5"
               cy="36"
               r="34.4"
-              stroke="rgba(255, 255, 255, 0.5)"
+              stroke="var(--color-text-muted)"
               strokeWidth="2.2"
               strokeDasharray="4 4"
               fill="none"
@@ -35,7 +46,7 @@ export default function EmptyState({
               cx="35.5"
               cy="36"
               r="16.38"
-              stroke="rgba(255, 255, 255, 0.5)"
+              stroke="var(--color-text-muted)"
               strokeWidth="2.2"
               strokeDasharray="4 4"
               fill="none"
@@ -46,7 +57,7 @@ export default function EmptyState({
               y1="36"
               x2="41.81"
               y2="36"
-              stroke="rgba(255, 245, 245, 0.7)"
+              stroke="var(--color-text-tertiary)"
               strokeWidth="1"
             />
             {/* Vertical line (plus) */}
@@ -55,7 +66,7 @@ export default function EmptyState({
               y1="28.09"
               x2="35.5"
               y2="43.35"
-              stroke="rgba(255, 245, 245, 0.7)"
+              stroke="var(--color-text-tertiary)"
               strokeWidth="1"
             />
           </svg>
@@ -63,12 +74,17 @@ export default function EmptyState({
       )}
 
       {/* Message */}
-      <p style={styles.messageText}>{message}</p>
+      <p className={styles.messageText}>{message}</p>
 
-      {/* Optional Button */}
-      {buttonText && buttonHref && (
-        <div style={styles.buttonContainer}>
-          <Button size="M" href={buttonHref}>
+      {/* Dynamic Button - Always Size L as requested */}
+      {buttonText && (
+        <div className={styles.buttonContainer}>
+          <Button
+            variant="primary"
+            size="L"
+            href={buttonHref}
+            onClick={onButtonClick}
+          >
             {buttonText}
           </Button>
         </div>
@@ -76,54 +92,3 @@ export default function EmptyState({
     </div>
   );
 }
-
-const styles: { [key: string]: CSSProperties } = {
-  // Empty state container using CSS variables
-  emptyStateContainer: {
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: "var(--spacing-md) var(--spacing-lg)", // 12px 16px
-    gap: "var(--spacing-md)", // 12px
-    width: "100%",
-    maxWidth: "22.0625rem", // 353px
-    minHeight: "11.625rem", // 186px
-    background: "var(--color-background)",
-    border: "0.0625rem solid var(--color-text-secondary)",
-    borderRadius: "var(--radius-md)",
-  },
-
-  // Icon container using CSS variables
-  iconContainer: {
-    width: "var(--icon-size-md)", // 71px
-    height: "var(--icon-size-md-height)", // 72px
-    flex: "none",
-    flexGrow: 0,
-  },
-
-  // Message text using CSS variables
-  messageText: {
-    width: "100%",
-    maxWidth: "22.0625rem", // 353px
-    fontFamily: "var(--font-secondary)",
-    fontStyle: "normal",
-    fontWeight: "var(--font-weight-normal)",
-    fontSize: "var(--font-size-xl)", // 20px
-    lineHeight: "var(--font-size-xl)", // 20px
-    display: "flex",
-    alignItems: "flex-end",
-    justifyContent: "center",
-    textAlign: "center",
-    color: "var(--color-text-tertiary)", // rgba(255, 245, 245, 0.7)
-    flex: "none",
-    flexGrow: 0,
-    margin: 0,
-  },
-
-  // Button container
-  buttonContainer: {
-    flex: "none",
-    flexGrow: 0,
-  },
-};
