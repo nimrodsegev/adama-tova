@@ -1,27 +1,34 @@
 "use client";
 import React from "react";
 import { useUser } from "@/app/contexts/UserContext";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
+  const pathname = usePathname();
   const { user, userProfile, loading } = useUser();
 
-  if (loading || !user || !userProfile) return null;
+  // 1. Blacklist of routes where the footer must be hidden
+  const hiddenRoutes = [
+    "/AdminScreens/AddActivityPage",
+    "/AdminScreens/addNotification",
+    "/login",
+    "/ApplicationForm", // This covers the SignupWizard folder
+    "/AdminScreens/EditActivityPage",
+  ];
+
+  // Check if current path matches any item in the blacklist
+  const isHidden = hiddenRoutes.some((route) => pathname.includes(route));
+
+  // 2. Logic-based hiding
+  if (isHidden || loading || !user || !userProfile) return null;
   if (userProfile.role === "participant" && !userProfile.is_approved)
     return null;
 
   const isAdmin = userProfile.role === "admin";
 
-  /**
-   * Navigation Order (Right to Left):
-   * 1. Home
-   * 2. Notifications (Message)
-   * 3. Calendar
-   * 4. Profile (Figure)
-   * 5. Users (Admin Only)
-   */
   const baseNavItems = [
     {
       href: isAdmin ? "/AdminScreens/HomePage" : "/UserScreens/HomePage",
@@ -66,7 +73,7 @@ export default function Footer() {
                 <Image
                   src={item.icon}
                   alt={item.label}
-                  width={32} /* Increased from 24 */
+                  width={32}
                   height={32}
                   className={styles.iconImage}
                 />
