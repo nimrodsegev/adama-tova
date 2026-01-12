@@ -1,0 +1,45 @@
+.emptyStateContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Reduced padding and gap */
+  padding: var(--spacing-sm) var(--spacing-md);
+  gap: var(--spacing-sm); /* 0.5rem / 8px */
+
+  width: 100%;
+  max-width: 22.0625rem;
+  min-height: 10rem; /* Slightly lower height */
+
+  /* Transparent background with white stroke */
+  background: transparent;
+  border: 0.0625rem solid var(--color-text-secondary); /* #F9F9F9 */
+  border-radius: var(--radius-md);
+  margin: 0 auto;
+}
+
+.iconContainer {
+  width: 3.5rem; /* Reduced icon size slightly for compact look */
+  height: 3.5rem;
+  flex: none;
+}
+
+.messageText {
+  width: 100%;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-lg); /* 1.125rem / 18px */
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.buttonContainer {
+  flex: none;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-xs); /* Minimal gap to button */
+}

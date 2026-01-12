@@ -2,7 +2,6 @@ import "@/styles/global.css";
 import "./fonts.css";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-// import Navbar from "@/lib/components/Navbar";
 import Footer from "@/lib/components/Footer";
 import { AppProviders } from "@/app/providers/AppProviders";
 import { createClient } from "@/lib/supabase/server";
@@ -53,9 +52,18 @@ export default async function RootLayout({
         <script src="https://accounts.google.com/gsi/client" async defer />
       </head>
       <body>
-        {/* 👇 hydrate client with server user */}
+        {/* 👇 Hydrate client with server user */}
         <AppProviders initialUser={user}>
-          <div>{children}</div>
+          {/* Main application content. 
+              The pages (children) typically contain the .mobile-container 
+              wrapper which handles the fixed width and background.
+          */}
+          {children}
+
+          {/* Footer is placed outside the standard flow.
+              Combined with 'left: 0; right: 0;' in CSS, this ensures 
+              the bar spans the absolute full width of the screen.
+          */}
           <Footer />
         </AppProviders>
       </body>

@@ -661,7 +661,7 @@ body {
   height: 2.5rem; /* 40px */
   right: 1.5rem; /* 24px from right */
   top: 3.1875rem; /* 51px */
-
+  margin-top: 2rem; /* 16px */
   display: flex;
   justify-content: center;
   align-items: center;
