@@ -26,8 +26,8 @@ const BRANCH_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { value: "workshop", label: "סדנה (מפגש בודד)" },
-  { value: "group", label: "קבוצה (סדרת מפגשים)" },
+  { value: "workshop", label: "סדנה" },
+  { value: "group", label: "קבוצה" },
 ];
 
 const CATEGORY_OPTIONS = [
@@ -241,8 +241,8 @@ export default function AddActivityPage() {
               <label className="input-label">שם הפעילות</label>
             </div>
 
-            {/* CUSTOM BRANCH DROPDOWN */}
-            <div className={styles.dropdownContainer}>
+            {/* CUSTOM BRANCH DROPDOWN - 🔥 FIX: activeZIndex Class */}
+            <div className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownContainer : ''}`}>
               <div className="input-wrapper">
                 <button type="button" onClick={() => setIsBranchOpen(!isBranchOpen)} className={`${styles.dropdownToggle} ${isBranchOpen ? styles.open : ''}`}>
                   <span className={!formData.branch ? styles.dropdownPlaceholder : ''}>
@@ -310,7 +310,8 @@ export default function AddActivityPage() {
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             
-            <div className={styles.dropdownContainer}>
+            {/* CUSTOM TYPE DROPDOWN - 🔥 FIX: activeZIndex Class */}
+            <div className={`${styles.dropdownContainer} ${isTypeOpen ? styles.activeDropdownContainer : ''}`}>
               <div className="input-wrapper">
                 <button type="button" onClick={() => setIsTypeOpen(!isTypeOpen)} className={`${styles.dropdownToggle} ${isTypeOpen ? styles.open : ''}`}>
                   <span className={!formData.type ? styles.dropdownPlaceholder : ''}>
@@ -334,7 +335,8 @@ export default function AddActivityPage() {
             </div>
 
             {formData.type === 'workshop' && (
-              <div className={styles.dropdownContainer}>
+              /* CUSTOM CATEGORY DROPDOWN - 🔥 FIX: activeZIndex Class */
+              <div className={`${styles.dropdownContainer} ${isCategoryOpen ? styles.activeDropdownContainer : ''}`}>
                 <div className="input-wrapper">
                   <button type="button" onClick={() => setIsCategoryOpen(!isCategoryOpen)} className={`${styles.dropdownToggle} ${isCategoryOpen ? styles.open : ''}`}>
                     <span className={!formData.category ? styles.dropdownPlaceholder : ''}>
@@ -360,7 +362,8 @@ export default function AddActivityPage() {
 
             {formData.type === 'group' && (
               <>
-                <div className={styles.dropdownContainer}>
+                {/* CUSTOM CIRCLE DROPDOWN - 🔥 FIX: activeZIndex Class */ }
+                <div className={`${styles.dropdownContainer} ${isCircleOpen ? styles.activeDropdownContainer : ''}`}>
                   <div className="input-wrapper">
                     <button type="button" onClick={() => setIsCircleOpen(!isCircleOpen)} className={`${styles.dropdownToggle} ${isCircleOpen ? styles.open : ''}`}>
                       <span className={!formData.circle ? styles.dropdownPlaceholder : ''}>
@@ -393,8 +396,8 @@ export default function AddActivityPage() {
             <div className={styles.fieldGroup}>
               <div className={styles.dateLabel}>{formData.type === 'group' ? 'תאריך התחלה' : 'תאריך'}</div>
               <div className={styles.dateRow}>
-                {/* YEAR */}
-                <div className={styles.miniDropdownContainer}>
+                {/* YEAR - 🔥 FIX: activeMiniDropdown Class */}
+                <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
                   <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
                     <span>{formData.year || "שנה"}</span>
                     <div className={styles.arrowIconWrapper} style={{transform: isYearOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
@@ -410,8 +413,8 @@ export default function AddActivityPage() {
                   )}
                 </div>
 
-                {/* MONTH */}
-                <div className={styles.miniDropdownContainer}>
+                {/* MONTH - 🔥 FIX: activeMiniDropdown Class */}
+                <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
                   <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
                     <span>{formData.month || "חודש"}</span>
                     <div className={styles.arrowIconWrapper} style={{transform: isMonthOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
@@ -427,8 +430,8 @@ export default function AddActivityPage() {
                   )}
                 </div>
 
-                {/* DAY */}
-                <div className={styles.miniDropdownContainer}>
+                {/* DAY - 🔥 FIX: activeMiniDropdown Class */}
+                <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
                   <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
                     <span>{formData.day || "יום"}</span>
                     <div className={styles.arrowIconWrapper} style={{transform: isDayOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
