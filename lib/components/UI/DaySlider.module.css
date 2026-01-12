@@ -1,0 +1,122 @@
+.weekContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  width: 100%;
+  max-width: 393px;
+  height: 99px;
+  direction: rtl;
+  position: relative;
+}
+
+.sliderWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: space-around;
+  isolation: isolate;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 5px;
+  gap: 5px;
+  min-width: 44px;
+  height: 59px;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.selectedDay {
+  color: #681f02 !important;
+}
+
+.selectedDay .dayName,
+.selectedDay .dateNumber {
+  color: #681f02 !important;
+}
+
+.dayName {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 17px;
+  text-align: center;
+  color: rgba(255, 245, 245, 0.7);
+}
+
+.dateContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 8px;
+  border-radius: 999px;
+}
+
+.dateNumber {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 17px;
+  text-align: center;
+  color: rgba(255, 245, 245, 0.7);
+}
+
+.disabledText {
+  opacity: 0.3;
+}
+
+.todayDot {
+  position: absolute;
+  bottom: 0px;
+  width: 5px;
+  height: 5px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+.navButton {
+  background: transparent;
+  border: none;
+  width: 30px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.navDisabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.arrowIcon {
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #f9f9f9;
+  border-right: 2px solid #f9f9f9;
+}
+
+.nextButton .arrowIcon {
+  transform: rotate(-135deg);
+}
+
+.prevButton .arrowIcon {
+  transform: rotate(45deg);
+}
+
+.dayColumn:not(.selectedDay) {
+  color: #f9f9f9;
+}
