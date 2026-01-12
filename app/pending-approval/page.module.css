@@ -1,5 +1,6 @@
 /* ============================================
    PENDING APPROVAL PAGE
+   Updated to use OrganicCircles
    ============================================ */
 
 .container {
@@ -14,7 +15,9 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  padding-top: calc(2rem + env(safe-area-inset-top, 0)); /* Safe area for notch */
+  padding-top: calc(
+    2rem + env(safe-area-inset-top, 0)
+  ); /* Safe area for notch */
   padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0));
   overflow: hidden;
 }
@@ -32,120 +35,9 @@
 }
 
 /* ============================================
-   CONCENTRIC CIRCLES
+   CONCENTRIC CIRCLES - REMOVED
+   Now using OrganicCircles component rendered in JSX
    ============================================ */
-.circles {
-  position: absolute;
-  width: 40.5625rem; /* 649px */
-  height: 40.5625rem; /* 649px */
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
-
-.circle1, .circle2, .circle3, .circle4, .circle5,
-.circle6, .circle7, .circle8, .circle9, .circle10 {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border-style: solid;
-  border-color: rgba(255, 255, 255, 0.2);
-  animation: pulse 4.5s ease-in-out infinite;
-}
-
-.circle1 {
-  width: 18rem;
-  height: 18rem;
-  border-width: 0.7px;
-  border-color: rgba(255, 255, 255, 0.135);
-  animation-delay: 0s;
-}
-
-.circle2 {
-  width: 20rem;
-  height: 20rem;
-  border-width: 0.8px;
-  border-color: rgba(254, 254, 254, 0.151);
-  animation-delay: 0.3s;
-}
-
-.circle3 {
-  width: 22rem;
-  height: 22rem;
-  border-width: 0.89px;
-  border-color: rgba(255, 255, 255, 0.166);
-  animation-delay: 0.6s;
-}
-
-.circle4 {
-  width: 24rem;
-  height: 24rem;
-  border-width: 0.96px;
-  border-color: rgba(255, 255, 255, 0.18);
-  animation-delay: 0.9s;
-}
-
-.circle5 {
-  width: 26rem;
-  height: 26rem;
-  border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.193);
-  animation-delay: 1.2s;
-}
-
-.circle6 {
-  width: 28rem;
-  height: 28rem;
-  border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.204);
-  animation-delay: 1.5s;
-}
-
-.circle7 {
-  width: 30rem;
-  height: 30rem;
-  border-width: 0.96px;
-  border-color: rgba(255, 255, 255, 0.213);
-  animation-delay: 1.8s;
-}
-
-.circle8 {
-  width: 32rem;
-  height: 32rem;
-  border-width: 0.89px;
-  border-color: rgba(255, 255, 255, 0.22);
-  animation-delay: 2.1s;
-}
-
-.circle9 {
-  width: 34rem;
-  height: 34rem;
-  border-width: 0.8px;
-  border-color: rgba(255, 255, 255, 0.224);
-  animation-delay: 2.4s;
-}
-
-.circle10 {
-  width: 36rem;
-  height: 36rem;
-  border-width: 0.7px;
-  border-color: rgba(255, 255, 255, 0.225);
-  animation-delay: 2.7s;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.15;
-    transform: translate(-50%, -50%) scale(0.95);
-  }
-  50% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-}
 
 /* ============================================
    MESSAGE BOX
@@ -167,7 +59,7 @@
   font-size: 1.25rem; /* 20px */
   line-height: 1.375rem; /* 22px */
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
   direction: rtl;
 }
