@@ -315,8 +315,8 @@
   gap: 0.5rem; /* 8px */
   padding: 0;
   margin-top: -0.25rem; /* 4px */
-  width: 100%;
-
+  width: fit-content;
+  align-self: flex-end; /* Position to the left in RTL */
   background: transparent;
   border: none;
 
