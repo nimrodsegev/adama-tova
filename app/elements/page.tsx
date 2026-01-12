@@ -70,14 +70,6 @@ export default function ElementsPage() {
         <section className="section">
           <h2 className="text-section-title">רכיבי משתמש</h2>
           <div className="vertical-scroll gap-md">
-            <NewUserActivityCard
-              id="u_act_1"
-              title="תנועה וצלילים מרפאים במרחב"
-              instructor="חגית אזולי"
-              day="יום ה׳"
-              startTime="19:00"
-              isRegistered={false}
-            />
             <NewUserScheduleActivityCard
               id="u_sch_1"
               title="יוגה ויניאסה"
