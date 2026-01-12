@@ -1,0 +1,57 @@
+.cardContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Pushes actionSection left and infoSection right */
+  align-items: center;
+  padding: 3px 12px; /* Adjusted padding for better edge alignment */
+
+  width: 100%;
+  max-width: 342px;
+  height: 79px;
+
+  background: rgba(247, 247, 247, 0.9);
+  border-radius: 9px;
+  direction: rtl; /* RTL: First child is Right, Second child is Left */
+  position: relative;
+  isolation: isolate;
+}
+
+/* --- RIGHT SIDE: Info --- */
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Right aligned in RTL */
+  gap: 1px;
+  flex: 1;
+}
+
+.titleText {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #681f02;
+  margin: 0;
+  text-align: right;
+}
+
+.timeRange,
+.participantsText {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 20px;
+  color: #681f02;
+  margin: 0;
+  text-align: right;
+}
+
+/* --- LEFT SIDE: Button --- */
+.actionSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* In RTL, this pushes the button to the far left */
+  height: 100%;
+  padding-right: 10px; /* Space between text and button */
+}

@@ -1,0 +1,56 @@
+.cardContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* In RTL, flex-start is the Right side */
+  align-items: flex-start;
+  padding: 16px;
+
+  width: 100%;
+  max-width: 345px;
+  min-height: 105px;
+
+  background: rgba(247, 247, 247, 0.9);
+  border-radius: 9px;
+  direction: rtl;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.cardContainer:active {
+  transform: scale(0.98);
+  background: rgba(247, 247, 247, 1);
+}
+
+.contentStack {
+  display: flex;
+  flex-direction: column;
+  /* Ensure stack stays right-aligned */
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+}
+
+.titleText {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #681f02;
+  margin: 0;
+  text-align: right;
+  width: 100%;
+}
+
+.instructorText,
+.dateTimeText,
+.participantsText {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.2;
+  color: #681f02;
+  margin: 0;
+  text-align: right;
+  width: 100%;
+}

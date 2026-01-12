@@ -6,140 +6,173 @@
   gap: 8px;
   border: none;
   cursor: pointer;
-  font-family: var(--font-secondary); /* Ezer Shemesh TRIAL ONLY */
-  font-style: normal;
-  font-weight: 400;
-  transition: all var(--transition-fast);
+  font-family: var(--font-secondary);
+  transition: all var(--transition-normal);
   direction: rtl;
-  text-decoration: none; /* Ensure links don't get underlines */
+  text-decoration: none;
 }
 
 .base:active {
-  transform: scale(0.98);
-  filter: brightness(0.9);
+  transform: scale(0.96);
 }
 
-.base:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* --- PRIMARY --- */
+/* --- PURPLE VARIANTS --- */
 .primary {
-  background: #b37eb3; /* purple */
-  color: #f9f9f9; /* white */
+  background: #b37eb3;
+  color: #f9f9f9;
+}
+.secondary {
+  box-sizing: border-box;
+  background: rgba(247, 247, 247, 0.9);
+  border: 1px solid #b37eb3;
+  color: #b37eb3;
 }
 
 .sizeL {
-  width: auto;
   min-width: 70px;
   height: 36px;
   padding: 8px 16px;
   border-radius: 5px;
   font-size: 18px;
-  line-height: 20px;
 }
-
 .sizeM {
-  width: auto;
   min-width: 62px;
   height: 28px;
   padding: 4px 16px;
   border-radius: 4px;
   font-size: 18px;
-  line-height: 20px;
 }
-
 .sizeS {
-  width: auto;
   min-width: 77px;
   height: 24px;
   padding: 2px 16px;
   border-radius: 3.5px;
   font-size: 18px;
-  line-height: 20px;
-}
-
-/* --- SECONDARY --- */
-.secondary {
-  box-sizing: border-box;
-  background: rgba(247, 247, 247, 0.9);
-  border: 1px solid #b37eb3; /* purple stroke */
-  color: #b37eb3;
 }
 
 /* --- TERTIARY --- */
 .tertiary {
   background: transparent;
   padding: 0;
-  gap: 8px;
-  height: 18.46px;
-  border-radius: 5px;
-  font-size: 16px;
-  line-height: 19px;
+  gap: 12px; /* Increased space between text and arrow */
+  justify-content: flex-start;
 }
 
-.tertiary .label {
-  height: 19px;
-  display: flex;
-  align-items: center;
+.white {
+  color: rgba(249, 249, 249, 1);
 }
-
 .orange {
-  color: #e74e1c;
+  color: rgba(231, 78, 28, 1);
 }
 .delete {
-  color: #a70000;
+  color: rgba(167, 0, 0, 1);
 }
-.white {
+
+.arrowWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.chevron {
+  font-size: 1.75rem;
+  line-height: 1;
+  color: inherit;
+  display: inline-block;
+  margin-top: -2px;
+}
+
+/* --- UNIQUE ICONS & ACTIONS --- */
+.whatsapp {
+  min-width: 171px;
+  height: 36px;
+  padding: 8px 16px;
+  background: rgba(247, 247, 247, 0.9);
+  border: 1px solid #b37eb3;
+  border-radius: 4px;
+  color: #b37eb3;
+}
+.whatsappIcon {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #b37eb3;
+  border-radius: 2px;
+}
+
+.waiting-list {
+  min-width: 161px;
+  height: 36px;
+  padding: 8px 16px;
+  background: #b37eb3;
+  border-radius: 4px;
   color: #f9f9f9;
 }
-
-/* Tertiary Icon (Rectangle 2159 logic) */
-.iconWrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 3px 6px 5px;
-  transform: rotate(-180deg);
+.clockIcon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background: #f7e3d5;
+  border: 0.6px solid #e74e1c;
+  border-radius: 50%;
+}
+.clockInner {
+  position: absolute;
+  left: 15%;
+  top: 15%;
+  right: 15%;
+  bottom: 15%;
+  border: 0.6px solid #e74e1c;
+  border-radius: 50%;
+}
+.clockHandLong {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  width: 1px;
+  height: 25%;
+  background: #e74e1c;
+}
+.clockHandShort {
+  position: absolute;
+  left: 30%;
+  top: 50%;
+  width: 20%;
+  height: 1px;
+  background: #e74e1c;
 }
 
-.arrowIcon {
-  box-sizing: border-box;
-  width: 10.46px;
-  height: 3.93px;
-  border: 1px solid currentColor; /* Matches label color */
-  transform: matrix(0, -1, -1, 0, 0, 0);
+.approve {
+  width: 4rem;
+  height: 1.5rem;
+  background: #e74e1c;
+  color: #f9f9f9;
+  border-radius: 0.22rem;
+}
+.reject {
+  width: 4rem;
+  height: 1.5rem;
+  background: rgba(247, 247, 247, 0.9);
+  border: 1px solid #e74e1c;
+  color: #e74e1c;
+  border-radius: 0.22rem;
+}
+.popup-primary {
+  min-width: 63px;
+  height: 36px;
+  background: #e74e1c;
+  border: 1px solid #f9f9f9;
+  color: #f9f9f9;
+  border-radius: 5px;
+}
+.popup-secondary {
+  min-width: 117px;
+  height: 36px;
+  background: rgba(247, 247, 247, 0.9);
+  color: #e74e1c;
+  border-radius: 5px;
 }
 
 .label {
   white-space: nowrap;
-}
-
-/* --- APPROVE BUTTON (אשר) --- */
-.approve {
-  width: 4rem;
-  height: 1.5rem;
-  padding: 0.125rem 1rem;
-  gap: 0.6875rem;
-  background: #E74E1C;
-  border-radius: 0.22rem;
-  color: #F9F9F9;
-  font-size: 1.125rem;
-  line-height: 1.25rem;
-}
-
-/* --- REJECT BUTTON (סרב) --- */
-.reject {
-  box-sizing: border-box;
-  width: 4rem;
-  height: 1.5rem;
-  padding: 0.125rem 1rem;
-  gap: 0.6875rem;
-  background: rgba(247, 247, 247, 0.9);
-  border: 0.0625rem solid #E74E1C;
-  border-radius: 0.22rem;
-  color: #E74E1C;
-  font-size: 1.125rem;
-  line-height: 1.25rem;
 }
