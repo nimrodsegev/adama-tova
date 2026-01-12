@@ -967,7 +967,7 @@ export const apiRegistrations = {
         created_at,
         status,
         user_id,
-        users (id, full_name, email, phone, quiz),
+        users (id, full_name, email, phone, circle, quiz),
         activities (id, title, start_time, date, series_id)
       `)
       .eq("status", "pending")
