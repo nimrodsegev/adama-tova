@@ -29,6 +29,7 @@ interface PendingGroupRegistration {
   users: {
     id: string;
     full_name: string;
+    circle?: string;
     quiz?: {
       circle?: string;
     };
@@ -38,6 +39,28 @@ interface PendingGroupRegistration {
     title: string;
   };
 }
+
+// Map English circle values to Hebrew
+const CIRCLE_TO_HEBREW: Record<string, string> = {
+  'Nova Survivor': 'שורדי ושורדות המסיבות',
+  'October 7 victim': 'נפגעי טראומה 7.10 ומלחמת חרבות ברזל',
+  'Shkulim parents': 'הורים שכולים',
+  'Shkulim Siblings': 'אחים.ות שכולים',
+  'Family of october 7 victim': 'משפחות וקרובים של פצועים טראומה בגופם ובנפשם',
+  'Rescue forces': 'כוחות הצלה וחילוץ',
+  'Residence of Otef Aza': 'תושבי העוטף ומפונים',
+  'Second or third': 'מעגל שני ושלישי של משפחות השכול',
+};
+
+// Get Hebrew circle name (from quiz.circle or translate from users.circle)
+const getCircleHebrew = (user: { circle?: string; quiz?: { circle?: string } } | undefined): string | undefined => {
+  if (!user) return undefined;
+  // First try quiz.circle (already in Hebrew)
+  if (user.quiz?.circle) return user.quiz.circle;
+  // Fall back to translating users.circle (English)
+  if (user.circle) return CIRCLE_TO_HEBREW[user.circle] || user.circle;
+  return undefined;
+};
 
 interface Activity {
   id: string;
@@ -349,7 +372,7 @@ export default function AdminHomePage() {
                     type="initial"
                     userName={pendingUser.full_name || "משתמש"}
                     requestDate={formatDate(pendingUser.created_at)}
-                    circle={pendingUser.quiz?.circle}
+                    circle={getCircleHebrew(pendingUser)}
                     onApprove={() => openConfirmForUser(pendingUser.id, pendingUser.full_name || "המשתמש", "approve")}
                     onReject={() => openConfirmForUser(pendingUser.id, pendingUser.full_name || "המשתמש", "reject")}
                     onClick={() => handleUserCardClick(pendingUser.id)}
@@ -362,7 +385,7 @@ export default function AdminHomePage() {
                     type="group"
                     userName={reg.users?.full_name || "משתמש"}
                     requestDate={formatDate(reg.created_at)}
-                    circle={reg.users?.quiz?.circle}
+                    circle={getCircleHebrew(reg.users)}
                     groupName={reg.activities?.title}
                     onApprove={() => openConfirmForGroup(reg.id, reg.users?.full_name || "המשתמש", "approve")}
                     onReject={() => openConfirmForGroup(reg.id, reg.users?.full_name || "המשתמש", "reject")}
