@@ -12,12 +12,10 @@ import styles from "./UserCalendarPage.module.css";
 
 // Interests Mapping (same as HomePage)
 const INTRESTS_MAPPING: Record<string, string> = {
-  מדיטציה: "Meditation",
-  יוגה: "Yoga",
-  אומנות: "Art",
-  כתיבה: "Writing",
-  מיינדפולנס: "Mindfulness",
-  יצירה: "Crafts",
+  'מיינדפולנס': 'mindfulness',
+  'גוף ותנועה': 'body_motion',
+  'מוזיקה': 'music_sound',
+  'יצירה וחומר': 'creation_material',
 };
 
 export default function UserCalendarPage() {

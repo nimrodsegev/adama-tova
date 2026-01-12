@@ -147,7 +147,8 @@ export const apiActivities = {
       weeks = 1, 
       requires_approval = false,
       whatsapp_group_url = null,
-      is_group = false, 
+      is_group = false,
+      circle = null, 
       ...baseData 
     } = activityData;
 
@@ -171,7 +172,8 @@ export const apiActivities = {
         end_time: baseData.end_time,
         max_participants: baseData.max_participants,
         status: baseData.status,
-        category: baseData.category,
+        category: is_group ? null : baseData.category, 
+        circle: is_group ? circle : null,
         location: baseData.location,
         instructor: baseData.instructor,
         image_url: baseData.image_url,
@@ -577,13 +579,10 @@ export const apiActivities = {
   async getByUserPreferences(userId) {
     // 1. Define the Mapping
     const INTRESTS_MAPPING = {
-      'מדיטציה': 'Meditation',
-      'יוגה': 'Yoga',
-      'אומנות': 'Art',
-      'כתיבה': 'Writing',
-      'מיינדפולנס': 'Mindfulness',
-      'יצירה': 'Crafts',
-      // Add more as needed
+      'מיינדפולנס': 'mindfulness',
+      'גוף ותנועה': 'body_motion',
+      'מוזיקה': 'music_sound',
+      'יצירה וחומר': 'creation_material',
     };
 
     // 2. Get User's Interests (Hebrew) from the 'quiz' JSON column
@@ -599,7 +598,7 @@ export const apiActivities = {
       return [[], null]; 
     }
 
-    const hebrewInterests = user.quiz.interests; // Example: ["יוגה", "אומנות"]
+    const hebrewInterests = user.quiz.interests; 
 
     // 3. Convert to English Categories
     // We map the Hebrew terms to English. If a term isn't found in the map, we keep the original (fallback).
@@ -612,7 +611,7 @@ export const apiActivities = {
       supabase
         .from('activities')
         .select('*')
-        .in('category', englishCategories) // 👈 Queries using: ['Yoga', 'Art']
+        .in('category', englishCategories) // 👈 Queries 
         .gte('date', new Date().toISOString()) 
         .order('date', { ascending: true })
     );

@@ -9,12 +9,10 @@ import styles from "./ProfilePage.module.css";
 
 // Available options for Interests
 const AVAILABLE_INTERESTS = [
-  "מדיטציה",
-  "יוגה",
-  "אומנות",
-  "כתיבה",
-  "מיינדפולנס",
-  "יצירה",
+  'מיינדפולנס',
+  'גוף ותנועה',
+  'מוזיקה',
+  'יצירה וחומר',
 ];
 
 export default function ProfilePage() {

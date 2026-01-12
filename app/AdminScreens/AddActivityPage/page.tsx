@@ -6,13 +6,20 @@ import styles from "./AddActivityPage.styles";
 
 type ActivityStatus = "open" | "closed" | "cancelled";
 type ActivityCategory =
-  | "Art"
-  | "Yoga"
-  | "Meditation"
-  | "Writing"
-  | "Crafts"
-  | "Mindfulness";
+  | "mindfulness"
+  | "body_motion"
+  | "music_sound"
+  | "creation_material";
 type ActivityBranch = "satria" | "nahalal";
+type GroupCircles = 
+  |"Nova Survivor"
+  |"October 7 victim"
+  |"Shkulim parents"
+  |"Shkulim Siblings"
+  |"Family of october 7 victim"
+  |"Rescue forces"
+  |"Residence of Otef Aza"
+  |"Second or third";
 
 export default function AddActivityPage() {
   const { t } = useIvrita();
@@ -24,7 +31,8 @@ export default function AddActivityPage() {
     end_time: "",
     max_participants: "",
     status: "open" as ActivityStatus,
-    category: "Art" as ActivityCategory,
+    category: "mindfulness" as ActivityCategory,
+    circle: "Nova Survivor" as GroupCircles,
     instructor: "",
     location: "",
     branch: "satria" as ActivityBranch,
@@ -83,7 +91,8 @@ export default function AddActivityPage() {
       end_time: formData.end_time,
       max_participants: parseInt(formData.max_participants),
       status: formData.status,
-      category: formData.category,
+      category: isGroup ? null : formData.category,
+      circle: isGroup ? formData.circle : null,
       instructor: formData.instructor,
       location: formData.location,
       image_url: imageUrl,
@@ -118,7 +127,8 @@ export default function AddActivityPage() {
           end_time: "",
           max_participants: "",
           status: "open",
-          category: "Art",
+          category: "mindfulness",
+          circle: "Nova Survivor",
           instructor: "",
           location: "",
           branch: "satria" as ActivityBranch,
@@ -344,25 +354,47 @@ export default function AddActivityPage() {
             </div>
           </div>
 
-          {/* Category */}
-          <div style={styles.fieldContainer}>
-            <label htmlFor="category" style={styles.label}>קטגוריה *</label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-              style={styles.select}
-            >
-              <option value="Art">אמנות</option>
-              <option value="Yoga">יוגה</option>
-              <option value="Meditation">מדיטציה</option>
-              <option value="Writing">כתיבה</option>
-              <option value="Crafts">יצירה</option>
-              <option value="Mindfulness">מיידנפולנס</option>
-            </select>
-          </div>
+          {isGroup ? (
+             //SHOW CIRCLE SELECTOR
+             <div style={styles.fieldContainer}>
+               <label htmlFor="circle" style={styles.label}>מעגל (Circle) *</label>
+               <select
+                 id="circle"
+                 name="circle"
+                 value={formData.circle}
+                 onChange={handleChange}
+                 required
+                 style={styles.select}
+               >
+                 <option value="Nova Survivor">שורדי ושורדות המסיבות</option>
+                 <option value="October 7 victim">נפגעי טראומה 7.10 ומלחמת חרבות ברזל</option>
+                 <option value="Shkulim parents">הורים שכולים</option>
+                 <option value="Shkulim Siblings">אחים.ות שכולים</option>
+                 <option value="Family of october 7 victim">משפחות וקרובים של פצועים טראומה בגופם ובנפשם</option>
+                 <option value="Rescue forces">כוחות הצלה וחילוץ</option>
+                 <option value="Residence of Otef Aza">תושבי העוטף ומפונים</option>
+                 <option value="Second or third">מעגל שני או שלישי של משפחת השכול</option>
+               </select>
+             </div>
+          ) : (
+             // SHOW CATEGORY SELECTOR
+             <div style={styles.fieldContainer}>
+               <label htmlFor="category" style={styles.label}>קטגוריה *</label>
+               <select
+                 id="category"
+                 name="category"
+                 value={formData.category}
+                 onChange={handleChange}
+                 required
+                 style={styles.select}
+               >
+                 <option value="mindfulness">מיינדפולנס</option>
+                 <option value="body_motion">גוף ותנועה</option>
+                 <option value="music_sound">מוזיקה</option>
+                 <option value="creation_material">יצירה וחומר</option>
+               </select>
+             </div>
+          )}
 
           {/* Max Participants */}
           <div style={styles.fieldContainer}>
@@ -424,7 +456,7 @@ export default function AddActivityPage() {
               opacity: uploading || submitStatus === "success" ? 0.7 : 1,
               cursor: uploading || submitStatus === "success" ? "not-allowed" : "pointer",
             }}
-          >
+          >v
             {uploading
               ? "מעלה תמונה..."
               : submitStatus === "success"

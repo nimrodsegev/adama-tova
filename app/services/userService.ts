@@ -22,12 +22,10 @@ const CIRCLE_MAPPING: Record<string, string> = {
 };
 
 const INTRESTS_MAPPING: Record<string, string> = {
-  'מדיטציה': 'Meditation',
-  'יוגה': 'Yoga',
-  'אומנות': 'Art',
-  'כתיבה': 'Writing',
-  'מיינדפולנס': 'Mindfulness',
-  'יצירה': 'Crafts',
+  'מיינדפולנס': 'mindfulness',
+  'גוף ותנועה': 'body_motion',
+  'מוזיקה': 'music_sound',
+  'יצירה וחומר': 'creation_material',
 };
 const BRANCHES_MAPPING: Record<string, string> = {
   'נהלל': 'nahalal',
