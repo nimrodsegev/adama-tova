@@ -11,6 +11,7 @@
   font-weight: 400;
   transition: all var(--transition-fast);
   direction: rtl;
+  text-decoration: none; /* Ensure links don't get underlines */
 }
 
 .base:active {
@@ -66,8 +67,6 @@
   border: 1px solid #b37eb3; /* purple stroke */
   color: #b37eb3;
 }
-
-/* Secondary uses same sizes as Primary */
 
 /* --- TERTIARY --- */
 .tertiary {
