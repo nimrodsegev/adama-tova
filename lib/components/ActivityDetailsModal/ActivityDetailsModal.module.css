@@ -18,7 +18,7 @@
 .modalContainer {
   position: fixed;
   top: 0;
-  bottom: 6.8125rem; /* 61px for navbar - ends above navbar */
+  bottom: 3.8125rem; /* 61px for navbar - ends above navbar */
   left: 0;
   right: 0;
   width: 100%;
