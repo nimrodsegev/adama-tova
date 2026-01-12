@@ -1,0 +1,106 @@
+.cardContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  width: 100%;
+  max-width: 345px;
+  height: 135px; /* Increased slightly to fit more lines comfortably */
+  background: rgba(247, 247, 247, 0.9);
+  border-radius: 9px;
+  direction: rtl;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* --- RIGHT SIDE (INFO) --- */
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Right alignment in RTL */
+  gap: 8px;
+  flex: 1;
+}
+
+.userHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.userName {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #681f02;
+}
+
+/* User Icon Styling */
+.userIcon {
+  width: 13px;
+  height: 15px;
+  position: relative;
+}
+
+.iconCircle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #681f02;
+  border-radius: 50%;
+  top: 0;
+  left: 2px;
+}
+
+.iconBody {
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  border: 1px solid #681f02;
+  border-radius: 6px 6px 0 0;
+  bottom: 0;
+}
+
+.statusWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px; /* Spacing between text lines */
+}
+
+.statusLine,
+.circleLine {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 19px;
+  color: #681f02;
+  text-align: right;
+  margin: 0;
+}
+
+.circleLine {
+  margin-top: 4px; /* Extra space before the "מעגל" line */
+}
+
+/* --- LEFT SIDE (BUTTONS) --- */
+.actionSection {
+  display: flex;
+  justify-content: flex-end; /* Pushes to left in RTL */
+}
+
+.buttonStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 64px;
+}

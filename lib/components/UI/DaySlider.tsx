@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useMemo, useState } from "react";
 import styles from "./DaySlider.module.css";
 
@@ -10,16 +12,12 @@ const DaySlider: React.FC<DaySliderProps> = ({
   selectedDate,
   onDateChange,
 }) => {
-  // 0 is current week, 1 is next week
   const [weekOffset, setWeekOffset] = useState<0 | 1>(0);
 
   const weekDays = useMemo(() => {
     const today = new Date();
     const startOfThisWeek = new Date(today);
-    // Adjust to start from Sunday (index 0)
     startOfThisWeek.setDate(today.getDate() - today.getDay());
-
-    // Offset by 7 days if looking at the next week
     startOfThisWeek.setDate(startOfThisWeek.getDate() + weekOffset * 7);
 
     return Array.from({ length: 7 }, (_, i) => {
@@ -30,48 +28,36 @@ const DaySlider: React.FC<DaySliderProps> = ({
   }, [weekOffset]);
 
   const dayNames = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
-
-  /**
-   * Pressable Days: Sunday (0), Tuesday (2), Wednesday (3)
-   */
   const isForbidden = (dayIndex: number) => ![0, 2, 3].includes(dayIndex);
 
   const isToday = (date: Date) => {
     const today = new Date();
     return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const isSelected = (date: Date) => {
-    return (
-      date.getDate() === selectedDate.getDate() &&
-      date.getMonth() === selectedDate.getMonth()
+      date.getDate() === today.getDate() && date.getMonth() === today.getMonth()
     );
   };
 
   return (
     <div className={styles.weekContainer}>
-      {/* Previous Week Arrow - Always Visible */}
       <button
         type="button"
-        className={`${styles.navButton} ${styles.prevButton} ${
+        className={`${styles.navButton} ${
           weekOffset === 0 ? styles.navDisabled : ""
         }`}
-        onClick={() => weekOffset === 1 && setWeekOffset(0)}
-        aria-label="השבוע הקודם"
+        onClick={() => setWeekOffset(0)}
       >
-        <div className={styles.arrowIcon} />
+        <div
+          className={styles.arrowIcon}
+          style={{ transform: "rotate(45deg)" }}
+        />
       </button>
 
       <div className={styles.sliderWrapper}>
         {weekDays.map((date, index) => {
-          const dayIndex = date.getDay();
-          const forbidden = isForbidden(dayIndex);
-          const selected = isSelected(date);
-          const today = isToday(date);
+          const forbidden = isForbidden(date.getDay());
+          const selected =
+            date.getDate() === selectedDate.getDate() &&
+            date.getMonth() === selectedDate.getMonth();
 
           return (
             <div
@@ -87,7 +73,7 @@ const DaySlider: React.FC<DaySliderProps> = ({
                   forbidden ? styles.disabledText : ""
                 }`}
               >
-                {dayNames[dayIndex]}
+                {dayNames[date.getDay()]}
               </span>
               <div className={styles.dateContainer}>
                 <span
@@ -98,22 +84,23 @@ const DaySlider: React.FC<DaySliderProps> = ({
                   {date.getDate()}
                 </span>
               </div>
-              {today && <div className={styles.todayDot} />}
+              {isToday(date) && <div className={styles.todayDot} />}
             </div>
           );
         })}
       </div>
 
-      {/* Next Week Arrow - Always Visible */}
       <button
         type="button"
-        className={`${styles.navButton} ${styles.nextButton} ${
+        className={`${styles.navButton} ${
           weekOffset === 1 ? styles.navDisabled : ""
         }`}
-        onClick={() => weekOffset === 0 && setWeekOffset(1)}
-        aria-label="השבוע הבא"
+        onClick={() => setWeekOffset(1)}
       >
-        <div className={styles.arrowIcon} />
+        <div
+          className={styles.arrowIcon}
+          style={{ transform: "rotate(-135deg)" }}
+        />
       </button>
     </div>
   );
