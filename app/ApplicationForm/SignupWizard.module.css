@@ -9,8 +9,12 @@
   flex-direction: column;
   align-items: center;
   padding: 0;
-  padding-top: calc(3vh + env(safe-area-inset-top, 0)); /* Safe area for notch */
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0)); /* Space for fixed navigation */
+  padding-top: calc(
+    3vh + env(safe-area-inset-top, 0)
+  ); /* Safe area for notch */
+  padding-bottom: calc(
+    4rem + env(safe-area-inset-bottom, 0)
+  ); /* Space for fixed navigation */
 
   width: 100%;
   min-height: 100dvh; /* Use dvh only for PWA compatibility */
@@ -100,7 +104,7 @@
   text-align: right;
   letter-spacing: 0.02em;
 
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .optionalSubtitle {
@@ -113,20 +117,29 @@
   font-size: 1rem;
   line-height: 1.1875rem;
   text-align: right;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 /* ============================================
-   DECORATIVE CIRCLE - Placeholder
+   DECORATIVE CIRCLE - OrganicCircles Container
+   UPDATED: Increased size by 10% to prevent layer cutoff
    ============================================ */
 .decorativeCircles {
-  width: min(55vw, 13.5625rem); /* Responsive: 55% of viewport or max 217px */
-  height: min(55vw, 13.75rem);
+  width: min(
+    60.5vw,
+    14.92rem
+  ); /* +10% from 55vw/13.5625rem - ~239px max (was 217px) */
+  height: min(
+    60.5vw,
+    15.13rem
+  ); /* +10% from 55vw/13.75rem - ~242px max (was 220px) */
   position: relative;
   flex-shrink: 0;
   margin-top: 5vh;
   margin-bottom: 4vh;
   pointer-events: none;
+  overflow: visible; /* Allow circles to extend slightly if needed */
+  z-index: 1;
 }
 
 .circlePlaceholder {
@@ -201,7 +214,7 @@
   height: 3.75rem; /* 60px */
   padding: 0.6875rem 1.875rem 0.6875rem 1.875rem; /* Vertically centered: 11px top/bottom, 30px sides */
   background: transparent;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-radius: 0.5625rem; /* 9px */
 
   font-family: var(--font-secondary);
@@ -211,7 +224,7 @@
   line-height: 1.0625rem; /* 17px */
   text-align: right;
 
-  color: #F9F9F9;
+  color: #f9f9f9;
 
   direction: rtl;
   outline: none;
@@ -225,7 +238,7 @@
 }
 
 .input:focus {
-  border-color: #FFFFFF;
+  border-color: #ffffff;
 }
 
 .inputLabel {
@@ -242,7 +255,12 @@
   top: -0.5rem; /* -8px */
 
   /* Gradient that aligns with page - position set via JS (frozen during keyboard) */
-  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-image: linear-gradient(
+    180deg,
+    #e74e1c 0%,
+    #de6930 53%,
+    #e79267 87%
+  );
   background-repeat: no-repeat;
   background-size: 100% var(--vh, 100dvh);
   background-position: 0 var(--bg-y, 0px);
@@ -254,7 +272,7 @@
   line-height: 1.1875rem; /* 19px */
   text-align: right;
 
-  color: #F9F9F9;
+  color: #f9f9f9;
 
   pointer-events: none;
   z-index: 1;
@@ -270,7 +288,12 @@
   top: -0.5rem;
   padding: 0 0.3125rem;
   /* Gradient that aligns with page - position set via JS (frozen during keyboard) */
-  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-image: linear-gradient(
+    180deg,
+    #e74e1c 0%,
+    #de6930 53%,
+    #e79267 87%
+  );
   background-repeat: no-repeat;
   background-size: 100% var(--vh, 100dvh);
   background-position: 0 var(--bg-y, 0px);
@@ -296,7 +319,7 @@
   height: 3.7rem; /* ~59.22px */
   padding: 0 1.875rem;
   background: transparent;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-radius: 0.5625rem; /* 9px */
   display: flex;
   align-items: center;
@@ -310,7 +333,7 @@
   line-height: 1.0625rem; /* 17px */
   text-align: right;
 
-  color: #F9F9F9;
+  color: #f9f9f9;
 
   direction: rtl;
   cursor: pointer;
@@ -342,12 +365,12 @@
 
 .genderToggleArrow::before,
 .genderToggleArrow::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   width: 0.55rem;
   height: 0.0625rem;
-  background: #F9F9F9;
+  background: #f9f9f9;
 }
 
 .genderToggleArrow::before {
@@ -373,7 +396,7 @@
   right: 0;
   background: var(--color-background);
   background-attachment: fixed;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
   z-index: 50;
@@ -384,7 +407,7 @@
   padding: 0.875rem 1.875rem;
   background: transparent;
   border: none;
-  border-bottom: 0.0625rem solid #F9F9F9;
+  border-bottom: 0.0625rem solid #f9f9f9;
 
   font-family: var(--font-secondary);
   font-style: normal;
@@ -393,7 +416,7 @@
   line-height: 1.0625rem;
   text-align: right;
 
-  color: #FFFFFF;
+  color: #ffffff;
 
   direction: rtl;
   cursor: pointer;
@@ -428,7 +451,7 @@
   height: 3.75rem;
   padding: 0 1.875rem;
   background: transparent;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-radius: 0.5625rem;
   display: flex;
   align-items: center;
@@ -437,7 +460,7 @@
   font-weight: var(--font-weight-light);
   font-size: 1rem;
   text-align: right;
-  color: #F9F9F9;
+  color: #f9f9f9;
   direction: rtl;
   cursor: pointer;
   transition: border-radius 0.2s;
@@ -464,12 +487,12 @@
 
 .accordionArrow::before,
 .accordionArrow::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   width: 0.55rem;
   height: 0.0625rem;
-  background: #F9F9F9;
+  background: #f9f9f9;
 }
 
 .accordionArrow::before {
@@ -495,7 +518,7 @@
   right: 0;
   background: var(--color-background);
   background-attachment: fixed;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
   z-index: 100;
@@ -510,7 +533,7 @@
   padding: 0.875rem 1.875rem;
   background: transparent;
   border: none;
-  border-bottom: 0.0625rem solid #F9F9F9;
+  border-bottom: 0.0625rem solid #f9f9f9;
 
   font-family: var(--font-secondary);
   font-style: normal;
@@ -519,7 +542,7 @@
   line-height: 1.0625rem; /* 17px */
   text-align: right;
 
-  color: #FFFFFF;
+  color: #ffffff;
 
   direction: rtl;
   cursor: pointer;
@@ -565,7 +588,7 @@
   width: 19.6875rem; /* 315px */
   max-width: 100%;
   height: 2.9375rem; /* 47px */
-  background: #F9F9F9; /* White - unselected */
+  background: #f9f9f9; /* White - unselected */
   border-radius: 0.5625rem; /* 9px */
   border: none;
   font-family: var(--font-secondary);
@@ -573,7 +596,7 @@
   font-size: 1rem; /* 16px */
   line-height: 1.1875rem; /* 19px */
   text-align: right;
-  color: #681F02; /* DarkTypo */
+  color: #681f02; /* DarkTypo */
   cursor: pointer;
   transition: all 0.2s;
   -webkit-tap-highlight-color: transparent;
@@ -600,20 +623,20 @@
   height: 3.75rem;
   padding: 1rem 1.875rem;
   background: transparent;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-radius: 0.5625rem;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-light);
   font-size: 1rem;
   text-align: right;
-  color: #F9F9F9;
+  color: #f9f9f9;
   direction: rtl;
   resize: none;
   outline: none;
 }
 
 .textarea:focus {
-  border-color: #FFFFFF;
+  border-color: #ffffff;
 }
 
 /* ============================================
@@ -659,7 +682,7 @@
   width: 0.857rem; /* 13.71px */
   height: 0.767rem; /* 12.27px */
   background: transparent;
-  border: 0.0625rem solid #E74E1C; /* 1px */
+  border: 0.0625rem solid #e74e1c; /* 1px */
   border-radius: 50%;
   transform: matrix(1, 0, 0, -1, 0, 0);
   transition: all 0.3s;
@@ -669,13 +692,13 @@
 }
 
 .completedDot {
-  background: #E79267;
-  border-color: #E74E1C;
+  background: #e79267;
+  border-color: #e74e1c;
 }
 
 .activeDot {
-  background: #E74E1C;
-  border-color: #E74E1C;
+  background: #e74e1c;
+  border-color: #e74e1c;
 }
 
 /* ============================================
@@ -698,7 +721,7 @@
   font-weight: var(--font-weight-normal);
   font-size: 1.125rem;
   line-height: 1.25rem;
-  color: #F9F9F9;
+  color: #f9f9f9;
   cursor: pointer;
   transition: opacity 0.2s;
   margin-top: -0.5rem;
@@ -743,8 +766,8 @@
   font-size: 1.25rem; /* 20px - matches Figma */
   line-height: 1.25rem; /* 20px */
   text-align: right;
-  color: #FFFFFF;
-  margin-bottom: 0.0rem;
+  color: #ffffff;
+  margin-bottom: 0rem;
 }
 
 /* ============================================
@@ -802,7 +825,7 @@
   font-size: 1.25rem;
   line-height: 1.375rem;
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   z-index: 1;
 }
 
@@ -833,7 +856,7 @@
 .backLinkArrowIcon {
   width: 0.6538rem;
   height: 0.2456rem;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-right: none;
   transform: rotate(-45deg);
@@ -844,7 +867,7 @@
   font-weight: var(--font-weight-normal);
   font-size: 1rem;
   line-height: 1.1875rem;
-  color: #F9F9F9;
+  color: #f9f9f9;
 }
 
 /* ============================================
@@ -855,8 +878,8 @@
 .input:-webkit-autofill:focus,
 .input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-text-fill-color: #F9F9F9 !important;
-  border: 0.0625rem solid #F9F9F9 !important;
+  -webkit-text-fill-color: #f9f9f9 !important;
+  border: 0.0625rem solid #f9f9f9 !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -908,7 +931,6 @@
   .wizardContainer {
     padding-top: 1vh;
   }
-  
 
   .decorativeCircles {
     width: min(35vw, 7rem);
@@ -955,7 +977,6 @@
     margin-top: 1vh;
     margin-bottom: 1vh;
   }
-  
 
   .input,
   .genderToggle,
