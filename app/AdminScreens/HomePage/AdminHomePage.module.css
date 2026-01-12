@@ -304,21 +304,189 @@
   gap: 1rem; /* 16px */
 
   width: 100%;
-  position: absolute;
+  max-width: 24.5625rem; /* 393px - same as page container */
+  position: fixed;
   bottom: 6.5rem; /* 104px from bottom - above navbar */
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE - Only for smaller screens
    ============================================ */
-@media (max-width: 26rem) {
+
+/* Screens smaller than design width (below 393px) */
+@media (max-width: 24.5rem) {
   .pageContainer {
-    padding: 4rem 1rem 1rem;
+    padding: 5.75rem 1rem 1.5rem;
   }
 
   .mainContent {
+    width: calc(100% - 0.5rem);
+  }
+
+  .emptyStateContainer {
     width: 100%;
+  }
+
+  .openingHoursText {
+    padding-right: 0.5rem;
+  }
+
+  .editArrow {
+    margin-left: 0.5rem;
+  }
+}
+
+/* Small screens (below 360px) */
+@media (max-width: 22.5rem) {
+  .pageContainer {
+    padding: 4rem 0.75rem 1.5rem;
+  }
+
+  .mainContent {
+    margin-top: 5rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.75rem;
+    line-height: 2.25rem;
+  }
+
+  .greetingSubtitle {
+    font-size: 1.125rem;
+  }
+
+  .openingHoursText {
+    font-size: 0.875rem;
+  }
+
+  .editText {
+    font-size: 0.875rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.125rem;
+  }
+
+  .bottomButtons {
+    gap: 0.5rem;
+  }
+}
+
+/* Very small screens (below 320px) */
+@media (max-width: 20rem) {
+  .pageContainer {
+    padding: 3rem 0.5rem 1rem;
+  }
+
+  .mainContent {
+    margin-top: 4rem;
+    gap: 0.75rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .greetingSubtitle {
+    font-size: 1rem;
+  }
+
+  .openingHoursText {
+    font-size: 0.75rem;
+  }
+
+  .editText {
+    font-size: 0.75rem;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .emptyStateText {
+    font-size: 1rem;
+  }
+
+  .bottomButtons {
+    flex-direction: column;
+    gap: 0.5rem;
+    bottom: 5.5rem;
+  }
+}
+
+/* Short screens (iPhone SE, etc. - below 700px height) */
+@media (max-height: 43.75rem) {
+  .pageContainer {
+    padding-top: 3rem;
+  }
+
+  .mainContent {
+    margin-top: 4rem;
+  }
+
+  .greetingSection {
+    gap: 0.25rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.75rem;
+    line-height: 2rem;
+  }
+
+  .greetingSubtitle {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .filterContainer {
+    margin-top: 0.25rem;
+  }
+
+  .sectionTitle {
+    margin: 0.5rem 0 0 0;
+  }
+
+  .cardsContainer {
+    max-height: 15rem;
+  }
+
+  .bottomButtons {
+    bottom: 6rem;
+  }
+}
+
+/* iPhone SE specific (around 667px height) */
+@media (max-height: 41.75rem) {
+  .bottomButtons {
+    bottom: 6.5rem;
+  }
+}
+
+/* Very short screens (below 600px height) */
+@media (max-height: 37.5rem) {
+  .pageContainer {
+    padding-top: 2rem;
+  }
+
+  .mainContent {
+    margin-top: 2.5rem;
+    gap: 0.5rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+  }
+
+  .cardsContainer {
+    max-height: 12rem;
+  }
+
+  .bottomButtons {
+    bottom: 4.5rem;
   }
 }
