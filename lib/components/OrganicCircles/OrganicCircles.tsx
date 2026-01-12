@@ -149,7 +149,7 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           }
 
           if (c.layers !== undefined)
-            this.config.layerCount = Math.max(4, Math.min(7, c.layers));
+            this.config.layerCount = Math.max(1, Math.min(10, c.layers));
           if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
           if (c.strokeWidth !== undefined)
             this.config.strokeWidth = c.strokeWidth;
@@ -165,7 +165,6 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
         }
 
         updateTargetsForMode(m: MotionMode, r: number) {
-          const conf = getModeConfig(m);
           this.currentMode = m;
           if (m === "splash") {
             this.targets = {
@@ -181,7 +180,14 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             this.animState.breathCycleSeconds =
               5.0 / Math.max(0.1, SPLASH_CONFIG.speed);
             this.animState.splashCallbackTriggered = false;
+          } else if (m === "static") {
+            // Static mode: no amplitude, no speed, but uses calculator values
+            this.targets.radius = r;
+            this.targets.amplitude = 0;
+            this.targets.noiseSpeed = 0;
+            this.targets.elongation = this.targets.elongation || 1.0;
           } else {
+            const conf = getModeConfig(m);
             this.targets.radius = r;
             this.targets.amplitude = conf.amplitude;
             this.targets.noiseSpeed = conf.speed;
@@ -198,7 +204,6 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             this.animState.splashCallbackTriggered = false;
             this.createLayers();
           } else if (m === "spouting") {
-            // Reset emit phase for continuous ripples
             this.animState.emitPhase = 0;
           } else if (m === "rolling") {
             this.animState.rollingStartTime = Date.now();
@@ -228,6 +233,7 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           layerIndex: number
         ): number {
           const noiseScale = 2.5 - this.animState.smoothness * 2.0;
+          // In static mode, this.animState.time will be constant
           const nx =
             (Math.cos(angle) * noiseScale) /
               Math.max(0.1, this.animState.elongation) +
@@ -235,9 +241,6 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           const ny = Math.sin(angle) * noiseScale + layerIndex * 10;
           let n =
             (noise.noise2D(nx, ny) + 0.5 * noise.noise2D(nx * 2, ny * 2)) / 1.5;
-
-          // ✅ NO DIRECTIONAL LOGIC - Continuous ripples for spouting
-          // The ripple effect is handled in the draw() method with radius/opacity
 
           return baseR * (1 + n * this.animState.complexity * 0.3);
         }
@@ -259,10 +262,15 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
                 (this.targets[k] - (this.animState as any)[k]) * ease;
           });
 
-          this.animState.time += dt * this.animState.noiseSpeed;
-
-          // 💧 SPOUTING: Continuous phase increment for ripple effect
-          this.animState.emitPhase += dt * 0.1; // Speed of ripples
+          // Only increment time and phase if not in static mode
+          if (this.currentMode !== "static") {
+            this.animState.time += dt * this.animState.noiseSpeed;
+            this.animState.breathPhase +=
+              dt *
+              ((Math.PI * 2) /
+                Math.max(0.1, this.animState.breathCycleSeconds));
+            this.animState.emitPhase += dt * 0.1;
+          }
 
           if (
             this.currentMode === "splash" &&
@@ -295,9 +303,6 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             (tx - this.animState.centerXOffset) * currentEase;
           this.animState.centerYOffset +=
             (ty - this.animState.centerYOffset) * currentEase;
-          this.animState.breathPhase +=
-            dt *
-            ((Math.PI * 2) / Math.max(0.1, this.animState.breathCycleSeconds));
         }
 
         draw() {
@@ -306,33 +311,24 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           const cy =
             this.height * this.config.position.y + this.animState.centerYOffset;
           const dim = Math.min(this.width, this.height);
-          const breath = Math.sin(this.animState.breathPhase);
+
+          // In static mode, breath is effectively 0
+          const breath =
+            this.currentMode === "static"
+              ? 0
+              : Math.sin(this.animState.breathPhase);
 
           this.paths.forEach((path, i) => {
             let r, op;
 
-            // 💧 SPOUTING MODE - CONTINUOUS RIPPLES
             if (this.currentMode === "spouting") {
-              // Each layer offset creates staggered ripples
               const layerOffset = i / this.config.layerCount;
-
-              // Progress wraps continuously (0 to 1 cycle)
               const progress = (this.animState.emitPhase + layerOffset) % 1;
-
-              // Radius grows from center outward
               r = this.animState.radius * dim * progress;
-
-              // Fade in quickly at start
               const fadeIn = Math.min(progress * 8, 1);
-
-              // Fade out as it reaches edge
               const fadeOut = 1 - Math.pow(progress, 3);
-
-              // Combined opacity for smooth ripple
               op = this.animState.opacity * fadeOut * fadeIn;
-            }
-            // ALL OTHER MODES
-            else if (this.currentMode === "splash") {
+            } else if (this.currentMode === "splash") {
               const start = i / this.config.layerCount,
                 end = (i + 1) / this.config.layerCount;
               const sVis =
@@ -348,6 +344,7 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
                 (1 + breath * this.animState.amplitude);
               op = this.animState.opacity * (1 - i * 0.12) * sVis;
             } else {
+              // Standard drawing (including static)
               r =
                 this.animState.radius *
                 dim *

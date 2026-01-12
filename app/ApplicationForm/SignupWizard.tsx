@@ -1,14 +1,23 @@
 "use client";
 
-import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { authService } from '@/app/services/authService';
-import { userService } from '@/app/services/userService';
-import styles from './SignupWizard.module.css';
-import { useIvrita } from '@/app/contexts/IvritaContext';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useMemo,
+} from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "@/app/services/authService";
+import { userService } from "@/app/services/userService";
+import styles from "./SignupWizard.module.css";
+import { useIvrita } from "@/app/contexts/IvritaContext";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
 interface SignupWizardProps {
-  signupType: 'email' | 'google';
+  signupType: "email" | "google";
   email: string;
   password: string;
   googleUserId?: string;
@@ -16,60 +25,71 @@ interface SignupWizardProps {
 }
 
 const CIRCLE_OPTIONS = [
-  'שורדי ושורדות המסיבות',
-  'נפגעי טראומה 7.10 ומלחמת חרבות ברזל',
-  'הורים שכולים',
-  'אחים.ות שכולים',
-  'משפחות וקרובים של פצועים טראומה בגופם ובנפשם',
-  'כוחות הצלה וחילוץ',
-  'תושבי העוטף ומפונים',
-  'מעגל שני ושלישי של משפחות השכול',
+  "שורדי ושורדות המסיבות",
+  "נפגעי טראומה 7.10 ומלחמת חרבות ברזל",
+  "הורים שכולים",
+  "אחים.ות שכולים",
+  "משפחות וקרובים של פצועים טראומה בגופם ובנפשם",
+  "כוחות הצלה וחילוץ",
+  "תושבי העוטף ומפונים",
+  "מעגל שני ושלישי של משפחות השכול",
 ];
 
 const INTEREST_OPTIONS = [
-  'יוגה',
-  'מדיטציה',
-  'אומנות',
-  'כתיבה',
-  'יצירה',
-  'מיינדפולנס',
+  "יוגה",
+  "מדיטציה",
+  "אומנות",
+  "כתיבה",
+  "יצירה",
+  "מיינדפולנס",
 ];
 
 const BRANCH_OPTIONS = [
-  { value: 'nahalal', label: 'נהלל' },
-  { value: 'satria', label: 'סתריה' },
+  { value: "nahalal", label: "נהלל" },
+  { value: "satria", label: "סתריה" },
 ];
 
-const GENDER_OPTIONS: { value: 'male' | 'female' | 'prefer_not_to_say'; label: string }[] = [
-  { value: 'male', label: 'זכר' },
-  { value: 'female', label: 'נקבה' },
-  { value: 'prefer_not_to_say', label: 'מעדיפ/ה לא לציין' },
+const GENDER_OPTIONS: {
+  value: "male" | "female" | "prefer_not_to_say";
+  label: string;
+}[] = [
+  { value: "male", label: "זכר" },
+  { value: "female", label: "נקבה" },
+  { value: "prefer_not_to_say", label: "מעדיפ/ה לא לציין" },
 ];
 
 const TOTAL_STEPS = 5;
 
-export default function SignupWizard({ signupType, email, password, googleUserId, onBack }: SignupWizardProps) {
+export default function SignupWizard({
+  signupType,
+  email,
+  password,
+  googleUserId,
+  onBack,
+}: SignupWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { setGender: setIvritaGender, t } = useIvrita();
 
   // Form data
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [gender, setGender] = useState<'male' | 'female' | 'prefer_not_to_say' | null>(null);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState<
+    "male" | "female" | "prefer_not_to_say" | null
+  >(null);
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
-  const [circle, setCircle] = useState('');
+  const [circle, setCircle] = useState("");
   const [circleDropdownOpen, setCircleDropdownOpen] = useState(false);
-  const [proximity, setProximity] = useState('');
+  const [proximity, setProximity] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [branches, setBranches] = useState<string[]>([]);
-  const [freeText, setFreeText] = useState('');
+  const [freeText, setFreeText] = useState("");
 
   // Field errors
-  const [nameError, setNameError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
+  const [nameError, setNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   // Scroll snap refs
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -78,40 +98,92 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   const touchStartX = useRef<number | null>(null);
   const touchStartScrollLeft = useRef<number | null>(null);
 
+  // OrganicCircles parameters - start with defaults
+  const defaultParams = useMemo(() => calculateShapeParams(null), []);
+
+  // SEPARATE STATE FOR LAYER COUNT - starts at 1
+  const [layerCount, setLayerCount] = useState(1);
+
+  // CALCULATED PARAMS based on user selections (Step 2+)
+  const [calculatedParams, setCalculatedParams] = useState(defaultParams);
+
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
-  const isValidIsraeliMobile = (p: string) => /^05\d{8}$/.test(p.replace(/[-\s]/g, ''));
+  const isValidIsraeliMobile = (p: string) =>
+    /^05\d{8}$/.test(p.replace(/[-\s]/g, ""));
 
   // Computed validation - determines if scrolling is allowed
   const isStep0Valid = useMemo(() => {
     const trimmedName = fullName.trim();
-    const cleanPhone = phone.replace(/[-\s]/g, '');
+    const cleanPhone = phone.replace(/[-\s]/g, "");
     return (
-      trimmedName !== '' &&
+      trimmedName !== "" &&
       isHebrewName(trimmedName) &&
-      cleanPhone !== '' &&
+      cleanPhone !== "" &&
       isValidIsraeliMobile(cleanPhone)
     );
   }, [fullName, phone]);
 
+  // STEP 0: UPDATE LAYER COUNT based on filled fields (lines 109-125)
+  useEffect(() => {
+    let layers = 1; // Start with 1 layer
+
+    // Add 1 layer for each valid filled field
+    if (fullName.trim() && isHebrewName(fullName.trim())) {
+      layers++;
+    }
+    if (phone.trim() && isValidIsraeliMobile(phone.replace(/[-\s]/g, ""))) {
+      layers++;
+    }
+    if (gender) {
+      layers++;
+    }
+
+    // Update the layer count state (max 4 layers)
+    setLayerCount(Math.min(layers, 4));
+
+    console.log("Step 0 - Layer count updated to:", Math.min(layers, 4));
+  }, [fullName, phone, gender]);
+
+  // STEP 2+ (Interests & Circle): CALCULATE ALL PARAMS using calculator (lines 127-148)
+  useEffect(() => {
+    // Build user profile for calculator
+    const userProfile = {
+      gender: gender || undefined,
+      quiz: {
+        interests: interests.length > 0 ? interests : undefined,
+        circle: circle || undefined,
+        branches: branches.length > 0 ? branches : undefined,
+        free_text: freeText || undefined,
+      },
+    };
+
+    // Calculate params based on selections
+    const params = calculateShapeParams(userProfile as any);
+
+    setCalculatedParams(params);
+
+    console.log("Step 2+ - Calculated params:", params);
+  }, [interests, circle, gender, branches, freeText]);
+
   const validateStep0 = (): boolean => {
-    setNameError('');
-    setPhoneError('');
+    setNameError("");
+    setPhoneError("");
 
     if (!fullName.trim()) {
-      setNameError('שדה חובה');
+      setNameError("שדה חובה");
       return false;
     }
     if (!isHebrewName(fullName.trim())) {
-      setNameError('עברית בלבד');
+      setNameError("עברית בלבד");
       return false;
     }
     if (!phone.trim()) {
-      setPhoneError('שדה חובה');
+      setPhoneError("שדה חובה");
       return false;
     }
-    const cleanPhone = phone.replace(/[-\s]/g, '');
+    const cleanPhone = phone.replace(/[-\s]/g, "");
     if (!isValidIsraeliMobile(cleanPhone)) {
-      setPhoneError('מספר טלפון לא תקין');
+      setPhoneError("מספר טלפון לא תקין");
       return false;
     }
     return true;
@@ -138,12 +210,12 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     if (!container) return;
 
     // Use both scroll and scrollend for reliability
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    container.addEventListener('scrollend', handleScroll, { passive: true });
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    container.addEventListener("scrollend", handleScroll, { passive: true });
 
     return () => {
-      container.removeEventListener('scroll', handleScroll);
-      container.removeEventListener('scrollend', handleScroll);
+      container.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("scrollend", handleScroll);
     };
   }, [handleScroll]);
 
@@ -156,7 +228,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       if (isKeyboardOpen.current) return;
 
       const vh = window.innerHeight;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
 
       const container = scrollContainerRef.current;
       if (!container) return;
@@ -167,7 +239,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
       labels.forEach((el) => {
         const rect = el.getBoundingClientRect();
-        el.style.setProperty('--bg-y', `${-rect.top}px`);
+        el.style.setProperty("--bg-y", `${-rect.top}px`);
       });
     };
 
@@ -184,24 +256,26 @@ export default function SignupWizard({ signupType, email, password, googleUserId
     updateLabelBackgrounds();
     const raf = requestAnimationFrame(updateLabelBackgrounds);
 
-    window.addEventListener('resize', updateLabelBackgrounds);
-    window.addEventListener('orientationchange', updateLabelBackgrounds);
-    document.addEventListener('focusin', onFocusIn);
-    document.addEventListener('focusout', onFocusOut);
+    window.addEventListener("resize", updateLabelBackgrounds);
+    window.addEventListener("orientationchange", updateLabelBackgrounds);
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("focusout", onFocusOut);
 
     const container = scrollContainerRef.current;
-    container?.addEventListener('scroll', updateLabelBackgrounds, { passive: true });
+    container?.addEventListener("scroll", updateLabelBackgrounds, {
+      passive: true,
+    });
 
     const ro = new ResizeObserver(updateLabelBackgrounds);
     ro.observe(document.body);
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize', updateLabelBackgrounds);
-      window.removeEventListener('orientationchange', updateLabelBackgrounds);
-      document.removeEventListener('focusin', onFocusIn);
-      document.removeEventListener('focusout', onFocusOut);
-      container?.removeEventListener('scroll', updateLabelBackgrounds);
+      window.removeEventListener("resize", updateLabelBackgrounds);
+      window.removeEventListener("orientationchange", updateLabelBackgrounds);
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("focusout", onFocusOut);
+      container?.removeEventListener("scroll", updateLabelBackgrounds);
       ro.disconnect();
     };
   }, []);
@@ -215,7 +289,8 @@ export default function SignupWizard({ signupType, email, password, googleUserId
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartScrollLeft.current === null) return;
+    if (touchStartX.current === null || touchStartScrollLeft.current === null)
+      return;
 
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -244,22 +319,22 @@ export default function SignupWizard({ signupType, email, password, googleUserId
 
   const handleSubmit = async () => {
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       let userId: string;
 
-      if (signupType === 'email') {
+      if (signupType === "email") {
         await authService.signUp(email, password);
         const user = await authService.getCurrentUser();
 
-        if (!user) throw new Error('שגיאה ביצירת חשבון');
+        if (!user) throw new Error("שגיאה ביצירת חשבון");
         userId = user.id;
       } else {
         userId = googleUserId!;
       }
 
-      const cleanPhone = phone.replace(/[-\s]/g, '');
+      const cleanPhone = phone.replace(/[-\s]/g, "");
 
       await userService.completeProfile(userId, email, {
         full_name: fullName.trim(),
@@ -272,26 +347,26 @@ export default function SignupWizard({ signupType, email, password, googleUserId
         free_text: freeText || undefined,
       });
 
-      router.replace('/pending-approval');
+      router.replace("/pending-approval");
     } catch (err: any) {
-      setError(err.message || 'שגיאה בשמירה');
+      setError(err.message || "שגיאה בשמירה");
     } finally {
       setLoading(false);
     }
   };
 
   const toggleInterest = (interest: string) => {
-    setInterests(prev =>
+    setInterests((prev) =>
       prev.includes(interest)
-        ? prev.filter(i => i !== interest)
+        ? prev.filter((i) => i !== interest)
         : [...prev, interest]
     );
   };
 
   const toggleBranch = (branchValue: string) => {
-    setBranches(prev =>
+    setBranches((prev) =>
       prev.includes(branchValue)
-        ? prev.filter(b => b !== branchValue)
+        ? prev.filter((b) => b !== branchValue)
         : [...prev, branchValue]
     );
   };
@@ -308,19 +383,33 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       {/* Scroll Snap Container - locked until step 0 is valid */}
       <div
         ref={scrollContainerRef}
-        className={`${styles.scrollSnapContainer} ${!isStep0Valid ? styles.scrollLocked : ''}`}
+        className={`${styles.scrollSnapContainer} ${
+          !isStep0Valid ? styles.scrollLocked : ""
+        }`}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Step 0: Personal Details */}
+        {/* Step 0: Personal Details - Uses layerCount only */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>{t('השלם/י פרטים אישיים')}</h2>
+              <h2 className={styles.stepTitle}>{t("השלם/י פרטים אישיים")}</h2>
             </div>
 
             <div className={styles.decorativeCircles}>
-              <span className={styles.circlePlaceholder}></span>
+              <OrganicCircles
+                key={`circles-step0-${layerCount}`}
+                mode="static"
+                radius={0.13}
+                layers={layerCount}
+                smoothness={defaultParams.smoothness}
+                complexity={defaultParams.complexity}
+                elongation={defaultParams.elongation}
+                opacity={0.8}
+                strokeWidth={1}
+                position={{ x: 0.3, y: 0.15 }}
+                baseColor="#FFFFFF"
+              />
             </div>
 
             <div className={styles.stepContainer}>
@@ -332,12 +421,16 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                     value={fullName}
                     onChange={(e) => {
                       setFullName(e.target.value);
-                      setNameError('');
+                      setNameError("");
                     }}
-                    className={`${styles.input} ${nameError ? styles.inputError : ''}`}
+                    className={`${styles.input} ${
+                      nameError ? styles.inputError : ""
+                    }`}
                     dir="rtl"
                   />
-                  {nameError && <span className={styles.fieldError}>{nameError}</span>}
+                  {nameError && (
+                    <span className={styles.fieldError}>{nameError}</span>
+                  )}
                 </div>
 
                 <div className={styles.inputWrapper}>
@@ -347,12 +440,16 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                     value={phone}
                     onChange={(e) => {
                       setPhone(e.target.value);
-                      setPhoneError('');
+                      setPhoneError("");
                     }}
-                    className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
+                    className={`${styles.input} ${
+                      phoneError ? styles.inputError : ""
+                    }`}
                     dir="rtl"
                   />
-                  {phoneError && <span className={styles.fieldError}>{phoneError}</span>}
+                  {phoneError && (
+                    <span className={styles.fieldError}>{phoneError}</span>
+                  )}
                 </div>
 
                 <div className={styles.genderSelector}>
@@ -361,12 +458,25 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                     <button
                       type="button"
                       onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
-                      className={`${styles.genderToggle} ${genderDropdownOpen ? styles.open : ''}`}
+                      className={`${styles.genderToggle} ${
+                        genderDropdownOpen ? styles.open : ""
+                      }`}
                     >
-                      <span className={!gender ? styles.accordionPlaceholder : ''}>
-                        {gender ? GENDER_OPTIONS.find(g => g.value === gender)?.label : t('בחר/י')}
+                      <span
+                        className={!gender ? styles.accordionPlaceholder : ""}
+                      >
+                        {gender
+                          ? GENDER_OPTIONS.find((g) => g.value === gender)
+                              ?.label
+                          : t("בחר/י")}
                       </span>
-                      <span className={`${styles.genderToggleArrow} ${genderDropdownOpen ? styles.open : ''}`}>▼</span>
+                      <span
+                        className={`${styles.genderToggleArrow} ${
+                          genderDropdownOpen ? styles.open : ""
+                        }`}
+                      >
+                        ▼
+                      </span>
                     </button>
                   </div>
                   {genderDropdownOpen && (
@@ -380,7 +490,9 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                             setIvritaGender(option.value);
                             setGenderDropdownOpen(false);
                           }}
-                          className={`${styles.genderOption} ${gender === option.value ? styles.selected : ''}`}
+                          className={`${styles.genderOption} ${
+                            gender === option.value ? styles.selected : ""
+                          }`}
                         >
                           {option.label}
                         </button>
@@ -393,16 +505,30 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         </div>
 
-        {/* Step 1: Branch Selection */}
+        {/* Step 1: Branch Selection - Uses layerCount only (no calculator) */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>{t('הסניף הקרוב [אליך|אלייך]')}</h2>
+              <h2 className={styles.stepTitle}>
+                {t("הסניף הקרוב [אליך|אלייך]")}
+              </h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
             <div className={styles.decorativeCircles}>
-              <span className={styles.circlePlaceholder}></span>
+              <OrganicCircles
+                key={`circles-step1-${layerCount}`}
+                mode="static"
+                radius={0.13}
+                layers={layerCount}
+                smoothness={defaultParams.smoothness}
+                complexity={defaultParams.complexity}
+                elongation={defaultParams.elongation}
+                opacity={0.8}
+                strokeWidth={1}
+                position={{ x: 0.3, y: 0.15 }}
+                baseColor="#FFFFFF"
+              />
             </div>
 
             <div className={styles.stepContainerLower}>
@@ -411,7 +537,9 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   <button
                     key={option.value}
                     onClick={() => toggleBranch(option.value)}
-                    className={`${styles.optionButton} ${branches.includes(option.value) ? styles.selected : ''}`}
+                    className={`${styles.optionButton} ${
+                      branches.includes(option.value) ? styles.selected : ""
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -421,16 +549,28 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         </div>
 
-        {/* Step 2: Interests */}
+        {/* Step 2: Interests - Uses CALCULATED PARAMS */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>{t('מה מעניין אותך?')}</h2>
+              <h2 className={styles.stepTitle}>{t("מה מעניין אותך?")}</h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
             <div className={styles.decorativeCircles}>
-              <span className={styles.circlePlaceholder}></span>
+              <OrganicCircles
+                key={`circles-step2-${interests.length}-${calculatedParams.layers}-${calculatedParams.complexity}`}
+                mode="static"
+                radius={0.11}
+                layers={calculatedParams.layers}
+                smoothness={calculatedParams.smoothness}
+                complexity={calculatedParams.complexity}
+                elongation={calculatedParams.elongation}
+                opacity={calculatedParams.opacity}
+                strokeWidth={calculatedParams.strokeWidth}
+                position={{ x: 0.3, y: 0.15 }}
+                baseColor="#FFFFFF"
+              />
             </div>
 
             <div className={styles.stepContainerLower}>
@@ -439,7 +579,9 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   <button
                     key={option}
                     onClick={() => toggleInterest(option)}
-                    className={`${styles.optionButton} ${interests.includes(option) ? styles.selected : ''}`}
+                    className={`${styles.optionButton} ${
+                      interests.includes(option) ? styles.selected : ""
+                    }`}
                   >
                     {option}
                   </button>
@@ -449,32 +591,56 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         </div>
 
-        {/* Step 3: Circle Selection (Personal Background) */}
+        {/* Step 3: Circle Selection - Uses CALCULATED PARAMS */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</h2>
+              <h2 className={styles.stepTitle}>
+                {t("מאיזה מקום אישי את/ה מגיע/ה אלינו?")}
+              </h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
             <div className={styles.decorativeCircles}>
-              <span className={styles.circlePlaceholder}></span>
+              <OrganicCircles
+                key={`circles-step3-${circle}-${calculatedParams.layers}-${calculatedParams.opacity}`}
+                mode="static"
+                radius={0.11}
+                layers={calculatedParams.layers}
+                smoothness={calculatedParams.smoothness}
+                complexity={calculatedParams.complexity}
+                elongation={calculatedParams.elongation}
+                opacity={calculatedParams.opacity}
+                strokeWidth={calculatedParams.strokeWidth}
+                position={{ x: 0.3, y: 0.15 }}
+                baseColor="#FFFFFF"
+              />
             </div>
 
             <div className={styles.stepContainerLower}>
               <div className={styles.inputsContainer}>
                 <div className={styles.accordionContainer}>
                   <div className={styles.inputWrapper}>
-                    <span className={styles.inputLabel}>{t('מאיזה מקום אישי את/ה מגיע/ה אלינו?')}</span>
+                    <span className={styles.inputLabel}>
+                      {t("מאיזה מקום אישי את/ה מגיע/ה אלינו?")}
+                    </span>
                     <button
                       type="button"
                       onClick={() => setCircleDropdownOpen(!circleDropdownOpen)}
-                      className={`${styles.accordionHeader} ${circleDropdownOpen ? styles.open : ''}`}
+                      className={`${styles.accordionHeader} ${
+                        circleDropdownOpen ? styles.open : ""
+                      }`}
                     >
-                      <span className={!circle ? styles.accordionPlaceholder : ''}>
-                        {circle || t('בחר/י')}
+                      <span
+                        className={!circle ? styles.accordionPlaceholder : ""}
+                      >
+                        {circle || t("בחר/י")}
                       </span>
-                      <span className={`${styles.accordionArrow} ${circleDropdownOpen ? styles.open : ''}`}></span>
+                      <span
+                        className={`${styles.accordionArrow} ${
+                          circleDropdownOpen ? styles.open : ""
+                        }`}
+                      ></span>
                     </button>
                   </div>
                   {circleDropdownOpen && (
@@ -484,10 +650,14 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                           key={option}
                           type="button"
                           onClick={() => {
-                            setCircle(prev => prev === option ? '' : option);
+                            setCircle((prev) =>
+                              prev === option ? "" : option
+                            );
                             setCircleDropdownOpen(false);
                           }}
-                          className={`${styles.accordionOption} ${circle === option ? styles.selected : ''}`}
+                          className={`${styles.accordionOption} ${
+                            circle === option ? styles.selected : ""
+                          }`}
                         >
                           {option}
                         </button>
@@ -511,12 +681,14 @@ export default function SignupWizard({ signupType, email, password, googleUserId
           </div>
         </div>
 
-        {/* Step 4: Free Text */}
+        {/* Step 4: Free Text - Uses CALCULATED PARAMS */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.lastStepContainer}>
               <div className={styles.lastStepContent}>
-                <h2 className={styles.lastStepTitle}>{t('*כל דבר אחר שתרצה/י שנדע:')}</h2>
+                <h2 className={styles.lastStepTitle}>
+                  {t("*כל דבר אחר שתרצה/י שנדע:")}
+                </h2>
 
                 <div className={styles.inputWrapper}>
                   <span className={styles.inputLabel}>אחר</span>
@@ -534,7 +706,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
                   disabled={loading}
                   className={styles.submitButton}
                 >
-                  {loading ? '...' : 'סיום'}
+                  {loading ? "..." : "סיום"}
                 </button>
               </div>
             </div>
@@ -548,10 +720,7 @@ export default function SignupWizard({ signupType, email, password, googleUserId
       <div className={styles.navigation}>
         <div className={styles.progressDots}>
           {[0, 1, 2, 3, 4].map((step) => (
-            <div
-              key={step}
-              className={getDotClass(step)}
-            />
+            <div key={step} className={getDotClass(step)} />
           ))}
         </div>
       </div>
