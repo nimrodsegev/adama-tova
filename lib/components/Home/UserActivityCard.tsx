@@ -176,7 +176,7 @@ export default function UserActivityCard({
         {showRegisterButton && (
           <div className={styles.registerButton}>
             <Button
-              size="icon"
+              size="S"
               onClick={handleRegistrationToggle}
               disabled={loading}
             >
