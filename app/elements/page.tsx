@@ -122,6 +122,21 @@ export default function ElementsPage() {
             </div>
           </section>
 
+          <section className="section">
+            <h2 className="text-section-title">Action Buttons (Approve/Reject)</h2>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <Button variant="approve">אשר</Button>
+              <Button variant="reject">סרב</Button>
+            </div>
+          </section>
+
           <hr
             style={{
               border: "0.5px solid rgba(255,255,255,0.2)",
