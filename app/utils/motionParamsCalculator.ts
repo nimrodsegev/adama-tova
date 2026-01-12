@@ -38,10 +38,10 @@ const INTEREST_ADJUSTMENTS: Record<
   Partial<ShapeParams> & { layersIncrease?: number }
 > = {
   mindfulness: { elongation: 1.4, smoothness: 1.0, layersIncrease: 1 },
-  body_motion: { complexity: 0.3, smoothness: 0.5, layersIncrease: 1 },
+  body_motion: { complexity: 0.6, smoothness: 0.5, layersIncrease: 1 },
   music_sound: { smoothness: 0.0, layersIncrease: 1 },
   creation_material: {
-    complexity: 0.3,
+    complexity: 0.7,
     elongation: 0.8,
     strokeWidth: 0.7,
     layersIncrease: 1,
@@ -52,7 +52,7 @@ const CIRCLE_ADJUSTMENTS: Record<
   string,
   Partial<ShapeParams> & { layersMax?: boolean; layersIncrease?: number }
 > = {
-  "Nova Survivor": { strokeWidth: 1.5, opacity: 0.6 },
+  "Nova Survivor": { strokeWidth: 1.5, opacity: 0.6, complexity: 0.6 },
   "Rescue Forces": { smoothness: 1.0, strokeWidth: 3.0, opacity: 0.9 },
   "Area/Bereavement": { layersMax: true },
   "Support Group": { layersIncrease: 1 },
