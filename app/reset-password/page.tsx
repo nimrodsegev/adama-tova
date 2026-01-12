@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -57,15 +57,11 @@ export default function ResetPasswordPage() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        // No valid session - show error
         if (exchangeError) {
-          // Code exchange failed - likely opened on different device or private browsing
           setSessionError('הקישור לא תקף. יש לפתוח את הקישור מאותו מכשיר בו ביקשת לאפס את הסיסמה, ולוודא שאינך בגלישה פרטית.');
         } else if (code || accessToken) {
-          // Had tokens but still no session - expired or invalid
           setSessionError('הקישור פג תוקף. אנא בקשו קישור חדש.');
         } else {
-          // No tokens at all - direct navigation to page
           setSessionError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
         }
       }
@@ -100,33 +96,24 @@ export default function ResetPasswordPage() {
 
     try {
       const supabase = createClient();
-
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
 
       if (error) {
-        // Check for specific error types
         const errorMessage = error.message?.toLowerCase() || '';
-
-        if (errorMessage.includes('same') || errorMessage.includes('different') ||
-            error.message?.includes('should be different')) {
-          // Same password error
+        if (errorMessage.includes('same') || errorMessage.includes('different') || error.message?.includes('should be different')) {
           setPasswordError('הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית');
         } else if (errorMessage.includes('session') || errorMessage.includes('not authenticated')) {
-          // Session expired
           setPasswordError('פג תוקף החיבור. אנא בקשו קישור חדש.');
         } else {
-          // Generic error
           setPasswordError('שגיאה - אנא בקשו לינק חדש בדף ההתחברות');
         }
         return;
       }
 
       await supabase.auth.signOut();
-
       setSuccess(true);
-
       setTimeout(() => {
         router.push('/login');
       }, 2000);
@@ -138,35 +125,36 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Loading state while checking session
+  // LOADING STATE
   if (checkingSession) {
     return (
-      <div className={styles.container}>
+      <div className={styles.resetContainer}>
         <div className={styles.content}>
-          <div
-            style={{
-              color: "#EFEFEF",
-              fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
-              fontSize: "1.25rem",
-              textAlign: "center",
-            }}
-            dir="rtl"
-          >
-            טוען...
+          <div className={styles.greeting}>
+            <p className={styles.subtitle}>טוען...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Session error - show message with button to go back to login
+  // ERROR STATE
   if (sessionError) {
     return (
-      <div className={styles.container}>
+      <div className={styles.resetContainer}>
         <div className={styles.content}>
+          {/* Decorative Icon */}
+          <div className={styles.decorativeIcon}>
+            <span className={styles.vectorOuter}></span>
+            <span className={styles.vectorMiddle}></span>
+            <span className={styles.vectorInner}></span>
+          </div>
+
           <div className={styles.greeting}>
+            <h1 className={styles.title}>שגיאה</h1>
             <p className={styles.subtitle}>{sessionError}</p>
           </div>
+
           <button
             onClick={() => router.push('/login')}
             className={styles.primaryButton}
@@ -178,69 +166,89 @@ export default function ResetPasswordPage() {
     );
   }
 
+  // SUCCESS STATE
   if (success) {
     return (
-      <div className={styles.pageBackground}>
-        <div className={styles.container}>
-          <div className={styles.content}>
-            <div className={styles.greeting}>
-              <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
-              <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
-            </div>
+      <div className={styles.resetContainer}>
+        <div className={styles.content}>
+          {/* Decorative Icon */}
+          <div className={styles.decorativeIcon}>
+            <span className={styles.vectorOuter}></span>
+            <span className={styles.vectorMiddle}></span>
+            <span className={styles.vectorInner}></span>
+          </div>
+
+          <div className={styles.greeting}>
+            <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
+            <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // MAIN FORM STATE
   return (
-    <div className={styles.container}>
+    <div className={styles.resetContainer}>
       <div className={styles.content}>
+        {/* Decorative Icon */}
+        <div className={styles.decorativeIcon}>
+          <span className={styles.vectorOuter}></span>
+          <span className={styles.vectorMiddle}></span>
+          <span className={styles.vectorInner}></span>
+        </div>
+
+        {/* Greeting section */}
         <div className={styles.greeting}>
           <h1 className={styles.title}>שינוי סיסמה</h1>
           <p className={styles.subtitle}>
-            הכנס את סיסמה החדשה על מנת לקבל שוב גישה למערכת.
+            הכנס את הסיסמה החדשה על מנת לקבל שוב גישה למערכת.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className={styles.loginContent}>
-          <div className={styles.inputWrapper}>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordError('');
-                setConfirmPasswordError('');
-              }}
-              required
-              className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
-              dir="rtl"
-              placeholder="6 תווים או יותר"
-            />
-            <span className={styles.inputLabel}>סיסמה חדשה</span>
-            {passwordError && (
-              <span className={styles.fieldError}>{passwordError}</span>
-            )}
-          </div>
+        {/* Form Content */}
+        <form onSubmit={handleSubmit} className={styles.formContent}>
+          <div className={styles.inputsContainer}>
+            {/* Password Input */}
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputLabel}>סיסמה חדשה</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError('');
+                  setConfirmPasswordError('');
+                }}
+                required
+                className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
+                dir="rtl"
+                placeholder="6 תווים או יותר"
+              />
+              {passwordError && (
+                <span className={styles.fieldError}>{passwordError}</span>
+              )}
+            </div>
 
-          <div className={styles.inputWrapper}>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                setConfirmPasswordError('');
-              }}
-              required
-              className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
-              dir="rtl"
-              placeholder="6 תווים או יותר"
-            />
-            <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
-            {confirmPasswordError && (
-              <span className={styles.fieldError}>{confirmPasswordError}</span>
-            )}
+            {/* Confirm Password Input */}
+            <div className={styles.inputWrapper}>
+              <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setConfirmPasswordError('');
+                }}
+                required
+                className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
+                dir="rtl"
+                placeholder="6 תווים או יותר"
+              />
+              {confirmPasswordError && (
+                <span className={styles.fieldError}>{confirmPasswordError}</span>
+              )}
+            </div>
           </div>
 
           <button

@@ -1,15 +1,66 @@
-/* Container */
-.container {
-  position: relative;
-  width: 100%;
-  max-width: 24.5625rem; /* 393px */
-  min-height: 100vh;
-  margin: 0 auto;
-  background: #F28130;
+/* ============================================
+   SIGNUP WIZARD - Responsive Design
+   Works on all phone screens
+   ============================================ */
+
+/* Container - Full screen background like login page */
+.wizardContainer {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
+  padding: 0;
+  padding-top: calc(3vh + env(safe-area-inset-top, 0)); /* Safe area for notch */
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0)); /* Space for fixed navigation */
+
+  width: 100%;
+  min-height: 100dvh; /* Use dvh only for PWA compatibility */
+
+  background: var(--color-background);
+  background-attachment: fixed;
+
+  overflow-x: hidden;
+  overflow-y: visible;
+  direction: rtl;
+  position: relative;
+}
+
+/* Scroll Snap Container - horizontal scrolling */
+.scrollSnapContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scrollSnapContainer::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Lock scrolling until validation passes */
+.scrollLocked {
+  overflow-x: hidden !important;
+  touch-action: pan-y;
+}
+
+/* Each slide takes full width */
+.scrollSnapSlide {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem;
+  overflow: visible; /* Allow dropdowns to extend beyond */
 }
 
 /* Content wrapper */
@@ -17,360 +68,223 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem; /* 24px */
   width: 100%;
-  max-width: 19.9375rem; /* 319px */
+  max-width: 100%;
+  flex: 1;
   position: relative;
-  min-height: 35rem; /* 🔥 CHANGED: Increased height for more space */
 }
 
-/* Step container */
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 21.5625rem; /* 345px */
+  flex-shrink: 0;
+}
+
+.stepTitle {
+  width: 100%;
+  margin: 0;
+
+  font-family: var(--font-primary);
+  font-style: normal;
+  font-weight: var(--font-weight-normal);
+  font-size: clamp(1rem, 5vw, 1.25rem); /* Responsive font size */
+  line-height: 1.4;
+  text-align: right;
+  letter-spacing: 0.02em;
+
+  color: #FFFFFF;
+}
+
+.optionalSubtitle {
+  width: 100%;
+  margin: 0;
+  margin-top: -0.25rem;
+  margin-bottom: -1.25rem; /* Doesn't push content down */
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: 1rem;
+  line-height: 1.1875rem;
+  text-align: right;
+  color: #FFFFFF;
+}
+
+/* ============================================
+   DECORATIVE CIRCLE - Placeholder
+   ============================================ */
+.decorativeCircles {
+  width: min(55vw, 13.5625rem); /* Responsive: 55% of viewport or max 217px */
+  height: min(55vw, 13.75rem);
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 5vh;
+  margin-bottom: 4vh;
+  pointer-events: none;
+}
+
+.circlePlaceholder {
+  position: absolute;
+  left: 0%;
+  right: 4.86%;
+  top: 0%;
+  bottom: 4.79%;
+  border: 0.1445rem solid rgba(249, 249, 249, 0.45);
+  border-radius: 50%;
+  transform: matrix(1, -0.05, 0.05, 1, 0, 0);
+}
+
+/* ============================================
+   STEP CONTAINERS
+   ============================================ */
 .stepContainer {
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* RTL alignment */
-  gap: 0.8125rem; /* 13px */
+  align-items: flex-start;
+  padding: 0;
+  gap: 1rem;
   width: 100%;
-  flex: 1; /* Takes available space */
-  padding-top: 6.25rem; /* 🔥 NEW: Push content down */
+  max-width: 19.6875rem; /* 315px */
+  flex: 1;
+  margin-top: 3rem;
 }
 
-/* ===============================
-   Step-specific vertical control
-   =============================== */
-
-/* Step 1: slightly LOWER */
-.step1 {
-    padding-top: 8.25rem; /* was effectively 6.25rem via stepContainer */
-  }
-  
-  /* Step 2: slightly HIGHER (title + options + קרבה) */
-  .step2 {
-    padding-top: 1rem;
-  }
-
-  .step2 .optionsContainer {
-    max-height: 23.5rem;
-  }
-
-  /* Step 3: slightly HIGHER + future scroll */
-  .step3 {
-    padding-top: 1.5rem;
-  }
-  
-  /* Step 4: slightly LOWER */
-  .step4 {
-    padding-top: 8.75rem;
-  }
-  
-  
-  /* Allow scrolling ONLY in interests step */
-.step3 .optionsContainer {
-    max-height: 18rem;
-    overflow-y: auto;
-    padding-right: 0.25rem; /* small RTL scroll comfort */
-  }
-
-  
-  .container {
-    overflow-y: auto;
-    scrollbar-width: thin;                 /* Firefox */
-    scrollbar-color: rgba(120,120,120,0.6) transparent;
-  }
-  
-  /* Chrome / Edge / Safari */
-  .container::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .container::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .container::-webkit-scrollbar-thumb {
-    background-color: rgba(120,120,120,0.6);
-    border-radius: 999px;
-  }
-  
-  .container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(120,120,120,0.8);
-  }
-  
-
-/* Step title */
-.stepTitle {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem; /* 20px */
-  line-height: 1.25rem; /* 20px */
-  text-align: right;
-  color: #FFFFFF;
-  margin: 0;
-  margin-bottom: 0.0rem; /* 🔥 NEW: More space below title */
-  margin-right: 0.5rem;
+.stepContainerLower {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  gap: 1rem;
   width: 100%;
-  direction: rtl;
+  max-width: 19.6875rem; /* 315px */
+  flex: 1;
 }
 
-/* Inputs container (for step 1) */
+/* More space between circle and inputs on Step 3 */
+.stepContainerLower .inputsContainer {
+  margin-top: 3rem;
+}
+
+/* ============================================
+   FORM INPUTS
+   ============================================ */
+.formContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 1rem;
+  width: 100%;
+}
+
 .inputsContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* 12px */
+  gap: 1rem;
   width: 100%;
 }
 
-/* Input wrapper */
 .inputWrapper {
   position: relative;
   width: 100%;
 }
 
-/* Input field */
 .input {
   box-sizing: border-box;
   width: 100%;
   height: 3.75rem; /* 60px */
-  padding: 0.5rem 1.625rem; /* 8px 26px */
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 1.875rem; /* 30px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 300;
+  padding: 0.6875rem 1.875rem 0.6875rem 1.875rem; /* Vertically centered: 11px top/bottom, 30px sides */
+  background: transparent;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem; /* 9px */
+
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
   font-size: 1rem; /* 16px */
   line-height: 1.0625rem; /* 17px */
   text-align: right;
-  color: rgba(249, 249, 249, 0.8);
+
+  color: #F9F9F9;
+
   direction: rtl;
   outline: none;
 }
 
-.input:focus {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
 .input::placeholder {
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 400;
-  font-size: 0.875rem;
-  color: rgba(255, 245, 245, 0.7);
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: 1rem;
+  color: rgba(247, 247, 247, 0.7);
 }
 
-/* Floating label */
+.input:focus {
+  border-color: #FFFFFF;
+}
+
 .inputLabel {
-  position: absolute;
-  right: 1.625rem; /* 26px */
-  top: -0.5625rem; /* -9px */
-  
   display: flex;
+  flex-direction: row;
   align-items: center;
   padding: 0.0625rem 0.5rem; /* 1px 8px */
-  
-  height: 1.0625rem; /* 17px */
-  
-  background: #F28130;
-  
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  gap: 0.5rem; /* 8px */
+  isolation: isolate;
+
+  position: absolute;
+  height: 0.875rem; /* 14px */
+  right: 1.9531rem; /* 31.25px */
+  top: -0.5rem; /* -8px */
+
+  /* Gradient that aligns with page - position set via JS (frozen during keyboard) */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100% var(--vh, 100dvh);
+  background-position: 0 var(--bg-y, 0px);
+
+  font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: 400;
-  font-size: 0.875rem; /* 14px */
-  line-height: 1.25rem; /* 20px */
+  font-weight: var(--font-weight-normal);
+  font-size: 1rem; /* 16px */
+  line-height: 1.1875rem; /* 19px */
   text-align: right;
-  color: rgba(255, 245, 245, 0.7);
-  
+
+  color: #F9F9F9;
+
   pointer-events: none;
   z-index: 1;
 }
 
-/* Input error state */
 .inputError {
-  border: 2px solid #FF0000 !important;
+  border: 0.125rem solid #ff0000 !important;
 }
 
-/* Field error text */
 .fieldError {
   position: absolute;
-  right: 6.5rem; /* 🔥 CHANGED: 88px (was 72px) - much more to the right */
-  top: -0.5625rem;
-  padding: 0.0625rem 0.5rem;
-  background: #F28130;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
+  right: 1.9531rem; /* Same as inputLabel */
+  top: -0.5rem;
+  padding: 0 0.3125rem;
+  /* Gradient that aligns with page - position set via JS (frozen during keyboard) */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100% var(--vh, 100dvh);
+  background-position: 0 var(--bg-y, 0px);
+  font-family: var(--font-secondary);
   font-size: 0.875rem;
-  font-weight: 400;
-  color: #FF0000;
+  font-weight: var(--font-weight-normal);
+  color: #ff0000;
   white-space: nowrap;
-  z-index: 2;
+  z-index: 3;
 }
 
-/* Options container (for circles and interests) */
-.optionsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem; /* 12px */
-  width: 100%;
-  max-height: 22rem; /* Scrollable if needed */
-  overflow-y: auto;
-}
-
-/* Option button */
-.optionButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.3125rem 4.625rem; /* 5px 74px */
-  width: 100%;
-  height: 2.9375rem; /* 47px */
-  background: #EFEFEF;
-  border-radius: 1.5625rem; /* 25px */
-  border: none;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.1875rem; /* 19px */
-  text-align: center;
-  color: #681F02;
-  cursor: pointer;
-  transition: all 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.optionButton:hover {
-  opacity: 0.9;
-}
-
-.optionButton:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Selected option (semi-transparent) */
-.optionButton.selected {
-  background: rgba(239, 239, 239, 0.7);
-}
-
-/* Textarea wrapper */
-.textareaWrapper {
-  width: 100%;
-}
-
-/* Textarea */
-.textarea {
-  width: 100%;
-  height: 3.75rem; /* 60px */
-  padding: 1rem 1.625rem;
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 1.875rem; /* 30px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(249, 249, 249, 0.8);
-  direction: rtl;
-  resize: none;
-  outline: none;
-}
-
-.textarea:focus {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-/* Navigation section - FIXED POSITION */
-.navigation {
-  position: absolute;
-  bottom: -5.5rem; /* 🔥 CHANGED: 88px (was 48px) - much lower like Figma */
-  left: 50%;
-  transform: translateX(-50%);
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem; /* 40px */
-  width: 100%;
-  max-width: 19.9375rem;
-}
-
-/* Navigation buttons */
-.navButtons {
-  display: flex;
-  gap: 0.4375rem; /* 7px */
-  justify-content: center;
-}
-
-/* Single nav button */
-.navButton {
-  width: 2.75rem; /* 44px */
-  height: 2.75rem; /* 44px */
-  background: #F9F9F9;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.25rem;
-  color: #681F02;
-  cursor: pointer;
-  transition: all 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.navButton:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: scale(1.05);
-}
-
-.navButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.navButton:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Progress dots */
-.progressDots {
-  display: flex;
-  gap: 1.75rem; /* 28px */
-  justify-content: center;
-  align-items: center;
-}
-
-/* Single dot */
-.dot {
-  width: 0.9375rem; /* 15px */
-  height: 0.9375rem; /* 15px */
-  border-radius: 50%;
-  border: 1px solid #F9F9F9;
-  background: transparent;
-  transition: all 0.3s;
-}
-
-/* Active dot */
-.activeDot {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #F9F9F9;
-}
-
-/* Error message */
-.error {
-  width: 100%;
-  padding: 0.75rem;
-  background: rgba(255, 0, 0, 0.15);
-  border: 1px solid #FF0000;
-  border-radius: 0.5rem;
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-size: 0.875rem;
-  color: #FF0000;
-  text-align: center;
-  direction: rtl;
-  margin-top: 1rem;
-}
-
-
-/* Gender selector dropdown */
+/* ============================================
+   GENDER SELECTOR / ACCORDION
+   ============================================ */
 .genderSelector {
   width: 100%;
   position: relative;
@@ -379,40 +293,73 @@
 .genderToggle {
   box-sizing: border-box;
   width: 100%;
-  height: 3.75rem; /* 60px */
-  padding: 0.5rem 1.625rem; /* 8px 26px */
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 1.875rem; /* 30px */
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 300;
-  font-size: 1rem; /* 16px */
-  line-height: 1.0625rem; /* 17px */
-  text-align: right;
-  color: rgba(249, 249, 249, 0.8);
-  direction: rtl;
-  cursor: pointer;
+  height: 3.7rem; /* ~59.22px */
+  padding: 0 1.875rem;
+  background: transparent;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem; /* 9px */
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
+  font-size: 1rem; /* 16px */
+  line-height: 1.0625rem; /* 17px */
+  text-align: right;
+
+  color: #F9F9F9;
+
+  direction: rtl;
+  cursor: pointer;
   transition: border-radius 0.2s;
-  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .genderToggle.open {
-  border-radius: 1.875rem 1.875rem 0 0;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0.5625rem 0.5625rem 0 0;
 }
 
-.genderToggle:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+.accordionPlaceholder {
+  color: rgba(247, 247, 247, 0.7);
 }
 
 .genderToggleArrow {
+  /* Hide the text character */
+  font-size: 0;
+  color: transparent;
+
+  /* Container */
+  position: relative;
+  width: 1rem;
+  height: 0.5rem;
+  transform-origin: center center;
+
   transition: transform 0.2s;
-  font-size: 0.75rem;
+}
+
+.genderToggleArrow::before,
+.genderToggleArrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.0625rem;
+  background: #F9F9F9;
+}
+
+.genderToggleArrow::before {
+  right: 50%;
+  transform: translateY(-50%) rotate(35deg);
+  transform-origin: right center;
+}
+
+.genderToggleArrow::after {
+  left: 50%;
+  transform: translateY(-50%) rotate(-35deg);
+  transform-origin: left center;
 }
 
 .genderToggleArrow.open {
@@ -424,74 +371,744 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #F28130;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--color-background);
+  background-attachment: fixed;
+  border: 0.0625rem solid #F9F9F9;
   border-top: none;
-  border-radius: 0 0 1.875rem 1.875rem;
-  overflow: hidden;
-  z-index: 10;
+  border-radius: 0 0 0.5625rem 0.5625rem;
+  z-index: 50;
 }
 
 .genderOption {
   width: 100%;
-  padding: 1rem 1.625rem;
+  padding: 0.875rem 1.875rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  font-family: 'Ezer Shemesh TRIAL ONLY', sans-serif;
-  font-weight: 300;
+  border-bottom: 0.0625rem solid #F9F9F9;
+
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
   font-size: 1rem;
+  line-height: 1.0625rem;
   text-align: right;
-  color: rgba(249, 249, 249, 0.9);
+
+  color: #FFFFFF;
+
   direction: rtl;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s;
 }
 
 .genderOption:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
-}
-
-.genderOption:focus {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .genderOption.selected {
-  background: rgba(255, 255, 255, 0.2);
-  font-weight: 400;
-  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: var(--font-weight-normal);
 }
 
 .genderOption:last-child {
   border-bottom: none;
-  border-radius: 0 0 1.875rem 1.875rem;
 }
 
-/* Responsive */
-@media (min-width: 48rem) {
-  .container {
-    max-width: 100%;
+/* ============================================
+   ACCORDION (Circle selection)
+   ============================================ */
+.accordionContainer {
+  width: 100%;
+  position: relative;
+  z-index: 20;
+}
+
+.accordionHeader {
+  box-sizing: border-box;
+  width: 100%;
+  height: 3.75rem;
+  padding: 0 1.875rem;
+  background: transparent;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: 1rem;
+  text-align: right;
+  color: #F9F9F9;
+  direction: rtl;
+  cursor: pointer;
+  transition: border-radius 0.2s;
+}
+
+.accordionHeader.open {
+  border-radius: 0.5625rem 0.5625rem 0 0;
+}
+
+/* Accordion arrow - identical to gender arrow */
+.accordionArrow {
+  /* Hide the text character */
+  font-size: 0;
+  color: transparent;
+
+  /* Container */
+  position: relative;
+  width: 1rem;
+  height: 0.5rem;
+  transform-origin: center center;
+
+  transition: transform 0.2s;
+}
+
+.accordionArrow::before,
+.accordionArrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.0625rem;
+  background: #F9F9F9;
+}
+
+.accordionArrow::before {
+  right: 50%;
+  transform: translateY(-50%) rotate(35deg);
+  transform-origin: right center;
+}
+
+.accordionArrow::after {
+  left: 50%;
+  transform: translateY(-50%) rotate(-35deg);
+  transform-origin: left center;
+}
+
+.accordionArrow.open {
+  transform: rotate(180deg);
+}
+
+.accordionDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-background);
+  background-attachment: fixed;
+  border: 0.0625rem solid #F9F9F9;
+  border-top: none;
+  border-radius: 0 0 0.5625rem 0.5625rem;
+  z-index: 100;
+  max-height: min(11.5rem, 35vh); /* Shows exactly 4 options */
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.accordionOption {
+  width: 100%;
+  padding: 0.875rem 1.875rem;
+  background: transparent;
+  border: none;
+  border-bottom: 0.0625rem solid #F9F9F9;
+
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
+  font-size: 1rem; /* 16px */
+  line-height: 1.0625rem; /* 17px */
+  text-align: right;
+
+  color: #FFFFFF;
+
+  direction: rtl;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.accordionOption:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.accordionOption.selected {
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: var(--font-weight-normal);
+}
+
+.accordionOption:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
+   OPTION BUTTONS (Branches, Interests)
+   ============================================ */
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  gap: 1rem; /* 16px - matches Figma */
+  width: 19.6875rem; /* 315px */
+  max-width: 100%;
+  margin-top: 2.5rem; /* Push options lower */
+}
+
+.optionButton {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem; /* 16px */
+  gap: 0.625rem; /* 10px */
+  margin: 0 auto;
+  width: 19.6875rem; /* 315px */
+  max-width: 100%;
+  height: 2.9375rem; /* 47px */
+  background: #F9F9F9; /* White - unselected */
+  border-radius: 0.5625rem; /* 9px */
+  border: none;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1rem; /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  text-align: right;
+  color: #681F02; /* DarkTypo */
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.optionButton:hover {
+  opacity: 0.9;
+}
+
+.optionButton.selected {
+  background: rgba(247, 247, 247, 0.7); /* Semi-transparent - selected */
+}
+
+/* ============================================
+   TEXTAREA
+   ============================================ */
+.textareaWrapper {
+  width: 100%;
+}
+
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  height: 3.75rem;
+  padding: 1rem 1.875rem;
+  background: transparent;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: 1rem;
+  text-align: right;
+  color: #F9F9F9;
+  direction: rtl;
+  resize: none;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: #FFFFFF;
+}
+
+/* ============================================
+   NAVIGATION (Progress dots)
+   ============================================ */
+.navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  gap: 0.5rem; /* 8px */
+
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-top: 1rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0));
+  background: transparent;
+  pointer-events: none;
+}
+
+.navButtons {
+  display: none;
+}
+
+.navButton {
+  display: none;
+}
+
+.progressDots {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  gap: 0.5rem; /* 8px */
+}
+
+.dot {
+  width: 0.857rem; /* 13.71px */
+  height: 0.767rem; /* 12.27px */
+  background: transparent;
+  border: 0.0625rem solid #E74E1C; /* 1px */
+  border-radius: 50%;
+  transform: matrix(1, 0, 0, -1, 0, 0);
+  transition: all 0.3s;
+
+  flex: none;
+  flex-grow: 0;
+}
+
+.completedDot {
+  background: #E79267;
+  border-color: #E74E1C;
+}
+
+.activeDot {
+  background: #E74E1C;
+  border-color: #E74E1C;
+}
+
+/* ============================================
+   SUBMIT BUTTON
+   ============================================ */
+.submitButton {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0.25rem 1rem;
+  gap: 0.5rem;
+  width: auto;
+  min-width: 3.875rem;
+  height: 1.75rem;
+  background: #b37eb3;
+  border-radius: 0.25rem;
+  border: none;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1.125rem;
+  line-height: 1.25rem;
+  color: #F9F9F9;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: -0.5rem;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   LAST STEP (Free text - no circle)
+   ============================================ */
+.lastStepContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  padding-top: 10vh;
+}
+
+.lastStepContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 19.6875rem;
+}
+
+.lastStepTitle {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-secondary); /* Ezer Shemesh - matches Figma */
+  font-weight: var(--font-weight-normal);
+  font-size: 1.25rem; /* 20px - matches Figma */
+  line-height: 1.25rem; /* 20px */
+  text-align: right;
+  color: #FFFFFF;
+  margin-bottom: 0.0rem;
+}
+
+/* ============================================
+   ERROR MESSAGE
+   ============================================ */
+.error {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255, 0, 0, 0.15);
+  border: 0.0625rem solid #ff0000;
+  border-radius: 0.5625rem;
+  font-family: var(--font-secondary);
+  font-size: 0.875rem;
+  color: #ff0000;
+  text-align: center;
+  direction: rtl;
+}
+
+/* ============================================
+   APPROVAL PAGE
+   ============================================ */
+.approvalContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh; /* Use dvh for PWA compatibility */
+  width: 100%;
+  padding-top: env(safe-area-inset-top, 0); /* Safe area for notch */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: var(--color-background);
+  background-attachment: fixed;
+  position: relative;
+}
+
+.approvalCircles {
+  position: absolute;
+  width: 40.5625rem;
+  height: 40.6619rem;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.approvalRing {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.approvalMessage {
+  width: 11.4375rem;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1.25rem;
+  line-height: 1.375rem;
+  text-align: center;
+  color: #FFFFFF;
+  z-index: 1;
+}
+
+.backLink {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  gap: 0.5rem;
+  position: absolute;
+  left: 1.5rem;
+  bottom: 2.9688rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.backLinkArrow {
+  display: flex;
+  align-items: center;
+  padding: 0.1875rem 0.375rem 0.3125rem;
+  width: 1rem;
+  height: 1.1538rem;
+  transform: rotate(180deg);
+}
+
+.backLinkArrowIcon {
+  width: 0.6538rem;
+  height: 0.2456rem;
+  border: 0.0625rem solid #F9F9F9;
+  border-top: none;
+  border-right: none;
+  transform: rotate(-45deg);
+}
+
+.backLinkText {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1rem;
+  line-height: 1.1875rem;
+  color: #F9F9F9;
+}
+
+/* ============================================
+   AUTOFILL FIX
+   ============================================ */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: #F9F9F9 !important;
+  border: 0.0625rem solid #F9F9F9 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ============================================
+   RESPONSIVE - Works on all phone screens
+   ============================================ */
+
+/* Small height screens - reduce spacing and sizes */
+@media (max-height: 700px) {
+  .wizardContainer {
+    padding-top: 2vh;
   }
-  
-  .content {
-    max-width: 28rem;
+
+  .decorativeCircles {
+    width: min(45vw, 10rem);
+    height: min(45vw, 10rem);
+    margin-top: 2vh;
+    margin-bottom: 2vh;
   }
-  
-  .stepTitle {
-    font-size: 1.5rem;
+
+  .stepContainer {
+    margin-top: 1.5rem;
   }
-  
+
   .input,
-  .textarea {
-    font-size: 1.125rem;
-  }
-  
-  .optionButton {
-    font-size: 1.125rem;
+  .genderToggle,
+  .accordionHeader {
     height: 3.25rem;
   }
 
+  .genderOption,
+  .accordionOption {
+    padding: 0.625rem 1.5rem;
+  }
+
+  .optionButton {
+    height: 2.5rem;
+    padding: 0.75rem;
+  }
+
+  .navigation {
+    padding-top: 1.5rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* Very small height screens */
+@media (max-height: 600px) {
+  .wizardContainer {
+    padding-top: 1vh;
+  }
+  
+
+  .decorativeCircles {
+    width: min(35vw, 7rem);
+    height: min(35vw, 7rem);
+    margin-top: 1.5vh;
+    margin-bottom: 1.5vh;
+  }
+
+  .stepTitle {
+    font-size: 1rem;
+  }
+
+  .input,
+  .genderToggle,
+  .accordionHeader {
+    height: 2.75rem;
+  }
+
+  .genderOption,
+  .accordionOption {
+    padding: 0.5rem 1.25rem;
+  }
+
+  .optionButton {
+    height: 2.25rem;
+    padding: 0.5rem;
+  }
+
+  .navigation {
+    padding-top: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+  }
+
+  .lastStepContainer {
+    margin-top: 10%;
+  }
+}
+
+/* Landscape or very short screens */
+@media (max-height: 500px) {
+  .decorativeCircles {
+    width: min(25vw, 5rem);
+    height: min(25vw, 5rem);
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+  }
+  
+
+  .input,
+  .genderToggle,
+  .accordionHeader {
+    height: 2.5rem;
+  }
+
+  .stepContainer,
+  .stepContainerLower {
+    gap: 0.75rem;
+  }
+}
+
+/* Medium height screens (700-800px) - like Galaxy S8+ */
+@media (min-height: 700px) and (max-height: 799px) {
+  .stepContainer {
+    margin-top: 1.5rem;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Taller phones (iPhone 12 Pro, etc.)
+   ============================================ */
+
+/* Taller screens (800px+) - push form lower */
+@media (min-height: 800px) {
+  .wizardContainer {
+    padding-top: 3vh;
+  }
+
+  .decorativeCircles {
+    margin-top: 4vh;
+    margin-bottom: 3vh;
+  }
+
+  .stepContainer {
+    margin-top: 4rem;
+  }
+
+  .optionsContainer {
+    margin-top: 1.5rem;
+  }
+}
+
+/* Very tall screens (900px+) - push form even lower */
+@media (min-height: 900px) {
+  .wizardContainer {
+    padding-top: 4vh;
+  }
+
+  .decorativeCircles {
+    margin-top: 5vh;
+  }
+
+  .stepContainer {
+    margin-top: 5rem;
+  }
+
+  .optionsContainer {
+    margin-top: 2rem;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Tablet and Desktop (width-based)
+   ============================================ */
+
+/* Tablet */
+@media (min-width: 48rem) {
+  .content {
+    max-width: 22rem;
+  }
+
+  .headerSection {
+    max-width: 22rem;
+  }
+
+  /* Make dots more visible on larger screens */
+  .dot {
+    width: 1rem;
+    height: 0.9rem;
+    border-width: 0.125rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 64rem) {
+  .content {
+    max-width: 24rem;
+  }
+
+  .headerSection {
+    max-width: 24rem;
+  }
+
+  /* Ensure dots are visible on desktop */
+  .dot {
+    width: 1.1rem;
+    height: 1rem;
+    border-width: 0.125rem;
+  }
+
+  .navigation {
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* ============================================
+   PWA STANDALONE MODE - iOS Home Screen App Fix
+   ============================================ */
+@media (display-mode: standalone) {
+  .wizardContainer {
+    padding-top: calc(2vh + env(safe-area-inset-top, 0));
+  }
+
+  .decorativeCircles {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+  }
+
+  .stepContainer {
+    margin-top: 0.5rem;
+  }
+
+  .optionsContainer {
+    margin-top: 1rem;
+  }
+
+  .stepContainerLower .inputsContainer {
+    margin-top: 1rem;
+  }
+
+  .navigation {
+    padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* PWA on taller phones */
+@media (display-mode: standalone) and (min-height: 800px) {
+  .wizardContainer {
+    padding-top: calc(2vh + env(safe-area-inset-top, 0));
+  }
+
+  .decorativeCircles {
+    margin-top: 3vh;
+    margin-bottom: 2vh;
+  }
+
+  .stepContainer {
+    margin-top: 0.5rem;
+  }
+
+  .optionsContainer {
+    margin-top: 1rem;
+  }
 }
