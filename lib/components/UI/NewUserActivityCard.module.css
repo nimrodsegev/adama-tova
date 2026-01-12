@@ -1,0 +1,61 @@
+.cardContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* align-items: flex-start anchors content to the RIGHT in RTL */
+  align-items: flex-start;
+  padding: var(--spacing-lg); /* 1rem / 16px */
+
+  width: 100%;
+  max-width: 21.5625rem; /* 345px */
+  height: 8.03rem; /* 128.46px */
+
+  background: var(--button-bg-light);
+  border-radius: var(--radius-sm);
+  direction: rtl;
+  position: relative;
+}
+
+.contentStack {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Right alignment */
+  gap: 0.25rem; /* 4px */
+}
+
+.titleText {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base); /* 1rem / 16px */
+  line-height: 1.25rem; /* 20px */
+  color: #681f02;
+  margin: 0;
+  text-align: right;
+}
+
+.instructorText,
+.dateTimeText {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.125rem; /* 18px */
+  color: #681f02;
+  margin: 0;
+  text-align: right;
+}
+
+.actionWrapper {
+  display: flex;
+  /* justify-content: flex-end pushes the button to the LEFT in RTL */
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: auto;
+}
