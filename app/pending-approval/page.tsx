@@ -1,33 +1,47 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import styles from './page.module.css';
+import { useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/app/contexts/UserContext";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import styles from "./page.module.css";
 
 export default function PendingApprovalPage() {
   const router = useRouter();
   const supabase = createClient();
+  const { userProfile, loading } = useUser();
+
+  // Default params for loading state
+  const defaultParams = useMemo(() => calculateShapeParams(null), []);
+
+  // Calculate circle parameters from user profile - memoized to prevent recalculation
+  const circleParams = useMemo(() => {
+    return userProfile ? calculateShapeParams(userProfile) : defaultParams;
+  }, [userProfile, defaultParams]);
 
   // Poll for approval status changes
   useEffect(() => {
     const checkApprovalStatus = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) return;
 
         const { data: profile } = await supabase
-          .from('users')
-          .select('is_approved, role')
-          .eq('id', user.id)
+          .from("users")
+          .select("is_approved, role")
+          .eq("id", user.id)
           .maybeSingle();
 
         if (profile?.is_approved) {
           // User has been approved - redirect to home
-          if (profile.role === 'admin') {
-            router.replace('/AdminScreens/HomePage');
+          if (profile.role === "admin") {
+            router.replace("/AdminScreens/HomePage");
           } else {
-            router.replace('/UserScreens/HomePage');
+            router.replace("/UserScreens/HomePage");
           }
         }
       } catch (error) {
@@ -47,26 +61,49 @@ export default function PendingApprovalPage() {
 
   const handleBackToLogin = async () => {
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push("/login");
   };
+
+  // Show loading state with spouting circles while userProfile is being fetched
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        {/* OrganicCircles in spouting mode during loading */}
+        <OrganicCircles
+          key="pending-approval-loading"
+          mode="spouting"
+          radius={0.35}
+          layers={defaultParams.layers}
+          smoothness={defaultParams.smoothness}
+          complexity={defaultParams.complexity}
+          elongation={defaultParams.elongation}
+          opacity={defaultParams.opacity}
+          strokeWidth={defaultParams.strokeWidth}
+          position={{ x: 0.5, y: 0.5 }}
+          baseColor="#FFFFFF"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        {/* Concentric circles animation */}
-        <div className={styles.circles}>
-          <div className={styles.circle1}></div>
-          <div className={styles.circle2}></div>
-          <div className={styles.circle3}></div>
-          <div className={styles.circle4}></div>
-          <div className={styles.circle5}></div>
-          <div className={styles.circle6}></div>
-          <div className={styles.circle7}></div>
-          <div className={styles.circle8}></div>
-          <div className={styles.circle9}></div>
-          <div className={styles.circle10}></div>
-        </div>
+      {/* OrganicCircles with calculated parameters - only renders after profile loads */}
+      <OrganicCircles
+        key={`pending-approval-${circleParams.layers}-${circleParams.complexity}`}
+        mode="breathing"
+        radius={0.35}
+        layers={circleParams.layers}
+        smoothness={circleParams.smoothness}
+        complexity={circleParams.complexity}
+        elongation={circleParams.elongation}
+        opacity={circleParams.opacity}
+        strokeWidth={circleParams.strokeWidth}
+        position={{ x: 0.5, y: 0.5 }}
+        baseColor="#FFFFFF"
+      />
 
+      <div className={styles.content}>
         {/* Main message */}
         <div className={styles.messageBox}>
           <p className={styles.mainText}>
@@ -82,10 +119,7 @@ export default function PendingApprovalPage() {
         </p>
 
         {/* Back to registration button */}
-        <button
-          onClick={handleBackToLogin}
-          className={styles.backButton}
-        >
+        <button onClick={handleBackToLogin} className={styles.backButton}>
           לעמוד ההרשמה
           <span className={styles.backButtonArrow}></span>
         </button>
