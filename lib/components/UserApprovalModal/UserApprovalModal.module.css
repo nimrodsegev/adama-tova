@@ -1,4 +1,4 @@
-/* ActivityDetailsModal.module.css - Modal-specific styles */
+/* UserApprovalModal.module.css - Modal for user approval details */
 
 /* Overlay backdrop - TRANSPARENT */
 .overlay {
@@ -64,10 +64,10 @@
 .contentFrame {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start; /* flex-start = right side in RTL */
   padding: 0 var(--spacing-xl);
   padding-bottom: 2rem;
-  gap: var(--spacing-2xl); /* 24px between elements */
+  gap: var(--spacing-lg); /* 16px between elements */
   width: 100%;
   max-width: var(--container-max-width); /* 393px */
   margin: 0 auto;
@@ -85,26 +85,7 @@
   direction: rtl;
 }
 
-/* Image container */
-.imageContainer {
-  width: 100%;
-  height: 12rem; /* 192px */
-  margin-bottom: 0;
-  border-radius: 0.75rem; /* 12px */
-  overflow: hidden;
-  border: 0.1rem solid var(--color-text-secondary);
-  flex: none;
-}
-
-/* Activity image */
-.activityImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Title text */
+/* Title text (User name) */
 .titleText {
   width: 100%;
   font-family: var(--font-primary);
@@ -118,132 +99,80 @@
   margin: 0;
 }
 
-/* Date/Time/Location info frame */
-.dateInfoFrame {
+/* Status badge */
+.statusBadge {
+  display: inline-flex;
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+  border-radius: 1rem; /* 16px */
+  background-color: rgba(104, 31, 2, 0.15);
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm); /* 14px */
+  color: var(--color-text-primary);
+  align-self: flex-start; /* flex-start = right side in RTL */
+}
+
+/* Info section container */
+.infoSection {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start; /* flex-start = right side in RTL */
+  gap: 0.375rem; /* 6px */
   width: 100%;
 }
 
-/* Date text */
-.dateText {
-  width: 100%;
-  font-family: var(--font-primary);
+/* Section title */
+.sectionTitle {
+  font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-xs); /* 11.6px */
-  line-height: var(--font-size-base); /* 16px */
-  letter-spacing: 0;
+  font-weight: 700;
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.25rem; /* 20px */
   text-align: right;
   color: var(--color-text-primary);
   margin: 0;
 }
 
-/* Description frame */
-.descriptionFrame {
-  width: 100%;
-  max-height: 20rem;
-  overflow-y: auto;
-}
-
-/* Description text */
-.descriptionText {
-  width: 100%;
+/* Section text */
+.sectionText {
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-base); /* 16px */
   line-height: 1.2125rem; /* 19.4px */
-  letter-spacing: 0;
   text-align: right;
   color: var(--color-text-secondary);
   margin: 0;
 }
 
-/* Bottom bar */
-.bottomBar {
+/* Tags container (for interests) */
+.tagsContainer {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem; /* 8px */
+  justify-content: flex-start; /* flex-start = right side in RTL */
   width: 100%;
-  gap: var(--spacing-2xl); /* 24px */
-  margin-top: 0.75rem; /* 12px */
 }
 
-/* Capacity frame (text + progress bar) - RIGHT SIDE */
-.capacityFrame {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 0.375rem; /* 6px */
-  margin-bottom: var(--spacing-sm);
-}
-
-/* Capacity text (10/10) */
-.capacityText {
+/* Individual tag */
+.tag {
+  display: inline-flex;
+  padding: 0.25rem 0.625rem; /* 4px 10px */
+  border-radius: 0.75rem; /* 12px */
+  background-color: rgba(104, 31, 2, 0.1);
   font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base); /* 16px */
-  line-height: 1.1875rem; /* 19px */
-  text-align: right;
-  color: var(--color-text-secondary);
-  margin: 0;
-  align-self: flex-start;
-}
-
-/* Progress bar container */
-.progressBarContainer {
-  width: 5rem; /* 80px */
-  height: 0.375rem; /* 6px */
-  position: relative;
-  flex: none;
-  align-self: flex-start;
-}
-
-/* Progress bar background - Light border only */
-.progressBarBackground {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  width: 100%;
-  height: 0.375rem; /* 6px */
-  border: 0.1875rem solid rgba(255, 255, 255, 0.4); /* 3px */
-  border-radius: 0.1875rem; /* 3px */
-  background-color: transparent;
-}
-
-/* Progress bar fill - Darker border */
-.progressBarFill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 0.375rem; /* 6px */
-  border: 0.1875rem solid #681f02; /* Dark red/brown border */
-  border-radius: 0.1875rem; /* 3px */
-  background-color: transparent;
-  transition: width var(--transition-slow);
-}
-
-/* Waitlist position text */
-.waitlistPosition {
   font-size: var(--font-size-sm); /* 14px */
-  color: var(--color-text-secondary);
-  margin-top: var(--spacing-sm);
-  opacity: 0.9;
+  color: var(--color-text-primary);
 }
 
-/* Action buttons container - LEFT SIDE */
-.actionButtonsContainer {
+/* Action buttons container */
+.actionButtons {
   display: flex;
   flex-direction: row;
   gap: var(--spacing-sm); /* 8px */
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-start; /* flex-start = right side in RTL */
+  width: 100%;
+  margin-top: 1rem;
 }
 
 /* Animations */
