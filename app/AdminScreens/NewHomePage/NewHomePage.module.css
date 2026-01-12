@@ -218,6 +218,7 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
+  padding-bottom: 10rem; /* Extra space to scroll past navbar and buttons */
   gap: 0.5rem; /* 8px */
 
   width: 100%;
@@ -243,145 +244,20 @@
 }
 
 /* ============================================
-   PLACEHOLDER CARD (To be replaced)
+   EMPTY STATE
    ============================================ */
-.placeholderCard {
-  box-sizing: border-box;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem; /* 16px */
-  gap: 1rem; /* 16px */
-
+.emptyState {
   width: 100%;
-
-  background: rgba(247, 247, 247, 0.9);
-  border-radius: 0.5625rem; /* 9px */
-}
-
-.cardHeader {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-
-  width: 100%;
-}
-
-.userName {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.5rem; /* 24px */
-  text-align: right;
-
-  color: #681F02;
-}
-
-.userIcon {
-  font-size: 0.875rem; /* 14px */
-  color: #681F02;
-}
-
-.cardBody {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-start;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-
-  width: 100%;
-}
-
-.cardButtons {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-}
-
-.approveButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.125rem 1rem; /* 2px 16px */
-  gap: 0.6875rem; /* 11px */
-
-  min-width: 4rem; /* 64px */
-  height: 1.5rem; /* 24px */
-
-  background: #E74E1C;
-  border: none;
-  border-radius: 0.21875rem; /* 3.5px */
-
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
-
-  color: #F9F9F9;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.approveButton:hover {
-  opacity: 0.9;
-}
-
-.rejectButton {
-  box-sizing: border-box;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.125rem 1rem; /* 2px 16px */
-  gap: 0.6875rem; /* 11px */
-
-  min-width: 4rem; /* 64px */
-  height: 1.5rem; /* 24px */
-
-  background: rgba(247, 247, 247, 0.9);
-  border: 0.0625rem solid #E74E1C; /* 1px */
-  border-radius: 0.21875rem; /* 3.5px */
-
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
-
-  color: #E74E1C;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.rejectButton:hover {
-  opacity: 0.9;
-}
-
-.cardInfo {
-  width: 7.8125rem; /* 125px */
+  padding: 2rem 0;
 
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: 300;
   font-size: 1rem; /* 16px */
-  line-height: 1.1875rem; /* 19px */
-  text-align: right;
+  line-height: 1.5rem; /* 24px */
+  text-align: center;
 
-  color: #681F02;
-  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ============================================
@@ -396,39 +272,10 @@
   gap: 1rem; /* 16px */
 
   width: 100%;
-  margin-top: auto; /* Push to bottom */
-  padding-top: 1rem;
-}
-
-.purpleButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 1rem; /* 8px 16px */
-  gap: 0.5rem; /* 8px */
-
-  min-width: 8rem; /* 128px */
-  height: 2.25rem; /* 36px */
-
-  background: #B37EB3;
-  border: none;
-  border-radius: 0.3125rem; /* 5px */
-
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
-
-  color: #F9F9F9;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.purpleButton:hover {
-  opacity: 0.9;
+  position: absolute;
+  bottom: 6.5rem; /* 104px from bottom - above navbar */
+  left: 0;
+  z-index: 10;
 }
 
 /* ============================================

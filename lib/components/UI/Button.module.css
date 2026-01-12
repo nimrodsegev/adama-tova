@@ -3,7 +3,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem; /* 8px */
   border: none;
   cursor: pointer;
   font-family: var(--font-secondary);
@@ -24,37 +24,37 @@
 .secondary {
   box-sizing: border-box;
   background: rgba(247, 247, 247, 0.9);
-  border: 1px solid #b37eb3;
+  border: 0.0625rem solid #b37eb3; /* 1px */
   color: #b37eb3;
 }
 
 .sizeL {
-  min-width: 70px;
-  height: 36px;
-  padding: 8px 16px;
-  border-radius: 5px;
-  font-size: 18px;
+  min-width: 4.375rem; /* 70px */
+  height: 2.25rem; /* 36px */
+  padding: 0.5rem 1rem; /* 8px 16px */
+  border-radius: 0.3125rem; /* 5px */
+  font-size: 1.125rem; /* 18px */
 }
 .sizeM {
-  min-width: 62px;
-  height: 28px;
-  padding: 4px 16px;
-  border-radius: 4px;
-  font-size: 18px;
+  min-width: 3.875rem; /* 62px */
+  height: 1.75rem; /* 28px */
+  padding: 0.25rem 1rem; /* 4px 16px */
+  border-radius: 0.25rem; /* 4px */
+  font-size: 1.125rem; /* 18px */
 }
 .sizeS {
-  min-width: 77px;
-  height: 24px;
-  padding: 2px 16px;
-  border-radius: 3.5px;
-  font-size: 18px;
+  min-width: 4.8125rem; /* 77px */
+  height: 1.5rem; /* 24px */
+  padding: 0.125rem 1rem; /* 2px 16px */
+  border-radius: 0.21875rem; /* 3.5px */
+  font-size: 1.125rem; /* 18px */
 }
 
 /* --- TERTIARY --- */
 .tertiary {
   background: transparent;
   padding: 0;
-  gap: 12px; /* Increased space between text and arrow */
+  gap: 0.75rem; /* 12px - Increased space between text and arrow */
   justify-content: flex-start;
 }
 
@@ -80,40 +80,40 @@
   line-height: 1;
   color: inherit;
   display: inline-block;
-  margin-top: -2px;
+  margin-top: -0.125rem; /* -2px */
 }
 
 /* --- UNIQUE ICONS & ACTIONS --- */
 .whatsapp {
-  min-width: 171px;
-  height: 36px;
-  padding: 8px 16px;
+  min-width: 10.6875rem; /* 171px */
+  height: 2.25rem; /* 36px */
+  padding: 0.5rem 1rem; /* 8px 16px */
   background: rgba(247, 247, 247, 0.9);
-  border: 1px solid #b37eb3;
-  border-radius: 4px;
+  border: 0.0625rem solid #b37eb3; /* 1px */
+  border-radius: 0.25rem; /* 4px */
   color: #b37eb3;
 }
 .whatsappIcon {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid #b37eb3;
-  border-radius: 2px;
+  width: 0.875rem; /* 14px */
+  height: 0.875rem; /* 14px */
+  border: 0.09375rem solid #b37eb3; /* 1.5px */
+  border-radius: 0.125rem; /* 2px */
 }
 
 .waiting-list {
-  min-width: 161px;
-  height: 36px;
-  padding: 8px 16px;
+  min-width: 10.0625rem; /* 161px */
+  height: 2.25rem; /* 36px */
+  padding: 0.5rem 1rem; /* 8px 16px */
   background: #b37eb3;
-  border-radius: 4px;
+  border-radius: 0.25rem; /* 4px */
   color: #f9f9f9;
 }
 .clockIcon {
   position: relative;
-  width: 20px;
-  height: 20px;
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
   background: #f7e3d5;
-  border: 0.6px solid #e74e1c;
+  border: 0.0375rem solid #e74e1c; /* 0.6px */
   border-radius: 50%;
 }
 .clockInner {
@@ -122,14 +122,14 @@
   top: 15%;
   right: 15%;
   bottom: 15%;
-  border: 0.6px solid #e74e1c;
+  border: 0.0375rem solid #e74e1c; /* 0.6px */
   border-radius: 50%;
 }
 .clockHandLong {
   position: absolute;
   left: 50%;
   top: 25%;
-  width: 1px;
+  width: 0.0625rem; /* 1px */
   height: 25%;
   background: #e74e1c;
 }
@@ -138,39 +138,45 @@
   left: 30%;
   top: 50%;
   width: 20%;
-  height: 1px;
+  height: 0.0625rem; /* 1px */
   background: #e74e1c;
 }
 
 .approve {
-  width: 4rem;
-  height: 1.5rem;
+  width: 4rem; /* 64px */
+  height: 1.5rem; /* 24px */
+  padding: 0.125rem 1rem; /* 2px 16px */
   background: #e74e1c;
   color: #f9f9f9;
-  border-radius: 0.22rem;
+  border-radius: 0.21875rem; /* 3.5px */
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.25rem; /* 20px */
 }
 .reject {
-  width: 4rem;
-  height: 1.5rem;
+  width: 4rem; /* 64px */
+  height: 1.5rem; /* 24px */
+  padding: 0.125rem 1rem; /* 2px 16px */
   background: rgba(247, 247, 247, 0.9);
-  border: 1px solid #e74e1c;
+  border: 0.0625rem solid #e74e1c; /* 1px */
   color: #e74e1c;
-  border-radius: 0.22rem;
+  border-radius: 0.21875rem; /* 3.5px */
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.25rem; /* 20px */
 }
 .popup-primary {
-  min-width: 63px;
-  height: 36px;
+  min-width: 3.9375rem; /* 63px */
+  height: 2.25rem; /* 36px */
   background: #e74e1c;
-  border: 1px solid #f9f9f9;
+  border: 0.0625rem solid #f9f9f9; /* 1px */
   color: #f9f9f9;
-  border-radius: 5px;
+  border-radius: 0.3125rem; /* 5px */
 }
 .popup-secondary {
-  min-width: 117px;
-  height: 36px;
+  min-width: 7.3125rem; /* 117px */
+  height: 2.25rem; /* 36px */
   background: rgba(247, 247, 247, 0.9);
   color: #e74e1c;
-  border-radius: 5px;
+  border-radius: 0.3125rem; /* 5px */
 }
 
 .label {
