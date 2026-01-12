@@ -68,6 +68,7 @@ export const userService = {
         is_approved: false,
         notifications_enabled: true,
         branches: profileData.branches,
+        created_at: new Date().toISOString(),
         quiz: {
           circle: profileData.circle || null,
           proximity: profileData.proximity || null,

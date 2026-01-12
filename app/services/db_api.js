@@ -69,13 +69,32 @@ async function getWaitlistCount(activityId) {
 export const apiActivities = {
   // GET all upcoming activities
   async getAll() {
-    return safeRequest(
+    const [activities, error] = await safeRequest(
       supabase
         .from("activities")
         .select("*")
         .gte("date", new Date().toISOString()) // Only future dates
         .order("date", { ascending: true })
     );
+
+    if (error || !activities) {
+      return [null, error];
+    }
+
+    // Get actual counts for each activity (including waitlist)
+    const activitiesWithCounts = await Promise.all(
+      activities.map(async (activity) => {
+        const confirmedCount = await getConfirmedCount(activity.id);
+        const waitlistCount = await getWaitlistCount(activity.id);
+        return {
+          ...activity,
+          current_participants: confirmedCount,
+          waitlist_count: waitlistCount
+        };
+      })
+    );
+
+    return [activitiesWithCounts, null];
   },
 
   async getAllForUser(userId) {
@@ -611,8 +630,8 @@ export const apiActivities = {
       supabase
         .from('activities')
         .select('*')
-        .in('category', englishCategories) // 👈 Queries 
-        .gte('date', new Date().toISOString()) 
+        .in('category', englishCategories) // 👈 Queries
+        .gte('date', new Date().toISOString())
         .order('date', { ascending: true })
     );
   },
@@ -948,7 +967,7 @@ export const apiRegistrations = {
         created_at,
         status,
         user_id,
-        users (id, full_name, email, phone),
+        users (id, full_name, email, phone, quiz),
         activities (id, title, start_time, date, series_id)
       `)
       .eq("status", "pending")
