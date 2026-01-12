@@ -23,7 +23,7 @@
   gap: 2rem; /* 32px */
   width: 19.6875rem; /* 315px */
   max-width: 100%;
-  margin-top: 5.6875rem; /* 91px from top */
+  margin-top: 12rem; /* Push content lower since decorative icon was removed */
 }
 
 /* Decorative Icon */

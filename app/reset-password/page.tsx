@@ -143,13 +143,6 @@ export default function ResetPasswordPage() {
     return (
       <div className={styles.resetContainer}>
         <div className={styles.content}>
-          {/* Decorative Icon */}
-          <div className={styles.decorativeIcon}>
-            <span className={styles.vectorOuter}></span>
-            <span className={styles.vectorMiddle}></span>
-            <span className={styles.vectorInner}></span>
-          </div>
-
           <div className={styles.greeting}>
             <h1 className={styles.title}>שגיאה</h1>
             <p className={styles.subtitle}>{sessionError}</p>
@@ -171,13 +164,6 @@ export default function ResetPasswordPage() {
     return (
       <div className={styles.resetContainer}>
         <div className={styles.content}>
-          {/* Decorative Icon */}
-          <div className={styles.decorativeIcon}>
-            <span className={styles.vectorOuter}></span>
-            <span className={styles.vectorMiddle}></span>
-            <span className={styles.vectorInner}></span>
-          </div>
-
           <div className={styles.greeting}>
             <h1 className={styles.title}>סיסמה שונתה בהצלחה!</h1>
             <p className={styles.subtitle}>מעביר אותך לדף ההתחברות...</p>
@@ -191,13 +177,6 @@ export default function ResetPasswordPage() {
   return (
     <div className={styles.resetContainer}>
       <div className={styles.content}>
-        {/* Decorative Icon */}
-        <div className={styles.decorativeIcon}>
-          <span className={styles.vectorOuter}></span>
-          <span className={styles.vectorMiddle}></span>
-          <span className={styles.vectorInner}></span>
-        </div>
-
         {/* Greeting section */}
         <div className={styles.greeting}>
           <h1 className={styles.title}>שינוי סיסמה</h1>
