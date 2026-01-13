@@ -137,8 +137,8 @@
   ); /* +10% from 55vw/13.75rem - ~242px max (was 220px) */
   position: relative;
   flex-shrink: 0;
-  margin-top: 5vh;
-  margin-bottom: 4vh;
+  margin-top: 3vh;
+  margin-bottom: 2vh;
   pointer-events: none;
   overflow: visible; /* Allow circles to extend slightly if needed */
   z-index: 1;
@@ -167,7 +167,7 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
-  margin-top: 2.5rem; /* Matches optionsContainer for consistent content start height */
+  margin-top: 1.5rem; /* Matches optionsContainer for consistent content start height */
   overflow: visible;
 }
 
@@ -580,7 +580,7 @@
   gap: 1rem; /* 16px - matches Figma */
   width: 19.6875rem; /* 315px */
   max-width: 100%;
-  margin-top: 2.5rem; /* Push options lower */
+  margin-top: 1.5rem; /* Push options lower */
 }
 
 .optionButton {
@@ -925,6 +925,14 @@
    RESPONSIVE - Works on all phone screens
    ============================================ */
 
+/* Medium-small height screens (Galaxy S8+ ~740px) - lift circles more */
+@media (min-height: 700px) and (max-height: 760px) {
+  .decorativeCircles {
+    margin-top: -2.5vh;
+    margin-bottom: -1vh;
+  }
+}
+
 /* Small height screens - reduce spacing and sizes */
 @media (max-height: 700px) {
   .wizardContainer {
@@ -941,6 +949,7 @@
     height: min(45vw, 10rem);
     margin-top: 2vh;
     margin-bottom: 2vh;
+    transform: translate(-10%, -5%); /* Move slightly left and up */
   }
 
   .input,
@@ -1048,19 +1057,19 @@
    RESPONSIVE - Taller phones (iPhone 12 Pro, etc.)
    ============================================ */
 
-/* Taller screens (800px+) - push form lower */
+/* Taller screens (800px+) */
 @media (min-height: 800px) {
   .wizardContainer {
     padding-top: 3vh;
   }
 
   .decorativeCircles {
-    margin-top: 4vh;
-    margin-bottom: 3vh;
+    margin-top: 3vh;
+    margin-bottom: 2vh;
   }
 
   .stepContainer {
-    margin-top: 1.5rem; /* Match optionsContainer */
+    margin-top: 1.5rem;
   }
 
   .optionsContainer {
@@ -1068,22 +1077,22 @@
   }
 }
 
-/* Very tall screens (900px+) - push form even lower */
+/* Very tall screens (900px+) */
 @media (min-height: 900px) {
   .wizardContainer {
     padding-top: 4vh;
   }
 
   .decorativeCircles {
-    margin-top: 5vh;
+    margin-top: 4vh;
   }
 
   .stepContainer {
-    margin-top: 2rem; /* Match optionsContainer */
+    margin-top: 1.5rem;
   }
 
   .optionsContainer {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
 }
 
