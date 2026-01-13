@@ -76,6 +76,7 @@
   max-width: 100%;
   flex: 1;
   position: relative;
+  overflow: visible;
 }
 
 /* ============================================
@@ -167,6 +168,7 @@
   max-width: 19.6875rem; /* 315px */
   flex: 1;
   margin-top: 2.5rem; /* Matches optionsContainer for consistent content start height */
+  overflow: visible;
 }
 
 .stepContainerLower {
@@ -202,11 +204,13 @@
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+  overflow: visible;
 }
 
 .inputWrapper {
   position: relative;
   width: 100%;
+  overflow: visible;
 }
 
 .input {
@@ -312,6 +316,7 @@
 .genderSelector {
   width: 100%;
   position: relative;
+  z-index: 60;
 }
 
 .genderToggle {
@@ -400,7 +405,7 @@
   border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
-  z-index: 50;
+  z-index: 100;
 }
 
 .genderOption {
@@ -924,6 +929,7 @@
 @media (max-height: 700px) {
   .wizardContainer {
     padding-top: 2vh;
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0)); /* More room for dropdowns */
   }
 
   .headerSection {
@@ -956,6 +962,10 @@
   .navigation {
     padding-top: 1.5rem;
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+  }
+
+  .stepContainer {
+    padding-bottom: 8rem; /* Extra space for gender dropdown */
   }
 }
 
