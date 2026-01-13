@@ -50,7 +50,7 @@ export default function Footer() {
       icon: "/icons/calendar_icon.svg",
       label: "Calendar",
     },
-    { href: "/profile", icon: "/icons/figure_icon.svg", label: "Profile" },
+    { href: "/ProfilePage", icon: "/icons/figure_icon.svg", label: "Profile" },
   ];
 
   const navItems = isAdmin
