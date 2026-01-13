@@ -407,7 +407,7 @@ body {
 .text-empty {
   font-family: var(--font-secondary);
   font-size: var(--font-size-base);
-  font-weight: var(--font-weight-light);
+  font-weight: var(--font-weight-normal);
   color: var(--color-text-muted);
   text-align: center;
   width: 100%;
