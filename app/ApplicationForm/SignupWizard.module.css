@@ -1169,17 +1169,17 @@
   }
 
   .stepContainer {
-    margin-top: -1rem; /* Negative margin to bring content closer to circle */
+    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
     padding-bottom: 6rem;
     overflow: visible !important;
   }
 
   .optionsContainer {
-    margin-top: -1rem; /* Negative margin to bring content closer to circle */
+    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
   }
 
   .stepContainerLower .inputsContainer {
-    margin-top: -1rem;
+    margin-top: -1.5rem;
   }
 
   .scrollSnapSlide {
@@ -1225,11 +1225,11 @@
   }
 
   .stepContainer {
-    margin-top: -1rem; /* Negative margin to bring content closer to circle */
+    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
     padding-bottom: 6rem;
   }
 
   .optionsContainer {
-    margin-top: -1rem; /* Negative margin to bring content closer to circle */
+    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
   }
 }
