@@ -1,32 +1,53 @@
 /* ============================================
-   PAGE LAYOUT LOCK
+   PAGE LAYOUT LOCK & RESPONSIVENESS
    ============================================ */
 .pageOverride {
   display: flex;
   flex-direction: column;
+  
+  /* 🔥 FIX: Center inner content (header/slider) horizontally */
+  align-items: center;
+  
+  /* Lock to viewport edges explicitly */
   position: fixed; 
-  top: 0;
-  left: 0;
+  inset: 0; 
+  
+  /* 🔥 FIX: Force full width/height for background coverage */
   width: 100%;
   height: 100dvh;
+  min-height: 0 !important;
+  max-width: none !important; /* Override any previous max-width */
+  
+  /* Prevent background scroll */
+  overflow: hidden;
+  overscroll-behavior: none; 
+  touch-action: none;
+  
+  background: var(--color-background);
+  
+  /* Safe Areas */
   padding: 0 !important; 
   padding-top: env(safe-area-inset-top) !important;
   padding-bottom: env(safe-area-inset-bottom) !important;
-  overflow: hidden;
-  overscroll-behavior: none; 
-  background: var(--color-background);
+  
+  /* Desktop shadow */
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
   z-index: 1;
 }
 
-/* Header position adjusted for the absolute close button */
+/* Header */
 .header {
   text-align: center;
-  margin-top: 7rem; 
-  margin-bottom: 3rem;
+  margin-top: 5rem; 
+  margin-bottom: 2rem;
   z-index: 10;
   flex-shrink: 0;
+  transition: margin 0.3s ease;
+  
+  /* 🔥 FIX: Constrain header width here instead of parent */
+  width: 100%;
+  max-width: var(--container-max-width, 24.5625rem); 
 }
-
 
 /* ============================================
    SCROLL SNAP (SWIPE) CONTAINER
@@ -34,7 +55,12 @@
 .scrollSnapContainer {
   display: flex;
   flex-direction: row;
+  
+  /* 🔥 FIX: Constrain slider width here */
   width: 100%;
+  max-width: var(--container-max-width, 24.5625rem);
+  
+  height: 100%; /* Fill remaining space */
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
@@ -50,11 +76,18 @@
   flex: 0 0 100%;
   width: 100%;
   min-width: 100%;
+  height: 100%; /* Full height of container */
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  
+  /* Standard Padding */
   padding: 1.5rem 1.5rem 8rem; 
+  
+  /* Allow INTERNAL content scroll, but not body scroll */
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -65,519 +98,285 @@
   max-width: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 1rem;
   box-sizing: border-box; 
-}
-
-/* ============================================
-   CUSTOM ARROW ICON (SVG)
-   ============================================ */
-.selectArrowWrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 3px 6px 5px;
-  gap: 10px;
-  position: absolute;
-  width: 1.1275rem; 
-  height: 1.505rem; 
-  left: 1rem; 
-  top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.selectArrowIcon {
-  box-sizing: border-box;
-  width: 16.08px;
-  height: 10px; 
-  border: 1px solid #F9F9F9;
-  transform: matrix(-1, 0, 0, 1, 0, 0);
-  background: transparent;
-  flex: none;
-  order: 0;
-  flex-grow: 0;
-}
-
-.miniSelectWrapper .selectArrowWrapper {
-  left: 0.5rem; 
-  transform: translateY(-50%) rotate(90deg) scale(0.8);
-}
-
-/* ============================================
-   CUSTOM DATE PICKER (Pills)
-   ============================================ */
-.dateLabel {
-  width: 100%;
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1rem;
-  text-align: right; /* Ensure Right Alignment */
-  color: var(--color-text-secondary);
-}
-
-.dateRow {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0;
-  gap: 0.5rem;
-  width: 100%;
-  direction: rtl;
-}
-
-.miniSelectWrapper {
+  transition: gap 0.3s ease;
   position: relative;
-  width: 5.875rem;
-  height: 1.75rem;
-}
-
-.miniSelect {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: 0.0625rem solid var(--color-text-secondary);
-  border-radius: 0.21875rem;
-  font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 1rem;
-  color: rgba(247, 247, 247, 0.7);
-  text-align: right; /* Ensure Right Alignment */
-  padding-right: 0.5rem;
-  padding-left: 1.5rem;
-  direction: rtl;
-  appearance: none;
-  outline: none;
-}
-
-.miniSelect:focus {
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFFFFF;
 }
 
 /* ============================================
-   IMAGE UPLOAD
-   ============================================ */
-.uploadWrapper { position: relative; width: 100%; }
-
-.uploadBox {
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between;
-  width: 100%; 
-  height: 3.75rem; 
-  padding: 0.6875rem 1.875rem;
-  background: transparent;
-  border: 0.0625rem solid var(--color-text-secondary);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.paperclipWrapper {
-  position: absolute;
-  width: 1.125rem;
-  height: 1.125rem;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 1.5rem; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.paperclipIcon {
-  width: 100%;
-  height: 100%;
-}
-
-/* 🔥 UPLOAD TEXT ALIGNED RIGHT */
-.uploadText {
-  flex: 1; 
-  text-align: right; /* Changed to Right */
-  color: var(--color-text-tertiary);
-  font-family: var(--font-secondary); 
-  font-size: 1rem; 
-  font-weight: 300;
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis;
-  direction: rtl;
-}
-
-.uploadSubtext {
-  position: absolute; 
-  right: 1.95rem; 
-  top: -0.6rem;
-  font-size: 0.875rem; 
-  color: var(--color-text-secondary);
-  background: var(--color-background); 
-  background-attachment: fixed; 
-  padding: 0 4px;
-}
-
-.optionalText {
-  font-family: var(--font-secondary);
-  font-weight: 300;
-  color: #FFFFFF;
-  padding-right: 0.25rem;
-}
-
-/* ============================================
-   PREVIEW CARD (Step 3)
-   ============================================ */
-.step3Container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 21.625rem;
-  gap: 2rem;
-}
-
-.previewImageCard {
-  box-sizing: border-box;
-  width: 100%;
-  height: 13.0625rem;
-  background: #AB4016;
-  border: 0.0625rem solid #F9F9F9;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  position: relative;
-  margin-bottom: 2rem;
-}
-
-.previewImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.previewImagePlaceholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #F9F9F9;
-  font-family: var(--font-secondary);
-  font-size: 1rem;
-}
-
-/* Title Aligned Right */
-.previewTitle {
-  width: 100%;
-  font-family: 'Arfilit', sans-serif;
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  text-align: right; /* Aligned Right */
-  letter-spacing: 0.02em;
-  color: #FFFFFF;
-  margin: 0;
-  margin-bottom: 1rem;
-}
-
-/* 🔥 INFO BLOCK ALIGNED RIGHT (RTL logic) */
-.previewInfoBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* In RTL, flex-start is the Right side */
-  gap: 0.5rem;
-  width: 100%;
-  margin-bottom: 1rem;
-}
-
-.previewDetailsText {
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1.125rem;
-  line-height: 1.25rem;
-  text-align: right; /* Aligned Right */
-  color: #FFFFFF;
-  white-space: pre-wrap;
-}
-
-.previewDescription {
-  width: 100%;
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.1875rem;
-  text-align: right; /* Aligned Right */
-  color: #F9F9F9;
-  white-space: pre-wrap;
-  min-height: 8.375rem;
-}
-
-/* ============================================
-   BUTTONS & FOOTER
-   ============================================ */
-.submitButtonContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1rem;
-  width: 100%;
-}
-
-.submitButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  gap: 0.5rem;
-  width: 7.625rem;
-  height: 2.25rem;
-  background: #B37EB3;
-  border-radius: 0.3125rem;
-  border: none;
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1.125rem;
-  line-height: 1.25rem;
-  color: #F9F9F9;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.submitButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.errorBanner {
-  color: #ffcccc;
-  font-size: 0.9rem;
-  text-align: center;
-  background: rgba(0,0,0,0.2);
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-top: 1rem;
-}
-
-.footer {
-  position: absolute; bottom: 0; left: 0; width: 100%;
-  padding: 1.5rem;
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, #e79267 20%, transparent); 
-  display: flex; justify-content: center;
-  pointer-events: none; 
-  z-index: 20;
-}
-
-.dotsContainer { display: flex; gap: 8px; pointer-events: auto; direction: ltr;}
-
-.dot {
-  width: 13.71px; height: 12.27px;
-  background: #E79267; border: 1px solid #E74E1C;
-  border-radius: 50%; transition: all 0.3s ease;
-}
-.activeDot { background: #E74E1C; border-color: #E74E1C; }
-
-.nextButtonContainer { width: 100%; display: flex; justify-content: center; margin-top: 2rem; }
-
-/* ============================================
-   UTILITY
-   ============================================ */
-.hiddenArrow {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: none;
-}
-.hiddenArrow::-ms-expand { display: none; }
-
-/* Responsive */
-@media (max-height: 700px) {
-  .scrollSnapSlide { padding-top: 1rem; }
-  .header { margin-top: 4rem; margin-bottom: 1rem; }
-}
-@media (min-height: 800px) {
-  .scrollSnapSlide { padding-top: 3rem; }
-}
-/* ... (Previous Layout CSS) ... */
-
-/* ============================================
-   CUSTOM DROPDOWN (Matches SignupWizard)
+   CUSTOM DROPDOWN
    ============================================ */
 .dropdownContainer {
   position: relative;
   direction: rtl;
   width: 100%;
-  z-index: 20; /* Ensure it floats above other elements */
+  /* Default Z-Index */
+  z-index: 1; 
+  transition: z-index 0.1s; 
 }
 
-/* The Toggle Button (looks like an input) */
+/* Active Dropdown Z-Index */
+.activeDropdownContainer {
+  z-index: 100 !important;
+}
+
 .dropdownToggle {
   box-sizing: border-box;
   width: 100%;
-  height: 3.75rem; /* 60px */
-  padding: 0 1.625rem; /* Match input padding */
-  
+  height: 3.75rem; 
+  padding: 0 1.625rem;
   background: transparent;
   border: 0.0625rem solid var(--color-text-secondary);
-  border-radius: 0.5625rem; /* 9px */
-  
+  border-radius: 0.5625rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
   font-family: var(--font-secondary);
   font-weight: 300;
   font-size: 1rem;
   color: var(--color-text-secondary);
-  
   direction: rtl;
   cursor: pointer;
-  transition: border-radius 0.2s;
+  transition: all 0.2s ease;
 }
 
-/* Remove bottom radius when open */
 .dropdownToggle.open {
   border-radius: 0.5625rem 0.5625rem 0 0;
   border-bottom: none;
 }
 
-.dropdownPlaceholder {
-  color: rgba(247, 247, 247, 0.7);
-}
+.dropdownPlaceholder { color: rgba(247, 247, 247, 0.7); }
 
-/* The Dropdown List */
 .dropdownMenu {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  
-  /* Matches SignupWizard gradient background */
+  top: 100%; left: 0; right: 0;
   background: var(--color-background); 
   background-attachment: fixed;
-  
   border: 0.0625rem solid var(--color-text-secondary);
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
-  
-  z-index: 100;
-  max-height: 12rem; /* Limit height */
+  z-index: 10;
+  max-height: 12rem;
   overflow-y: auto;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
 
-/* Options inside the list */
 .dropdownOption {
   width: 100%;
   padding: 0.875rem 1.625rem;
   background: transparent;
   border: none;
   border-bottom: 0.0625rem solid rgba(249, 249, 249, 0.3);
-  
   font-family: var(--font-secondary);
   font-weight: 300;
   font-size: 1rem;
   text-align: right;
   color: #ffffff;
-  
   direction: rtl;
   cursor: pointer;
-  transition: background 0.2s;
 }
-
-.dropdownOption:last-child {
-  border-bottom: none;
-}
-
-.dropdownOption:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.dropdownOption.selected {
-  background: rgba(255, 255, 255, 0.15);
-  font-weight: 400;
-}
+.dropdownOption:last-child { border-bottom: none; }
+.dropdownOption:hover { background: rgba(255, 255, 255, 0.1); }
+.dropdownOption.selected { background: rgba(255, 255, 255, 0.15); font-weight: 400; }
 
 /* ============================================
-   MINI DROPDOWN (For Date Picker)
+   MINI DROPDOWN (Date)
    ============================================ */
 .miniDropdownContainer {
   position: relative;
-  width: 5.875rem; /* 94px */
-  height: 1.75rem; /* 28px */
+  width: 5.875rem;
+  height: 1.75rem;
+  z-index: 1;
+}
+
+.activeMiniDropdown {
+  z-index: 100 !important;
 }
 
 .miniDropdownToggle {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   background: transparent;
   border: 0.0625rem solid var(--color-text-secondary);
-  border-radius: 0.21875rem; /* 3.5px */
-  
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-right: 0.5rem;
-  padding-left: 0.5rem;
-  
+  border-radius: 0.21875rem;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 0.5rem;
   font-family: var(--font-secondary);
   font-weight: 300;
   font-size: 1rem;
   color: rgba(247, 247, 247, 0.7);
-  
   direction: rtl;
   cursor: pointer;
 }
-
-.miniDropdownToggle.open {
-  border-radius: 0.21875rem 0.21875rem 0 0;
-  border-bottom: none;
-}
+.miniDropdownToggle.open { border-radius: 0.21875rem 0.21875rem 0 0; border-bottom: none; }
 
 .miniDropdownMenu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--color-background);
-  background-attachment: fixed;
-  border: 0.0625rem solid var(--color-text-secondary);
-  border-top: none;
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: var(--color-background); background-attachment: fixed;
+  border: 0.0625rem solid var(--color-text-secondary); border-top: none;
   border-radius: 0 0 0.21875rem 0.21875rem;
-  z-index: 100;
-  max-height: 10rem;
-  overflow-y: auto;
+  z-index: 100; max-height: 10rem; overflow-y: auto;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
 }
-
 .miniDropdownOption {
-  width: 100%;
-  padding: 0.5rem;
-  background: transparent;
-  border: none;
+  width: 100%; padding: 0.5rem; background: transparent; border: none;
   border-bottom: 0.0625rem solid rgba(249, 249, 249, 0.2);
-  color: #fff;
-  font-family: var(--font-secondary);
-  font-size: 0.9rem;
-  text-align: center;
-  cursor: pointer;
+  color: #fff; font-family: var(--font-secondary); font-size: 0.9rem; text-align: center; cursor: pointer;
 }
 
 /* ============================================
-   CUSTOM SVG ARROW
+   ICONS & HELPERS
    ============================================ */
 .arrowIconWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  transition: transform 0.2s ease;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; transition: transform 0.2s ease;
+}
+.dropdownToggle.open .arrowIconWrapper, .miniDropdownToggle.open .arrowIconWrapper { transform: rotate(180deg); }
+
+.fieldGroup { width: 100%; display: flex; flex-direction: column; gap: 0.375rem; }
+.dateLabel { width: 100%; font-family: var(--font-secondary); font-weight: 400; font-size: 1rem; text-align: right; color: var(--color-text-secondary); margin-bottom: 0; }
+.dateRow { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0; gap: 0.5rem; width: 100%; direction: rtl; }
+
+/* ============================================
+   IMAGE UPLOAD
+   ============================================ */
+.uploadWrapper { position: relative; width: 100%; }
+.uploadBox {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; height: 3.75rem; padding: 0.6875rem 1.875rem;
+  background: transparent; border: 0.0625rem solid var(--color-text-secondary);
+  border-radius: var(--radius-sm); cursor: pointer; transition: height 0.2s ease;
+}
+.paperclipWrapper {
+  position: absolute; width: 1.125rem; height: 1.125rem;
+  top: 50%; transform: translateY(-50%); left: 1.5rem; 
+  display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1;
+}
+.paperclipIcon { width: 100%; height: 100%; }
+.uploadText {
+  flex: 1; text-align: right; color: var(--color-text-tertiary);
+  font-family: var(--font-secondary); font-size: 1rem; font-weight: 300;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl;
+}
+.uploadSubtext {
+  position: absolute; right: 1.95rem; top: -0.6rem;
+  font-size: 0.875rem; color: var(--color-text-secondary);
+  background: var(--color-background); background-attachment: fixed; padding: 0 4px;
+}
+.optionalText { font-family: var(--font-secondary); font-weight: 300; color: #FFFFFF; padding-right: 0.25rem; }
+
+/* ============================================
+   PREVIEW CARD (Step 3)
+   ============================================ */
+.step3Container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 21.625rem; gap: 2rem; }
+.previewImageCard {
+  box-sizing: border-box; width: 100%; height: 13.0625rem;
+  background: #AB4016; border: 0.0625rem solid #F9F9F9; border-radius: 0.75rem;
+  overflow: hidden; position: relative; margin-bottom: 2rem;
+}
+.previewImage { width: 100%; height: 100%; object-fit: cover; }
+.previewImagePlaceholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #F9F9F9; font-family: var(--font-secondary); font-size: 1rem; }
+.previewTitle { width: 100%; font-family: 'Arfilit', sans-serif; font-weight: 400; font-size: 1.25rem; line-height: 1.75rem; text-align: right; letter-spacing: 0.02em; color: #FFFFFF; margin: 0; margin-bottom: 1rem; }
+.previewInfoBlock { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; width: 100%; margin-bottom: 1rem; }
+.previewDetailsText { font-family: var(--font-secondary); font-weight: 400; font-size: 1.125rem; line-height: 1.25rem; text-align: right; color: #FFFFFF; white-space: pre-wrap; }
+.previewDescription { width: 100%; font-family: var(--font-secondary); font-weight: 400; font-size: 1rem; line-height: 1.1875rem; text-align: right; color: #F9F9F9; white-space: pre-wrap; min-height: 8.375rem; }
+
+/* ============================================
+   BUTTONS & FOOTER
+   ============================================ */
+.submitButtonContainer { display: flex; justify-content: center; align-items: center; margin-top: 1rem; width: 100%; }
+.submitButton {
+  display: flex; flex-direction: row; justify-content: center; align-items: center;
+  padding: 0.5rem 1rem; gap: 0.5rem; width: 7.625rem; height: 2.25rem;
+  background: #B37EB3; border-radius: 0.3125rem; border: none;
+  font-family: var(--font-secondary); font-weight: 400; font-size: 1.125rem; line-height: 1.25rem; color: #F9F9F9; cursor: pointer; transition: opacity 0.2s;
+}
+.submitButton:disabled { opacity: 0.6; cursor: not-allowed; }
+.errorBanner { color: #ffcccc; font-size: 0.9rem; text-align: center; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; margin-top: 1rem; }
+.footer {
+  position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem;
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #e79267 20%, transparent); 
+  display: flex; justify-content: center; pointer-events: none; z-index: 20;
+}
+.dotsContainer { display: flex; gap: 8px; pointer-events: auto; direction: ltr; }
+.dot { width: 13.71px; height: 12.27px; background: #E79267; border: 1px solid #E74E1C; border-radius: 50%; transition: all 0.3s ease; }
+.activeDot { background: #E74E1C; border-color: #E74E1C; }
+.nextButtonContainer { width: 100%; display: flex; justify-content: center; margin-top: 2rem; }
+.hiddenArrow { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none; }
+.hiddenArrow::-ms-expand { display: none; }
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* 1. Global Input Overrides for Responsiveness */
+.pageOverride :global(.input-field) {
+  transition: height 0.2s ease;
 }
 
-/* Rotate arrow when open */
-.dropdownToggle.open .arrowIconWrapper,
-.miniDropdownToggle.open .arrowIconWrapper {
-  transform: rotate(180deg);
+/* 2. Small Height Screens (< 700px) */
+@media (max-height: 700px) {
+  .header {
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .scrollSnapSlide {
+    padding-top: 1rem;
+  }
+  /* Shrink inputs and dropdowns */
+  .pageOverride :global(.input-field),
+  .dropdownToggle,
+  .uploadBox {
+    height: 3rem; /* 48px */
+  }
+  .slideContent {
+    gap: 0.75rem;
+  }
 }
 
-/* ... (Keep other styles like dateLabel, uploadBox, etc.) ... */
+/* 3. Very Small Height Screens (< 600px) */
+@media (max-height: 600px) {
+  .header {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .pageOverride :global(.input-field),
+  .dropdownToggle,
+  .uploadBox {
+    height: 2.5rem; /* 40px */
+  }
+  .slideContent {
+    gap: 0.5rem;
+  }
+}
+
+/* 4. Taller Phones (> 800px) */
+@media (min-height: 800px) {
+  .header {
+    margin-top: 6rem;
+  }
+  .scrollSnapSlide {
+    padding-top: 3rem;
+  }
+  .slideContent {
+    gap: 1.25rem;
+  }
+}
+
+/* 5. Tablet & Desktop Widths */
+@media (min-width: 48rem) {
+  .slideContent {
+    max-width: 24rem;
+  }
+}
+
+/* 6. PWA Standalone Mode Fixes */
+@media (display-mode: standalone) {
+  .pageOverride {
+    padding-top: calc(2vh + env(safe-area-inset-top)) !important;
+  }
+  .footer {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
+}

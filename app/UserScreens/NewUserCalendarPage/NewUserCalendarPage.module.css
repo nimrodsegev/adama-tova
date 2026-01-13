@@ -1,0 +1,99 @@
+.pageContainer {
+  composes: mobile-container from global;
+  background: linear-gradient(
+    180deg,
+    #e74e1c 0%,
+    #de6930 53%,
+    #e79267 87%
+  ) !important;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainFrame {
+  position: absolute;
+  width: 23.5rem; /* 376px */
+  left: 0.5rem; /* 8px */
+  top: 3.5rem; /* Shipped up */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Ensuring the frame doesn't exceed screen height */
+  height: calc(100vh - 3.5rem);
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 21.5625rem;
+  margin-bottom: 1.25rem;
+}
+
+.titleText {
+  font-family: var(--font-primary);
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 2.125rem;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.sliderSection {
+  width: 100%;
+  max-width: 22.5625rem;
+  height: 3.6875rem;
+  /* Created the requested gap below the slider */
+  margin-bottom: 2.5rem;
+  margin-left: 2rem;
+}
+
+.filterSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.25rem;
+
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.activitiesList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 22.0625rem;
+
+  /* CONSTRAINT: Stop the list 21rem from the bottom of the viewport */
+  position: fixed;
+  top: 19rem; /* Adjusted based on title+slider+filter height */
+  bottom: 5rem;
+
+  overflow-y: auto;
+  scrollbar-width: none;
+  z-index: 10;
+}
+
+.activitiesList::-webkit-scrollbar {
+  display: none;
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(231, 78, 28, 0.2);
+  pointer-events: none;
+}
