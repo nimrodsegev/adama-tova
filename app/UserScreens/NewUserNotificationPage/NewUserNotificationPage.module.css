@@ -6,6 +6,7 @@
   background: var(--color-background);
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
   direction: rtl;
   padding: var(--spacing-xl); /* 20px */
   padding-bottom: var(--spacing-5xl); /* 100px - space for nav bar */
@@ -16,13 +17,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 5rem; /* 91px - same as absolute-header top */
-  margin-bottom: var(--spacing-3xl); /* 24px */
+  margin-top: 5.6875rem; /* 91px - same as absolute-header top */
+  margin-bottom: var(--spacing-2xl); /* 24px */
+  overflow-x: hidden;
 }
 
 .title {
   font-family: var(--font-primary);
-  font-size: var(--font-size-3xl); /* 24px */
+  font-size: var(--font-size-2xl); /* 24px */
   font-weight: var(--font-weight-normal);
   line-height: 1.8125rem; /* 29px */
   color: var(--color-text-primary);
@@ -37,6 +39,7 @@
   align-items: center;
   margin-bottom: var(--spacing-2xl); /* 24px */
   width: 100%;
+  overflow-x: hidden;
 }
 
 /* Content Container */
@@ -44,6 +47,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* Notifications List - Scrollable */
@@ -52,6 +56,7 @@
   flex-direction: column;
   gap: var(--spacing-md); /* 12px between notifications */
   max-height: calc(100vh - 250px); /* Adjust based on header + filter height */
+  overflow-x: hidden;
   overflow-y: auto;
   padding-right: var(--spacing-xs); /* 4px - space for scrollbar */
 
@@ -76,10 +81,6 @@
 /* Individual Notification Item */
 .notificationItem {
   width: 100%;
-  transition: transform var(--transition-normal);
-}
-
-/* Optional: Add subtle hover effect */
-.notificationItem:hover {
-  transform: translateX(-2px);
+  overflow-x: hidden;
+  transition: none;
 }
