@@ -303,13 +303,63 @@
   padding: 0;
   gap: 1rem; /* 16px */
 
-  width: 100%;
-  max-width: 24.5625rem; /* 393px - same as page container */
+  width: 21rem; /* Base width for 375px screens */
   position: fixed;
   bottom: 6.5rem; /* 104px from bottom - above navbar */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-51.25%); /* Shift slightly left to align with cards */
   z-index: 10;
+}
+
+/* Smaller screens like 360px width */
+@media (max-width: 370px) {
+  .bottomButtons {
+    width: 20.75rem;
+  }
+  .cardsContainer {
+    max-height: 26rem; /* More space for cards */
+  }
+}
+
+/* Wider screens like iPhone 12 Pro (390px) */
+@media (min-width: 385px) {
+  .bottomButtons {
+    width: 21.5rem;
+    transform: translateX(-50.5%);
+  }
+}
+
+/* Large screens like iPhone 14 Pro Max (430px) - more room for cards */
+@media (min-width: 420px) {
+  .cardsContainer {
+    max-height: 30rem; /* More space for cards on larger screens */
+  }
+  .bottomButtons {
+    width: 22rem; /* Wider for larger screens */
+    transform: translateX(-49.5%); /* Tiny bit more to the right */
+  }
+}
+
+/* Make buttons equal width to fill container */
+.bottomButtons > * {
+  flex: 1;
+  width: auto !important;
+  position: relative;
+  z-index: 2; /* Above the gradient */
+}
+
+/* Gradient overlay for better readability when scrolling - only when many cards */
+.bottomButtons.showGradient::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: -6.5rem; /* Extend down to navbar */
+  background: linear-gradient(180deg, rgba(247, 247, 247, 0.651) -17.65%, rgba(231, 146, 103, 0.93) 100%);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 0.5rem;
 }
 
 /* ============================================
@@ -451,7 +501,7 @@
   }
 
   .cardsContainer {
-    max-height: 15rem;
+    max-height: 18rem;
   }
 
   .bottomButtons {

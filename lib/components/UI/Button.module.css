@@ -40,7 +40,7 @@
    COLOR VARIANTS
    ============================================ */
 .primary {
-  background: var(--color-purple);
+  background: #B37EB3;
   color: var(--color-text-secondary);
 }
 
@@ -58,7 +58,7 @@
 .sizeL {
   height: 2.75rem; /* 44px */
   /* Side padding defines the breathing room, width is automatic */
-  padding: 0 1.5rem; /* 24px */
+  padding: 0 2rem; /* 32px - wider buttons */
   border-radius: 0.3125rem;
   font-size: var(--font-size-lg);
 }

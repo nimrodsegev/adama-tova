@@ -4,6 +4,7 @@ import "./HomeFilter.css";
 export interface FilterOption {
   id: string;
   label: string;
+  count?: number;
 }
 export const ADMIN_FILTER_OPTIONS: FilterOption[] = [
   { id: "pending", label: "ממתינים לאישור" },
@@ -63,7 +64,10 @@ export const HomeFilter: React.FC<HomeFilterProps> = ({
           aria-selected={activeOption === option.id}
           aria-label={option.label}
         >
-          <span className="home-filter__label">{option.label}</span>
+          <span className="home-filter__label">
+            {option.label}
+            {option.count !== undefined && ` (${option.count})`}
+          </span>
         </button>
       ))}
     </div>

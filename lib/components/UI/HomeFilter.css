@@ -44,7 +44,7 @@
   height: auto; /* Let flexbox stretch it to fill container height */
 
   /* Text Spacing */
-  padding: 0 1.5rem; /* 24px side padding for wider click area */
+  padding: 0 1rem; /* 16px side padding - reduced to fit counts */
 
   /* Reset Button Styles */
   background: transparent;
@@ -85,7 +85,7 @@
 
 .home-filter__label {
   font-family: var(--font-secondary, sans-serif);
-  font-size: 1.125rem; /* 18px */
+  font-size: 1rem; /* 16px - reduced to fit counts */
   font-weight: 400;
   color: var(--color-text-secondary, #f9f9f9);
   line-height: 1;

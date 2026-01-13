@@ -25,6 +25,7 @@ const NewAdminActivityCard: React.FC<NewAdminActivityCardProps> = ({
 }) => {
   const formatTime = (time: string) => time.slice(0, 5);
   const isOverCapacity = currentParticipants > maxParticipants;
+  const waitlistCount = isOverCapacity ? currentParticipants - maxParticipants : 0;
 
   return (
     <div className={styles.cardContainer} onClick={onClick}>
@@ -43,6 +44,7 @@ const NewAdminActivityCard: React.FC<NewAdminActivityCardProps> = ({
         {/* Line 4: Participants Ratio */}
         <p className={`${styles.participantsText} ${isOverCapacity ? styles.participantsOverCapacity : ''}`}>
           {currentParticipants}/{maxParticipants} נרשמים
+          {isOverCapacity && ` (מלא - ${waitlistCount} ממתין)`}
         </p>
       </div>
     </div>
