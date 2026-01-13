@@ -167,7 +167,7 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
-  margin-top: 1.5rem; /* Matches optionsContainer for consistent content start height */
+  margin-top: 0.75rem; /* Matches optionsContainer for consistent content start height */
   overflow: visible;
 }
 
@@ -580,7 +580,7 @@
   gap: 1rem; /* 16px - matches Figma */
   width: 19.6875rem; /* 315px */
   max-width: 100%;
-  margin-top: 1.5rem; /* Push options lower */
+  margin-top: 0.75rem; /* Push options lower */
 }
 
 .optionButton {
@@ -1146,6 +1146,12 @@
   .wizardContainer {
     padding-top: calc(2vh + env(safe-area-inset-top, 0));
     padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0)); /* More room for dropdowns */
+    overflow: visible;
+  }
+
+  .scrollSnapContainer {
+    overflow-x: auto;
+    overflow-y: visible;
   }
 
   .decorativeCircles {
@@ -1153,10 +1159,14 @@
     margin-bottom: 2vh;
   }
 
+  .content {
+    overflow: visible;
+  }
+
   .stepContainer {
     margin-top: 1rem;
-    padding-bottom: 10rem; /* Extra space for gender dropdown */
-    overflow: visible;
+    padding-bottom: 12rem; /* Extra space for gender dropdown */
+    overflow: visible !important;
   }
 
   .optionsContainer {
@@ -1168,11 +1178,24 @@
   }
 
   .scrollSnapSlide {
-    overflow: visible;
+    overflow: visible !important;
   }
 
   .inputsContainer {
-    overflow: visible;
+    overflow: visible !important;
+  }
+
+  .inputWrapper {
+    overflow: visible !important;
+  }
+
+  .genderSelector {
+    z-index: 100;
+    overflow: visible !important;
+  }
+
+  .genderDropdown {
+    z-index: 200;
   }
 
   .navigation {
