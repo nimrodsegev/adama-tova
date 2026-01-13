@@ -86,12 +86,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: flex-start;
   padding: 0;
-  gap: 0.5rem;
+  gap: 0.25rem;
   width: 100%;
   max-width: 21.5625rem; /* 345px */
   flex-shrink: 0;
-  min-height: 4.5rem; /* Fixed height to accommodate 2-line titles - ensures circles align */
+  height: 5rem; /* FIXED height - ensures circles align on ALL pages */
 }
 
 .stepTitle {
@@ -167,7 +168,7 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
-  margin-top: 1.5rem; /* Matches optionsContainer for consistent content start height */
+  margin-top: 0.75rem; /* Matches optionsContainer for consistent content start height */
   overflow: visible;
 }
 
@@ -580,7 +581,7 @@
   gap: 1rem; /* 16px - matches Figma */
   width: 19.6875rem; /* 315px */
   max-width: 100%;
-  margin-top: 1.5rem; /* Push options lower */
+  margin-top: 0.75rem; /* Push options lower */
 }
 
 .optionButton {
@@ -941,7 +942,7 @@
   }
 
   .headerSection {
-    min-height: 4rem;
+    height: 4.5rem; /* FIXED height for consistent circles */
   }
 
   .decorativeCircles {
@@ -984,7 +985,7 @@
   }
 
   .headerSection {
-    min-height: 3.5rem;
+    height: 4rem; /* FIXED height for consistent circles */
   }
 
   .decorativeCircles {
@@ -1027,7 +1028,7 @@
 /* Landscape or very short screens */
 @media (max-height: 500px) {
   .headerSection {
-    min-height: 3rem;
+    height: 3.5rem; /* FIXED height for consistent circles */
   }
 
   .decorativeCircles {
@@ -1144,39 +1145,66 @@
    ============================================ */
 @media (display-mode: standalone) {
   .wizardContainer {
-    padding-top: calc(2vh + env(safe-area-inset-top, 0));
-    padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0)); /* More room for dropdowns */
+    padding-top: calc(1vh + env(safe-area-inset-top, 0)); /* Reduced to move content up */
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0));
+    overflow: visible;
+  }
+
+  .scrollSnapContainer {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .headerSection {
+    height: 4.5rem; /* FIXED height for consistent circles */
   }
 
   .decorativeCircles {
-    margin-top: 2vh;
-    margin-bottom: 2vh;
+    margin-top: 1vh; /* Reduced to move content up */
+    margin-bottom: 1vh;
+  }
+
+  .content {
+    overflow: visible;
   }
 
   .stepContainer {
-    margin-top: 1rem;
-    padding-bottom: 10rem; /* Extra space for gender dropdown */
-    overflow: visible;
+    margin-top: 0.5rem; /* Reduced to move content up */
+    padding-bottom: 6rem;
+    overflow: visible !important;
   }
 
   .optionsContainer {
-    margin-top: 1rem;
+    margin-top: 0.5rem; /* Reduced to move content up */
   }
 
   .stepContainerLower .inputsContainer {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 
   .scrollSnapSlide {
-    overflow: visible;
+    overflow: visible !important;
   }
 
   .inputsContainer {
-    overflow: visible;
+    overflow: visible !important;
+  }
+
+  .inputWrapper {
+    overflow: visible !important;
+  }
+
+  .genderSelector {
+    z-index: 100;
+    overflow: visible !important;
+  }
+
+  .genderDropdown {
+    z-index: 200;
   }
 
   .navigation {
-    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0)); /* Lower dots */
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
   }
 }
 
@@ -1184,20 +1212,24 @@
 @media (display-mode: standalone) and (min-height: 800px) {
   .wizardContainer {
     padding-top: calc(2vh + env(safe-area-inset-top, 0));
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0));
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0));
+  }
+
+  .headerSection {
+    height: 5rem; /* FIXED height for consistent circles */
   }
 
   .decorativeCircles {
-    margin-top: 3vh;
-    margin-bottom: 2vh;
+    margin-top: 2vh;
+    margin-bottom: 1.5vh;
   }
 
   .stepContainer {
-    margin-top: 1rem;
-    padding-bottom: 8rem;
+    margin-top: 0.5rem;
+    padding-bottom: 6rem;
   }
 
   .optionsContainer {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 }
