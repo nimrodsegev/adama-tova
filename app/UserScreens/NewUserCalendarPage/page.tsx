@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiActivities, apiUser } from "@/app/services/db_api";
+import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
 // UI Components
@@ -28,7 +28,14 @@ const INTRESTS_MAPPING: Record<string, string> = {
 export default function NewUserCalendarPage() {
   const { user, userProfile } = useUser();
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Data State
   const [activities, setActivities] = useState<any[]>([]);
+  const [registeredActivityIds, setRegisteredActivityIds] = useState<string[]>(
+    []
+  );
+
+  // UI State
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -45,20 +52,41 @@ export default function NewUserCalendarPage() {
     const dateString = selectedDate.toISOString().split("T")[0];
 
     try {
-      // Force delay + API call
-      const [[actData, actError], [userBranches]] = await Promise.all([
+      // 1. Prepare Supabase query for registrations (Active only)
+      const registrationsPromise = user
+        ? supabase
+            .from("registrations")
+            .select("activity_id")
+            .eq("user_id", user.id)
+            .in("status", ["confirmed", "waitlist", "approved"])
+        : Promise.resolve({ data: [] });
+
+      // 2. Execute all fetches + Delay
+      const [
+        [actData, actError],
+        [userBranches],
+        { data: rawRegs },
+        _, // Delay result
+      ] = await Promise.all([
         apiActivities.getByDate(dateString),
         user ? apiUser.getUserBranches(user.id) : Promise.resolve([null, null]),
-        new Promise((resolve) => setTimeout(resolve, 500)),
+        registrationsPromise,
+        new Promise((resolve) => setTimeout(resolve, 500)), // Force 0.5s delay
       ]);
 
+      // 3. Process Activities
       if (!actError) {
         const validBranches = userBranches || ["nahalal", "satria"];
         const filtered = actData.filter(
           (a: any) => !a.branch || validBranches.includes(a.branch)
         );
-        // Populate with new data
         setActivities(filtered);
+      }
+
+      // 4. Process Registrations
+      if (rawRegs) {
+        const ids = rawRegs.map((r: any) => r.activity_id);
+        setRegisteredActivityIds(ids);
       }
     } catch (err) {
       console.error(err);
@@ -81,14 +109,27 @@ export default function NewUserCalendarPage() {
     fetchData();
   }, [selectedDate, user]);
 
+  // 🔍 Updated Filtering Logic
   const filteredActivities = activities.filter((activity: any) => {
     if (filter === "all") return true;
-    if (filter === "foryou" && userProfile?.quiz?.interests) {
-      const myInterests = userProfile.quiz.interests.map(
-        (i: string) => INTRESTS_MAPPING[i] || i
-      );
-      return myInterests.includes(activity.category);
+
+    if (filter === "foryou") {
+      // Condition A: User is registered
+      const isRegistered = registeredActivityIds.includes(activity.id);
+
+      // Condition B: Matches Interests
+      let isInterested = false;
+      if (userProfile?.quiz?.interests) {
+        const myInterests = userProfile.quiz.interests.map(
+          (i: string) => INTRESTS_MAPPING[i] || i
+        );
+        isInterested = myInterests.includes(activity.category);
+      }
+
+      // Return true if EITHER is true
+      return isRegistered || isInterested;
     }
+
     return true;
   });
 
@@ -163,7 +204,7 @@ export default function NewUserCalendarPage() {
                     key={activity.id}
                     id={activity.id}
                     title={activity.title}
-                    date={activity.date}
+                    date={activity.date} // Ensure your API returns this or construct it
                     startTime={activity.start_time}
                     endTime={activity.end_time}
                     currentParticipants={activity.current_participants || 0}
