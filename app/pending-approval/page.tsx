@@ -121,7 +121,6 @@ export default function PendingApprovalPage() {
         {/* Back to registration button */}
         <button onClick={handleBackToLogin} className={styles.backButton}>
           לעמוד ההרשמה
-          <span className={styles.backButtonArrow}></span>
         </button>
       </div>
     </div>
