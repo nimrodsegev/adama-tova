@@ -192,7 +192,7 @@
 
   background: var(--color-text-secondary); /* #F9F9F9 */
   border-radius: var(--radius-sm); /* 9px */
-  border: none;
+  border: 1px solid #E74E1C;
 
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
@@ -224,7 +224,7 @@
 
   background: var(--button-text); /* #E74E1C */
   border-radius: var(--radius-sm); /* 9px */
-  border: none;
+  border: 1px solid #F9F9F9;
 
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
@@ -282,7 +282,7 @@
 
   background: var(--color-text-secondary); /* #F9F9F9 */
   border-radius: var(--radius-sm); /* 9px */
-  border: none;
+  border: 1px solid #E74E1C;
 
   cursor: pointer;
   transition: opacity var(--transition-normal);
@@ -351,18 +351,22 @@
 /* About Link - Purple pill fixed at bottom of screen */
 .aboutLink {
   position: fixed;
-  bottom: 2.0625rem; /* 33px */
+  bottom: 3.1875rem; /* 51px */
   left: 50%;
   transform: translateX(-50%);
 
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding: 0.125rem 1rem; /* 2px 16px */
+  padding: 0.75rem 2rem; /* 12px 32px */
   gap: 0.5rem;
 
+  width: 8rem; /* 128px */
+  height: 2.75rem; /* 44px */
+  box-sizing: border-box;
+
   background: #b37eb3; /* purple */
-  border-radius: 0.21875rem; /* 3.5px */
+  border-radius: 0.3125rem; /* 5px */
   border: none;
 
   font-family: var(--font-secondary);

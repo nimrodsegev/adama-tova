@@ -105,6 +105,28 @@ export default function SignupWizard({
   // CALCULATED PARAMS based on user selections (Step 2+)
   const [calculatedParams, setCalculatedParams] = useState(defaultParams);
 
+  // Responsive radius and position for very small screens (iPhone SE, etc.)
+  const [circleRadius, setCircleRadius] = useState(0.11);
+  const [circlePosition, setCirclePosition] = useState({ x: 0.3, y: 0.15 });
+
+  useEffect(() => {
+    const updateCircleParams = () => {
+      const height = window.innerHeight;
+      // Very small screens (iPhone SE: 667px height, older SE: 568px)
+      if (height <= 670) {
+        setCircleRadius(0.07);
+        setCirclePosition({ x: 0.25, y: 0.15 }); // Moved slightly to the left
+      } else {
+        setCircleRadius(0.11);
+        setCirclePosition({ x: 0.3, y: 0.15 });
+      }
+    };
+
+    updateCircleParams();
+    window.addEventListener("resize", updateCircleParams);
+    return () => window.removeEventListener("resize", updateCircleParams);
+  }, []);
+
   const isHebrewName = (name: string) => /^[\u0590-\u05FF\s]+$/.test(name);
   const isValidIsraeliMobile = (p: string) =>
     /^05\d{8}$/.test(p.replace(/[-\s]/g, ""));
@@ -369,10 +391,9 @@ export default function SignupWizard({
     );
   };
 
-  // Get dot class based on step state
+  // Get dot class based on step state - fills up progressively
   const getDotClass = (stepIndex: number) => {
-    if (stepIndex < currentStep) return `${styles.dot} ${styles.completedDot}`;
-    if (stepIndex === currentStep) return `${styles.dot} ${styles.activeDot}`;
+    if (stepIndex <= currentStep) return `${styles.dot} ${styles.filledDot}`;
     return styles.dot;
   };
 
@@ -392,20 +413,21 @@ export default function SignupWizard({
           <div className={styles.content}>
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t("השלם/י פרטים אישיים")}</h2>
+              <p className={styles.optionalSubtitle}>&nbsp;</p>
             </div>
 
             <div className={styles.decorativeCircles}>
               <OrganicCircles
                 key={`circles-step0-${layerCount}`}
                 mode="static"
-                radius={0.13}
+                radius={circleRadius}
                 layers={layerCount}
                 smoothness={defaultParams.smoothness}
                 complexity={defaultParams.complexity}
                 elongation={defaultParams.elongation}
                 opacity={0.8}
                 strokeWidth={1}
-                position={{ x: 0.3, y: 0.15 }}
+                position={circlePosition}
                 baseColor="#FFFFFF"
               />
             </div>
@@ -517,14 +539,14 @@ export default function SignupWizard({
               <OrganicCircles
                 key={`circles-step1-${layerCount}`}
                 mode="static"
-                radius={0.13}
+                radius={circleRadius}
                 layers={layerCount}
                 smoothness={defaultParams.smoothness}
                 complexity={defaultParams.complexity}
                 elongation={defaultParams.elongation}
                 opacity={0.8}
                 strokeWidth={1}
-                position={{ x: 0.3, y: 0.15 }}
+                position={circlePosition}
                 baseColor="#FFFFFF"
               />
             </div>
@@ -559,14 +581,14 @@ export default function SignupWizard({
               <OrganicCircles
                 key={`circles-step2-${interests.length}-${calculatedParams.layers}-${calculatedParams.complexity}`}
                 mode="static"
-                radius={0.11}
+                radius={circleRadius}
                 layers={calculatedParams.layers}
                 smoothness={calculatedParams.smoothness}
                 complexity={calculatedParams.complexity}
                 elongation={calculatedParams.elongation}
                 opacity={calculatedParams.opacity}
                 strokeWidth={calculatedParams.strokeWidth}
-                position={{ x: 0.3, y: 0.15 }}
+                position={circlePosition}
                 baseColor="#FFFFFF"
               />
             </div>
@@ -603,14 +625,14 @@ export default function SignupWizard({
               <OrganicCircles
                 key={`circles-step3-${circle}-${calculatedParams.layers}-${calculatedParams.opacity}`}
                 mode="static"
-                radius={0.11}
+                radius={circleRadius}
                 layers={calculatedParams.layers}
                 smoothness={calculatedParams.smoothness}
                 complexity={calculatedParams.complexity}
                 elongation={calculatedParams.elongation}
                 opacity={calculatedParams.opacity}
                 strokeWidth={calculatedParams.strokeWidth}
-                position={{ x: 0.3, y: 0.15 }}
+                position={circlePosition}
                 baseColor="#FFFFFF"
               />
             </div>
@@ -666,11 +688,10 @@ export default function SignupWizard({
 
                 <div className={styles.inputWrapper}>
                   <span className={styles.inputLabel}>אחר</span>
-                  <input
-                    type="text"
+                  <textarea
                     value={proximity}
                     onChange={(e) => setProximity(e.target.value)}
-                    className={styles.input}
+                    className={styles.textareaLarge}
                     dir="rtl"
                   />
                 </div>
@@ -682,9 +703,30 @@ export default function SignupWizard({
         {/* Step 4: Free Text - Uses CALCULATED PARAMS */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
-            <div className={styles.lastStepContainer}>
-              <div className={styles.lastStepContent}>
-                <h2 className={styles.lastStepTitle}>
+            <div className={styles.headerSection}>
+              <p className={styles.optionalSubtitle}>&nbsp;</p>
+              <p className={styles.optionalSubtitle}>&nbsp;</p>
+            </div>
+
+            <div className={styles.decorativeCircles}>
+              <OrganicCircles
+                key={`circles-step4-${freeText.length}-${calculatedParams.layers}`}
+                mode="static"
+                radius={circleRadius}
+                layers={calculatedParams.layers}
+                smoothness={calculatedParams.smoothness}
+                complexity={calculatedParams.complexity}
+                elongation={calculatedParams.elongation}
+                opacity={calculatedParams.opacity}
+                strokeWidth={calculatedParams.strokeWidth}
+                position={circlePosition}
+                baseColor="#FFFFFF"
+              />
+            </div>
+
+            <div className={styles.stepContainerLower}>
+              <div className={styles.inputsContainer}>
+                <h2 className={styles.step4Title}>
                   {t("*כל דבר אחר שתרצה/י שנדע:")}
                 </h2>
 
