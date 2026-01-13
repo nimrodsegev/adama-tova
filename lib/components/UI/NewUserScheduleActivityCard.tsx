@@ -202,7 +202,7 @@ const NewUserScheduleActivityCard: React.FC<
           <div className={styles.actionSection}>
             <Button
               variant="primary"
-              size="S"
+              size="L-short"
               onClick={handleRegistrationToggle}
               disabled={loading}
             >

@@ -17,6 +17,7 @@ export default function Footer() {
     "/login",
     "/ApplicationForm", // This covers the SignupWizard folder
     "/AdminScreens/EditActivityPage",
+    "/elements",
   ];
 
   // Check if current path matches any item in the blacklist

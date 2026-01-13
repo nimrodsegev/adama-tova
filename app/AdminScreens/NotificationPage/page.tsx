@@ -155,7 +155,7 @@ export default function NotificationsPage() {
         )}
 
         <div className={styles.buttonContainer}>
-          <Button size="M" href="/AdminScreens/addNotification">
+          <Button size="L" href="/AdminScreens/addNotification">
             + הודעה חדשה
           </Button>
         </div>

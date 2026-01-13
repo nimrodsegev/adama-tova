@@ -41,7 +41,9 @@ export default function ActivityDetailsModal({
   const [mounted, setMounted] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<string | null>(null);
+  const [registrationBackendStatus, setRegistrationBackendStatus] = useState<
+    string | null
+  >(null);
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -228,7 +230,7 @@ export default function ActivityDetailsModal({
       : 0;
 
   const isGroup = activity?.is_group || !!activity?.series_id;
-  
+
   const modalContent = (
     <>
       {/* Overlay backdrop */}
@@ -326,11 +328,11 @@ export default function ActivityDetailsModal({
                   {isAdmin ? (
                     // ADMIN: Edit + Delete buttons
                     <>
-                      <Button size="M" onClick={handleEdit} disabled={loading}>
+                      <Button size="L" onClick={handleEdit} disabled={loading}>
                         {t("[ערוך|ערכי]")}
                       </Button>
                       <Button
-                        size="M"
+                        size="L"
                         onClick={handleDelete}
                         disabled={loading}
                       >
@@ -340,7 +342,7 @@ export default function ActivityDetailsModal({
                   ) : (
                     // USER: Register button
                     <Button
-                      size="M"
+                      size="L"
                       onClick={handleRegistrationToggle}
                       disabled={loading}
                     >
@@ -367,9 +369,9 @@ export default function ActivityDetailsModal({
       )}
 
       {/* Success Modal */}
-      {isSuccessModalOpen && (
+      {isSuccessModalOpen &&
         // Group with space AND pending approval (not waitlist)
-        registrationBackendStatus === 'pending' && regStatus !== 'waitlist' ? (
+        (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
@@ -389,8 +391,7 @@ export default function ActivityDetailsModal({
             isWaitlist={regStatus === "waitlist"}
             waitlistPosition={waitlistPosition}
           />
-        )
-      )}
+        ))}
     </>
   );
 

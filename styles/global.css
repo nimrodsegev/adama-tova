@@ -136,9 +136,32 @@ body {
   /* Brand Colors */
   --color-primary: #2b2d42;
   --color-secondary: #bfc6d2;
-  --color-background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
-  --color-background-solid: #de6930; /* Solid color for labels/masks on gradient */
+  --color-background: linear-gradient(
+    180deg,
+    #e74e1c 0%,
+    #de6930 53%,
+    #e79267 87%
+  );
+  --color-background-solid: #de6930;
   --color-accent: #535bf2;
+
+  /* --- NEW: Raw Palette for Flexible Buttons --- */
+  /* Use these variables when passing color props to your Button component */
+
+  /* Purples */
+  --color-purple-text: rgba(146, 104, 146, 1); /* Deep purple for text/stroke */
+  --color-purple-bg: rgba(179, 126, 179, 1); /* Lighter purple for background */
+
+  /* Oranges */
+  --color-orange-main: rgba(231, 78, 28, 1); /* Main brand orange */
+
+  /* Whites / Lights */
+  --color-white-pure: rgba(249, 249, 249, 1); /* Soft white for text/stroke */
+  --color-bg-light-opaque: rgba(247, 247, 247, 0.9); /* Light background */
+
+  /* Reds */
+  --color-red-alert: rgba(167, 0, 0, 1); /* For delete/reject text */
+  /* ------------------------------------------- */
 
   /* Text Colors */
   --color-text-primary: #ffffff;
@@ -167,15 +190,15 @@ body {
   --font-titles: "Rubik", serif;
 
   /* Font Sizes - Mobile First */
-  --font-size-xs: 0.725rem; /* 11.6px */
-  --font-size-sm: 0.875rem; /* 14px */
-  --font-size-base: 1rem; /* 16px */
-  --font-size-md: 1.0625rem; /* 17px */
-  --font-size-lg: 1.125rem; /* 18px */
-  --font-size-xl: 1.25rem; /* 20px */
-  --font-size-2xl: 1.5rem; /* 24px */
-  --font-size-3xl: 1.875rem; /* 30px */
-  --font-size-4xl: 2.25rem; /* 36px */
+  --font-size-xs: 0.725rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.0625rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
 
   /* Font Weights */
   --font-weight-ultralight: 200;
@@ -191,22 +214,22 @@ body {
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.75;
 
-  /* Spacing - Mobile Optimized */
-  --spacing-xs: 0.25rem; /* 4px */
-  --spacing-sm: 0.5rem; /* 8px */
-  --spacing-md: 0.75rem; /* 12px */
-  --spacing-lg: 1rem; /* 16px */
-  --spacing-xl: 1.25rem; /* 20px */
-  --spacing-2xl: 1.5rem; /* 24px */
-  --spacing-3xl: 2rem; /* 32px */
-  --spacing-4xl: 3rem; /* 48px */
-  --spacing-5xl: 6.25rem; /* 100px */
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.25rem;
+  --spacing-2xl: 1.5rem;
+  --spacing-3xl: 2rem;
+  --spacing-4xl: 3rem;
+  --spacing-5xl: 6.25rem;
 
   /* Border Radius */
-  --radius-xs: 0.3125rem; /* 5px */
-  --radius-sm: 0.5625rem; /* 9px */
-  --radius-md: 0.875rem; /* 14px */
-  --radius-lg: 1.5rem; /* 24px */
+  --radius-xs: 0.3125rem;
+  --radius-sm: 0.5625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.5rem;
   --radius-full: 50%;
 
   /* Shadows */
@@ -215,17 +238,17 @@ body {
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
   /* Backdrop Filters */
-  --blur-sm: blur(0.4rem); /* 6.4px */
-  --blur-md: blur(0.625rem); /* 10px */
+  --blur-sm: blur(0.4rem);
+  --blur-md: blur(0.625rem);
 
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
 
-  /* Layout - Mobile Container */
-  --container-max-width: 24.5625rem; /* 393px */
-  --container-min-height: 53.25rem; /* 852px */
+  /* Layout */
+  --container-max-width: 24.5625rem;
+  --container-min-height: 53.25rem;
 
   /* Z-index Scale */
   --z-background: -1;
@@ -238,22 +261,22 @@ body {
   --z-tooltip: 1200;
 
   /* Button Sizes */
-  --button-size-s: 2.75rem; /* 44px - small circular */
-  --button-size-icon: 2.75rem; /* 44px - icon button */
-  --button-size-m-width: 7.3125rem; /* 117px - medium width */
-  --button-size-m-height: 2.75rem; /* 44px - medium height */
+  --button-size-s: 2.75rem;
+  --button-size-icon: 2.75rem;
+  --button-size-m-width: 7.3125rem;
+  --button-size-m-height: 2.75rem;
 
-  /* Button Colors */
+  /* Button Colors (Legacy/Presets) */
   --button-bg: #f9f9f9;
   --button-bg-light: rgba(247, 247, 247, 0.9);
   --button-text: #e74e1c;
-  --button-radius: 0.5625rem; /* 9px */
+  --button-radius: 0.5625rem;
   --button-radius-full: 50%;
 
   /* Icon Sizes */
-  --icon-size-sm: 1.25rem; /* 20px */
-  --icon-size-md: 4.4375rem; /* 71px - empty state icon width */
-  --icon-size-md-height: 4.5rem; /* 72px - empty state icon height */
+  --icon-size-sm: 1.25rem;
+  --icon-size-md: 4.4375rem;
+  --icon-size-md-height: 4.5rem;
 }
 
 /* ============================================
@@ -702,7 +725,7 @@ body {
 
 .close-icon::before,
 .close-icon::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 140%;
   height: 0.0625rem; /* 1px */

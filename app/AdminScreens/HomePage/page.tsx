@@ -2,9 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiUser, apiActivities, apiRegistrations } from "@/app/services/db_api";
+import {
+  apiUser,
+  apiActivities,
+  apiRegistrations,
+} from "@/app/services/db_api";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
-import { HomeFilter, ADMIN_FILTER_OPTIONS } from "@/lib/components/UI/HomeFilter";
+import {
+  HomeFilter,
+  ADMIN_FILTER_OPTIONS,
+} from "@/lib/components/UI/HomeFilter";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
 import Button from "@/lib/components/UI/Button";
@@ -42,18 +49,20 @@ interface PendingGroupRegistration {
 
 // Map English circle values to Hebrew
 const CIRCLE_TO_HEBREW: Record<string, string> = {
-  'Nova Survivor': 'שורדי ושורדות המסיבות',
-  'October 7 victim': 'נפגעי טראומה 7.10 ומלחמת חרבות ברזל',
-  'Shkulim parents': 'הורים שכולים',
-  'Shkulim Siblings': 'אחים.ות שכולים',
-  'Family of october 7 victim': 'משפחות וקרובים של פצועים טראומה בגופם ובנפשם',
-  'Rescue forces': 'כוחות הצלה וחילוץ',
-  'Residence of Otef Aza': 'תושבי העוטף ומפונים',
-  'Second or third': 'מעגל שני ושלישי של משפחות השכול',
+  "Nova Survivor": "שורדי ושורדות המסיבות",
+  "October 7 victim": "נפגעי טראומה 7.10 ומלחמת חרבות ברזל",
+  "Shkulim parents": "הורים שכולים",
+  "Shkulim Siblings": "אחים.ות שכולים",
+  "Family of october 7 victim": "משפחות וקרובים של פצועים טראומה בגופם ובנפשם",
+  "Rescue forces": "כוחות הצלה וחילוץ",
+  "Residence of Otef Aza": "תושבי העוטף ומפונים",
+  "Second or third": "מעגל שני ושלישי של משפחות השכול",
 };
 
 // Get Hebrew circle name (from quiz.circle or translate from users.circle)
-const getCircleHebrew = (user: { circle?: string; quiz?: { circle?: string } } | undefined): string | undefined => {
+const getCircleHebrew = (
+  user: { circle?: string; quiz?: { circle?: string } } | undefined
+): string | undefined => {
   if (!user) return undefined;
   // First try quiz.circle (already in Hebrew)
   if (user.quiz?.circle) return user.quiz.circle;
@@ -78,29 +87,47 @@ const HEBREW_DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמי
 
 export default function AdminHomePage() {
   const { userProfile, loading: userLoading } = useUser();
-  const [activeFilter, setActiveFilter] = useState<"pending" | "approved">("pending");
+  const [activeFilter, setActiveFilter] = useState<"pending" | "approved">(
+    "pending"
+  );
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
-  const [pendingGroupRegs, setPendingGroupRegs] = useState<PendingGroupRegistration[]>([]);
+  const [pendingGroupRegs, setPendingGroupRegs] = useState<
+    PendingGroupRegistration[]
+  >([]);
   const [upcomingActivities, setUpcomingActivities] = useState<Activity[]>([]);
 
   // Activity modal state
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
+    null
+  );
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
 
   // User details modal state
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedUserType, setSelectedUserType] = useState<"initial" | "group">("initial");
-  const [selectedGroupName, setSelectedGroupName] = useState<string | undefined>(undefined);
-  const [selectedRegistrationId, setSelectedRegistrationId] = useState<string | null>(null);
+  const [selectedUserType, setSelectedUserType] = useState<"initial" | "group">(
+    "initial"
+  );
+  const [selectedGroupName, setSelectedGroupName] = useState<
+    string | undefined
+  >(undefined);
+  const [selectedRegistrationId, setSelectedRegistrationId] = useState<
+    string | null
+  >(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   // Confirmation modal state
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<"approve" | "reject">("approve");
+  const [confirmAction, setConfirmAction] = useState<"approve" | "reject">(
+    "approve"
+  );
   const [confirmUserName, setConfirmUserName] = useState("");
-  const [confirmType, setConfirmType] = useState<"initial" | "group">("initial");
+  const [confirmType, setConfirmType] = useState<"initial" | "group">(
+    "initial"
+  );
   const [confirmUserId, setConfirmUserId] = useState<string | null>(null);
-  const [confirmRegistrationId, setConfirmRegistrationId] = useState<string | null>(null);
+  const [confirmRegistrationId, setConfirmRegistrationId] = useState<
+    string | null
+  >(null);
 
   // Fetch data on mount
   useEffect(() => {
@@ -118,7 +145,8 @@ export default function AdminHomePage() {
     }
 
     // Fetch pending group registrations
-    const [groupRegs, groupError] = await apiRegistrations.getPendingRegistrations();
+    const [groupRegs, groupError] =
+      await apiRegistrations.getPendingRegistrations();
     if (!groupError && groupRegs && Array.isArray(groupRegs)) {
       setPendingGroupRegs(groupRegs);
     }
@@ -171,7 +199,9 @@ export default function AdminHomePage() {
 
   // Handle approve group registration (called after confirmation)
   const handleApproveGroupReg = async (registrationId: string) => {
-    const [, error] = await apiRegistrations.approveRegistration(registrationId);
+    const [, error] = await apiRegistrations.approveRegistration(
+      registrationId
+    );
     if (!error) {
       fetchData();
     }
@@ -186,7 +216,11 @@ export default function AdminHomePage() {
   };
 
   // Open confirmation modal for initial user approval
-  const openConfirmForUser = (userId: string, userName: string, action: "approve" | "reject") => {
+  const openConfirmForUser = (
+    userId: string,
+    userName: string,
+    action: "approve" | "reject"
+  ) => {
     setConfirmUserId(userId);
     setConfirmRegistrationId(null);
     setConfirmUserName(userName);
@@ -196,7 +230,11 @@ export default function AdminHomePage() {
   };
 
   // Open confirmation modal for group registration
-  const openConfirmForGroup = (registrationId: string, userName: string, action: "approve" | "reject") => {
+  const openConfirmForGroup = (
+    registrationId: string,
+    userName: string,
+    action: "approve" | "reject"
+  ) => {
     setConfirmUserId(null);
     setConfirmRegistrationId(registrationId);
     setConfirmUserName(userName);
@@ -249,7 +287,11 @@ export default function AdminHomePage() {
   };
 
   // Handle group registration card click - opens details modal
-  const handleGroupCardClick = (userId: string, groupName: string, registrationId: string) => {
+  const handleGroupCardClick = (
+    userId: string,
+    groupName: string,
+    registrationId: string
+  ) => {
     setSelectedUserId(userId);
     setSelectedUserType("group");
     setSelectedGroupName(groupName);
@@ -268,22 +310,34 @@ export default function AdminHomePage() {
   // Handle approve from user details modal - opens confirm modal
   const handleModalApprove = () => {
     if (selectedUserType === "initial" && selectedUserId) {
-      const user = pendingUsers.find(u => u.id === selectedUserId);
-      openConfirmForUser(selectedUserId, user?.full_name || "המשתמש", "approve");
+      const user = pendingUsers.find((u) => u.id === selectedUserId);
+      openConfirmForUser(
+        selectedUserId,
+        user?.full_name || "המשתמש",
+        "approve"
+      );
     } else if (selectedUserType === "group" && selectedRegistrationId) {
-      const reg = pendingGroupRegs.find(r => r.id === selectedRegistrationId);
-      openConfirmForGroup(selectedRegistrationId, reg?.users?.full_name || "המשתמש", "approve");
+      const reg = pendingGroupRegs.find((r) => r.id === selectedRegistrationId);
+      openConfirmForGroup(
+        selectedRegistrationId,
+        reg?.users?.full_name || "המשתמש",
+        "approve"
+      );
     }
   };
 
   // Handle reject from user details modal - opens confirm modal
   const handleModalReject = () => {
     if (selectedUserType === "initial" && selectedUserId) {
-      const user = pendingUsers.find(u => u.id === selectedUserId);
+      const user = pendingUsers.find((u) => u.id === selectedUserId);
       openConfirmForUser(selectedUserId, user?.full_name || "המשתמש", "reject");
     } else if (selectedUserType === "group" && selectedRegistrationId) {
-      const reg = pendingGroupRegs.find(r => r.id === selectedRegistrationId);
-      openConfirmForGroup(selectedRegistrationId, reg?.users?.full_name || "המשתמש", "reject");
+      const reg = pendingGroupRegs.find((r) => r.id === selectedRegistrationId);
+      openConfirmForGroup(
+        selectedRegistrationId,
+        reg?.users?.full_name || "המשתמש",
+        "reject"
+      );
     }
   };
 
@@ -347,15 +401,19 @@ export default function AdminHomePage() {
           <HomeFilter
             options={ADMIN_FILTER_OPTIONS}
             activeOption={activeFilter}
-            onFilterChange={(id) => setActiveFilter(id as "pending" | "approved")}
-            size="medium"
+            onFilterChange={(id) =>
+              setActiveFilter(id as "pending" | "approved")
+            }
+            // Removed 'size' prop as it's no longer part of the interface
           />
         </div>
 
         {/* Section Title */}
         <h2 className={styles.sectionTitle}>
           {activeFilter === "pending"
-            ? `ממתינים לאישור (${pendingUsers.length + pendingGroupRegs.length})`
+            ? `ממתינים לאישור (${
+                pendingUsers.length + pendingGroupRegs.length
+              })`
             : `המפגשים הבאים (${upcomingActivities.length})`}
         </h2>
 
@@ -363,7 +421,7 @@ export default function AdminHomePage() {
         <div className={styles.cardsContainer}>
           {activeFilter === "pending" ? (
             // Pending Users Cards (Initial + Group)
-            (pendingUsers.length > 0 || pendingGroupRegs.length > 0) ? (
+            pendingUsers.length > 0 || pendingGroupRegs.length > 0 ? (
               <>
                 {/* Initial approval cards */}
                 {pendingUsers.map((pendingUser) => (
@@ -373,8 +431,20 @@ export default function AdminHomePage() {
                     userName={pendingUser.full_name || "משתמש"}
                     requestDate={formatDate(pendingUser.created_at)}
                     circle={getCircleHebrew(pendingUser)}
-                    onApprove={() => openConfirmForUser(pendingUser.id, pendingUser.full_name || "המשתמש", "approve")}
-                    onReject={() => openConfirmForUser(pendingUser.id, pendingUser.full_name || "המשתמש", "reject")}
+                    onApprove={() =>
+                      openConfirmForUser(
+                        pendingUser.id,
+                        pendingUser.full_name || "המשתמש",
+                        "approve"
+                      )
+                    }
+                    onReject={() =>
+                      openConfirmForUser(
+                        pendingUser.id,
+                        pendingUser.full_name || "המשתמש",
+                        "reject"
+                      )
+                    }
                     onClick={() => handleUserCardClick(pendingUser.id)}
                   />
                 ))}
@@ -387,9 +457,27 @@ export default function AdminHomePage() {
                     requestDate={formatDate(reg.created_at)}
                     circle={getCircleHebrew(reg.users)}
                     groupName={reg.activities?.title}
-                    onApprove={() => openConfirmForGroup(reg.id, reg.users?.full_name || "המשתמש", "approve")}
-                    onReject={() => openConfirmForGroup(reg.id, reg.users?.full_name || "המשתמש", "reject")}
-                    onClick={() => handleGroupCardClick(reg.users?.id, reg.activities?.title || "", reg.id)}
+                    onApprove={() =>
+                      openConfirmForGroup(
+                        reg.id,
+                        reg.users?.full_name || "המשתמש",
+                        "approve"
+                      )
+                    }
+                    onReject={() =>
+                      openConfirmForGroup(
+                        reg.id,
+                        reg.users?.full_name || "המשתמש",
+                        "reject"
+                      )
+                    }
+                    onClick={() =>
+                      handleGroupCardClick(
+                        reg.users?.id,
+                        reg.activities?.title || "",
+                        reg.id
+                      )
+                    }
                   />
                 ))}
               </>
@@ -442,85 +530,85 @@ export default function AdminHomePage() {
                 </div>
               </div>
             )
+          ) : // Upcoming Activities Cards
+          upcomingActivities.length > 0 ? (
+            upcomingActivities.map((activity) => {
+              const totalRegistrations =
+                (activity.current_participants || 0) +
+                (activity.waitlist_count || 0);
+              return (
+                <NewAdminActivityCard
+                  key={activity.id}
+                  id={activity.id}
+                  title={activity.title}
+                  instructor={activity.instructor || "לא צוין"}
+                  day={formatDayHebrew(activity.date)}
+                  startTime={activity.start_time}
+                  currentParticipants={totalRegistrations}
+                  maxParticipants={activity.max_participants || 0}
+                  onClick={() => handleActivityClick(activity.id)}
+                />
+              );
+            })
           ) : (
-            // Upcoming Activities Cards
-            upcomingActivities.length > 0 ? (
-              upcomingActivities.map((activity) => {
-                const totalRegistrations = (activity.current_participants || 0) + (activity.waitlist_count || 0);
-                return (
-                  <NewAdminActivityCard
-                    key={activity.id}
-                    id={activity.id}
-                    title={activity.title}
-                    instructor={activity.instructor || "לא צוין"}
-                    day={formatDayHebrew(activity.date)}
-                    startTime={activity.start_time}
-                    currentParticipants={totalRegistrations}
-                    maxParticipants={activity.max_participants || 0}
-                    onClick={() => handleActivityClick(activity.id)}
-                  />
-                );
-              })
-            ) : (
-              <div className={styles.emptyStateContainer}>
-                <div className={styles.emptyStateContent}>
-                  <div className={styles.emptyStateIcon}>
-                    <svg width="48" height="49" viewBox="0 0 48 49" fill="none">
-                      {/* Outer dashed circle */}
-                      <circle
-                        cx="24"
-                        cy="24.5"
-                        r="22.9"
-                        stroke="rgba(255, 255, 255, 0.5)"
-                        strokeWidth="2.2"
-                        strokeDasharray="4 4"
-                        fill="none"
-                      />
-                      {/* Inner dashed circle */}
-                      <circle
-                        cx="24"
-                        cy="24.5"
-                        r="11"
-                        stroke="rgba(255, 255, 255, 0.5)"
-                        strokeWidth="2.2"
-                        strokeDasharray="4 4"
-                        fill="none"
-                      />
-                      {/* Horizontal line */}
-                      <line
-                        x1="19.7"
-                        y1="24.5"
-                        x2="28.3"
-                        y2="24.5"
-                        stroke="rgba(255, 245, 245, 0.7)"
-                        strokeWidth="1"
-                      />
-                      {/* Vertical line */}
-                      <line
-                        x1="24"
-                        y1="19.2"
-                        x2="24"
-                        y2="29.8"
-                        stroke="rgba(255, 245, 245, 0.7)"
-                        strokeWidth="1"
-                      />
-                    </svg>
-                  </div>
-                  <p className={styles.emptyStateText}>אין מפגשים קרובים</p>
+            <div className={styles.emptyStateContainer}>
+              <div className={styles.emptyStateContent}>
+                <div className={styles.emptyStateIcon}>
+                  <svg width="48" height="49" viewBox="0 0 48 49" fill="none">
+                    {/* Outer dashed circle */}
+                    <circle
+                      cx="24"
+                      cy="24.5"
+                      r="22.9"
+                      stroke="rgba(255, 255, 255, 0.5)"
+                      strokeWidth="2.2"
+                      strokeDasharray="4 4"
+                      fill="none"
+                    />
+                    {/* Inner dashed circle */}
+                    <circle
+                      cx="24"
+                      cy="24.5"
+                      r="11"
+                      stroke="rgba(255, 255, 255, 0.5)"
+                      strokeWidth="2.2"
+                      strokeDasharray="4 4"
+                      fill="none"
+                    />
+                    {/* Horizontal line */}
+                    <line
+                      x1="19.7"
+                      y1="24.5"
+                      x2="28.3"
+                      y2="24.5"
+                      stroke="rgba(255, 245, 245, 0.7)"
+                      strokeWidth="1"
+                    />
+                    {/* Vertical line */}
+                    <line
+                      x1="24"
+                      y1="19.2"
+                      x2="24"
+                      y2="29.8"
+                      stroke="rgba(255, 245, 245, 0.7)"
+                      strokeWidth="1"
+                    />
+                  </svg>
                 </div>
+                <p className={styles.emptyStateText}>אין מפגשים קרובים</p>
               </div>
-            )
+            </div>
           )}
         </div>
-
       </div>
 
       {/* Bottom Buttons */}
       <div className={styles.bottomButtons}>
-        <Button size="M" href="/AdminScreens/addNotification">
+        {/* Changed size="M" to size="L" to match ButtonProps interface */}
+        <Button size="L" href="/AdminScreens/addNotification">
           להוספת הודעה
         </Button>
-        <Button size="M" href="/AdminScreens/AddActivityPage">
+        <Button size="L" href="/AdminScreens/AddActivityPage">
           להוספת פעילות
         </Button>
       </div>

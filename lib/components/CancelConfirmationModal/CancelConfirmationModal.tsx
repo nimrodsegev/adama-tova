@@ -46,11 +46,11 @@ export default function CancelConfirmationModal({
         </div>
 
         <div className={styles.buttonsFrame}>
-          <Button size="S" onClick={onClose}>
+          <Button size="L-short" onClick={onClose}>
             לא
           </Button>
 
-          <Button size="M" onClick={onConfirm}>
+          <Button size="L-short" onClick={onConfirm}>
             <span className={styles.confirmButtonText}>כן, לבטל</span>
           </Button>
         </div>
