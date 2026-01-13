@@ -151,23 +151,28 @@
 
 /* Input error state */
 .inputError {
-  border: 0.125rem solid #ff0000 !important;
+  border: 0.125rem solid #A70000 !important;
 }
 
-/* Field error text */
+/* Field error text - replaces label */
 .fieldError {
   position: absolute;
   right: 1.8125rem; /* Same as inputLabel */
   top: -0.5rem;
 
-  padding: 0 0.3125rem;
+  display: flex;
+  align-items: center;
+  padding: 0.0625rem 0.5rem; /* 1px 8px - same as label */
+
   background: var(--color-background); /* Same gradient as container */
   background-attachment: fixed; /* Aligns with container gradient */
 
   font-family: var(--font-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base); /* 16px - same as label */
   font-weight: var(--font-weight-normal);
-  color: #ff0000;
+  line-height: 1.1875rem; /* 19px */
+  text-align: right;
+  color: #A70000;
 
   white-space: nowrap;
   z-index: 3;
