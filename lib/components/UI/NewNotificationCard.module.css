@@ -1,0 +1,175 @@
+/* Container - Holds the static Glass Background & Border */
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 21.5625rem; /* ~345px */
+
+  min-height: 5.625rem;
+  height: auto;
+
+  /* --- GLASS EFFECT --- */
+  background: rgba(104, 31, 2, 0.05);
+  backdrop-filter: blur(0.625rem); /* 10px Blur for Glass Effect */
+  -webkit-backdrop-filter: blur(0.625rem); /* Safari support */
+
+  /* Container Stroke */
+  border: 0.0625rem solid #f9f9f9;
+  border-radius: var(--radius-sm);
+
+  user-select: none;
+  direction: rtl;
+
+  display: flex;
+  align-items: stretch;
+
+  /* Clips content so swipe box stays inside border */
+  overflow: hidden;
+}
+
+/* --- SWIPE MASK --- */
+.revealMask {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+
+  z-index: 1;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* --- SWIPE ACTION BOX --- */
+.swipeActionBox {
+  width: 7.5rem;
+  height: 100%; /* Fills container height completely */
+
+  /* NO STROKE (Uses container's border due to overflow:hidden) */
+  border: none;
+  margin: 0;
+
+  background: rgba(179, 126, 179, 0.5);
+  /* Optional: Inner radius just on left side if you want it to look separate, 
+     but usually for full fill we keep it square or match container radius.
+     Let's keep inner radius small for aesthetics. */
+  border-top-left-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--radius-xs);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.swipeText {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: var(--line-height-tight);
+}
+
+.swipeArrow {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+/* --- FOREGROUND CONTENT (Sliding Layer) --- */
+.card {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+
+  flex-grow: 1;
+  width: 100%;
+  min-height: 5.625rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  padding: var(--spacing-lg);
+  gap: var(--spacing-sm);
+
+  /* Transparent so Glass BG shows through */
+  background: transparent;
+
+  transition: transform 0.1s linear;
+  touch-action: pan-y;
+}
+
+/* HEADER */
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.625rem;
+  max-height: 3em;
+  overflow: hidden;
+}
+
+.headerTextGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.time,
+.pipe,
+.title {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-snug);
+  text-align: right;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.pipe {
+  margin: 0 0.125rem;
+}
+
+.unreadDot {
+  width: 0.6875rem;
+  height: 0.6875rem;
+  background: #681f02;
+  border-radius: var(--radius-full);
+  flex: none;
+  order: -1;
+  box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.3);
+  margin-top: 0.4rem;
+}
+
+/* CONTENT CONTAINER */
+.messageContent {
+  width: 70%;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  text-align: right;
+  color: var(--color-text-secondary);
+  word-wrap: break-word;
+  margin-bottom: 0;
+}
+
+/* BUTTON POSITIONING */
+.buttonPositioner {
+  position: absolute;
+  bottom: var(--spacing-lg);
+  left: var(--spacing-lg);
+  z-index: 3;
+}

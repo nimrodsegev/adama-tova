@@ -112,13 +112,20 @@ export default function SignupWizard({
   useEffect(() => {
     const updateCircleParams = () => {
       const height = window.innerHeight;
-      // Very small screens (iPhone SE: 667px height, older SE: 568px)
-      if (height <= 670) {
-        setCircleRadius(0.07);
-        setCirclePosition({ x: 0.25, y: 0.15 }); // Moved slightly to the left
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+      // PWA mode has larger viewport - adjust position to be more centered
+      if (isPWA) {
+        setCircleRadius(0.10);
+        setCirclePosition({ x: 0.32, y: 0.12 }); // More centered for PWA
+      } else if (height <= 670) {
+        // Very small screens (iPhone SE: 667px height, older SE: 568px)
+        setCircleRadius(0.08);
+        setCirclePosition({ x: 0.22, y: 0.12 });
       } else {
-        setCircleRadius(0.11);
-        setCirclePosition({ x: 0.3, y: 0.15 });
+        // Larger screens
+        setCircleRadius(0.10);
+        setCirclePosition({ x: 0.32, y: 0.12 }); // More to the right
       }
     };
 
@@ -704,7 +711,7 @@ export default function SignupWizard({
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.headerSection}>
-              <p className={styles.optionalSubtitle}>&nbsp;</p>
+              <h2 className={styles.stepTitle}>&nbsp;</h2>
               <p className={styles.optionalSubtitle}>&nbsp;</p>
             </div>
 
