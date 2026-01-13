@@ -1,144 +1,142 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useMemo } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
-import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
-import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
-import OrganicCircles, {
-  OrganicCirclesRef,
-} from "@/lib/components/OrganicCircles/OrganicCircles";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+
+// UI Components
+import DaySlider from "@/lib/components/UI/DaySlider";
+import { HomeFilter } from "@/lib/components/UI/HomeFilter";
+import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+
 import styles from "./UserCalendarPage.module.css";
 
-// Interests Mapping (same as HomePage)
+const CALENDAR_FILTERS = [
+  { id: "all", label: "הכל" },
+  { id: "foryou", label: "בשבילך" },
+];
+
 const INTRESTS_MAPPING: Record<string, string> = {
-  'מיינדפולנס': 'mindfulness',
-  'גוף ותנועה': 'body_motion',
-  'מוזיקה': 'music_sound',
-  'יצירה וחומר': 'creation_material',
+  מיינדפולנס: "mindfulness",
+  "גוף ותנועה": "body_motion",
+  מוזיקה: "music_sound",
+  "יצירה וחומר": "creation_material",
 };
 
-export default function UserCalendarPage() {
+export default function NewUserCalendarPage() {
   const { user, userProfile } = useUser();
-  const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Data State
   const [activities, setActivities] = useState<any[]>([]);
-  const [filter, setFilter] = useState<"all" | "foryou">("all");
+  const [registeredActivityIds, setRegisteredActivityIds] = useState<string[]>(
+    []
+  );
+
+  // UI State
+  const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
-  const [weekOffset, setWeekOffset] = useState(0); // 0 = current week, 1 = next week
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // 🔵 Organic Circles ref for imperative controls if needed
-  const circlesRef = useRef<OrganicCirclesRef>(null);
-
-  // 🎨 Calculate shape parameters based on user profile (Native Ranges: 0-1, 0-5)
-  const shapeParams = calculateShapeParams(userProfile);
-
-  // Closed days: Monday(1), Thursday(4), Friday(5), Saturday(6)
-  const closedDays = [1, 4, 5, 6];
-  const isDayClosed = closedDays.includes(selectedDayIndex);
-
-  const getWeekStartDate = () => {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const diff = -dayOfWeek;
-    const sunday = new Date(now);
-    sunday.setDate(now.getDate() + diff + weekOffset * 7);
-    sunday.setHours(0, 0, 0, 0);
-    return sunday;
-  };
-
-  const goToPreviousWeek = () => {
-    if (weekOffset > 0) setWeekOffset(weekOffset - 1);
-  };
-  const goToNextWeek = () => {
-    if (weekOffset < 1) setWeekOffset(weekOffset + 1);
-  };
-
-  const isCurrentWeek = weekOffset === 0;
-  const isNextWeek = weekOffset === 1;
-
-  const getSelectedDateObject = () => {
-    const weekStart = getWeekStartDate();
-    const selected = new Date(weekStart);
-    selected.setDate(weekStart.getDate() + selectedDayIndex);
-    return selected;
-  };
-
-  const selectedDateObj = getSelectedDateObject();
+  const shapeParams = useMemo(() => {
+    return calculateShapeParams(userProfile);
+  }, [userProfile]);
 
   const fetchData = async () => {
-    if (isDayClosed) {
-      setActivities([]);
-      return;
-    }
-
+    // Clear activities and start loading
+    setActivities([]);
     setLoading(true);
 
-    const year = selectedDateObj.getFullYear();
-    const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(selectedDateObj.getDate()).padStart(2, "0");
-    const dateString = `${year}-${month}-${day}`;
-
-    // Force delay to ensure the organic loading animation is visible
-    await new Promise((resolve) => setTimeout(resolve, 750));
+    const dateString = selectedDate.toISOString().split("T")[0];
 
     try {
-      const [[actData, actError], [userBranches, branchError]] =
-        await Promise.all([
-          apiActivities.getByDate(dateString),
-          user
-            ? apiUser.getUserBranches(user.id)
-            : Promise.resolve([null, null]),
-        ]);
+      // 1. Prepare Supabase query for registrations (Active only)
+      const registrationsPromise = user
+        ? supabase
+            .from("registrations")
+            .select("activity_id")
+            .eq("user_id", user.id)
+            .in("status", ["confirmed", "waitlist", "approved"])
+        : Promise.resolve({ data: [] });
 
-      if (actError) console.error("Error fetching activities:", actError);
+      // 2. Execute all fetches + Delay
+      const [
+        [actData, actError],
+        [userBranches],
+        { data: rawRegs },
+        _, // Delay result
+      ] = await Promise.all([
+        apiActivities.getByDate(dateString),
+        user ? apiUser.getUserBranches(user.id) : Promise.resolve([null, null]),
+        registrationsPromise,
+        new Promise((resolve) => setTimeout(resolve, 500)), // Force 0.5s delay
+      ]);
 
-      const rawActivities = actData || [];
-      const validBranches = userBranches || ["nahalal", "satria"];
+      // 3. Process Activities
+      if (!actError) {
+        const validBranches = userBranches || ["nahalal", "satria"];
+        const filtered = actData.filter(
+          (a: any) => !a.branch || validBranches.includes(a.branch)
+        );
+        setActivities(filtered);
+      }
 
-      const branchFilteredActivities = rawActivities.filter((activity: any) => {
-        return !activity.branch || validBranches.includes(activity.branch);
-      });
-
-      setActivities(branchFilteredActivities);
+      // 4. Process Registrations
+      if (rawRegs) {
+        const ids = rawRegs.map((r: any) => r.activity_id);
+        setRegisteredActivityIds(ids);
+      }
     } catch (err) {
-      console.error("Fetch failed", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleMotionState = async (state: "start" | "end") => {
+    if (state === "start") {
+      setIsProcessing(true);
+      setTimeout(() => setIsProcessing(false), 3000);
+    } else {
+      await fetchData();
+      setIsProcessing(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, [selectedDayIndex, weekOffset, user]);
+  }, [selectedDate, user]);
 
-  const getFilteredActivities = () => {
-    if (filter === "all") return activities;
-    if (filter === "foryou" && userProfile?.quiz?.interests) {
-      const myInterestsEnglish = userProfile.quiz.interests.map(
-        (interest: string) => INTRESTS_MAPPING[interest] || interest
-      );
-      return activities.filter((activity: any) =>
-        myInterestsEnglish.includes(activity.category)
-      );
+  // 🔍 Updated Filtering Logic
+  const filteredActivities = activities.filter((activity: any) => {
+    if (filter === "all") return true;
+
+    if (filter === "foryou") {
+      // Condition A: User is registered
+      const isRegistered = registeredActivityIds.includes(activity.id);
+
+      // Condition B: Matches Interests
+      let isInterested = false;
+      if (userProfile?.quiz?.interests) {
+        const myInterests = userProfile.quiz.interests.map(
+          (i: string) => INTRESTS_MAPPING[i] || i
+        );
+        isInterested = myInterests.includes(activity.category);
+      }
+
+      // Return true if EITHER is true
+      return isRegistered || isInterested;
     }
-    return activities;
-  };
 
-  const filteredActivities = getFilteredActivities();
-
-  const getWeekDisplayText = () => {
-    const weekStart = getWeekStartDate();
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    const formatDate = (date: Date) =>
-      `${date.getDate()}.${date.getMonth() + 1}`;
-    return `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
-  };
+    return true;
+  });
 
   return (
-    <div className="mobile-container">
-      {/* 🔵 Organic Circles Loading Overlay - Semi-transparent gradient */}
-      {loading && (
+    <>
+      {/* Motion overlay - Shows during registration/cancellation */}
+      {isProcessing && (
         <div
           style={{
             position: "fixed",
@@ -146,21 +144,18 @@ export default function UserCalendarPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 1000,
-            pointerEvents: "none",
+            zIndex: 10001,
+            background:
+              "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            // Using gradient colors from CSS variables with opacity
-            background:
-              "linear-gradient(180deg, rgba(231, 78, 28, 0.3) 0%, rgba(222, 105, 48, 0.3) 53%, rgba(231, 146, 103, 0.3) 87%)",
+            pointerEvents: "all",
           }}
         >
           <OrganicCircles
-            ref={circlesRef}
-            mode="loading"
-            radius={0.08}
-            // Spreading unified shape parameters (complexity, smoothness, elongation, opacity, strokeWidth)
+            mode="breathing"
+            radius={0.25}
             {...shapeParams}
             baseColor="#FFFFFF"
             position={{ x: 0.5, y: 0.5 }}
@@ -168,85 +163,73 @@ export default function UserCalendarPage() {
         </div>
       )}
 
-      <div className={styles.mainFrame}>
-        <div className={styles.headerSection}>
-          <div className={styles.topRow}>
-            <h1 className="header-secondary">לוח פעילויות</h1>
+      <div className={styles.pageContainer}>
+        {/* Loading overlay - Shows during data fetch */}
+        {loading && (
+          <div className={styles.loadingOverlay}>
+            <OrganicCircles
+              mode="loading"
+              radius={0.08}
+              {...shapeParams}
+              baseColor="#FFFFFF"
+            />
+          </div>
+        )}
 
-            <div className={styles.filterRow}>
-              <span
-                className={
-                  filter === "all"
-                    ? "filter-button filter-button-active"
-                    : "filter-button"
-                }
-                onClick={() => setFilter("all")}
-              >
-                הכל
-              </span>
-              <span
-                className={
-                  filter === "foryou"
-                    ? "filter-button filter-button-active"
-                    : "filter-button"
-                }
-                onClick={() => setFilter("foryou")}
-              >
-                בשבילך
-              </span>
-            </div>
+        <main className={styles.mainFrame}>
+          <div className={styles.titleContainer}>
+            <h1 className={styles.titleText}>לוח פעילויות</h1>
           </div>
 
-          <div className={styles.weekNavigation}>
-            <button
-              className={styles.weekNavButton}
-              style={{ opacity: isCurrentWeek ? 0.5 : 1 }}
-              onClick={goToPreviousWeek}
-              disabled={isCurrentWeek}
-            >
-              ‹
-            </button>
-
-            <span className={styles.weekDisplay}>
-              {isCurrentWeek ? "השבוע" : "השבוע הבא"} ({getWeekDisplayText()})
-            </span>
-
-            <button
-              className={styles.weekNavButton}
-              style={{ opacity: isNextWeek ? 0.5 : 1 }}
-              onClick={goToNextWeek}
-              disabled={isNextWeek}
-            >
-              ›
-            </button>
+          <div className={styles.sliderSection}>
+            <DaySlider
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
           </div>
 
-          <DaySlider
-            selectedDayIndex={selectedDayIndex}
-            onDaySelect={setSelectedDayIndex}
-            currentWeekStart={getWeekStartDate()}
-          />
-        </div>
+          <div className={styles.filterSection}>
+            <HomeFilter
+              options={CALENDAR_FILTERS}
+              activeOption={filter}
+              onFilterChange={(newId) => setFilter(newId)}
+            />
+          </div>
 
-        <div className={styles.activitiesList}>
-          {isDayClosed ? (
-            <p className={styles.closedMessage}>המרחב סגור היום</p>
-          ) : loading ? (
-            <div style={{ minHeight: "200px" }} />
-          ) : filteredActivities.length > 0 ? (
-            filteredActivities.map((activity) => (
-              <ScheduleActivityCard
-                key={activity.id}
-                {...activity}
-                onRegistrationChange={fetchData}
-                isGroup={activity.is_group || !!activity.series_id}
-              />
-            ))
-          ) : (
-            <p className="text-empty">אין פעילויות ליום זה</p>
-          )}
-        </div>
+          <div className={styles.activitiesList}>
+            {filteredActivities.length > 0
+              ? filteredActivities.map((activity) => {
+                  const isRegistered = registeredActivityIds.includes(
+                    activity.id
+                  );
+                  return (
+                    <NewUserScheduleActivityCard
+                      key={activity.id}
+                      id={activity.id}
+                      title={activity.title}
+                      startTime={activity.start_time}
+                      endTime={activity.end_time}
+                      currentParticipants={activity.current_participants || 0}
+                      maxParticipants={activity.max_participants || 0}
+                      waitlistCount={activity.waitlist_count || 0}
+                      isGroup={activity.is_group || !!activity.series_id}
+                      isRegistered={isRegistered}
+                      onRegistrationChange={fetchData}
+                      onMotionChange={handleMotionState}
+                    />
+                  );
+                })
+              : !loading && (
+                  <p
+                    className="text-empty"
+                    style={{ color: "white", marginTop: "2rem" }}
+                  >
+                    אין פעילויות ליום זה
+                  </p>
+                )}
+          </div>
+        </main>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,11 +1,18 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
-import UserActivityCard from "@/lib/components/Home/UserActivityCard";
-import EmptyState from "@/lib/components/UI/EmptyState";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import {
+  HomeFilter,
+  USER_FILTER_OPTIONS,
+} from "@/lib/components/UI/HomeFilter";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
+import OpenHours from "@/lib/components/UI/OpenHours";
+import EmptyState from "@/lib/components/UI/EmptyState";
+import styles from "./UserHomePage.module.css";
 
 interface Activity {
   id: string;
@@ -18,13 +25,14 @@ interface Activity {
   branch?: string;
   series_id?: string;
   is_group?: boolean;
+  instructor?: string;
 }
 
-const INTRESTS_MAPPING: Record<string, string> = {
- 'מיינדפולנס': 'mindfulness',
-  'גוף ותנועה': 'body_motion',
-  'מוזיקה': 'music_sound',
-  'יצירה וחומר': 'creation_material',
+const INTERESTS_MAPPING: Record<string, string> = {
+  מיינדפולנס: "mindfulness",
+  "גוף ותנועה": "body_motion",
+  מוזיקה: "music_sound",
+  "יצירה וחומר": "creation_material",
 };
 
 const OPENING_HOURS = {
@@ -33,17 +41,36 @@ const OPENING_HOURS = {
   3: { open: "16:00", close: "22:00" },
 };
 
-export default function HomePage() {
+export default function NewUserHomePage() {
   const { user, userProfile, loading: userLoading } = useUser();
+  const [activeFilter, setActiveFilter] = useState<"recommended" | "yours">(
+    "yours"
+  );
   const [registeredActivities, setRegisteredActivities] = useState<Activity[]>(
     []
   );
-  const [allActivities, setAllActivities] = useState<Activity[]>([]);
+  const [suggestedActivities, setSuggestedActivities] = useState<Activity[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const mountedRef = useRef(false);
 
-  const shapeParams = calculateShapeParams(userProfile);
+  // Calculate shape parameters based on user profile
+  const shapeParams = useMemo(() => {
+    return calculateShapeParams(userProfile);
+  }, [userProfile]);
+
+  // Get today's opening hours
+  const getTodayHours = () => {
+    const today = new Date().getDay();
+    if (today in OPENING_HOURS) {
+      return OPENING_HOURS[today as keyof typeof OPENING_HOURS];
+    }
+    return null;
+  };
+
+  const todayHours = getTodayHours();
 
   useEffect(() => {
     if (user && !mountedRef.current) {
@@ -54,25 +81,31 @@ export default function HomePage() {
 
   const fetchData = async () => {
     try {
+      // Fetch user's registrations
       const { data: rawRegs } = await supabase
         .from("registrations")
         .select("activity_id, status")
         .eq("user_id", user!.id);
+
       const approvedIds = (rawRegs || [])
         .filter((r: any) => r.status === "approved")
         .map((r: any) => r.activity_id);
+
       const allInteractedIds = (rawRegs || []).map((r: any) => r.activity_id);
 
+      // Fetch all activities and user branches
       const [[activities], [userBranches]] = await Promise.all([
         apiActivities.getAll() as Promise<[Activity[], any]>,
         apiUser.getUserBranches(user!.id),
       ]);
 
       if (activities && userBranches) {
+        // Filter by user's branches
         const branchFiltered = activities.filter(
           (act: Activity) => !act.branch || userBranches.includes(act.branch)
         );
 
+        // Process list to remove duplicate series
         const processList = (list: Activity[]) => {
           const unique: Activity[] = [];
           const seen = new Set<string>();
@@ -85,18 +118,22 @@ export default function HomePage() {
           return unique;
         };
 
+        // Get registered activities
         const regList = processList(
           branchFiltered.filter((act: Activity) => approvedIds.includes(act.id))
         );
+
+        // Get suggested activities (not interacted with)
         const candidates = branchFiltered.filter(
           (act: Activity) => !allInteractedIds.includes(act.id)
         );
         const suggList = processList(candidates);
 
+        // Filter suggestions by user interests if available
         let finalSuggestions = suggList;
         if (userProfile?.quiz?.interests?.length) {
           const myInterestsEnglish = userProfile.quiz.interests.map(
-            (i: string) => INTRESTS_MAPPING[i] || i
+            (i: string) => INTERESTS_MAPPING[i] || i
           );
           finalSuggestions = suggList.filter((act: Activity) =>
             myInterestsEnglish.includes(act.category)
@@ -104,7 +141,7 @@ export default function HomePage() {
         }
 
         setRegisteredActivities(regList);
-        setAllActivities(finalSuggestions);
+        setSuggestedActivities(finalSuggestions);
       }
     } catch (e) {
       console.error(e);
@@ -116,40 +153,19 @@ export default function HomePage() {
   const handleMotionState = async (state: "start" | "end") => {
     if (state === "start") {
       setIsProcessing(true);
-      // 🎯 FIX 1: Reduced timeout from 12s to 3s
-      // This ensures motion shows for max 3 seconds before auto-hiding
       setTimeout(() => setIsProcessing(false), 3000);
     } else {
-      // 🎯 FIX 2: Fetch data THEN hide motion
-      // This ensures page is ready before revealing
       await fetchData();
       setIsProcessing(false);
     }
   };
 
-  const getStatusMessage = () => {
-    const today = new Date().getDay();
-    if (today in OPENING_HOURS)
-      return `שעות הפעילות היום: ${
-        OPENING_HOURS[today as keyof typeof OPENING_HOURS].open
-      } עד ${OPENING_HOURS[today as keyof typeof OPENING_HOURS].close}`;
-    return "המרחב סגור היום";
-  };
-
   if (userLoading || loading) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "var(--color-background)", // Using CSS variable
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div className={styles.loadingContainer} dir="rtl">
         <OrganicCircles
           mode="loading"
-          radius={0.1}
+          radius={0.07}
           {...shapeParams}
           baseColor="#FFFFFF"
         />
@@ -157,9 +173,15 @@ export default function HomePage() {
     );
   }
 
+  const firstName = userProfile?.full_name?.split(" ")[0] || "משתמש";
+  const displayedActivities =
+    activeFilter === "yours"
+      ? registeredActivities
+      : suggestedActivities.slice(0, 4);
+
   return (
-    <div className="mobile-container">
-      {/* 🔵 THE TRANSITION MODAL - Shows during processing */}
+    <>
+      {/* Transition Modal - Shows during processing */}
       {isProcessing && (
         <div
           style={{
@@ -169,7 +191,8 @@ export default function HomePage() {
             right: 0,
             bottom: 0,
             zIndex: 10001,
-            backgroundColor: "var(--color-background)", // Using CSS variable
+            background:
+              "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -178,7 +201,7 @@ export default function HomePage() {
         >
           <OrganicCircles
             mode="breathing"
-            radius={0.25} // 🎨 SIZE: Smaller motion (was 0.3)
+            radius={0.25}
             {...shapeParams}
             baseColor="#FFFFFF"
             position={{ x: 0.5, y: 0.5 }}
@@ -186,52 +209,88 @@ export default function HomePage() {
         </div>
       )}
 
-      <div className="vector-background" />
-      <h1 className="header-primary absolute-header">
-        היי {userProfile?.full_name?.split(" ")[0] || ""},
-      </h1>
-      <p className="text-subtitle absolute-subtitle">המרחב כאן בשבילך.</p>
-      <p className="text-small absolute-status">{getStatusMessage()}</p>
+      <div className={styles.pageContainer} dir="rtl">
+        {/* Decorative Circles - using calculated parameters with radius 0.07 */}
+        <OrganicCircles
+          mode="breathing"
+          radius={0.07}
+          layers={shapeParams.layers}
+          smoothness={shapeParams.smoothness}
+          complexity={shapeParams.complexity}
+          elongation={shapeParams.elongation}
+          opacity={shapeParams.opacity}
+          strokeWidth={shapeParams.strokeWidth}
+          position={{ x: 0.5, y: 0.1 }}
+          baseColor="#FFFFFF"
+        />
 
-      <div className="main-content">
-        <section className="section">
-          <h2 className="text-section-title">המפגשים הבאים שלך:</h2>
-          <div className="horizontal-scroll">
-            {registeredActivities.length > 0 ? (
-              registeredActivities.map((act: Activity) => (
-                <div key={act.id} className="glass-card">
-                  <UserActivityCard
-                    {...act}
-                    onMotionChange={handleMotionState}
-                    isGroup={act.is_group || !!act.series_id}
-                  />
-                </div>
+        {/* Main Content */}
+        <div className={styles.mainContent}>
+          {/* Greeting Section */}
+          <div className={styles.greetingSection}>
+            <h1 className={styles.greetingTitle}>היי {firstName},</h1>
+            <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
+          </div>
+
+          {/* Opening Hours Component */}
+          {todayHours ? (
+            <OpenHours startTime={todayHours.open} endTime={todayHours.close} />
+          ) : (
+            <div className={styles.closedMessage}>
+              <p className={styles.closedText}>המרחב סגור היום</p>
+            </div>
+          )}
+
+          {/* Filter Tabs */}
+          <div className={styles.filterContainer}>
+            <HomeFilter
+              options={USER_FILTER_OPTIONS}
+              activeOption={activeFilter}
+              onFilterChange={(id) =>
+                setActiveFilter(id as "recommended" | "yours")
+              }
+            />
+          </div>
+
+          {/* Section Title - without counts */}
+          <h2 className={styles.sectionTitle}>
+            {activeFilter === "recommended"
+              ? "חשבנו שיעניין אותך"
+              : "המפגשים שלך"}
+          </h2>
+
+          {/* Cards Container */}
+          <div className={styles.cardsContainer}>
+            {displayedActivities.length > 0 ? (
+              displayedActivities.map((activity) => (
+                <NewUserActivityCard
+                  key={activity.id}
+                  id={activity.id}
+                  title={activity.title}
+                  instructor={activity.instructor || "מדריך"}
+                  date={activity.date}
+                  startTime={activity.start_time}
+                  onMotionChange={handleMotionState}
+                  isGroup={activity.is_group || !!activity.series_id}
+                />
               ))
+            ) : // Empty State - Different messages based on active filter
+            activeFilter === "yours" ? (
+              <EmptyState
+                message="אין לך מפגשים קרובים"
+                buttonText="הוספת פעילות"
+                buttonHref="/UserScreens/UserCalendarPage"
+              />
             ) : (
               <EmptyState
-                message="נראה שאין לך מפגשים השבוע"
-                buttonText="+ הוספת פעילות"
-                buttonHref="/UserScreens/UserCalendarPage"
+                message="אין פעילויות רלוונטיות עבורך"
+                buttonText="להוספת תחומי עניין"
+                buttonHref="/profile"
               />
             )}
           </div>
-        </section>
-
-        <section className="section">
-          <h2 className="text-section-title">חשבנו שיעניין אותך:</h2>
-          <div className="horizontal-scroll">
-            {allActivities.slice(0, 4).map((act: Activity) => (
-              <div key={act.id} className="glass-card">
-                <UserActivityCard
-                  {...act}
-                  onMotionChange={handleMotionState}
-                  isGroup={act.is_group || !!act.series_id}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

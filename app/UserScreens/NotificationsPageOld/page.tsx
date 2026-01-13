@@ -1,12 +1,10 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiNotifications, supabase } from "@/app/services/db_api";
-import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
-import { HomeFilter } from "@/lib/components/UI/HomeFilter";
+import NotificationCard from "@/lib/components/Notifications/NotificationCard";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import styles from "./NewUserNotificationPage.module.css";
+import styles from "./NotificationsPage.module.css"; // ✅ Import as styles object
 
 type Notification = {
   id: number;
@@ -18,12 +16,7 @@ type Notification = {
   activityId?: string;
 };
 
-const NOTIFICATION_FILTERS = [
-  { id: "all", label: "הכל" },
-  { id: "unread", label: "לא נקרא" },
-];
-
-export default function NewUserNotificationPage() {
+export default function NotificationsPage() {
   const { user } = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
@@ -90,29 +83,29 @@ export default function NewUserNotificationPage() {
     };
   }, [user]);
 
-  const handleMarkAsRead = async (id: number | string) => {
-    const numericId = typeof id === "string" ? parseInt(id) : id;
-
+  const handleMarkAsRead = async (id: number) => {
     // Optimistic update
     setNotifications((prev) =>
-      prev.map((n) => (n.id === numericId ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
 
-    const [_, error] = await apiNotifications.markAsRead(numericId);
+    const [_, error] = await apiNotifications.markAsRead(id);
 
     if (error) {
       console.error("Error marking as read:", error);
       setNotifications((prev) =>
-        prev.map((n) => (n.id === numericId ? { ...n, isRead: false } : n))
+        prev.map((n) => (n.id === id ? { ...n, isRead: false } : n))
       );
       alert("שגיאה בעדכון ההודעה");
     }
   };
 
-  // Handle activity click from notification card
-  const handleActivityClick = (activityId: string) => {
-    setSelectedActivityId(activityId);
-    setIsModalOpen(true);
+  // Handle notification click
+  const handleNotificationClick = (notif: Notification) => {
+    if (notif.activityId) {
+      setSelectedActivityId(notif.activityId);
+      setIsModalOpen(true);
+    }
   };
 
   // Close modal
@@ -128,49 +121,54 @@ export default function NewUserNotificationPage() {
 
   if (!user)
     return (
-      <div className={styles.pageContainer}>
+      <div className="mobile-container">
         <p className="text-loading">אנא התחבר כדי לצפות בהודעות</p>
       </div>
     );
 
   return (
-    <div className={styles.pageContainer}>
+    <div className="mobile-container">
       <div className="vector-background" />
 
-      {/* Centered Title */}
-      <div className={styles.titleContainer}>
-        <h1 className={styles.title}>הודעות ועדכונים</h1>
-      </div>
+      <h1 className="header-secondary absolute-header-right">
+        הודעות ועדכונים
+      </h1>
 
-      {/* Centered Filter */}
-      <div className={styles.filterContainer}>
-        <HomeFilter
-          options={NOTIFICATION_FILTERS}
-          activeOption={filter}
-          onFilterChange={(id) => setFilter(id as "all" | "unread")}
-        />
-      </div>
+      <div className="main-content-high">
+        <div className="filter-container">
+          <button
+            onClick={() => setFilter("all")}
+            className={`filter-button ${
+              filter === "all" ? "filter-button-active" : ""
+            }`}
+          >
+            הכל
+          </button>
+          <button
+            onClick={() => setFilter("unread")}
+            className={`filter-button ${
+              filter === "unread" ? "filter-button-active" : ""
+            }`}
+          >
+            לא נקראו
+          </button>
+        </div>
 
-      {/* Notifications List */}
-      <div className={styles.contentContainer}>
         {loading ? (
           <p className="text-loading">טוען הודעות...</p>
         ) : (
-          <div className={styles.notificationsList}>
+          <div className="vertical-scroll">
             {filteredNotifications.length > 0 ? (
               filteredNotifications.map((notif) => (
-                <div key={notif.id} className={styles.notificationItem}>
-                  <NewNotificationCard
-                    notification={{
-                      id: notif.id,
-                      title: notif.title,
-                      message: notif.message,
-                      timestamp: notif.timestamp,
-                      isRead: notif.isRead,
-                      activityId: notif.activityId,
-                    }}
+                <div
+                  key={notif.id}
+                  className={styles.notificationItem} // ✅ Use styles object for module CSS
+                  style={{ cursor: notif.activityId ? "pointer" : "default" }}
+                  onClick={() => handleNotificationClick(notif)}
+                >
+                  <NotificationCard
+                    notification={notif}
                     onMarkAsRead={handleMarkAsRead}
-                    onActivityClick={handleActivityClick}
                   />
                 </div>
               ))
@@ -181,7 +179,7 @@ export default function NewUserNotificationPage() {
         )}
       </div>
 
-      {/* Activity Details Modal */}
+      {/* Render Modal */}
       {selectedActivityId && (
         <ActivityDetailsModal
           isOpen={isModalOpen}
