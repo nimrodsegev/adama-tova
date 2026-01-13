@@ -182,10 +182,6 @@ const NewUserScheduleActivityCard: React.FC<
           <p className={styles.dateTimeText}>
             {`${dayName} בשעה ${formatTime(startTime)}`}
           </p>
-
-          {waitlistCount > 0 && (
-            <p className={styles.waitlistText}>{waitlistCount} ברשימת המתנה</p>
-          )}
         </div>
 
         {!isAdmin && (
@@ -202,13 +198,15 @@ const NewUserScheduleActivityCard: React.FC<
         )}
       </div>
 
-      {/* Modals remain unchanged... */}
+      {/* MODALS */}
       <ActivityDetailsModal
         activityId={id}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onRegistrationChange={() => checkRegistrationStatus()}
+        onMotionChange={onMotionChange}
       />
+
       <CancelConfirmationModal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
@@ -217,6 +215,7 @@ const NewUserScheduleActivityCard: React.FC<
         activityDate={`${dayName} ${dayMonth}`}
         activityTime={formatTime(startTime)}
       />
+
       {isSuccessModalOpen &&
         (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
           <GroupRegistrationSuccessModal
