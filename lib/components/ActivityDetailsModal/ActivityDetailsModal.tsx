@@ -16,6 +16,7 @@ type ActivityDetailsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onRegistrationChange?: () => void;
+  onMotionChange?: (state: "start" | "end") => void;
 };
 
 export default function ActivityDetailsModal({
@@ -23,6 +24,7 @@ export default function ActivityDetailsModal({
   isOpen,
   onClose,
   onRegistrationChange,
+  onMotionChange,
 }: ActivityDetailsModalProps) {
   const router = useRouter();
   const { user, userProfile } = useUser();
@@ -44,6 +46,7 @@ export default function ActivityDetailsModal({
   const [registrationBackendStatus, setRegistrationBackendStatus] = useState<
     string | null
   >(null);
+  const [hideDetailsModal, setHideDetailsModal] = useState(false);
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -111,18 +114,21 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // USER: Handle registration toggle with modals
   const handleRegistrationToggle = async () => {
     if (!user || loading || isAdmin) return;
 
-    // If already registered, show cancel confirmation modal
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
       return;
     }
 
-    // If not registered, proceed with registration
+    // Hide details modal but keep it mounted
+    setHideDetailsModal(true);
+
+    // Start motion overlay
+    onMotionChange?.("start");
     setLoading(true);
+
     try {
       const [res] = await apiRegistrations.registerUserToActivity(
         user.id,
@@ -135,20 +141,32 @@ export default function ActivityDetailsModal({
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        // Show success modal
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setIsSuccessModalOpen(true);
+      } else {
+        setHideDetailsModal(false);
+        onMotionChange?.("end");
       }
     } catch (error) {
       console.error("Registration error:", error);
+      setHideDetailsModal(false);
+      onMotionChange?.("end");
     } finally {
       setLoading(false);
     }
   };
 
-  // USER: Handle cancel confirmation
   const handleCancelConfirm = async () => {
     if (!user || loading) return;
 
+    // Close cancel modal
+    setIsCancelModalOpen(false);
+
+    // Close details modal
+    onClose();
+
+    // Start motion overlay
+    onMotionChange?.("start");
     setLoading(true);
 
     try {
@@ -160,57 +178,63 @@ export default function ActivityDetailsModal({
         setRegStatus("none");
         setWaitlistPosition(null);
 
-        // Close all modals
-        setIsCancelModalOpen(false);
-        onClose();
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        onMotionChange?.("end");
 
-        // Refresh home page
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        onRegistrationChange?.();
+        // Refresh data after a delay
+        setTimeout(() => {
+          onRegistrationChange?.();
+        }, 300);
+      } else {
+        onMotionChange?.("end");
       }
     } catch (error) {
       console.error("Unregistration error:", error);
+      onMotionChange?.("end");
     } finally {
       setLoading(false);
     }
   };
 
-  // USER: Handle success modal close - close details modal and refresh
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
+
+    // Close the details modal now
     onClose();
 
-    // Refresh home page
+    // Start motion overlay again
+    onMotionChange?.("start");
     setTimeout(() => {
-      onRegistrationChange?.();
-    }, 300);
+      onMotionChange?.("end");
+      // Refresh data after motion ends
+      setTimeout(() => {
+        onRegistrationChange?.();
+      }, 300);
+    }, 750);
   };
 
-  // ADMIN: Handle edit
   const handleEdit = () => {
-    onClose(); // Close modal first
+    onClose();
     router.push(`/AdminScreens/EditActivityPage?id=${activityId}`);
   };
 
-  // ADMIN: Handle delete
   const handleDelete = async () => {
     if (!confirm(t("האם את/ה בטוח/ה שברצונך למחוק פעילות זו?"))) return;
-
     setLoading(true);
     const [_, error] = await apiActivities.delete(activityId);
-
     if (error) {
       alert("שגיאה במחיקה: " + error);
       setLoading(false);
     } else {
       alert("הפעילות נמחקה בהצלחה");
       onClose();
-      onRegistrationChange?.(); // Refresh parent data
+      onRegistrationChange?.();
     }
   };
 
   if (!isOpen || !mounted) return null;
 
+  // -- Formatting Data --
   const formattedTime = activity?.start_time?.slice(0, 5) || "";
   const dateObj = activity?.date ? new Date(activity.date) : null;
   const dayName = dateObj
@@ -224,139 +248,153 @@ export default function ActivityDetailsModal({
         .padStart(2, "0")}`
     : "";
 
-  const progressPercentage =
-    registrationCount.total > 0
-      ? (registrationCount.confirmed / registrationCount.total) * 100
-      : 0;
-
   const isGroup = activity?.is_group || !!activity?.series_id;
+  const instructor = activity?.instructor || "";
+  const location = activity?.location || "";
+  const branch = activity?.branch || "המרכז";
+  const description = activity?.description || "";
+
+  // Calculate remaining spots
+  const remainingSpots = Math.max(
+    0,
+    registrationCount.total - registrationCount.confirmed
+  );
+
+  // -----------------------------------------------------------
+  // CONTROL HEIGHT HERE
+  // If no image, we add a larger top margin (e.g., 20vh)
+  // -----------------------------------------------------------
+  const hasImage = !!activity?.image_url;
+  const contentFrameStyle = {
+    marginTop: hasImage ? "5rem" : "20vh",
+  };
 
   const modalContent = (
     <>
-      {/* Overlay backdrop */}
-      <div className={styles.overlay} onClick={onClose} />
+      {!hideDetailsModal && (
+        <>
+          <div className={styles.overlay} onClick={onClose} />
 
-      {/* Modal container */}
-      <div className={styles.modalContainer}>
-        {/* Close button */}
-        <button className={styles.closeButton} onClick={onClose}>
-          <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
-            <line
-              x1="2"
-              y1="2"
-              x2="18"
-              y2="18"
-              stroke="#F9F9F9"
-              strokeWidth="1"
-            />
-            <line
-              x1="18"
-              y1="2"
-              x2="2"
-              y2="18"
-              stroke="#F9F9F9"
-              strokeWidth="1"
-            />
-          </svg>
-        </button>
+          <div className={styles.modalContainer}>
+            <button className={styles.closeButton} onClick={onClose}>
+              <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
+                <line
+                  x1="2"
+                  y1="2"
+                  x2="18"
+                  y2="18"
+                  stroke="#F9F9F9"
+                  strokeWidth="1"
+                />
+                <line
+                  x1="18"
+                  y1="2"
+                  x2="2"
+                  y2="18"
+                  stroke="#F9F9F9"
+                  strokeWidth="1"
+                />
+              </svg>
+            </button>
 
-        <div className={styles.contentFrame}>
-          {loading ? (
-            <p className={styles.loadingText}>טוען...</p>
-          ) : (
-            <>
-              {/* Image */}
-              {activity?.image_url && (
-                <div className={styles.imageContainer}>
-                  <img
-                    src={activity.image_url}
-                    alt={activity.title}
-                    className={styles.activityImage}
-                  />
-                </div>
-              )}
+            <div className={styles.contentFrame} style={contentFrameStyle}>
+              {loading ? (
+                <p className={styles.loadingText}>טוען...</p>
+              ) : (
+                <>
+                  {/* 1. Image */}
+                  {hasImage && (
+                    <div className={styles.imageContainer}>
+                      <img
+                        src={activity.image_url}
+                        alt={activity.title}
+                        className={styles.activityImage}
+                      />
+                    </div>
+                  )}
 
-              {/* Title */}
-              <h2 className={styles.titleText}>{activity?.title || ""}</h2>
+                  {/* 2. Title */}
+                  <h2 className={styles.titleText}>{activity?.title || ""}</h2>
 
-              {/* Date/Time/Location */}
-              <div className={styles.dateInfoFrame}>
-                <p className={styles.dateText}>
-                  יום {dayName} {dayMonth} בשעה {formattedTime}
-                  <br />
-                  {activity?.location || ""}
-                  <br />
-                  {activity?.instructor || ""}
-                </p>
-              </div>
+                  {/* Details Container - All Right Aligned */}
+                  <div className={styles.detailsContainer}>
+                    {/* 3. Day + Date + Time */}
+                    <div className={styles.textBlock}>
+                      <p className={styles.primaryInfoText}>
+                        {dayName} {dayMonth}
+                      </p>
+                      <p className={styles.primaryInfoText}>
+                        בשעה {formattedTime}
+                      </p>
+                    </div>
 
-              {/* Description */}
-              <div className={styles.descriptionFrame}>
-                <p className={styles.descriptionText}>
-                  {activity?.description || ""}
-                </p>
-              </div>
+                    {/* 4. Branch + Location + Instructor */}
+                    <div className={styles.textBlock}>
+                      <p className={styles.secondaryInfoText}>
+                        בסניף {branch} ב{location}
+                      </p>
+                      <p className={styles.secondaryInfoText}>
+                        בהנחיית {instructor}
+                      </p>
+                    </div>
 
-              {/* Bottom bar */}
-              <div className={styles.bottomBar}>
-                {/* Capacity info - RIGHT SIDE in RTL */}
-                <div className={styles.capacityFrame}>
-                  <p className={styles.capacityText}>
-                    {registrationCount.confirmed}/{registrationCount.total}
-                    {registrationCount.waitlist > 0 &&
-                      ` (${registrationCount.waitlist} בהמתנה)`}
-                  </p>
+                    {/* 5. Participants + Remaining Spots Logic */}
+                    <div className={styles.textBlock}>
+                      <p className={styles.secondaryInfoText}>
+                        משתתפים: {registrationCount.confirmed}/
+                        {registrationCount.total}{" "}
+                        {remainingSpots === 0
+                          ? "(לא נותרו מקומות)"
+                          : `(נותרו ${remainingSpots} מקומות)`}
+                        {regStatus === "waitlist" &&
+                          waitlistPosition &&
+                          ` (מיקומך: ${waitlistPosition})`}
+                      </p>
+                    </div>
 
-                  <div className={styles.progressBarContainer}>
-                    <div className={styles.progressBarBackground} />
-                    <div
-                      className={styles.progressBarFill}
-                      style={{ width: `${progressPercentage}%` }}
-                    />
+                    {/* 6. Description (Small text) */}
+                    <div className={styles.descriptionBlock}>
+                      <p className={styles.descriptionText}>{description}</p>
+                    </div>
                   </div>
 
-                  {/* Show waitlist position if user is on waitlist */}
-                  {regStatus === "waitlist" && waitlistPosition && (
-                    <p className={styles.waitlistPosition}>
-                      {t("[את|אתה]")} במקום {waitlistPosition} ברשימת ההמתנה
-                    </p>
-                  )}
-                </div>
-
-                {/* Action buttons - LEFT SIDE in RTL */}
-                <div className={styles.actionButtonsContainer}>
-                  {isAdmin ? (
-                    // ADMIN: Edit + Delete buttons
-                    <>
-                      <Button size="L" onClick={handleEdit} disabled={loading}>
-                        {t("[ערוך|ערכי]")}
-                      </Button>
+                  {/* 7. Bottom Buttons (Centered) */}
+                  <div className={styles.buttonContainer}>
+                    {isAdmin ? (
+                      <>
+                        <Button
+                          size="L"
+                          onClick={handleEdit}
+                          disabled={loading}
+                        >
+                          {t("[ערוך|ערכי]")}
+                        </Button>
+                        <Button
+                          size="L"
+                          variant="secondary"
+                          onClick={handleDelete}
+                          disabled={loading}
+                        >
+                          {loading ? "מוחק..." : t("מחק/י")}
+                        </Button>
+                      </>
+                    ) : (
                       <Button
                         size="L"
-                        onClick={handleDelete}
+                        onClick={handleRegistrationToggle}
                         disabled={loading}
                       >
-                        {loading ? "מוחק..." : t("מחק/י")}
+                        {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
                       </Button>
-                    </>
-                  ) : (
-                    // USER: Register button
-                    <Button
-                      size="L"
-                      onClick={handleRegistrationToggle}
-                      disabled={loading}
-                    >
-                      {regStatus === "none" ? "הרשמה" : "ביטול"}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
-      {/* Cancel Confirmation Modal */}
       {isCancelModalOpen && (
         <CancelConfirmationModal
           isOpen={isCancelModalOpen}
@@ -368,9 +406,7 @@ export default function ActivityDetailsModal({
         />
       )}
 
-      {/* Success Modal */}
       {isSuccessModalOpen &&
-        // Group with space AND pending approval (not waitlist)
         (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
@@ -380,7 +416,6 @@ export default function ActivityDetailsModal({
             startTime={formattedTime}
           />
         ) : (
-          // Waitlist or regular confirmed
           <RegistrationSuccessModal
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}

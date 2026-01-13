@@ -1,6 +1,6 @@
 /* ActivityDetailsModal.module.css */
 
-/* Overlay backdrop - TRANSPARENT */
+/* Overlay backdrop */
 .overlay {
   position: fixed;
   top: 0;
@@ -10,25 +10,22 @@
   width: 100vw;
   height: 100vh;
   background-color: transparent;
-  z-index: 999;
+  z-index: 1199;
   animation: fadeIn 0.2s ease-in-out;
 }
 
-/* Modal container - FULL SCREEN COVERING NAVBAR */
+/* Modal container */
 .modalContainer {
   position: fixed;
   top: 0;
-  bottom: 0; /* Changed from 3.8125rem to 0 to cover navbar */
+  bottom: 0;
   left: 0;
   right: 0;
-
   width: 100%;
   max-width: 100vw;
-  height: 100dvh; /* explicit full viewport height */
-
+  height: 100dvh;
   background: var(--color-background);
-  z-index: 1200; /* Increased to ensure it sits above the navbar (usually 900-1100) */
-
+  z-index: 1200;
   overflow-y: auto;
   overflow-x: hidden;
   animation: slideUp 0.3s ease-out;
@@ -36,9 +33,6 @@
   margin: 0 auto;
 }
 
-/* ... Rest of the file remains exactly the same ... */
-
-/* Close button (top right) */
 .closeButton {
   position: absolute;
   width: 2.75rem;
@@ -70,17 +64,18 @@
 .contentFrame {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  /* CHANGED: flex-start in RTL Column means Right Aligned */
+  align-items: flex-start;
   padding: 0 var(--spacing-xl);
   padding-bottom: 2rem;
-  gap: var(--spacing-2xl);
+  gap: var(--spacing-md);
   width: 100%;
   max-width: var(--container-max-width);
   margin: 0 auto;
-  margin-top: 5rem;
+  /* Margin top is now controlled via inline style in TSX */
+  text-align: right;
 }
 
-/* Loading text - RTL aligned */
 .loadingText {
   text-align: center;
   padding: 3rem;
@@ -88,21 +83,21 @@
   font-size: var(--font-size-base);
   font-family: var(--font-secondary);
   width: 100%;
-  direction: rtl;
 }
 
 /* Image container */
 .imageContainer {
   width: 100%;
   height: 12rem;
-  margin-bottom: 0;
+  margin-bottom: var(--spacing-sm);
   border-radius: 0.75rem;
   overflow: hidden;
   border: 0.1rem solid var(--color-text-secondary);
   flex: none;
+  /* Ensure image container is treated as a block that fills width */
+  align-self: stretch;
 }
 
-/* Activity image */
 .activityImage {
   width: 100%;
   height: 100%;
@@ -114,145 +109,90 @@
 .titleText {
   width: 100%;
   font-family: var(--font-primary);
-  font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
   line-height: var(--line-height-tight);
-  letter-spacing: 0;
-  text-align: right;
   color: var(--color-text-primary);
   margin: 0;
+  margin-bottom: var(--spacing-lg);
+  text-align: right;
 }
 
-/* Date/Time/Location info frame */
-.dateInfoFrame {
+/* Details Container */
+.detailsContainer {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  /* CHANGED: flex-start aligns to the Right in RTL */
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Individual text blocks */
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  /* CHANGED: flex-start aligns to the Right in RTL */
+  align-items: flex-start;
+  gap: 0.25rem;
   width: 100%;
 }
 
-/* Date text */
-.dateText {
-  width: 100%;
-  font-family: var(--font-primary);
-  font-style: normal;
+.primaryInfoText {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-xs);
-  line-height: var(--font-size-base);
-  letter-spacing: 0;
-  text-align: right;
   color: var(--color-text-primary);
   margin: 0;
-}
-
-/* Description frame */
-.descriptionFrame {
-  width: 100%;
-  max-height: 20rem;
-  overflow-y: auto;
-}
-
-/* Description text */
-.descriptionText {
-  width: 100%;
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
-  line-height: 1.2125rem;
-  letter-spacing: 0;
+  line-height: 1.2;
   text-align: right;
+}
+
+.secondaryInfoText {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-normal);
   color: var(--color-text-secondary);
   margin: 0;
-}
-
-/* Bottom bar */
-.bottomBar {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  gap: var(--spacing-2xl);
-  margin-top: 0.75rem;
-}
-
-/* Capacity frame (text + progress bar) - RIGHT SIDE */
-.capacityFrame {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
-  gap: 0.375rem;
-  margin-bottom: var(--spacing-sm);
-}
-
-/* Capacity text (10/10) */
-.capacityText {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
-  line-height: 1.1875rem;
+  line-height: 1.2;
   text-align: right;
-  color: var(--color-text-secondary);
-  margin: 0;
-  align-self: flex-start;
 }
 
-/* Progress bar container */
-.progressBarContainer {
-  width: 5rem;
-  height: 0.375rem;
-  position: relative;
-  flex: none;
-  align-self: flex-start;
-}
-
-/* Progress bar background - Light border only */
-.progressBarBackground {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  width: 100%;
-  height: 0.375rem;
-  border: 0.1875rem solid rgba(255, 255, 255, 0.4);
-  border-radius: 0.1875rem;
-  background-color: transparent;
-}
-
-/* Progress bar fill - Darker border */
-.progressBarFill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 0.375rem;
-  border: 0.1875rem solid #681f02;
-  border-radius: 0.1875rem;
-  background-color: transparent;
-  transition: width var(--transition-slow);
-}
-
-/* Waitlist position text */
-.waitlistPosition {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+/* Description Block */
+.descriptionBlock {
   margin-top: var(--spacing-sm);
-  opacity: 0.9;
+  max-height: 12rem;
+  overflow-y: auto;
+  width: 100%;
 }
 
-/* Action buttons container - LEFT SIDE */
-.actionButtonsContainer {
+/* Description Text */
+.descriptionText {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  text-align: right;
+}
+
+/* Button Container */
+.buttonContainer {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-sm);
+  justify-content: center;
   align-items: center;
-  justify-content: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+  margin-top: auto;
+  padding-top: var(--spacing-md);
+  /* Override parent alignment to center buttons */
+  align-self: center;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;

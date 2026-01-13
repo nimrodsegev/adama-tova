@@ -155,7 +155,7 @@ export default function NewUserCalendarPage() {
         >
           <OrganicCircles
             mode="breathing"
-            radius={0.25}
+            radius={0.3}
             {...shapeParams}
             baseColor="#FFFFFF"
             position={{ x: 0.5, y: 0.5 }}
