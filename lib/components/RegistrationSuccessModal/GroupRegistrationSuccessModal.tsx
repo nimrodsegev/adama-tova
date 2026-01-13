@@ -1,8 +1,11 @@
 "use client";
 import { createPortal } from "react-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useUser } from "@/app/contexts/UserContext";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 // We can reuse the same styles if they work for you, or create a new CSS module
-import styles from "./RegistrationSuccessModal.module.css"; 
+import styles from "./RegistrationSuccessModal.module.css";
 
 type GroupRegistrationSuccessModalProps = {
   isOpen: boolean;
@@ -20,6 +23,12 @@ export default function GroupRegistrationSuccessModal({
   startTime,
 }: GroupRegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { userProfile } = useUser();
+
+  // Calculate shape parameters based on user profile
+  const shapeParams = useMemo(() => {
+    return calculateShapeParams(userProfile);
+  }, [userProfile]);
 
   useEffect(() => {
     setMounted(true);
@@ -46,36 +55,54 @@ export default function GroupRegistrationSuccessModal({
 
       {/* Modal container */}
       <div className={styles.modalContainer}>
+        {/* Organic Circles in the background with calculated parameters */}
+        <OrganicCircles
+          mode="breathing"
+          radius={0.25}
+          layers={shapeParams.layers}
+          smoothness={shapeParams.smoothness}
+          complexity={shapeParams.complexity}
+          elongation={shapeParams.elongation}
+          opacity={shapeParams.opacity}
+          strokeWidth={shapeParams.strokeWidth}
+          position={{ x: 0.5, y: 0.5 }}
+          baseColor="#FFFFFF"
+        />
+
         {/* Close button */}
         <button className={styles.closeButton} onClick={onClose}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <line x1="2" y1="2" x2="18" y2="18" stroke="#F9F9F9" strokeWidth="2" />
-            <line x1="18" y1="2" x2="2" y2="18" stroke="#F9F9F9" strokeWidth="2" />
+            <line
+              x1="2"
+              y1="2"
+              x2="18"
+              y2="18"
+              stroke="#F9F9F9"
+              strokeWidth="2"
+            />
+            <line
+              x1="18"
+              y1="2"
+              x2="2"
+              y2="18"
+              stroke="#F9F9F9"
+              strokeWidth="2"
+            />
           </svg>
         </button>
 
         {/* Content Frame */}
         <div className={styles.contentFrame}>
-          {/* Icon Container - You might want a different icon for "Pending" */}
-          <div className={styles.iconContainer}>
-            {/* Using a clock or hourglass icon fits the "Pending" theme better */}
-            <span style={{ fontSize: '3rem', display: 'block' }}>⏳</span>
-          </div>
-
           {/* Pending Approval Message */}
-          <p className={styles.messageText} style={{ direction: 'rtl' }}>
-            <strong>בקשתך להצטרף לקבוצה נשלחה!</strong>
+          <p className={styles.messageText} style={{ direction: "rtl" }}>
+            קיבלנו את בקשתך להצטרף
+            <br />
+            ל״{activityTitle}״
+            <br />
+            בתאריך {startDate} בשעה {startTime}
             <br />
             <br />
-            ביקשת להצטרף לקבוצת <strong>{activityTitle}</strong>
-            <br />
-            שתתחיל בתאריך {startDate} בשעה {startTime}
-            <br />
-            <br />
-            <span style={{ fontSize: '0.9em', opacity: 0.85, display: 'block' }}>
-              הבקשה הועברה לאישור המנהל.<br/>
-              תקבל/י הודעה ברגע שהסטטוס יתעדכן.
-            </span>
+            נעדכן אותך בקרוב
           </p>
         </div>
       </div>
