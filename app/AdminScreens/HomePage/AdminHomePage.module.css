@@ -142,6 +142,8 @@
   justify-content: space-between;
   align-items: center;
   padding-left: 0.5rem; /* 8px */
+  margin-right: -1rem; /* moved to the right */
+  margin-left: 1rem;
   gap: 0.25rem; /* 4px - closer to text */
 }
 
