@@ -58,7 +58,7 @@ export default function GroupRegistrationSuccessModal({
         {/* Organic Circles in the background with calculated parameters */}
         <OrganicCircles
           mode="breathing"
-          radius={0.25}
+          radius={0.3}
           layers={shapeParams.layers}
           smoothness={shapeParams.smoothness}
           complexity={shapeParams.complexity}
