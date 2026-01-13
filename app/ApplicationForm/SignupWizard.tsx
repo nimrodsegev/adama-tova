@@ -442,7 +442,11 @@ export default function SignupWizard({
             <div className={styles.stepContainer}>
               <div className={styles.inputsContainer}>
                 <div className={styles.inputWrapper}>
-                  <span className={styles.inputLabel}>שם מלא</span>
+                  {nameError ? (
+                    <span className={styles.fieldError}>{nameError}</span>
+                  ) : (
+                    <span className={styles.inputLabel}>שם מלא</span>
+                  )}
                   <input
                     type="text"
                     value={fullName}
@@ -455,13 +459,14 @@ export default function SignupWizard({
                     }`}
                     dir="rtl"
                   />
-                  {nameError && (
-                    <span className={styles.fieldError}>{nameError}</span>
-                  )}
                 </div>
 
                 <div className={styles.inputWrapper}>
-                  <span className={styles.inputLabel}>מספר טלפון</span>
+                  {phoneError ? (
+                    <span className={styles.fieldError}>{phoneError}</span>
+                  ) : (
+                    <span className={styles.inputLabel}>מספר טלפון</span>
+                  )}
                   <input
                     type="tel"
                     value={phone}
@@ -474,9 +479,6 @@ export default function SignupWizard({
                     }`}
                     dir="rtl"
                   />
-                  {phoneError && (
-                    <span className={styles.fieldError}>{phoneError}</span>
-                  )}
                 </div>
 
                 <div className={styles.genderSelector}>

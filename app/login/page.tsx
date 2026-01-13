@@ -223,7 +223,11 @@ export default function LoginPage() {
             <div className={styles.loginContent}>
               {/* Input Wrapper - Email (first) */}
               <div className={styles.inputWrapper}>
-                <span className={styles.inputLabel}>אימייל</span>
+                {emailError ? (
+                  <span className={styles.fieldError}>{emailError}</span>
+                ) : (
+                  <span className={styles.inputLabel}>אימייל</span>
+                )}
                 <input
                   type="email"
                   value={email}
@@ -237,14 +241,15 @@ export default function LoginPage() {
                   }`}
                   dir="ltr"
                 />
-                {emailError && (
-                  <span className={styles.fieldError}>{emailError}</span>
-                )}
               </div>
 
               {/* Input Wrapper - Password (second) */}
               <div className={styles.inputWrapper}>
-                <span className={styles.inputLabel}>סיסמה</span>
+                {passwordError ? (
+                  <span className={styles.fieldError}>{passwordError}</span>
+                ) : (
+                  <span className={styles.inputLabel}>סיסמה</span>
+                )}
                 <input
                   type="password"
                   value={password}
@@ -258,9 +263,6 @@ export default function LoginPage() {
                   }`}
                   dir="rtl"
                 />
-                {passwordError && (
-                  <span className={styles.fieldError}>{passwordError}</span>
-                )}
               </div>
 
               {/* Action Buttons - New order per Image 1 */}
