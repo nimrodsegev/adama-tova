@@ -10,7 +10,7 @@ import {
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import {
   HomeFilter,
-  ADMIN_FILTER_OPTIONS,
+  FilterOption,
 } from "@/lib/components/UI/HomeFilter";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
@@ -396,26 +396,19 @@ export default function AdminHomePage() {
           </div>
         </button>
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs with counts */}
         <div className={styles.filterContainer}>
           <HomeFilter
-            options={ADMIN_FILTER_OPTIONS}
+            options={[
+              { id: "pending", label: "ממתינים לאישור", count: pendingUsers.length + pendingGroupRegs.length },
+              { id: "approved", label: "המפגשים הבאים", count: upcomingActivities.length },
+            ] as FilterOption[]}
             activeOption={activeFilter}
             onFilterChange={(id) =>
               setActiveFilter(id as "pending" | "approved")
             }
-            // Removed 'size' prop as it's no longer part of the interface
           />
         </div>
-
-        {/* Section Title */}
-        <h2 className={styles.sectionTitle}>
-          {activeFilter === "pending"
-            ? `ממתינים לאישור (${
-                pendingUsers.length + pendingGroupRegs.length
-              })`
-            : `המפגשים הבאים (${upcomingActivities.length})`}
-        </h2>
 
         {/* Cards Container */}
         <div className={styles.cardsContainer}>
@@ -602,8 +595,13 @@ export default function AdminHomePage() {
         </div>
       </div>
 
-      {/* Bottom Buttons */}
-      <div className={styles.bottomButtons}>
+      {/* Bottom Buttons - gradient only shows when 3+ cards */}
+      <div className={`${styles.bottomButtons} ${
+        (activeFilter === "pending" && pendingUsers.length + pendingGroupRegs.length >= 3) ||
+        (activeFilter === "approved" && upcomingActivities.length >= 3)
+          ? styles.showGradient
+          : ""
+      }`}>
         {/* Changed size="M" to size="L" to match ButtonProps interface */}
         <Button size="L" href="/AdminScreens/addNotification">
           להוספת הודעה
