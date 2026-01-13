@@ -190,7 +190,6 @@ export default function NewUserCalendarPage() {
 
           <div className={styles.filterSection}>
             <HomeFilter
-              size="small"
               options={CALENDAR_FILTERS}
               activeOption={filter}
               onFilterChange={(newId) => setFilter(newId)}

@@ -366,7 +366,7 @@ export default function UserManagementPage() {
         {/* ADD ADMIN LINK */}
         <div className={styles.linkButton}>
           {!isGroupsTab && (
-            <Button size="M" href="/AdminScreens/AddAdminPage">
+            <Button size="L" href="/AdminScreens/AddAdminPage">
               + הוספת אדמין
             </Button>
           )}

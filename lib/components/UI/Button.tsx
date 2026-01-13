@@ -14,8 +14,17 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | "popup-primary"
     | "popup-secondary"
     | "whatsapp"
-    | "waiting-list";
-  size?: "S" | "M" | "L";
+    | "waiting-list"
+    | "custom"
+    | "login"; // <--- Added "login"
+
+  size?: "L" | "L-short";
+  icon?: React.ReactNode;
+
+  customBgColor?: string;
+  customTextColor?: string;
+  customBorderColor?: string;
+
   colorType?: "orange" | "delete" | "white";
   children: React.ReactNode;
   href?: string;
@@ -23,34 +32,47 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = ({
   variant = "primary",
-  size = "M",
+  size = "L",
   colorType = "orange",
+  icon,
+  customBgColor,
+  customTextColor,
+  customBorderColor,
   children,
   className,
   href,
+  style,
   ...props
 }) => {
   const isTertiary = variant === "tertiary";
-  const isFixedSize = [
-    "approve",
-    "reject",
-    "popup-primary",
-    "popup-secondary",
+
+  // Login is now a "special" variant that ignores standard sizing
+  const isSpecialVariant = [
     "whatsapp",
     "waiting-list",
+    "login", // <--- Added here to prevent "sizeL" class from conflicting
   ].includes(variant);
+
+  const dynamicStyles: React.CSSProperties = {
+    ...style,
+    ...(customBgColor && { backgroundColor: customBgColor }),
+    ...(customTextColor && { color: customTextColor }),
+    ...(customBorderColor && { border: `1px solid ${customBorderColor}` }),
+  };
 
   const buttonClasses = [
     styles.base,
     styles[variant],
-    !isTertiary && !isFixedSize ? styles[`size${size}`] : null,
+    !isTertiary && !isSpecialVariant
+      ? styles[`size${size.replace("-", "")}`]
+      : null,
     isTertiary ? styles[colorType] : null,
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
-  const renderIcon = () => {
+  const renderVariantIcon = () => {
     if (variant === "whatsapp") return <div className={styles.whatsappIcon} />;
     if (variant === "waiting-list") {
       return (
@@ -73,8 +95,9 @@ const Button: React.FC<ButtonProps> = ({
 
   const content = (
     <>
+      {icon && <span className={styles.startIcon}>{icon}</span>}
       <span className={styles.label}>{children}</span>
-      {renderIcon()}
+      {renderVariantIcon()}
     </>
   );
 
@@ -83,7 +106,7 @@ const Button: React.FC<ButtonProps> = ({
       <Link
         href={href}
         className={buttonClasses}
-        style={{ textDecoration: "none" }}
+        style={{ textDecoration: "none", ...dynamicStyles }}
       >
         {content}
       </Link>
@@ -91,7 +114,12 @@ const Button: React.FC<ButtonProps> = ({
   }
 
   return (
-    <button className={buttonClasses} {...props}>
+    <button
+      className={buttonClasses}
+      style={dynamicStyles}
+      type="button"
+      {...props}
+    >
       {content}
     </button>
   );

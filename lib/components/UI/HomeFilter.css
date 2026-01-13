@@ -1,232 +1,110 @@
 /* ============================================
    HOME FILTER COMPONENT
-   Flexible 2-3 button filter with size control
-   Fully integrated with global.css design system
+   Flexible width, Auto-adjusting
    ============================================ */
 
 .home-filter {
-  /* Container - using global spacing and colors */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-  padding: var(--spacing-sm); /* 8px */
-  gap: var(--spacing-sm); /* 8px */
-
-  /* Width controlled by size variant */
-  width: auto;
-  height: 2.0625rem; /* 33px */
-
-  /* Using terracotta from global design system */
-  background: rgba(104, 31, 2, 0.3);
-  border-radius: var(--radius-xs); /* 5px */
-
-  /* RTL support built-in */
-  direction: rtl;
-}
-
-/* ============================================
-   SIZE VARIANTS - Control container width
-   ============================================ */
-
-/* Small - for short text like "הכל/לא נקרא" */
-.home-filter--small {
-  min-width: 12.5rem; /* 200px */
-  max-width: 15.625rem; /* 250px */
-}
-
-/* Medium - for medium text like "ממתינים לאישור/המפגשים הבאים" */
-.home-filter--medium {
-  min-width: 18.75rem; /* 300px */
-  max-width: 21.875rem; /* 350px */
-}
-
-/* Large - for long text like "חשבנו שיעניין אותך/המפגשים שלך" */
-.home-filter--large {
-  min-width: 20.3125rem; /* 325px */
-  max-width: 24.5rem; /* 392px */
-}
-
-.home-filter__container {
-  /* Filter buttons container - flexible layout */
-  display: flex;
+  /* Layout */
+  display: inline-flex;
   flex-direction: row;
-  align-items: center;
-  padding: 0;
-  gap: var(--spacing-lg); /* 16px */
+  align-items: stretch; /* Ensure buttons fill height */
+  justify-content: flex-start;
 
-  width: 100%;
-  height: 1.5rem; /* 24px */
+  /* Sizing */
+  height: 3.25rem; /* Increased to ~52px to account for larger padding */
+  width: auto;
+  min-width: min-content;
 
-  flex: none;
-  order: 0;
-  flex-grow: 0;
+  /* SPACING (The "Margin" from container edge)
+     We use equal padding and gap to ensure the active button
+     is always equidistant from the edges and other buttons. */
+  padding: 0.375rem; /* 6px padding all around */
+  gap: 0.375rem; /* 6px gap between buttons */
+
+  /* Appearance */
+  background: rgba(104, 31, 2, 0.3);
+  border-radius: var(--radius-sm, 6px); /* Slightly more rounded container */
+
+  /* Interaction */
+  direction: rtl;
+  box-sizing: border-box;
+
+  /* Prevent selection during rapid clicking */
+  user-select: none;
 }
 
 .home-filter__tab {
-  /* Individual filter tab button - auto-sizing based on content */
+  /* Layout */
   display: flex;
-  flex-direction: row;
-  justify-content: center;
   align-items: center;
-  padding: 0.125rem var(--spacing-lg); /* 2px 16px */
-  gap: var(--spacing-sm); /* 8px */
+  justify-content: center;
 
-  height: 1.5rem; /* 24px */
+  /* Sizing */
+  flex: 0 0 auto;
+  height: auto; /* Let flexbox stretch it to fill container height */
 
-  /* Auto-size based on content */
-  flex: 1;
-  min-width: fit-content;
-  white-space: nowrap;
+  /* Text Spacing */
+  padding: 0 1.5rem; /* 24px side padding for wider click area */
 
+  /* Reset Button Styles */
   background: transparent;
   border: none;
-  border-radius: 0.21875rem; /* 3.5px */
+  border-radius: var(--radius-sm, 6px);
   cursor: pointer;
+  white-space: nowrap;
 
-  /* Using global transitions */
-  transition: background-color var(--transition-normal),
-    transform var(--transition-fast);
+  /* Transitions for smooth hover and shrink effect */
+  transition: background-color 0.2s ease,
+    transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.home-filter__tab:hover {
-  background: rgba(104, 31, 2, 0.2);
-  transform: translateY(-0.0625rem); /* 1px */
+/* ============================================
+   INTERACTION STATES
+   ============================================ */
+
+/* 1. Hover State (only if not active) */
+.home-filter__tab:not(.home-filter__tab--active):hover {
+  background: rgba(104, 31, 2, 0.15);
 }
 
-.home-filter__tab:active {
-  transform: translateY(0);
-}
-
+/* 2. Active (Selected) State */
 .home-filter__tab--active {
-  /* Active state - using terracotta color with proper background */
-  background: #681f02 !important;
+  background: #681f02;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 3. PRESS EFFECT ("Shrink") 
+   This shrinks the button (and its background) when actively clicked */
+.home-filter__tab:active {
+  transform: scale(0.96); /* Shrink to 96% size */
+}
+
+/* ============================================
+   TEXT STYLING
+   ============================================ */
+
+.home-filter__label {
+  font-family: var(--font-secondary, sans-serif);
+  font-size: 1.125rem; /* 18px */
+  font-weight: 400;
+  color: var(--color-text-secondary, #f9f9f9);
+  line-height: 1;
+  pointer-events: none; /* Ensures clicks pass through to button */
 }
 
 .home-filter__tab--active .home-filter__label {
-  /* Make active tab text bold */
-  font-weight: var(--font-weight-bold); /* 700 */
-}
-
-.home-filter__label {
-  /* Label text - using global typography system */
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  gap: 0.625rem; /* 10px */
-
-  height: 1.25rem; /* 20px */
-
-  /* Using global font variables */
-  font-family: var(--font-secondary); /* Ezer Shemesh */
-  font-style: normal;
-  font-weight: var(--font-weight-normal); /* 400 */
-  font-size: var(--font-size-lg); /* 18px */
-  line-height: 1.25rem; /* 20px */
-
-  /* Using global text color */
-  color: var(--color-text-secondary); /* #F9F9F9 */
-
-  flex: none;
-  order: 0;
-  flex-grow: 0;
+  font-weight: 700;
 }
 
 /* ============================================
-   BUTTON COUNT SPECIFIC ADJUSTMENTS
+   MOBILE RESPONSIVENESS
    ============================================ */
 
-/* Two buttons - equal width distribution */
-.home-filter[data-button-count="2"] .home-filter__container {
-  justify-content: space-between;
-}
-
-/* Three buttons - equal width distribution */
-.home-filter[data-button-count="3"] .home-filter__container {
-  justify-content: space-between;
-}
-
-.home-filter[data-button-count="3"] .home-filter__tab {
-  /* For 3 buttons, make them slightly more compact */
-  padding: 0.125rem var(--spacing-md); /* 2px 12px */
-}
-
-/* Adjust gap for small size with 3 buttons */
-.home-filter--small[data-button-count="3"] .home-filter__container {
-  gap: var(--spacing-md); /* 12px for tighter spacing */
-}
-
-/* ============================================
-   RESPONSIVE ADJUSTMENTS
-   Using global container max-width
-   ============================================ */
-@media (max-width: 26rem) {
+@media (max-width: 400px) {
   .home-filter {
-    width: 100%;
-    max-width: var(--container-max-width); /* 393px */
-    min-width: auto;
+    /* Allow scrolling on very small screens */
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
-
-  .home-filter--small {
-    max-width: 15.625rem; /* 250px */
-  }
-
-  .home-filter--medium {
-    max-width: 21.875rem; /* 350px */
-  }
-
-  .home-filter--large {
-    max-width: var(--container-max-width); /* 393px */
-  }
-
-  .home-filter__container {
-    width: 100%;
-  }
-
-  .home-filter__tab {
-    font-size: var(--font-size-base); /* 16px on smaller screens */
-  }
-
-  .home-filter__label {
-    font-size: var(--font-size-base); /* 16px on smaller screens */
-  }
-}
-
-/* ============================================
-   ACCESSIBILITY
-   Using global focus patterns
-   ============================================ */
-.home-filter__tab:focus-visible {
-  outline: 0.125rem solid var(--color-text-secondary); /* 2px */
-  outline-offset: 0.125rem; /* 2px */
-}
-
-/* ============================================
-   DISABLED STATE
-   Using global opacity patterns
-   ============================================ */
-.home-filter__tab:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.home-filter__tab:disabled:hover {
-  background: transparent;
-  transform: none;
-}
-
-.home-filter__tab--active:disabled:hover {
-  background: #681f02;
-}
-
-/* ============================================
-   INTEGRATION WITH FILTER SYSTEM
-   Can be used with .filter-container from global.css
-   ============================================ */
-.filter-container .home-filter {
-  /* Fits naturally within global filter containers */
-  flex-shrink: 0;
 }

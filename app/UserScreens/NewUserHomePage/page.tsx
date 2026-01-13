@@ -249,7 +249,6 @@ export default function NewUserHomePage() {
               onFilterChange={(id) =>
                 setActiveFilter(id as "recommended" | "yours")
               }
-              size="large"
             />
           </div>
 

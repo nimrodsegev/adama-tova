@@ -187,7 +187,7 @@ export default function ScheduleActivityCard({
         {/* Register/Unregister Button - RIGHT MOST SIDE */}
         {showRegisterButton && (
           <Button
-            size="S"
+            size="L-short"
             onClick={handleRegistrationToggle}
             disabled={loading}
             style={styles.registerButton}
