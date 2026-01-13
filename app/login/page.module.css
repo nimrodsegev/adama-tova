@@ -400,6 +400,15 @@
 }
 
 /* ============================================
+   RESPONSIVE - Small height screens (iPhone SE, etc.)
+   ============================================ */
+@media (max-height: 670px) {
+  .aboutLink {
+    bottom: 1.5rem; /* 24px - lower on small screens */
+  }
+}
+
+/* ============================================
    RESPONSIVE - Tablet and up
    ============================================ */
 @media (min-width: 48rem) {

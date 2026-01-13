@@ -114,11 +114,11 @@ export default function SignupWizard({
       const height = window.innerHeight;
       // Very small screens (iPhone SE: 667px height, older SE: 568px)
       if (height <= 670) {
-        setCircleRadius(0.07);
-        setCirclePosition({ x: 0.25, y: 0.15 }); // Moved slightly to the left
+        setCircleRadius(0.08);
+        setCirclePosition({ x: 0.22, y: 0.12 }); // More left, smaller
       } else {
-        setCircleRadius(0.11);
-        setCirclePosition({ x: 0.3, y: 0.15 });
+        setCircleRadius(0.10);
+        setCirclePosition({ x: 0.22, y: 0.12 }); // More left, smaller
       }
     };
 
@@ -704,7 +704,7 @@ export default function SignupWizard({
         <div className={styles.scrollSnapSlide}>
           <div className={styles.content}>
             <div className={styles.headerSection}>
-              <p className={styles.optionalSubtitle}>&nbsp;</p>
+              <h2 className={styles.stepTitle}>&nbsp;</h2>
               <p className={styles.optionalSubtitle}>&nbsp;</p>
             </div>
 

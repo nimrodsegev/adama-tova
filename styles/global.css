@@ -750,6 +750,14 @@ body {
   }
 }
 
+/* Close button - higher on small height screens (iPhone SE, etc.) */
+@media (max-height: 670px) {
+  .close-button {
+    top: 1rem;
+    margin-top: 0;
+  }
+}
+
 /* ============================================
    FORM INPUTS (Gradient Background Style)
    ============================================ */

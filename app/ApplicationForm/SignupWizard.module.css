@@ -76,6 +76,7 @@
   max-width: 100%;
   flex: 1;
   position: relative;
+  overflow: visible;
 }
 
 /* ============================================
@@ -136,8 +137,8 @@
   ); /* +10% from 55vw/13.75rem - ~242px max (was 220px) */
   position: relative;
   flex-shrink: 0;
-  margin-top: 5vh;
-  margin-bottom: 4vh;
+  margin-top: 3vh;
+  margin-bottom: 2vh;
   pointer-events: none;
   overflow: visible; /* Allow circles to extend slightly if needed */
   z-index: 1;
@@ -166,7 +167,8 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
-  margin-top: 2.5rem; /* Matches optionsContainer for consistent content start height */
+  margin-top: 1.5rem; /* Matches optionsContainer for consistent content start height */
+  overflow: visible;
 }
 
 .stepContainerLower {
@@ -202,11 +204,13 @@
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+  overflow: visible;
 }
 
 .inputWrapper {
   position: relative;
   width: 100%;
+  overflow: visible;
 }
 
 .input {
@@ -312,6 +316,7 @@
 .genderSelector {
   width: 100%;
   position: relative;
+  z-index: 60;
 }
 
 .genderToggle {
@@ -400,7 +405,7 @@
   border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
-  z-index: 50;
+  z-index: 100;
 }
 
 .genderOption {
@@ -575,7 +580,7 @@
   gap: 1rem; /* 16px - matches Figma */
   width: 19.6875rem; /* 315px */
   max-width: 100%;
-  margin-top: 2.5rem; /* Push options lower */
+  margin-top: 1.5rem; /* Push options lower */
 }
 
 .optionButton {
@@ -920,10 +925,19 @@
    RESPONSIVE - Works on all phone screens
    ============================================ */
 
+/* Medium-small height screens (Galaxy S8+ ~740px) - lift circles more */
+@media (min-height: 700px) and (max-height: 760px) {
+  .decorativeCircles {
+    margin-top: -2.5vh;
+    margin-bottom: -1vh;
+  }
+}
+
 /* Small height screens - reduce spacing and sizes */
 @media (max-height: 700px) {
   .wizardContainer {
     padding-top: 2vh;
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0)); /* More room for dropdowns */
   }
 
   .headerSection {
@@ -956,6 +970,10 @@
   .navigation {
     padding-top: 1.5rem;
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0));
+  }
+
+  .stepContainer {
+    padding-bottom: 8rem; /* Extra space for gender dropdown */
   }
 }
 
@@ -1038,19 +1056,19 @@
    RESPONSIVE - Taller phones (iPhone 12 Pro, etc.)
    ============================================ */
 
-/* Taller screens (800px+) - push form lower */
+/* Taller screens (800px+) */
 @media (min-height: 800px) {
   .wizardContainer {
     padding-top: 3vh;
   }
 
   .decorativeCircles {
-    margin-top: 4vh;
-    margin-bottom: 3vh;
+    margin-top: 3vh;
+    margin-bottom: 2vh;
   }
 
   .stepContainer {
-    margin-top: 1.5rem; /* Match optionsContainer */
+    margin-top: 1.5rem;
   }
 
   .optionsContainer {
@@ -1058,22 +1076,22 @@
   }
 }
 
-/* Very tall screens (900px+) - push form even lower */
+/* Very tall screens (900px+) */
 @media (min-height: 900px) {
   .wizardContainer {
     padding-top: 4vh;
   }
 
   .decorativeCircles {
-    margin-top: 5vh;
+    margin-top: 4vh;
   }
 
   .stepContainer {
-    margin-top: 2rem; /* Match optionsContainer */
+    margin-top: 1.5rem;
   }
 
   .optionsContainer {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
 }
 
@@ -1127,6 +1145,7 @@
 @media (display-mode: standalone) {
   .wizardContainer {
     padding-top: calc(2vh + env(safe-area-inset-top, 0));
+    padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0)); /* More room for dropdowns */
   }
 
   .decorativeCircles {
@@ -1135,7 +1154,9 @@
   }
 
   .stepContainer {
-    margin-top: 1rem; /* Match optionsContainer */
+    margin-top: 1rem;
+    padding-bottom: 10rem; /* Extra space for gender dropdown */
+    overflow: visible;
   }
 
   .optionsContainer {
@@ -1146,8 +1167,16 @@
     margin-top: 1rem;
   }
 
+  .scrollSnapSlide {
+    overflow: visible;
+  }
+
+  .inputsContainer {
+    overflow: visible;
+  }
+
   .navigation {
-    padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0));
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0)); /* Lower dots */
   }
 }
 
@@ -1155,6 +1184,7 @@
 @media (display-mode: standalone) and (min-height: 800px) {
   .wizardContainer {
     padding-top: calc(2vh + env(safe-area-inset-top, 0));
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0));
   }
 
   .decorativeCircles {
@@ -1163,7 +1193,8 @@
   }
 
   .stepContainer {
-    margin-top: 1rem; /* Match optionsContainer */
+    margin-top: 1rem;
+    padding-bottom: 8rem;
   }
 
   .optionsContainer {
