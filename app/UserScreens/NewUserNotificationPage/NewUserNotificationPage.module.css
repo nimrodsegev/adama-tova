@@ -1,0 +1,85 @@
+.pageContainer {
+  width: 100%;
+  max-width: var(--container-max-width);
+  min-height: var(--container-min-height);
+  margin: 0 auto;
+  background: var(--color-background);
+  position: relative;
+  overflow-x: hidden;
+  direction: rtl;
+  padding: var(--spacing-xl); /* 20px */
+  padding-bottom: var(--spacing-5xl); /* 100px - space for nav bar */
+}
+
+/* Centered Title Container */
+.titleContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5rem; /* 91px - same as absolute-header top */
+  margin-bottom: var(--spacing-3xl); /* 24px */
+}
+
+.title {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-3xl); /* 24px */
+  font-weight: var(--font-weight-normal);
+  line-height: 1.8125rem; /* 29px */
+  color: var(--color-text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+/* Centered Filter Container */
+.filterContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--spacing-2xl); /* 24px */
+  width: 100%;
+}
+
+/* Content Container */
+.contentContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Notifications List - Scrollable */
+.notificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md); /* 12px between notifications */
+  max-height: calc(100vh - 250px); /* Adjust based on header + filter height */
+  overflow-y: auto;
+  padding-right: var(--spacing-xs); /* 4px - space for scrollbar */
+
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-glass) transparent;
+}
+
+.notificationsList::-webkit-scrollbar {
+  width: 0.375rem; /* 6px */
+}
+
+.notificationsList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notificationsList::-webkit-scrollbar-thumb {
+  background: var(--color-border-glass);
+  border-radius: var(--radius-sm);
+}
+
+/* Individual Notification Item */
+.notificationItem {
+  width: 100%;
+  transition: transform var(--transition-normal);
+}
+
+/* Optional: Add subtle hover effect */
+.notificationItem:hover {
+  transform: translateX(-2px);
+}
