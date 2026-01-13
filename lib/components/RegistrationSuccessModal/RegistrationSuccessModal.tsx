@@ -1,6 +1,9 @@
 "use client";
 import { createPortal } from "react-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useUser } from "@/app/contexts/UserContext";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./RegistrationSuccessModal.module.css";
 
 type RegistrationSuccessModalProps = {
@@ -25,6 +28,12 @@ export default function RegistrationSuccessModal({
   waitlistPosition = null,
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { userProfile } = useUser();
+
+  // Calculate shape parameters based on user profile
+  const shapeParams = useMemo(() => {
+    return calculateShapeParams(userProfile);
+  }, [userProfile]);
 
   useEffect(() => {
     setMounted(true);
@@ -51,6 +60,20 @@ export default function RegistrationSuccessModal({
 
       {/* Modal container */}
       <div className={styles.modalContainer}>
+        {/* Organic Circles in the background with calculated parameters */}
+        <OrganicCircles
+          mode="breathing"
+          radius={0.25}
+          layers={shapeParams.layers}
+          smoothness={shapeParams.smoothness}
+          complexity={shapeParams.complexity}
+          elongation={shapeParams.elongation}
+          opacity={shapeParams.opacity}
+          strokeWidth={shapeParams.strokeWidth}
+          position={{ x: 0.5, y: 0.5 }}
+          baseColor="#FFFFFF"
+        />
+
         {/* Close button */}
         <button className={styles.closeButton} onClick={onClose}>
           <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
@@ -75,15 +98,6 @@ export default function RegistrationSuccessModal({
 
         {/* Content Frame */}
         <div className={styles.contentFrame}>
-          {/* Icon Container */}
-          <div className={styles.iconContainer}>
-            <img
-              src="/icons/successful_registration_icon.svg"
-              alt={isWaitlist ? "Waitlist" : "Success"}
-              className={styles.successIcon}
-            />
-          </div>
-
           {/* Success message text - TWO LINES */}
           <p className={styles.messageText}>
             {isWaitlist ? (
