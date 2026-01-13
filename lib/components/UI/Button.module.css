@@ -1,68 +1,92 @@
+/* ============================================
+   BASE STYLES
+   ============================================ */
 .base {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+  /* Layout: This forces the button to wrap the text tightly */
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem; /* 8px */
+  justify-content: center;
+
+  /* Sizing: Crucial settings for "Hug Contents" */
+  width: fit-content; /* Only as wide as the text + padding */
+  min-width: 0; /* Remove intrinsic minimums */
+  max-width: 100%; /* Prevent overflow */
+  flex: 0 0 auto; /* Prevent flex parents from stretching/shrinking it */
+
+  /* Spacing */
+  gap: var(--spacing-sm); /* 8px */
+  margin: 0;
+
+  /* Typography & Appearance */
   border: none;
   cursor: pointer;
   font-family: var(--font-secondary);
-  transition: all var(--transition-normal);
-  direction: rtl;
   text-decoration: none;
+  white-space: nowrap; /* Keep text on one line */
+  direction: rtl;
+
+  /* Animation */
+  transition: all var(--transition-normal);
+
+  /* Box Model */
+  box-sizing: border-box;
 }
 
 .base:active {
   transform: scale(0.96);
 }
 
-/* --- PURPLE VARIANTS --- */
+/* ============================================
+   COLOR VARIANTS
+   ============================================ */
 .primary {
-  background: #b37eb3;
-  color: #f9f9f9;
+  background: var(--color-purple);
+  color: var(--color-text-secondary);
 }
+
 .secondary {
-  box-sizing: border-box;
-  background: rgba(247, 247, 247, 0.9);
-  border: 0.0625rem solid #b37eb3; /* 1px */
-  color: #b37eb3;
+  background: var(--button-bg-light);
+  border: 0.0625rem solid var(--color-purple);
+  color: var(--color-purple);
 }
 
+/* ============================================
+   SIZE VARIANTS (Controlled purely by padding)
+   ============================================ */
+
+/* L size: 44px height */
 .sizeL {
-  min-width: 4.375rem; /* 70px */
-  height: 2.25rem; /* 36px */
-  padding: 0.5rem 1rem; /* 8px 16px */
-  border-radius: 0.3125rem; /* 5px */
-  font-size: 1.125rem; /* 18px */
-}
-.sizeM {
-  min-width: 3.875rem; /* 62px */
-  height: 1.75rem; /* 28px */
-  padding: 0.25rem 1rem; /* 4px 16px */
-  border-radius: 0.25rem; /* 4px */
-  font-size: 1.125rem; /* 18px */
-}
-.sizeS {
-  min-width: 4.8125rem; /* 77px */
-  height: 1.5rem; /* 24px */
-  padding: 0.125rem 1rem; /* 2px 16px */
-  border-radius: 0.21875rem; /* 3.5px */
-  font-size: 1.125rem; /* 18px */
+  height: 2.75rem; /* 44px */
+  /* Side padding defines the breathing room, width is automatic */
+  padding: 0 1.5rem; /* 24px */
+  border-radius: 0.3125rem;
+  font-size: var(--font-size-lg);
 }
 
-/* --- TERTIARY --- */
+/* L-short size: 36px height */
+.sizeLshort {
+  height: 2.25rem; /* 36px */
+  padding: 0 1.25rem; /* 20px */
+  border-radius: 0.3125rem;
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================
+   TERTIARY (Text Link)
+   ============================================ */
 .tertiary {
   background: transparent;
   padding: 0;
-  gap: 0.75rem; /* 12px - Increased space between text and arrow */
+  height: auto;
+  gap: var(--spacing-md);
   justify-content: flex-start;
 }
 
 .white {
-  color: rgba(249, 249, 249, 1);
+  color: var(--color-text-secondary);
 }
 .orange {
-  color: rgba(231, 78, 28, 1);
+  color: var(--button-text);
 }
 .delete {
   color: rgba(167, 0, 0, 1);
@@ -78,107 +102,141 @@
 .chevron {
   font-size: 1.75rem;
   line-height: 1;
-  color: inherit;
   display: inline-block;
-  margin-top: -0.125rem; /* -2px */
+  margin-top: -0.125rem;
 }
 
-/* --- UNIQUE ICONS & ACTIONS --- */
+/* ============================================
+   CUSTOM VARIANTS
+   No fixed widths, only Padding + Height
+   ============================================ */
+
 .whatsapp {
-  min-width: 10.6875rem; /* 171px */
   height: 2.25rem; /* 36px */
-  padding: 0.5rem 1rem; /* 8px 16px */
-  background: rgba(247, 247, 247, 0.9);
-  border: 0.0625rem solid #b37eb3; /* 1px */
-  border-radius: 0.25rem; /* 4px */
-  color: #b37eb3;
+  padding: 0 1rem; /* 16px side padding */
+  background: var(--button-bg-light);
+  border: 0.0625rem solid var(--color-purple);
+  border-radius: var(--radius-sm);
+  color: var(--color-purple);
 }
+
 .whatsappIcon {
-  width: 0.875rem; /* 14px */
-  height: 0.875rem; /* 14px */
-  border: 0.09375rem solid #b37eb3; /* 1.5px */
-  border-radius: 0.125rem; /* 2px */
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 0.09375rem solid var(--color-purple);
+  border-radius: 0.125rem;
+  flex-shrink: 0;
 }
 
 .waiting-list {
-  min-width: 10.0625rem; /* 161px */
   height: 2.25rem; /* 36px */
-  padding: 0.5rem 1rem; /* 8px 16px */
-  background: #b37eb3;
-  border-radius: 0.25rem; /* 4px */
-  color: #f9f9f9;
+  padding: 0 1rem; /* 16px side padding */
+  background: var(--color-purple);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
 }
+
 .clockIcon {
   position: relative;
-  width: 1.25rem; /* 20px */
-  height: 1.25rem; /* 20px */
+  width: 1.25rem;
+  height: 1.25rem;
   background: #f7e3d5;
-  border: 0.0375rem solid #e74e1c; /* 0.6px */
+  border: 0.0375rem solid var(--button-text);
   border-radius: 50%;
+  flex-shrink: 0;
 }
+
 .clockInner {
   position: absolute;
-  left: 15%;
-  top: 15%;
-  right: 15%;
-  bottom: 15%;
-  border: 0.0375rem solid #e74e1c; /* 0.6px */
+  inset: 15%;
+  border: 0.0375rem solid var(--button-text);
   border-radius: 50%;
 }
+
 .clockHandLong {
   position: absolute;
   left: 50%;
   top: 25%;
-  width: 0.0625rem; /* 1px */
+  width: 1px;
   height: 25%;
-  background: #e74e1c;
+  background: var(--button-text);
 }
+
 .clockHandShort {
   position: absolute;
   left: 30%;
   top: 50%;
   width: 20%;
-  height: 0.0625rem; /* 1px */
-  background: #e74e1c;
+  height: 1px;
+  background: var(--button-text);
 }
 
 .approve {
-  width: 4rem; /* 64px */
   height: 1.5rem; /* 24px */
-  padding: 0.125rem 1rem; /* 2px 16px */
-  background: #e74e1c;
-  color: #f9f9f9;
-  border-radius: 0.21875rem; /* 3.5px */
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
+  padding: 0 0.75rem; /* 12px side padding */
+  background: var(--button-text);
+  color: var(--color-text-secondary);
+  border-radius: 0.21875rem;
+  font-size: var(--font-size-lg);
 }
+
 .reject {
-  width: 4rem; /* 64px */
   height: 1.5rem; /* 24px */
-  padding: 0.125rem 1rem; /* 2px 16px */
-  background: rgba(247, 247, 247, 0.9);
-  border: 0.0625rem solid #e74e1c; /* 1px */
-  color: #e74e1c;
-  border-radius: 0.21875rem; /* 3.5px */
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
+  padding: 0 0.75rem; /* 12px side padding */
+  background: var(--button-bg-light);
+  border: 0.0625rem solid var(--button-text);
+  color: var(--button-text);
+  border-radius: 0.21875rem;
+  font-size: var(--font-size-lg);
 }
+
 .popup-primary {
-  min-width: 3.9375rem; /* 63px */
   height: 2.25rem; /* 36px */
-  background: #e74e1c;
-  border: 0.0625rem solid #f9f9f9; /* 1px */
-  color: #f9f9f9;
-  border-radius: 0.3125rem; /* 5px */
+  padding: 0 1rem;
+  background: var(--button-text);
+  border: 0.0625rem solid var(--color-text-secondary);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-xs);
 }
+
 .popup-secondary {
-  min-width: 7.3125rem; /* 117px */
   height: 2.25rem; /* 36px */
-  background: rgba(247, 247, 247, 0.9);
-  color: #e74e1c;
-  border-radius: 0.3125rem; /* 5px */
+  padding: 0 1rem;
+  background: var(--button-bg-light);
+  color: var(--button-text);
+  border-radius: var(--radius-xs);
 }
 
 .label {
   white-space: nowrap;
+}
+
+.startIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Optional: limit icon size if you pass large SVGs */
+  font-size: 1.25rem; /* 20px */
+  line-height: 0;
+}
+
+.login {
+  /* Override auto-width behavior */
+  width: 19.6875rem; /* 315px */
+  height: 3.375rem; /* 54px */
+
+  /* Layout & Spacing */
+  padding: 1rem 2rem; /* 16px top/bottom, 32px left/right */
+  gap: 0.5rem; /* 8px */
+
+  /* Appearance */
+  border-radius: 0.5625rem; /* 9px */
+  border: 0.0625rem solid transparent; /* 1px default width */
+
+  /* Default Colors (can be overridden by custom props) */
+  background: var(--bg-light);
+  color: var(--color-purple-text);
+
+  /* Ensure centering since width is fixed */
+  justify-content: center;
 }
