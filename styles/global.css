@@ -182,6 +182,7 @@ body {
   --color-terracotta: rgba(173, 78, 52, 0.85);
   --color-peach: rgba(212, 137, 106, 0.8);
   --color-cream: rgba(255, 245, 245, 0.75);
+  --color-bordo: rgba(104, 31, 2, 1);
 
   /* Typography */
   --font-primary: "Arfilit", sans-serif;

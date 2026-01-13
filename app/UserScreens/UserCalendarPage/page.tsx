@@ -207,6 +207,8 @@ export default function NewUserCalendarPage() {
                       key={activity.id}
                       id={activity.id}
                       title={activity.title}
+                      date={activity.date}
+                      instructor={activity.instructor || "לא צוין"}
                       startTime={activity.start_time}
                       endTime={activity.end_time}
                       currentParticipants={activity.current_participants || 0}
