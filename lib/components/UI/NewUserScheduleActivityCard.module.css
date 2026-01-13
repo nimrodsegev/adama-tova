@@ -1,57 +1,68 @@
 .cardContainer {
-  box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  justify-content: space-between; /* Pushes actionSection left and infoSection right */
+  justify-content: space-between;
   align-items: center;
-  padding: 3px 12px; /* Adjusted padding for better edge alignment */
-
   width: 100%;
-  max-width: 342px;
-  height: 79px;
+  min-height: 7.5rem; /* 120px */
+  padding: var(--spacing-lg); /* 16px */
+  gap: var(--spacing-lg); /* 16px */
 
-  background: rgba(247, 247, 247, 0.9);
-  border-radius: 9px;
-  direction: rtl; /* RTL: First child is Right, Second child is Left */
-  position: relative;
-  isolation: isolate;
+  background: var(--color-bg-glass); /* rgba(255, 255, 255, 0.7) */
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border-radius: var(--radius-md); /* 14px */
+
+  direction: rtl;
+  text-align: right;
 }
 
-/* --- RIGHT SIDE: Info --- */
+/* Info Section (Right side in RTL) */
 .infoSection {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Right aligned in RTL */
-  gap: 1px;
+  gap: var(--spacing-xs); /* 4px */
   flex: 1;
 }
 
 .titleText {
   font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 22px;
-  color: #681f02;
+  font-size: var(--font-size-xl); /* 20px */
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-snug);
+  color: var(--color-primary); /* #2b2d42 */
   margin: 0;
-  text-align: right;
 }
 
-.timeRange,
+.timeRange {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-base); /* 16px */
+  font-weight: var(--font-weight-light);
+  color: var(--color-primary);
+  margin: 0;
+}
+
 .participantsText {
   font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 15px;
-  line-height: 20px;
-  color: #681f02;
+  font-size: var(--font-size-sm); /* 14px */
+  font-weight: var(--font-weight-light);
+  color: var(--color-primary);
+  opacity: 0.7;
   margin: 0;
-  text-align: right;
 }
 
-/* --- LEFT SIDE: Button --- */
+.waitlistText {
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-sm); /* 14px */
+  font-weight: var(--font-weight-light);
+  color: var(--button-text); /* #e74e1c - orange for waitlist */
+  margin: 0;
+}
+
+/* Action Section (Left side in RTL) */
 .actionSection {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* In RTL, this pushes the button to the far left */
-  height: 100%;
-  padding-right: 10px; /* Space between text and button */
+  justify-content: center;
+  flex-shrink: 0;
 }
