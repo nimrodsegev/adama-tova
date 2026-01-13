@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
@@ -26,8 +26,8 @@ const BRANCH_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { value: "workshop", label: "סדנה" },
-  { value: "group", label: "קבוצה" },
+  { value: "workshop", label: "סדנה (מפגש בודד)" },
+  { value: "group", label: "קבוצה (סדרת מפגשים)" },
 ];
 
 const CATEGORY_OPTIONS = [
@@ -156,6 +156,47 @@ export default function AddActivityPage() {
     }
   };
 
+  // 🔥 UPDATE LABEL BACKGROUNDS (Floating Label Fix)
+  useLayoutEffect(() => {
+    const updateLabelBackgrounds = () => {
+      const vh = window.innerHeight;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+
+      // We need to look inside ALL slides because they might be visible
+      const labels = document.querySelectorAll(
+        `.${styles.inputLabel}, .${styles.uploadSubtext}`
+      ) as NodeListOf<HTMLElement>;
+
+      labels.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        // Shift background up by the element's top position
+        el.style.setProperty("--bg-y", `${-rect.top}px`);
+      });
+    };
+
+    updateLabelBackgrounds();
+    const raf = requestAnimationFrame(updateLabelBackgrounds);
+
+    // Listeners
+    window.addEventListener("resize", updateLabelBackgrounds);
+    window.addEventListener("orientationchange", updateLabelBackgrounds);
+    
+    // Attach scroll listeners to the SLIDES (since they contain the vertical overflow)
+    const slides = document.querySelectorAll(`.${styles.scrollSnapSlide}`);
+    slides.forEach(slide => {
+        slide.addEventListener("scroll", updateLabelBackgrounds, { passive: true });
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", updateLabelBackgrounds);
+      window.removeEventListener("orientationchange", updateLabelBackgrounds);
+      slides.forEach(slide => {
+        slide.removeEventListener("scroll", updateLabelBackgrounds);
+      });
+    };
+  }, []);
+
   const handleSubmit = async () => {
     if (!isFormValid) return;
     setSubmitStatus("idle");
@@ -238,7 +279,7 @@ export default function AddActivityPage() {
             
             <div className="input-wrapper">
               <input type="text" name="title" value={formData.title} onChange={handleChange} className="input-field" placeholder=" " dir="rtl" />
-              <label className="input-label">שם הפעילות</label>
+              <label className={styles.inputLabel}>שם הפעילות</label>
             </div>
 
             {/* CUSTOM BRANCH DROPDOWN - 🔥 FIX: activeZIndex Class */}
@@ -252,7 +293,7 @@ export default function AddActivityPage() {
                     <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </div>
                 </button>
-                <label className="input-label">סניף</label>
+                <label className={styles.inputLabel}>סניף</label>
               </div>
               {isBranchOpen && (
                 <div className={styles.dropdownMenu}>

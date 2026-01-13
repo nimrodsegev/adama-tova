@@ -5,23 +5,23 @@
   display: flex;
   flex-direction: column;
   
-  /* 🔥 FIX: Center inner content (header/slider) horizontally */
+  /* Center inner content (header/slider) horizontally */
   align-items: center;
   
   /* Lock to viewport edges explicitly */
   position: fixed; 
   inset: 0; 
   
-  /* 🔥 FIX: Force full width/height for background coverage */
+  /* Force full width/height for background coverage */
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
-  max-width: none !important; /* Override any previous max-width */
+  max-width: none !important; 
   
   /* Prevent background scroll */
   overflow: hidden;
   overscroll-behavior: none; 
-  touch-action: none;
+  /* touch-action: none;  <-- REMOVED: This was blocking the swipe */
   
   background: var(--color-background);
   
@@ -44,7 +44,7 @@
   flex-shrink: 0;
   transition: margin 0.3s ease;
   
-  /* 🔥 FIX: Constrain header width here instead of parent */
+  /* Constrain header width here instead of parent */
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem); 
 }
@@ -56,11 +56,11 @@
   display: flex;
   flex-direction: row;
   
-  /* 🔥 FIX: Constrain slider width here */
+  /* Constrain slider width here */
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem);
   
-  height: 100%; /* Fill remaining space */
+  height: 100%; 
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
@@ -76,14 +76,12 @@
   flex: 0 0 100%;
   width: 100%;
   min-width: 100%;
-  height: 100%; /* Full height of container */
+  height: 100%; 
   scroll-snap-align: start;
   scroll-snap-stop: always;
   
-  /* Standard Padding */
   padding: 1.5rem 1.5rem 8rem; 
   
-  /* Allow INTERNAL content scroll, but not body scroll */
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
@@ -105,18 +103,47 @@
 }
 
 /* ============================================
+   FLOATING LABELS (SignupWizard Style)
+   ============================================ */
+.inputLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.0625rem 0.25rem;
+  gap: 0.5rem;
+  
+  position: absolute;
+  height: 0.875rem;
+  top: -0.6rem;
+  right: 1.5rem;
+  
+  /* Dynamic Background Logic */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100vw var(--vh, 100dvh); 
+  background-position: center var(--bg-y, 0px);
+  
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #F9F9F9;
+  
+  pointer-events: none;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+/* ============================================
    CUSTOM DROPDOWN
    ============================================ */
 .dropdownContainer {
   position: relative;
   direction: rtl;
   width: 100%;
-  /* Default Z-Index */
   z-index: 1; 
   transition: z-index 0.1s; 
 }
 
-/* Active Dropdown Z-Index */
 .activeDropdownContainer {
   z-index: 100 !important;
 }
@@ -261,7 +288,14 @@
 .uploadSubtext {
   position: absolute; right: 1.95rem; top: -0.6rem;
   font-size: 0.875rem; color: var(--color-text-secondary);
-  background: var(--color-background); background-attachment: fixed; padding: 0 4px;
+  
+  /* Dynamic Background for Subtext too */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100vw var(--vh, 100dvh); 
+  background-position: center var(--bg-y, 0px);
+  
+  padding: 0 4px;
 }
 .optionalText { font-family: var(--font-secondary); font-weight: 300; color: #FFFFFF; padding-right: 0.25rem; }
 
