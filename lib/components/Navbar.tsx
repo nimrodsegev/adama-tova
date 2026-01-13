@@ -31,7 +31,7 @@ export default function Navbar() {
           <span>...</span>
         ) : user ? (
           <>
-            <Link href="/profile">Profile</Link>
+            <Link href="/ProfilePage">Profile</Link>
             <button 
               onClick={handleLogout}
               style={{ 
