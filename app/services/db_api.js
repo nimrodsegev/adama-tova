@@ -62,6 +62,24 @@ async function getWaitlistCount(activityId) {
   return count || 0;
 }
 
+/**
+ * GET ALL ADMIN USER IDS
+ * Returns an array of user IDs for all admin users.
+ * Used to send notifications to all admins when admin-initiated messages are sent.
+ */
+async function getAllAdminIds() {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id")
+    .eq("role", "admin");
+
+  if (error) {
+    console.error("Error fetching admin IDs:", error.message);
+    return [];
+  }
+  return data ? data.map((u) => u.id) : [];
+}
+
 // ==========================================================
 // 1. ACTIVITIES FUNCTIONS
 // ==========================================================
@@ -431,8 +449,13 @@ export const apiActivities = {
     if (activity && activity.registrations && activity.registrations.length > 0) {
       console.log(`Notify ${activity.registrations.length} users about update...`);
 
-      const alerts = activity.registrations.map(reg => ({
-        user_id: reg.user_id,
+      // Get admin IDs to also receive this notification
+      const adminIds = await getAllAdminIds();
+      const participantIds = activity.registrations.map(reg => reg.user_id);
+      const allRecipientIds = [...new Set([...participantIds, ...adminIds])];
+
+      const alerts = allRecipientIds.map(userId => ({
+        user_id: userId,
         title: "פרטי הפעילות שונו ✏️",
         message: `פרטי הפעילות "${activity.title}" עודכנו על ידי המנחה.`,
         is_read: false,
@@ -460,11 +483,16 @@ export const apiActivities = {
     const { title, registrations } = activity;
 
     // --- STEP 2: Notify Participants ---
-    if (registrations && registrations.length > 0) {
-      console.log(`Notify ${registrations.length} users about cancellation...`);
+    // Get admin IDs to also receive this notification
+    const adminIds = await getAllAdminIds();
+    const participantIds = registrations ? registrations.map(reg => reg.user_id) : [];
+    const allRecipientIds = [...new Set([...participantIds, ...adminIds])];
 
-      const alerts = registrations.map((reg) => ({
-        user_id: reg.user_id,
+    if (allRecipientIds.length > 0) {
+      console.log(`Notify ${allRecipientIds.length} users about cancellation...`);
+
+      const alerts = allRecipientIds.map((userId) => ({
+        user_id: userId,
         title: "הפעילות בוטלה ⚠️",
         message: `הפעילות "${title}" בוטלה על ידי המנחה.`,
         is_read: false,
@@ -549,16 +577,24 @@ export const apiActivities = {
     if (!regs || regs.length === 0)
       return [null, "No participants found to notify."];
 
-    // 2. Prepare the notification batch
-    const notifications = regs.map((r) => ({
-      user_id: r.user_id,
+    // 2. Get all admin IDs to also receive this notification
+    const adminIds = await getAllAdminIds();
+
+    // 3. Combine participant IDs and admin IDs (avoid duplicates)
+    const participantIds = regs.map((r) => r.user_id);
+    const allRecipientIds = [...new Set([...participantIds, ...adminIds])];
+
+    // 4. Prepare the notification batch
+    const notifications = allRecipientIds.map((userId) => ({
+      user_id: userId,
       title: title,
       message: message,
       is_read: false,
       created_at: new Date().toISOString(),
+      linked_activity_id: activityId,
     }));
 
-    // 3. Send all at once
+    // 5. Send all at once
     return safeRequest(supabase.from("notifications").insert(notifications));
   },
   /**
@@ -581,18 +617,25 @@ export const apiActivities = {
     if (!users || users.length === 0)
       return [null, `No users found in circle: "${circleName}"`];
 
-    console.log(`Sending to ${users.length} users in circle ${circleName}`);
+    // 2. Get all admin IDs to also receive this notification
+    const adminIds = await getAllAdminIds();
 
-    // 2. Prepare Notification Objects
-    const notifications = users.map((u) => ({
-      user_id: u.id,
+    // 3. Combine circle user IDs and admin IDs (avoid duplicates)
+    const circleUserIds = users.map((u) => u.id);
+    const allRecipientIds = [...new Set([...circleUserIds, ...adminIds])];
+
+    console.log(`Sending to ${allRecipientIds.length} users (${users.length} in circle + admins)`);
+
+    // 4. Prepare Notification Objects
+    const notifications = allRecipientIds.map((userId) => ({
+      user_id: userId,
       title: title,
       message: message,
       is_read: false,
       created_at: new Date().toISOString(),
     }));
 
-    // 3. Batch Insert
+    // 5. Batch Insert
     return safeRequest(supabase.from("notifications").insert(notifications));
   },
   async getByUserPreferences(userId) {
@@ -1317,6 +1360,41 @@ export const apiNotifications = {
           schema: "public",
           table: "notifications",
           filter: `user_id=eq.${userId}`,
+        },
+        (payload) => onNewNotification(payload.new)
+      )
+      .subscribe();
+  },
+
+  /**
+   * GET ALL NOTIFICATIONS (Admin View)
+   * Fetches all notifications in the system, regardless of user.
+   * Used by admin to see all sent messages.
+   * @param {number} limit - How many to fetch (default 50).
+   */
+  async getAll(limit = 50) {
+    let query = supabase
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    return safeRequest(query);
+  },
+
+  /**
+   * SUBSCRIBE TO ALL NOTIFICATIONS (Admin View)
+   * Listen for any new notification in the system.
+   */
+  subscribeAll(onNewNotification) {
+    return supabase
+      .channel("public:notifications:all")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
         },
         (payload) => onNewNotification(payload.new)
       )
