@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import styles from "./NewUserScheduleActivityCard.module.css";
 import Button from "./Button";
@@ -11,32 +10,51 @@ interface NewUserScheduleActivityCardProps {
   endTime: string;
   currentParticipants: number;
   maxParticipants: number;
-  registrationStatus: "registered" | "not_registered" | "pending";
-  onAction?: (status: string) => void;
+  waitlistCount: number;
+  isGroup?: boolean;
+  isRegistered?: boolean;
+  isPending?: boolean;
+  onRegistrationChange?: () => void;
+  onMotionChange?: (state: "start" | "end") => void;
 }
 
 const NewUserScheduleActivityCard: React.FC<
   NewUserScheduleActivityCardProps
 > = ({
+  id,
   title,
   startTime,
   endTime,
   currentParticipants,
   maxParticipants,
-  registrationStatus,
-  onAction,
+  waitlistCount,
+  isGroup,
+  isRegistered = false,
+  isPending = false,
+  onRegistrationChange,
+  onMotionChange,
 }) => {
   const formatTime = (time: string) => time.slice(0, 5);
 
   const getButtonText = () => {
-    switch (registrationStatus) {
-      case "registered":
-        return "לביטול";
-      case "pending":
-        return "ממתין";
-      default:
-        return "הרשמה";
+    if (isRegistered) return "לביטול";
+    if (isPending) return "ממתין";
+
+    const isFull = currentParticipants >= maxParticipants;
+    if (isFull) return "רשימת המתנה";
+
+    return "הרשמה";
+  };
+
+  const handleAction = () => {
+    if (onMotionChange) {
+      onMotionChange("start");
     }
+
+    // TODO: Add actual registration/cancellation logic here
+    // After completion, call:
+    // if (onRegistrationChange) onRegistrationChange();
+    // if (onMotionChange) onMotionChange("end");
   };
 
   return (
@@ -53,14 +71,13 @@ const NewUserScheduleActivityCard: React.FC<
         <p className={styles.participantsText}>
           {currentParticipants}/{maxParticipants} נרשמים
         </p>
+        {waitlistCount > 0 && (
+          <p className={styles.waitlistText}>{waitlistCount} ברשימת המתנה</p>
+        )}
       </div>
 
       <div className={styles.actionSection}>
-        <Button
-          variant="primary"
-          size="S"
-          onClick={() => onAction?.(registrationStatus)}
-        >
+        <Button variant="primary" size="L-short" onClick={handleAction}>
           {getButtonText()}
         </Button>
       </div>

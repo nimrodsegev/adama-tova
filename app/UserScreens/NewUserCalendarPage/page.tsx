@@ -198,22 +198,27 @@ export default function NewUserCalendarPage() {
 
           <div className={styles.activitiesList}>
             {filteredActivities.length > 0
-              ? filteredActivities.map((activity) => (
-                  <NewUserScheduleActivityCard
-                    key={activity.id}
-                    id={activity.id}
-                    title={activity.title}
-                    date={activity.date} // Ensure your API returns this or construct it
-                    startTime={activity.start_time}
-                    endTime={activity.end_time}
-                    currentParticipants={activity.current_participants || 0}
-                    maxParticipants={activity.max_participants || 0}
-                    waitlistCount={activity.waitlist_count || 0}
-                    onRegistrationChange={fetchData}
-                    onMotionChange={handleMotionState}
-                    isGroup={activity.is_group || !!activity.series_id}
-                  />
-                ))
+              ? filteredActivities.map((activity) => {
+                  const isRegistered = registeredActivityIds.includes(
+                    activity.id
+                  );
+                  return (
+                    <NewUserScheduleActivityCard
+                      key={activity.id}
+                      id={activity.id}
+                      title={activity.title}
+                      startTime={activity.start_time}
+                      endTime={activity.end_time}
+                      currentParticipants={activity.current_participants || 0}
+                      maxParticipants={activity.max_participants || 0}
+                      waitlistCount={activity.waitlist_count || 0}
+                      isGroup={activity.is_group || !!activity.series_id}
+                      isRegistered={isRegistered}
+                      onRegistrationChange={fetchData}
+                      onMotionChange={handleMotionState}
+                    />
+                  );
+                })
               : !loading && (
                   <p
                     className="text-empty"
