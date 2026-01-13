@@ -188,6 +188,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onRegistrationChange={() => checkRegistrationStatus()}
+        onMotionChange={onMotionChange}
       />
 
       <CancelConfirmationModal

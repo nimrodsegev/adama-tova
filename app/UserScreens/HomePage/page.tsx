@@ -285,7 +285,7 @@ export default function NewUserHomePage() {
               <EmptyState
                 message="אין פעילויות רלוונטיות עבורך"
                 buttonText="להוספת תחומי עניין"
-                buttonHref="/profile"
+                buttonHref="/ProfilePage"
               />
             )}
           </div>

@@ -6,6 +6,7 @@ import { apiNotifications, supabase } from "@/app/services/db_api";
 import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import Button from "@/lib/components/UI/Button"; // Make sure this path is correct for your project
 import styles from "./UserNotificationPage.module.css";
 
 type Notification = {
@@ -93,7 +94,6 @@ export default function NewUserNotificationPage() {
   const handleMarkAsRead = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
 
-    // Optimistic update
     setNotifications((prev) =>
       prev.map((n) => (n.id === numericId ? { ...n, isRead: true } : n))
     );
@@ -106,6 +106,24 @@ export default function NewUserNotificationPage() {
         prev.map((n) => (n.id === numericId ? { ...n, isRead: false } : n))
       );
       alert("שגיאה בעדכון ההודעה");
+    }
+  };
+
+  // NEW: Handle "Mark All As Read"
+  const handleMarkAllAsRead = async () => {
+    if (!user) return;
+
+    // 1. Optimistic Update (Instant UI change)
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+
+    // 2. Call API
+    const [res, error] = await apiNotifications.markAllAsRead(user.id);
+
+    if (error) {
+      console.error("Error marking all as read", error);
+      // Revert on error (optional, usually fetching list again is safer)
+      const [data] = await apiNotifications.getList(user.id, 50);
+      if (data) setNotifications(data.map(mapDbToUi));
     }
   };
 
@@ -151,6 +169,21 @@ export default function NewUserNotificationPage() {
         />
       </div>
 
+      {/* NEW: Mark All As Read Button */}
+      <div className={styles.actionsContainer}>
+        <Button
+          variant="secondary"
+          size="L-short"
+          customBgColor="transparent"
+          customTextColor="var(--color-bg-light-opaque)"
+          customBorderColor="transparent"
+          onClick={handleMarkAllAsRead}
+          disabled={loading || notifications.every((n) => n.isRead)}
+        >
+          סמן הכל כנקרא
+        </Button>
+      </div>
+
       {/* Notifications List */}
       <div className={styles.contentContainer}>
         {loading ? (
@@ -175,7 +208,7 @@ export default function NewUserNotificationPage() {
                 </div>
               ))
             ) : (
-              <p className="text-empty">אין הודעות להצגה</p>
+              <p className="text-empty">כל ההודעות שלך נקראו</p>
             )}
           </div>
         )}
