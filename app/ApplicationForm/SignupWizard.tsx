@@ -117,7 +117,7 @@ export default function SignupWizard({
       // PWA mode has larger viewport - adjust position to be more centered
       if (isPWA) {
         setCircleRadius(0.09);
-        setCirclePosition({ x: 0.32, y: 0.10 }); // More centered for PWA, slightly higher
+        setCirclePosition({ x: 0.32, y: 0.12 }); // More centered for PWA
       } else if (height <= 670) {
         // Very small screens (iPhone SE: 667px height, older SE: 568px)
         setCircleRadius(0.08);
