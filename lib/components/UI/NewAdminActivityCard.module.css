@@ -2,13 +2,14 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* In RTL, flex-start is the Right side */
   align-items: flex-start;
   padding: 1rem; /* 16px */
+  gap: 0.125rem; /* 2px */
+  position: relative;
 
   width: 100%;
   max-width: 21.5625rem; /* 345px */
-  min-height: 6.5625rem; /* 105px */
+  min-height: 7.5625rem; /* 121px */
 
   background: rgba(247, 247, 247, 0.9);
   border-radius: 0.5625rem; /* 9px */
@@ -20,15 +21,6 @@
 .cardContainer:active {
   transform: scale(0.98);
   background: rgba(247, 247, 247, 1);
-}
-
-.contentStack {
-  display: flex;
-  flex-direction: column;
-  /* Ensure stack stays right-aligned */
-  align-items: flex-start;
-  gap: 0.125rem; /* 2px */
-  width: 100%;
 }
 
 .titleText {
@@ -58,4 +50,40 @@
 .participantsOverCapacity {
   color: #E74E1C;
   font-weight: 400;
+}
+
+/* Registration link with arrow - positioned bottom left */
+.registrationLink {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  bottom: 1rem; /* 16px */
+  left: 1rem; /* 16px */
+
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem; /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  color: #E74E1C;
+}
+
+.registrationLink:hover {
+  opacity: 0.8;
+}
+
+/* Arrow icon - Points left */
+.registrationArrow {
+  display: inline-block;
+  width: 0.4375rem; /* 7px */
+  height: 0.4375rem; /* 7px */
+  border-left: 0.0625rem solid #E74E1C; /* 1px */
+  border-bottom: 0.0625rem solid #E74E1C; /* 1px */
+  transform: rotate(45deg); /* Points left */
+  margin-top: 0.125rem; /* 2px - slightly lower */
 }
