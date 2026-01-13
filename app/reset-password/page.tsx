@@ -190,7 +190,11 @@ export default function ResetPasswordPage() {
           <div className={styles.inputsContainer}>
             {/* Password Input */}
             <div className={styles.inputWrapper}>
-              <span className={styles.inputLabel}>סיסמה חדשה</span>
+              {passwordError ? (
+                <span className={styles.fieldError}>{passwordError}</span>
+              ) : (
+                <span className={styles.inputLabel}>סיסמה חדשה</span>
+              )}
               <input
                 type="password"
                 value={password}
@@ -204,14 +208,15 @@ export default function ResetPasswordPage() {
                 dir="rtl"
                 placeholder="6 תווים או יותר"
               />
-              {passwordError && (
-                <span className={styles.fieldError}>{passwordError}</span>
-              )}
             </div>
 
             {/* Confirm Password Input */}
             <div className={styles.inputWrapper}>
-              <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
+              {confirmPasswordError ? (
+                <span className={styles.fieldError}>{confirmPasswordError}</span>
+              ) : (
+                <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
+              )}
               <input
                 type="password"
                 value={confirmPassword}
@@ -224,9 +229,6 @@ export default function ResetPasswordPage() {
                 dir="rtl"
                 placeholder="6 תווים או יותר"
               />
-              {confirmPasswordError && (
-                <span className={styles.fieldError}>{confirmPasswordError}</span>
-              )}
             </div>
           </div>
 
