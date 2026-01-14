@@ -56,8 +56,7 @@ export default function NewUserHomePage() {
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // 1. NEW: Dynamic Motion Mode State
-  // Default is "spouting" for page loads
+  // Motion Mode State
   const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
     "spouting"
   );
@@ -78,18 +77,51 @@ export default function NewUserHomePage() {
     return OPENING_HOURS[today] || null;
   })();
 
-  // Handle Resize for BACKGROUND circles
+  // --- UPDATED RESIZE LOGIC (Width + Height) ---
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // 1. Base Config (Standard Phones ~390x844)
+      let newConfig = { radius: 0.07, x: 0.47, y: 0.125 };
+
+      // 2. Width Adjustments
       if (width < 380) {
-        setBgCircleConfig({ radius: 0.07, x: 0.5, y: 0.125 });
+        // Small width (iPhone SE width etc)
+        newConfig.radius = 0.06;
+        newConfig.x = 0.5; // Center it
+        newConfig.y = 0.125;
       } else if (width > 600) {
-        setBgCircleConfig({ radius: 0.12, x: 0.5, y: 0.15 });
-      } else {
-        setBgCircleConfig({ radius: 0.07, x: 0.47, y: 0.125 });
+        // Tablet / Desktop
+        newConfig.radius = 0.12;
+        newConfig.x = 0.5;
+        newConfig.y = 0.15;
       }
+
+      // 3. Height Adjustments (Cascading overrides matching CSS)
+
+      // < 800px (Medium-Short)
+      if (height < 800) {
+        // Shift slightly up
+        newConfig.y = 0.11;
+      }
+
+      // < 700px (Short) - Content moves up significantly in CSS
+      if (height < 700) {
+        newConfig.radius = Math.min(newConfig.radius, 0.06); // Shrink slightly
+        newConfig.y = 0.1; // Move up to avoid overlap
+      }
+
+      // < 600px (Very Short)
+      if (height < 600) {
+        newConfig.radius = Math.min(newConfig.radius, 0.05); // Shrink more
+        newConfig.y = 0.08; // Move way up
+      }
+
+      setBgCircleConfig(newConfig);
     };
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -166,13 +198,12 @@ export default function NewUserHomePage() {
     }
   };
 
-  // 2. UPDATED: Switch mode when action starts
   const handleMotionState = async (
     state: "start" | "end",
     skipFetch?: boolean
   ) => {
     if (state === "start") {
-      setMotionMode("breathing"); // <--- Change to "liquid" for actions!
+      setMotionMode("breathing");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
@@ -180,7 +211,6 @@ export default function NewUserHomePage() {
         await fetchData();
       }
       setIsProcessing(false);
-      // Reset back to spouting for next page load (optional)
       setTimeout(() => setMotionMode("spouting"), 1000);
     }
   };
@@ -192,7 +222,6 @@ export default function NewUserHomePage() {
       : suggestedActivities.slice(0, 4);
 
   return (
-    // 3. PASS THE MODE PROP
     <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer} dir="rtl">
         <OrganicCircles
