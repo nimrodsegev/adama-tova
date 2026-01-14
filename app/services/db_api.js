@@ -532,7 +532,7 @@ export const apiActivities = {
           if_confirmed,
           created_at,
           status,
-          users ( full_name, email, phone )
+          users ( id, full_name, email, phone )
         `
         )
         .eq("activity_id", activityId)
