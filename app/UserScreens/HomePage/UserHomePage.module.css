@@ -458,7 +458,7 @@
   }
 
   .cardsContainer {
-    max-height: 20rem; /* Shrink scroll area to fit viewport */
+    max-height: 24rem; /* Shrink scroll area to fit viewport */
   }
 }
 
