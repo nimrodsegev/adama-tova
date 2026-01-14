@@ -29,6 +29,23 @@ export default function AdminNotificationsPage() {
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Swipe hints - show until admin uses each feature
+  const [showMarkAsReadHint, setShowMarkAsReadHint] = useState(false);
+  const [showDeleteHint, setShowDeleteHint] = useState(false);
+
+  // Check if admin has used each swipe action
+  useEffect(() => {
+    const hasUsedMarkAsRead = localStorage.getItem("admin_used_mark_as_read");
+    const hasUsedDelete = localStorage.getItem("admin_used_delete");
+
+    if (!hasUsedMarkAsRead) {
+      setShowMarkAsReadHint(true);
+    }
+    if (!hasUsedDelete) {
+      setShowDeleteHint(true);
+    }
+  }, []);
+
   // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
@@ -88,6 +105,16 @@ export default function AdminNotificationsPage() {
   const handleMarkAsRead = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
 
+    // Admin has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("admin_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("admin_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
+
     // Optimistic update
     setNotifications((prev) =>
       prev.map((n) => (n.id === numericId ? { ...n, isRead: true } : n))
@@ -119,6 +146,16 @@ export default function AdminNotificationsPage() {
   // Delete Handler
   const handleDelete = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
+
+    // Admin has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("admin_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("admin_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
 
     // Optimistic update - remove from list
     setNotifications((prev) => prev.filter((n) => n.id !== numericId));
@@ -179,22 +216,33 @@ export default function AdminNotificationsPage() {
           <p className={styles.loadingText}>טוען הודעות...</p>
         ) : filteredNotifications.length > 0 ? (
           <div className={styles.notificationsList}>
-            {filteredNotifications.map((notif) => (
-              <div key={notif.id} className={styles.notificationItem}>
-                <NewNotificationCard
-                  notification={{
-                    id: notif.id,
-                    title: notif.title,
-                    message: notif.message,
-                    timestamp: notif.timestamp,
-                    isRead: notif.isRead,
-                    activityId: notif.activityId,
-                  }}
-                  onMarkAsRead={handleMarkAsRead}
-                  onActivityClick={handleActivityClick}
-                />
-              </div>
-            ))}
+            {filteredNotifications.map((notif, index) => {
+              // Show hints only on first notification
+              const isFirst = index === 0;
+              // Mark as read hint only on first unread
+              const isFirstUnread = !notif.isRead &&
+                filteredNotifications.findIndex(n => !n.isRead) === index;
+
+              return (
+                <div key={notif.id} className={styles.notificationItem}>
+                  <NewNotificationCard
+                    notification={{
+                      id: notif.id,
+                      title: notif.title,
+                      message: notif.message,
+                      timestamp: notif.timestamp,
+                      isRead: notif.isRead,
+                      activityId: notif.activityId,
+                    }}
+                    onMarkAsRead={handleMarkAsRead}
+                    onDelete={handleDelete}
+                    onActivityClick={handleActivityClick}
+                    showMarkAsReadHint={showMarkAsReadHint && isFirstUnread}
+                    showDeleteHint={showDeleteHint && isFirst}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           /* Empty State */

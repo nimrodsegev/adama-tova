@@ -604,6 +604,57 @@ export const apiActivities = {
    * @param {string} title - The title of the notification
    * @param {string} message - The body text
    */
+  /**
+   * 📅 NOTIFY BY DATE
+   * Sends a notification to all users registered for activities on a specific date.
+   * Each user receives only ONE notification, even if registered for multiple activities.
+   * @param {string} dateString - The date in YYYY-MM-DD format
+   * @param {string} title - The title of the notification
+   * @param {string} message - The body text
+   */
+  async notifyByDate(dateString, title, message) {
+    // 1. Get all activities on this date
+    const [activities, fetchError] = await this.getByDate(dateString);
+    if (fetchError) return [null, fetchError];
+    if (!activities || activities.length === 0) {
+      return [null, `No activities found on date: "${dateString}"`];
+    }
+
+    // 2. Get all participant IDs from all activities on this date
+    const activityIds = activities.map((a) => a.id);
+    const { data: regs, error: regError } = await supabase
+      .from("registrations")
+      .select("user_id")
+      .in("activity_id", activityIds);
+
+    if (regError) return [null, regError.message];
+
+    // 3. Get all admin IDs
+    const adminIds = await getAllAdminIds();
+
+    // 4. Combine and deduplicate all user IDs
+    const participantIds = regs ? regs.map((r) => r.user_id) : [];
+    const allRecipientIds = [...new Set([...participantIds, ...adminIds])];
+
+    if (allRecipientIds.length === 0) {
+      return [null, "No users to notify for this date."];
+    }
+
+    console.log(`Sending to ${allRecipientIds.length} unique users for date ${dateString}`);
+
+    // 5. Prepare ONE notification per user
+    const notifications = allRecipientIds.map((userId) => ({
+      user_id: userId,
+      title: title,
+      message: message,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    }));
+
+    // 6. Batch Insert
+    return safeRequest(supabase.from("notifications").insert(notifications));
+  },
+
   async notifyByCircle(circleName, title, message) {
     // 1. Fetch all users in this circle
     // Note: This assumes 'circle' is a direct column in your 'users' table.
