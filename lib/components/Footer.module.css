@@ -27,8 +27,8 @@
   padding-bottom: env(safe-area-inset-bottom, 0);
 
   /* Color: rgba(222, 105, 48, 1) */
-  background: #de6930;
-  border-top: 0.0625rem solid #f9f9f9;
+  background: transparent;
+  border-top: 0.0625rem solid var(--color-white-pure);
   border-radius: 0.5625rem 0.5625rem 0 0; /* 9px corners */
 
   direction: rtl;
@@ -63,5 +63,4 @@
 
 .iconImage {
   object-fit: contain;
-  filter: brightness(0) invert(1);
 }
