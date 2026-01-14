@@ -281,16 +281,7 @@ export default function ProfilePage() {
               התנתק
             </Button>
           </div>
-
         </div>
-
-        {/* Navigation Bar */}
-        <nav className={styles.navBar}>
-          <div className={styles.navIcon}>⚙️</div>
-          <div className={styles.navIcon}>📅</div>
-          <div className={`${styles.navIcon} ${styles.active}`}>👤</div>
-        </nav>
-
       </main>
     </ProtectedRoute>
   );
