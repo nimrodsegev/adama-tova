@@ -6,7 +6,7 @@ import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import {
   HomeFilter,
-  USER_FILTER_OPTIONS,
+  // USER_FILTER_OPTIONS, // We don't use this directly in JSX anymore so we can add counts
 } from "@/lib/components/UI/HomeFilter";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
@@ -220,7 +220,7 @@ export default function NewUserHomePage() {
           elongation={shapeParams.elongation}
           opacity={shapeParams.opacity}
           strokeWidth={shapeParams.strokeWidth}
-          position={{ x: 0.5, y: 0.1 }}
+          position={{ x: 0.45, y: 0.125 }}
           baseColor="#FFFFFF"
         />
 
@@ -241,23 +241,27 @@ export default function NewUserHomePage() {
             </div>
           )}
 
-          {/* Filter Tabs */}
+          {/* Filter Tabs - NOW WITH COUNTS */}
           <div className={styles.filterContainer}>
             <HomeFilter
-              options={USER_FILTER_OPTIONS}
+              options={[
+                {
+                  id: "recommended",
+                  label: "חשבנו שיעניין אותך",
+                  count: suggestedActivities.length,
+                },
+                {
+                  id: "yours",
+                  label: "המפגשים שלך",
+                  count: registeredActivities.length,
+                },
+              ]}
               activeOption={activeFilter}
               onFilterChange={(id) =>
                 setActiveFilter(id as "recommended" | "yours")
               }
             />
           </div>
-
-          {/* Section Title - without counts */}
-          <h2 className={styles.sectionTitle}>
-            {activeFilter === "recommended"
-              ? "חשבנו שיעניין אותך"
-              : "המפגשים שלך"}
-          </h2>
 
           {/* Cards Container */}
           <div className={styles.cardsContainer}>
