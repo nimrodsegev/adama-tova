@@ -36,6 +36,23 @@ export default function NewUserNotificationPage() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Swipe hints - show until user uses each feature
+  const [showMarkAsReadHint, setShowMarkAsReadHint] = useState(false);
+  const [showDeleteHint, setShowDeleteHint] = useState(false);
+
+  // Check if user has used each swipe action
+  useEffect(() => {
+    const hasUsedMarkAsRead = localStorage.getItem("user_used_mark_as_read");
+    const hasUsedDelete = localStorage.getItem("user_used_delete");
+
+    if (!hasUsedMarkAsRead) {
+      setShowMarkAsReadHint(true);
+    }
+    if (!hasUsedDelete) {
+      setShowDeleteHint(true);
+    }
+  }, []);
+
   // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
@@ -94,6 +111,16 @@ export default function NewUserNotificationPage() {
   const handleMarkAsRead = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
 
+    // User has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("user_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("user_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
+
     setNotifications((prev) =>
       prev.map((n) => (n.id === numericId ? { ...n, isRead: true } : n))
     );
@@ -137,6 +164,36 @@ export default function NewUserNotificationPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedActivityId(null);
+  };
+
+  // Delete Handler
+  const handleDelete = async (id: number | string) => {
+    const numericId = typeof id === "string" ? parseInt(id) : id;
+
+    // User has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("user_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("user_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
+
+    // Optimistic update - remove from list
+    setNotifications((prev) => prev.filter((n) => n.id !== numericId));
+
+    const [_, error] = await apiNotifications.delete(numericId);
+
+    if (error) {
+      console.error("Error deleting notification:", error);
+      // Reload on error
+      if (user) {
+        const [data] = await apiNotifications.getList(user.id, 50);
+        if (data) setNotifications(data.map(mapDbToUi));
+      }
+      alert("שגיאה במחיקת ההודעה");
+    }
   };
 
   const filteredNotifications = notifications.filter((n) => {
@@ -191,22 +248,33 @@ export default function NewUserNotificationPage() {
         ) : (
           <div className={styles.notificationsList}>
             {filteredNotifications.length > 0 ? (
-              filteredNotifications.map((notif) => (
-                <div key={notif.id} className={styles.notificationItem}>
-                  <NewNotificationCard
-                    notification={{
-                      id: notif.id,
-                      title: notif.title,
-                      message: notif.message,
-                      timestamp: notif.timestamp,
-                      isRead: notif.isRead,
-                      activityId: notif.activityId,
-                    }}
-                    onMarkAsRead={handleMarkAsRead}
-                    onActivityClick={handleActivityClick}
-                  />
-                </div>
-              ))
+              filteredNotifications.map((notif, index) => {
+                // Show hints only on first notification
+                const isFirst = index === 0;
+                // Mark as read hint only on first unread
+                const isFirstUnread = !notif.isRead &&
+                  filteredNotifications.findIndex(n => !n.isRead) === index;
+
+                return (
+                  <div key={notif.id} className={styles.notificationItem}>
+                    <NewNotificationCard
+                      notification={{
+                        id: notif.id,
+                        title: notif.title,
+                        message: notif.message,
+                        timestamp: notif.timestamp,
+                        isRead: notif.isRead,
+                        activityId: notif.activityId,
+                      }}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={handleDelete}
+                      onActivityClick={handleActivityClick}
+                      showMarkAsReadHint={showMarkAsReadHint && isFirstUnread}
+                      showDeleteHint={showDeleteHint && isFirst}
+                    />
+                  </div>
+                );
+              })
             ) : (
               <p className="text-empty">כל ההודעות שלך נקראו</p>
             )}
