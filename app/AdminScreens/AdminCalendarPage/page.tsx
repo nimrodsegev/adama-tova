@@ -1,100 +1,172 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import DaySlider from "@/lib/components/WeeklyBoard/DaySlider";
+
+import React, { useState, useEffect } from "react";
 import { apiActivities } from "@/app/services/db_api";
-import ScheduleActivityCard from "@/lib/components/WeeklyBoard/ScheduleActivityCard";
+
+// UI Components
+import DaySlider from "@/lib/components/UI/DaySlider";
+import { HomeFilter } from "@/lib/components/UI/HomeFilter";
+import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+
 import styles from "./AdminCalendarPage.module.css";
 
 export default function AdminCalendarPage() {
-  const router = useRouter();
-  const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Data State
   const [activities, setActivities] = useState<any[]>([]);
+
+  // UI State
+  const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
 
-  // Get current week's start date (Sunday)
-  const getWeekStartDate = () => {
-    const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
-    const diff = -dayOfWeek; // Days to subtract to get to Sunday
-    const sunday = new Date(now);
-    sunday.setDate(now.getDate() + diff);
-    sunday.setHours(0, 0, 0, 0);
-    return sunday;
-  };
+  // Activity modal state
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
 
-  const getSelectedDateObject = () => {
-    const weekStart = getWeekStartDate();
-    const selected = new Date(weekStart);
-    selected.setDate(weekStart.getDate() + selectedDayIndex);
-    return selected;
-  };
-
-  const selectedDateObj = getSelectedDateObject();
-
-  // Fetch activities for selected date
-  const fetchActivities = async () => {
+  const fetchData = async () => {
+    setActivities([]);
     setLoading(true);
-    const year = selectedDateObj.getFullYear();
-    const month = String(selectedDateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(selectedDateObj.getDate()).padStart(2, "0");
-    const dateString = `${year}-${month}-${day}`;
 
-    const [data, error] = await apiActivities.getByDate(dateString);
-    if (error) {
-      console.error("Error fetching activities:", error);
-      setActivities([]);
-    } else {
-      setActivities(data || []);
+    const dateString = selectedDate.toISOString().split("T")[0];
+
+    try {
+      const [actData, actError] = await apiActivities.getByDate(dateString);
+
+      if (!actError && actData) {
+        setActivities(actData);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    fetchActivities();
-  }, [selectedDayIndex]);
+    fetchData();
+  }, [selectedDate]);
+
+  // Filter activities by availability
+  const filteredActivities = activities.filter((activity: any) => {
+    const currentParticipants = activity.current_participants || 0;
+    const maxParticipants = activity.max_participants || 0;
+    const isFull = currentParticipants >= maxParticipants;
+
+    if (filter === "all") return true;
+    if (filter === "waitlist") return isFull; // רשימת המתנה - full or over capacity
+    if (filter === "available") return !isFull; // מקום פנוי - has available spots
+
+    return true;
+  });
+
+  // Calculate counts for filter tabs
+  const waitlistCount = activities.filter((a: any) => {
+    const current = a.current_participants || 0;
+    const max = a.max_participants || 0;
+    return current >= max;
+  }).length;
+
+  const availableCount = activities.filter((a: any) => {
+    const current = a.current_participants || 0;
+    const max = a.max_participants || 0;
+    return current < max;
+  }).length;
+
+  // Format day string for card
+  const formatDayString = (date: string) => {
+    const d = new Date(date);
+    const days = ["יום א׳", "יום ב׳", "יום ג׳", "יום ד׳", "יום ה׳", "יום ו׳", "שבת"];
+    return days[d.getDay()];
+  };
+
+  // Handle activity card click
+  const handleActivityClick = (activityId: string) => {
+    setSelectedActivityId(activityId);
+    setIsActivityModalOpen(true);
+  };
+
+  // Handle activity modal close
+  const handleActivityModalClose = () => {
+    setIsActivityModalOpen(false);
+    setSelectedActivityId(null);
+  };
 
   return (
-    <div className="mobile-container">
-      <div className={styles.mainFrame}>
-        {/* Header Section */}
-        <div className={styles.headerSection}>
-          {/* Page Title */}
-          <h1 className="header-secondary">{/* Using global */}לוח שבועי</h1>
-
-          {/* Day Slider */}
-          <DaySlider
-            selectedDayIndex={selectedDayIndex}
-            onDaySelect={setSelectedDayIndex}
-            currentWeekStart={getWeekStartDate()}
+    <div className={styles.pageContainer}>
+      {/* Loading overlay */}
+      {loading && (
+        <div className={styles.loadingOverlay}>
+          <OrganicCircles
+            mode="loading"
+            radius={0.08}
+            baseColor="#FFFFFF"
           />
         </div>
+      )}
 
-        {/* Activities List */}
-        <div className={styles.activitiesList}>
-          {loading ? (
-            <p className="text-empty">טוען...</p>
-          ) : activities.length > 0 ? (
-            activities.map((activity) => (
-              <ScheduleActivityCard
-                key={activity.id}
-                id={activity.id}
-                title={activity.title}
-                date={activity.date}
-                start_time={activity.start_time}
-                end_time={activity.end_time}
-                current_participants={activity.current_participants || 0}
-                max_participants={activity.max_participants}
-                waitlist_count={activity.waitlist_count || 0}
-                onRegistrationChange={fetchActivities}
-                isGroup={activity.is_group}
-              />
-            ))
-          ) : (
-            <p className="text-empty">אין פעילויות ליום זה</p>
-          )}
+      <main className={styles.mainFrame}>
+        <div className={styles.contentWrapper}>
+          {/* Title */}
+          <div className={styles.titleContainer}>
+            <h1 className={styles.titleText}>לוח פעילויות</h1>
+          </div>
+
+          {/* Week Slider */}
+          <div className={styles.sliderSection}>
+            <DaySlider
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
+          </div>
+
+          {/* Filter Tabs */}
+          <div className={styles.filterSection}>
+            <HomeFilter
+              options={[
+                { id: "all", label: "הכל", count: activities.length },
+                { id: "waitlist", label: "רשימת המתנה", count: waitlistCount },
+                { id: "available", label: "מקום פנוי", count: availableCount },
+              ]}
+              activeOption={filter}
+              onFilterChange={(newId) => setFilter(newId)}
+            />
+          </div>
+
+          {/* Activities List */}
+          <div className={styles.activitiesList}>
+            {filteredActivities.length > 0
+              ? filteredActivities.map((activity) => (
+                  <NewAdminActivityCard
+                    key={activity.id}
+                    id={activity.id}
+                    title={activity.title}
+                    instructor={activity.instructor || "לא צוין"}
+                    day={formatDayString(activity.date)}
+                    startTime={activity.start_time}
+                    currentParticipants={activity.current_participants || 0}
+                    maxParticipants={activity.max_participants || 0}
+                    onClick={() => handleActivityClick(activity.id)}
+                  />
+                ))
+              : !loading && (
+                  <p className={styles.emptyText}>אין פעילויות ליום זה</p>
+                )}
+          </div>
         </div>
-      </div>
+      </main>
+
+      {/* Activity Details Modal */}
+      {selectedActivityId && (
+        <ActivityDetailsModal
+          activityId={selectedActivityId}
+          isOpen={isActivityModalOpen}
+          onClose={handleActivityModalClose}
+          onRegistrationChange={fetchData}
+        />
+      )}
     </div>
   );
 }
