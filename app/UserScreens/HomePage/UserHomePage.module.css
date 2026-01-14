@@ -332,14 +332,146 @@
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE ADAPTATIONS
    ============================================ */
-@media (max-width: 26rem) {
+
+/* Screens smaller than design width (below 393px) */
+/* Adjusts margins to prevent content touching edges */
+@media (max-width: 24.5rem) {
   .pageContainer {
-    padding: 4rem 1rem 1rem;
+    padding: 5.75rem 1rem 1.5rem;
   }
 
   .mainContent {
+    /* Ensure content doesn't overflow horizontally */
+    width: calc(100% - 0.5rem);
+  }
+
+  .emptyState {
     width: 100%;
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* Small screens (below 360px) - e.g., Small Androids, older iPhones */
+@media (max-width: 22.5rem) {
+  .pageContainer {
+    padding: 4rem 0.75rem 1.5rem;
+  }
+
+  .mainContent {
+    margin-top: 5rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.75rem; /* 28px */
+    line-height: 2.25rem;
+  }
+
+  .greetingSubtitle {
+    font-size: 1.125rem; /* 18px */
+  }
+
+  .sectionTitle {
+    font-size: 1.125rem; /* 18px */
+  }
+
+  .closedText {
+    font-size: 0.875rem; /* 14px */
+  }
+}
+
+/* Very small screens (below 320px) - e.g., Galaxy Fold outer screen */
+@media (max-width: 20rem) {
+  .pageContainer {
+    padding: 3rem 0.5rem 1rem;
+  }
+
+  .mainContent {
+    margin-top: 4rem;
+    gap: 0.75rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.5rem; /* 24px */
+    line-height: 2rem;
+  }
+
+  .greetingSubtitle {
+    font-size: 1rem; /* 16px */
+  }
+
+  .sectionTitle {
+    font-size: 1rem; /* 16px */
+  }
+
+  .emptyText {
+    font-size: 1rem;
+  }
+
+  /* Stack buttons vertically if they exist */
+  .bottomButtons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* ============================================
+   HEIGHT-BASED RESPONSIVENESS
+   Crucial for phones like iPhone SE where vertical space is limited
+   ============================================ */
+
+/* Short screens (below 700px height) */
+@media (max-height: 43.75rem) {
+  .pageContainer {
+    padding-top: 4rem; /* Reduce top padding */
+  }
+
+  .mainContent {
+    margin-top: 6rem; /* Pull content up closer to circles */
+  }
+
+  .greetingSection {
+    gap: 0.25rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.75rem;
+    line-height: 2rem;
+  }
+
+  .greetingSubtitle {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  /* Reduce height of scrollable area so bottom content isn't cut off */
+  .cardsContainer {
+    max-height: 15rem;
+  }
+}
+
+/* Very short screens (below 600px height) */
+@media (max-height: 37.5rem) {
+  .pageContainer {
+    padding-top: 2.5rem;
+  }
+
+  .mainContent {
+    margin-top: 2.5rem;
+    gap: 0.5rem;
+  }
+
+  .greetingTitle {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+  }
+
+  .greetingSubtitle {
+    display: none; /* Hide subtitle to save space */
+  }
+
+  .cardsContainer {
+    max-height: 14rem;
   }
 }
