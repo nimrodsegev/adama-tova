@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
-import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import OpenHours from "@/lib/components/UI/OpenHours";
 import EmptyState from "@/lib/components/UI/EmptyState";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+
 import styles from "./UserHomePage.module.css";
 
 interface Activity {
@@ -39,7 +41,7 @@ const OPENING_HOURS = {
 };
 
 export default function NewUserHomePage() {
-  const { user, userProfile, loading: userLoading } = useUser();
+  const { user, userProfile } = useUser();
   const [activeFilter, setActiveFilter] = useState<"recommended" | "yours">(
     "yours"
   );
@@ -50,11 +52,17 @@ export default function NewUserHomePage() {
     []
   );
 
-  // Combine all loading states into one
-  const [initialLoading, setInitialLoading] = useState(true);
+  // Loading States
+  const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Responsive state for background circles
+  // 1. NEW: Dynamic Motion Mode State
+  // Default is "spouting" for page loads
+  const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
+    "spouting"
+  );
+
+  // Background Circles State
   const [bgCircleConfig, setBgCircleConfig] = useState({
     radius: 0.07,
     x: 0.47,
@@ -62,11 +70,7 @@ export default function NewUserHomePage() {
   });
 
   const mountedRef = useRef(false);
-
-  // Calculate shape parameters based on user profile
-  const shapeParams = useMemo(() => {
-    return calculateShapeParams(userProfile);
-  }, [userProfile]);
+  const shapeParams = userProfile ? calculateShapeParams(userProfile) : {};
 
   const todayHours = (() => {
     const today = new Date().getDay();
@@ -158,23 +162,28 @@ export default function NewUserHomePage() {
     } catch (e) {
       console.error(e);
     } finally {
-      // Small delay to ensure smooth fade out
-      setTimeout(() => setInitialLoading(false), 500);
+      setTimeout(() => setLoading(false), 500);
     }
   };
 
-  const handleMotionState = async (state: "start" | "end") => {
+  // 2. UPDATED: Switch mode when action starts
+  const handleMotionState = async (
+    state: "start" | "end",
+    skipFetch?: boolean
+  ) => {
     if (state === "start") {
+      setMotionMode("breathing"); // <--- Change to "liquid" for actions!
       setIsProcessing(true);
-      setTimeout(() => setIsProcessing(false), 3000);
+      setTimeout(() => setIsProcessing(false), 5000);
     } else {
-      await fetchData();
+      if (!skipFetch) {
+        await fetchData();
+      }
       setIsProcessing(false);
+      // Reset back to spouting for next page load (optional)
+      setTimeout(() => setMotionMode("spouting"), 1000);
     }
   };
-
-  // Determine if we need to show the full-screen loader
-  const showLoader = userLoading || initialLoading || isProcessing;
 
   const firstName = userProfile?.full_name?.split(" ")[0] || "משתמש";
   const displayedActivities =
@@ -183,67 +192,19 @@ export default function NewUserHomePage() {
       : suggestedActivities.slice(0, 4);
 
   return (
-    <>
-      {/* SMOOTH LOADER:
-         Instead of "if (loading) return <Loader>", we render this ON TOP.
-         We use CSS opacity/visibility to fade it out, keeping the DOM stable.
-      */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          background:
-            "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 99999,
-          // CSS Transition Magic:
-          opacity: showLoader ? 1 : 0,
-          pointerEvents: showLoader ? "all" : "none",
-          transition: "opacity 0.4s ease-in-out",
-        }}
-        dir="rtl"
-      >
-        <OrganicCircles
-          mode="spouting"
-          radius={0.35}
-          {...shapeParams}
-          baseColor="#FFFFFF"
-          position={{ x: 0.5, y: 0.5 }}
-        />
-      </div>
-
+    // 3. PASS THE MODE PROP
+    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer} dir="rtl">
-        {/* Background Circles - These stay mounted underneath */}
         <OrganicCircles
           mode="breathing"
           radius={bgCircleConfig.radius}
           position={{ x: bgCircleConfig.x, y: bgCircleConfig.y }}
-          layers={shapeParams.layers}
-          smoothness={shapeParams.smoothness}
-          complexity={shapeParams.complexity}
-          elongation={shapeParams.elongation}
-          opacity={shapeParams.opacity}
-          strokeWidth={shapeParams.strokeWidth}
+          // @ts-ignore
+          {...shapeParams}
           baseColor="#FFFFFF"
         />
 
-        {/* Main content fades IN as loader fades OUT.
-           This overlap creates the smooth feel.
-        */}
-        <div
-          className={styles.mainContent}
-          style={{
-            opacity: showLoader ? 0 : 1,
-            transform: showLoader ? "translateY(20px)" : "translateY(0)",
-            transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
-            transitionDelay: "0.2s", // Wait slightly for loader to start fading
-          }}
-        >
+        <div className={styles.mainContent}>
           <div className={styles.greetingSection}>
             <h1 className={styles.greetingTitle}>היי {firstName},</h1>
             <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
@@ -308,6 +269,6 @@ export default function NewUserHomePage() {
           </div>
         </div>
       </div>
-    </>
+    </SmoothPageWrapper>
   );
 }

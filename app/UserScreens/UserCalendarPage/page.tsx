@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
-import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
 // UI Components
 import DaySlider from "@/lib/components/UI/DaySlider";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
-import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 import styles from "./UserCalendarPage.module.css";
 
@@ -37,22 +36,19 @@ export default function NewUserCalendarPage() {
 
   // UI State
   const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const shapeParams = useMemo(() => {
-    return calculateShapeParams(userProfile);
-  }, [userProfile]);
+  // 1. NEW: Dynamic Motion Mode State
+  const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
+    "spouting"
+  );
 
   const fetchData = async () => {
-    // Clear activities and start loading
-    setActivities([]);
     setLoading(true);
-
     const dateString = selectedDate.toISOString().split("T")[0];
 
     try {
-      // 1. Prepare Supabase query for registrations (Active only)
       const registrationsPromise = user
         ? supabase
             .from("registrations")
@@ -61,20 +57,16 @@ export default function NewUserCalendarPage() {
             .in("status", ["confirmed", "waitlist", "approved"])
         : Promise.resolve({ data: [] });
 
-      // 2. Execute all fetches + Delay
-      const [
-        [actData, actError],
-        [userBranches],
-        { data: rawRegs },
-        _, // Delay result
-      ] = await Promise.all([
-        apiActivities.getByDate(dateString),
-        user ? apiUser.getUserBranches(user.id) : Promise.resolve([null, null]),
-        registrationsPromise,
-        new Promise((resolve) => setTimeout(resolve, 500)), // Force 0.5s delay
-      ]);
+      const [[actData, actError], [userBranches], { data: rawRegs }, _] =
+        await Promise.all([
+          apiActivities.getByDate(dateString),
+          user
+            ? apiUser.getUserBranches(user.id)
+            : Promise.resolve([null, null]),
+          registrationsPromise,
+          new Promise((resolve) => setTimeout(resolve, 500)),
+        ]);
 
-      // 3. Process Activities
       if (!actError) {
         const validBranches = userBranches || ["nahalal", "satria"];
         const filtered = actData.filter(
@@ -83,7 +75,6 @@ export default function NewUserCalendarPage() {
         setActivities(filtered);
       }
 
-      // 4. Process Registrations
       if (rawRegs) {
         const ids = rawRegs.map((r: any) => r.activity_id);
         setRegisteredActivityIds(ids);
@@ -95,13 +86,21 @@ export default function NewUserCalendarPage() {
     }
   };
 
-  const handleMotionState = async (state: "start" | "end") => {
+  // 2. UPDATED: Switch mode here too
+  const handleMotionState = async (
+    state: "start" | "end",
+    skipFetch?: boolean
+  ) => {
     if (state === "start") {
+      setMotionMode("breathing"); // <--- Change to liquid
       setIsProcessing(true);
-      setTimeout(() => setIsProcessing(false), 3000);
+      setTimeout(() => setIsProcessing(false), 5000);
     } else {
-      await fetchData();
+      if (!skipFetch) {
+        await fetchData();
+      }
       setIsProcessing(false);
+      setTimeout(() => setMotionMode("spouting"), 1000);
     }
   };
 
@@ -109,15 +108,11 @@ export default function NewUserCalendarPage() {
     fetchData();
   }, [selectedDate, user]);
 
-  // 🔍 Updated Filtering Logic
   const filteredActivities = activities.filter((activity: any) => {
     if (filter === "all") return true;
 
     if (filter === "foryou") {
-      // Condition A: User is registered
       const isRegistered = registeredActivityIds.includes(activity.id);
-
-      // Condition B: Matches Interests
       let isInterested = false;
       if (userProfile?.quiz?.interests) {
         const myInterests = userProfile.quiz.interests.map(
@@ -125,57 +120,15 @@ export default function NewUserCalendarPage() {
         );
         isInterested = myInterests.includes(activity.category);
       }
-
-      // Return true if EITHER is true
       return isRegistered || isInterested;
     }
-
     return true;
   });
 
   return (
-    <>
-      {/* Motion overlay - Shows during registration/cancellation */}
-      {isProcessing && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10001,
-            background:
-              "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "all",
-          }}
-        >
-          <OrganicCircles
-            mode="breathing"
-            radius={0.3}
-            {...shapeParams}
-            baseColor="#FFFFFF"
-            position={{ x: 0.5, y: 0.5 }}
-          />
-        </div>
-      )}
-
+    // 3. PASS MODE PROP
+    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer}>
-        {/* Loading overlay - Shows during data fetch */}
-        {loading && (
-          <div className={styles.loadingOverlay}>
-            <OrganicCircles
-              mode="loading"
-              radius={0.08}
-              {...shapeParams}
-              baseColor="#FFFFFF"
-            />
-          </div>
-        )}
-
         <main className={styles.mainFrame}>
           <div className={styles.titleContainer}>
             <h1 className={styles.titleText}>לוח פעילויות</h1>
@@ -207,8 +160,8 @@ export default function NewUserCalendarPage() {
                       key={activity.id}
                       id={activity.id}
                       title={activity.title}
+                      instructor={activity.instructor || "לא צוין"} // Added instructor
                       date={activity.date}
-                      instructor={activity.instructor || "לא צוין"}
                       startTime={activity.start_time}
                       endTime={activity.end_time}
                       currentParticipants={activity.current_participants || 0}
@@ -224,7 +177,11 @@ export default function NewUserCalendarPage() {
               : !loading && (
                   <p
                     className="text-empty"
-                    style={{ color: "white", marginTop: "2rem" }}
+                    style={{
+                      color: "white",
+                      marginTop: "2rem",
+                      textAlign: "center",
+                    }}
                   >
                     אין פעילויות ליום זה
                   </p>
@@ -232,6 +189,6 @@ export default function NewUserCalendarPage() {
           </div>
         </main>
       </div>
-    </>
+    </SmoothPageWrapper>
   );
 }
