@@ -27,7 +27,7 @@ export default function SmoothPageWrapper({
   children,
   isLoading,
   mode = "spouting",
-  minDuration = 1000,
+  minDuration = 10,
   radiusScale = 1.0,
   baseColor = "#FFFFFF",
 }: SmoothPageWrapperProps) {
