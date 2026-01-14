@@ -16,7 +16,8 @@ type ActivityDetailsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onRegistrationChange?: () => void;
-  onMotionChange?: (state: "start" | "end") => void;
+  // UPDATED: Allow passing skipFetch to match parent
+  onMotionChange?: (state: "start" | "end", skipFetch?: boolean) => void;
 };
 
 export default function ActivityDetailsModal({
@@ -31,6 +32,8 @@ export default function ActivityDetailsModal({
   const { t } = useIvrita();
   const [activity, setActivity] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Registration State
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
     "none"
   );
@@ -40,6 +43,8 @@ export default function ActivityDetailsModal({
     total: 10,
     waitlist: 0,
   });
+
+  // Modal State
   const [mounted, setMounted] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -57,13 +62,13 @@ export default function ActivityDetailsModal({
 
   useEffect(() => {
     if (isOpen && activityId) {
+      setHideDetailsModal(false); // Reset visibility when opening
       fetchActivityDetails();
       checkRegistrationStatus();
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
-
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -75,7 +80,6 @@ export default function ActivityDetailsModal({
       const [activityData, error] = await apiActivities.getById(activityId);
       if (!error && activityData) {
         setActivity(activityData);
-
         setRegistrationCount({
           confirmed: activityData.current_participants || 0,
           total: activityData.max_participants || 10,
@@ -114,6 +118,7 @@ export default function ActivityDetailsModal({
     }
   };
 
+  // --- 1. REGISTER FLOW ---
   const handleRegistrationToggle = async () => {
     if (!user || loading || isAdmin) return;
 
@@ -122,10 +127,7 @@ export default function ActivityDetailsModal({
       return;
     }
 
-    // Hide details modal but keep it mounted
-    setHideDetailsModal(true);
-
-    // Start motion overlay
+    // A. Start Wrapper FIRST (Fade In)
     onMotionChange?.("start");
     setLoading(true);
 
@@ -137,35 +139,44 @@ export default function ActivityDetailsModal({
 
       if (res && typeof res === "object" && "success" in res) {
         const isWaitlist = res.if_confirmed === false;
+
+        // Update Local State
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsSuccessModalOpen(true);
+        // B. Wait for wrapper to cover screen (500ms)
+        setTimeout(() => {
+          // Hide the details UI so it doesn't overlap
+          setHideDetailsModal(true);
+
+          // Show the Success Modal
+          setIsSuccessModalOpen(true);
+
+          // C. Fade Out Wrapper (Skip Fetching Data yet)
+          // This reveals the Success Modal
+          onMotionChange?.("end", true);
+        }, 500);
       } else {
-        setHideDetailsModal(false);
+        // Error case
         onMotionChange?.("end");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setHideDetailsModal(false);
       onMotionChange?.("end");
     } finally {
       setLoading(false);
     }
   };
 
+  // --- 2. CANCEL FLOW ---
   const handleCancelConfirm = async () => {
     if (!user || loading) return;
 
-    // Close cancel modal
+    // Close the small confirmation modal immediately
     setIsCancelModalOpen(false);
 
-    // Close details modal
-    onClose();
-
-    // Start motion overlay
+    // A. Start Wrapper FIRST
     onMotionChange?.("start");
     setLoading(true);
 
@@ -174,17 +185,22 @@ export default function ActivityDetailsModal({
         user.id,
         activityId
       );
+
       if (!error) {
-        setRegStatus("none");
-        setWaitlistPosition(null);
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        onMotionChange?.("end");
-
-        // Refresh data after a delay
+        // B. Wait for wrapper (600ms)
         setTimeout(() => {
+          // C. Close the Main Modal (Details) BEHIND the wrapper
+          onClose();
+          setRegStatus("none");
+          setWaitlistPosition(null);
+
+          // D. Fade Out Wrapper + Fetch Data
+          // This reveals the underlying page (updated)
+          onMotionChange?.("end");
+
+          // Extra safety trigger for parent update
           onRegistrationChange?.();
-        }, 300);
+        }, 600);
       } else {
         onMotionChange?.("end");
       }
@@ -196,21 +212,24 @@ export default function ActivityDetailsModal({
     }
   };
 
+  // --- 3. CLOSE SUCCESS MODAL FLOW ---
   const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false);
-
-    // Close the details modal now
-    onClose();
-
-    // Start motion overlay again
+    // A. Start Wrapper (Fade In)
     onMotionChange?.("start");
+
+    // B. Wait for wrapper (600ms)
     setTimeout(() => {
-      onMotionChange?.("end");
-      // Refresh data after motion ends
-      setTimeout(() => {
-        onRegistrationChange?.();
-      }, 300);
-    }, 750);
+      // Close Success Modal
+      setIsSuccessModalOpen(false);
+
+      // Close Details Modal
+      onClose();
+
+      // C. Fade Out Wrapper + Fetch Data
+      onMotionChange?.("end"); // skipFetch defaults to false -> triggers fetch
+
+      onRegistrationChange?.();
+    }, 600);
   };
 
   const handleEdit = () => {
@@ -234,7 +253,7 @@ export default function ActivityDetailsModal({
 
   if (!isOpen || !mounted) return null;
 
-  // -- Formatting Data --
+  // Formatting...
   const formattedTime = activity?.start_time?.slice(0, 5) || "";
   const dateObj = activity?.date ? new Date(activity.date) : null;
   const dayName = dateObj
@@ -247,34 +266,24 @@ export default function ActivityDetailsModal({
         .toString()
         .padStart(2, "0")}`
     : "";
-
   const isGroup = activity?.is_group || !!activity?.series_id;
   const instructor = activity?.instructor || "";
   const location = activity?.location || "";
   const branch = activity?.branch || "המרכז";
   const description = activity?.description || "";
-
-  // Calculate remaining spots
   const remainingSpots = Math.max(
     0,
     registrationCount.total - registrationCount.confirmed
   );
-
-  // -----------------------------------------------------------
-  // CONTROL HEIGHT HERE
-  // If no image, we add a larger top margin (e.g., 20vh)
-  // -----------------------------------------------------------
   const hasImage = !!activity?.image_url;
-  const contentFrameStyle = {
-    marginTop: hasImage ? "5rem" : "20vh",
-  };
+  const contentFrameStyle = { marginTop: hasImage ? "5rem" : "20vh" };
 
   const modalContent = (
     <>
+      {/* Hide details if we are showing Success Modal */}
       {!hideDetailsModal && (
         <>
           <div className={styles.overlay} onClick={onClose} />
-
           <div className={styles.modalContainer}>
             <button className={styles.closeButton} onClick={onClose}>
               <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
@@ -302,7 +311,6 @@ export default function ActivityDetailsModal({
                 <p className={styles.loadingText}>טוען...</p>
               ) : (
                 <>
-                  {/* 1. Image */}
                   {hasImage && (
                     <div className={styles.imageContainer}>
                       <img
@@ -313,12 +321,9 @@ export default function ActivityDetailsModal({
                     </div>
                   )}
 
-                  {/* 2. Title */}
                   <h2 className={styles.titleText}>{activity?.title || ""}</h2>
 
-                  {/* Details Container - All Right Aligned */}
                   <div className={styles.detailsContainer}>
-                    {/* 3. Day + Date + Time */}
                     <div className={styles.textBlock}>
                       <p className={styles.primaryInfoText}>
                         {dayName} {dayMonth}
@@ -328,7 +333,6 @@ export default function ActivityDetailsModal({
                       </p>
                     </div>
 
-                    {/* 4. Branch + Location + Instructor */}
                     <div className={styles.textBlock}>
                       <p className={styles.secondaryInfoText}>
                         בסניף {branch} ב{location}
@@ -338,7 +342,6 @@ export default function ActivityDetailsModal({
                       </p>
                     </div>
 
-                    {/* 5. Participants + Remaining Spots Logic */}
                     <div className={styles.textBlock}>
                       <p className={styles.secondaryInfoText}>
                         משתתפים: {registrationCount.confirmed}/
@@ -352,13 +355,11 @@ export default function ActivityDetailsModal({
                       </p>
                     </div>
 
-                    {/* 6. Description (Small text) */}
                     <div className={styles.descriptionBlock}>
                       <p className={styles.descriptionText}>{description}</p>
                     </div>
                   </div>
 
-                  {/* 7. Bottom Buttons (Centered) */}
                   <div className={styles.buttonContainer}>
                     {isAdmin ? (
                       <>
@@ -398,6 +399,7 @@ export default function ActivityDetailsModal({
       {isCancelModalOpen && (
         <CancelConfirmationModal
           isOpen={isCancelModalOpen}
+          // Only close via X button or explicit close logic
           onClose={() => setIsCancelModalOpen(false)}
           onConfirm={handleCancelConfirm}
           activityTitle={activity?.title || ""}
