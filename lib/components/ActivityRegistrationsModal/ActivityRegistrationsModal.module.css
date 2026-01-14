@@ -143,7 +143,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   padding: 1rem; /* 16px */
   gap: 0.625rem; /* 10px */
   width: 21.5625rem; /* 345px */
@@ -165,7 +165,7 @@
 .userInfo {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end;
   padding: 0;
   gap: 0.25rem; /* 4px */
@@ -204,6 +204,19 @@
   /* Same as confirmed - white text on transparent */
 }
 
+/* Pending approval status */
+.pendingStatus {
+  width: 100%;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.1875rem; /* 19px */
+  text-align: right;
+  color: rgba(247, 247, 247, 0.9);
+  margin: 0;
+}
+
 /* ============================================
    PROFILE LINK
    ============================================ */
@@ -213,6 +226,7 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+  align-self: flex-end;
   gap: 0.5rem; /* 8px */
   padding: 0;
   background: transparent;
