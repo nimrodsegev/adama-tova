@@ -29,6 +29,17 @@ export default function AdminNotificationsPage() {
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Swipe hint - show until admin uses "mark as read" for the first time
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+
+  // Check if admin has ever used mark as read
+  useEffect(() => {
+    const hasUsedMarkAsRead = localStorage.getItem("admin_used_mark_as_read");
+    if (!hasUsedMarkAsRead) {
+      setShowSwipeHint(true);
+    }
+  }, []);
+
   // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
@@ -87,6 +98,12 @@ export default function AdminNotificationsPage() {
   // Mark as Read Handler
   const handleMarkAsRead = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
+
+    // Admin has learned about mark as read - disable hint forever
+    if (showSwipeHint) {
+      setShowSwipeHint(false);
+      localStorage.setItem("admin_used_mark_as_read", "true");
+    }
 
     // Optimistic update
     setNotifications((prev) =>
@@ -179,22 +196,29 @@ export default function AdminNotificationsPage() {
           <p className={styles.loadingText}>טוען הודעות...</p>
         ) : filteredNotifications.length > 0 ? (
           <div className={styles.notificationsList}>
-            {filteredNotifications.map((notif) => (
-              <div key={notif.id} className={styles.notificationItem}>
-                <NewNotificationCard
-                  notification={{
-                    id: notif.id,
-                    title: notif.title,
-                    message: notif.message,
-                    timestamp: notif.timestamp,
-                    isRead: notif.isRead,
-                    activityId: notif.activityId,
-                  }}
-                  onMarkAsRead={handleMarkAsRead}
-                  onActivityClick={handleActivityClick}
-                />
-              </div>
-            ))}
+            {filteredNotifications.map((notif, index) => {
+              // Show swipe hint only on first unread notification
+              const isFirstUnread = showSwipeHint && !notif.isRead &&
+                filteredNotifications.findIndex(n => !n.isRead) === index;
+
+              return (
+                <div key={notif.id} className={styles.notificationItem}>
+                  <NewNotificationCard
+                    notification={{
+                      id: notif.id,
+                      title: notif.title,
+                      message: notif.message,
+                      timestamp: notif.timestamp,
+                      isRead: notif.isRead,
+                      activityId: notif.activityId,
+                    }}
+                    onMarkAsRead={handleMarkAsRead}
+                    onActivityClick={handleActivityClick}
+                    showSwipeHint={isFirstUnread}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           /* Empty State */

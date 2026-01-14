@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./NewNotificationCard.module.css";
 import Button from "@/lib/components/UI/Button";
 
@@ -17,17 +17,42 @@ interface NewNotificationCardProps {
   notification: NotificationProps;
   onMarkAsRead?: (id: string | number) => void;
   onActivityClick?: (activityId: string) => void;
+  showSwipeHint?: boolean;
 }
 
 export default function NewNotificationCard({
   notification,
   onMarkAsRead,
   onActivityClick,
+  showSwipeHint = false,
 }: NewNotificationCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [offset, setOffset] = useState(0);
   const [isSwiped, setIsSwiped] = useState(false);
+  const [isHintAnimating, setIsHintAnimating] = useState(false);
+
+  // Swipe hint animation - peek to show users they can swipe
+  useEffect(() => {
+    if (showSwipeHint && !notification.isRead) {
+      // Wait a moment, then peek
+      const peekTimeout = setTimeout(() => {
+        setIsHintAnimating(true);
+        setOffset(-120); // Show more of the סמן כנקרא
+
+        // Hold, then return smoothly
+        setTimeout(() => {
+          setOffset(0);
+          // Remove hint class after animation completes
+          setTimeout(() => {
+            setIsHintAnimating(false);
+          }, 800);
+        }, 1200); // Hold peek longer
+      }, 800); // Delay before peek starts
+
+      return () => clearTimeout(peekTimeout);
+    }
+  }, [showSwipeHint, notification.isRead]);
 
   const minSwipeDistance = 50;
   const maxSwipeOffset = -125;
@@ -100,7 +125,7 @@ export default function NewNotificationCard({
 
       {/* FOREGROUND CARD (Slides Left) */}
       <div
-        className={styles.card}
+        className={`${styles.card} ${isHintAnimating ? styles.hintAnimating : ''}`}
         style={{
           transform: `translateX(${offset}px)`,
           opacity: isSwiped ? 0.7 : 1,
