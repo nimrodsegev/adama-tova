@@ -1,10 +1,13 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiNotifications, supabase } from "@/app/services/db_api";
+import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
+import { HomeFilter, FilterOption } from "@/lib/components/UI/HomeFilter";
 import Button from "@/lib/components/UI/Button";
-import NotificationCard from "@/lib/components/Notifications/NotificationCard";
-import styles from "./NotificationsPage.module.css";
+import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import styles from "./AdminNotificationsPage.module.css";
 
 type Notification = {
   id: number;
@@ -13,14 +16,37 @@ type Notification = {
   timestamp: Date;
   isRead: boolean;
   title: string;
+  activityId?: string;
 };
 
-export default function NotificationsPage() {
+export default function AdminNotificationsPage() {
   const { user } = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
 
+  // Modal state
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Swipe hints - show until admin uses each feature
+  const [showMarkAsReadHint, setShowMarkAsReadHint] = useState(false);
+  const [showDeleteHint, setShowDeleteHint] = useState(false);
+
+  // Check if admin has used each swipe action
+  useEffect(() => {
+    const hasUsedMarkAsRead = localStorage.getItem("admin_used_mark_as_read");
+    const hasUsedDelete = localStorage.getItem("admin_used_delete");
+
+    if (!hasUsedMarkAsRead) {
+      setShowMarkAsReadHint(true);
+    }
+    if (!hasUsedDelete) {
+      setShowDeleteHint(true);
+    }
+  }, []);
+
+  // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
     const text = (dbRecord.title + " " + dbRecord.message).toLowerCase();
@@ -44,6 +70,7 @@ export default function NotificationsPage() {
       timestamp: new Date(dbRecord.created_at),
       isRead: dbRecord.is_read,
       title: dbRecord.title || "הודעה מערכת",
+      activityId: dbRecord.linked_activity_id,
     };
   };
 
@@ -74,23 +101,75 @@ export default function NotificationsPage() {
     };
   }, [user]);
 
-  // ✅ Mark as Read Handler
-  const handleMarkAsRead = async (id: number) => {
-    // Optimistic update - update UI immediately
+  // Mark as Read Handler
+  const handleMarkAsRead = async (id: number | string) => {
+    const numericId = typeof id === "string" ? parseInt(id) : id;
+
+    // Admin has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("admin_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("admin_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
+
+    // Optimistic update
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === numericId ? { ...n, isRead: true } : n))
     );
 
-    // Call API
-    const [_, error] = await apiNotifications.markAsRead(id);
+    const [_, error] = await apiNotifications.markAsRead(numericId);
 
     if (error) {
       console.error("Error marking as read:", error);
-      // Revert optimistic update on error
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: false } : n))
+        prev.map((n) => (n.id === numericId ? { ...n, isRead: false } : n))
       );
       alert("שגיאה בעדכון ההודעה");
+    }
+  };
+
+  // Handle activity click from notification card
+  const handleActivityClick = (activityId: string) => {
+    setSelectedActivityId(activityId);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedActivityId(null);
+  };
+
+  // Delete Handler
+  const handleDelete = async (id: number | string) => {
+    const numericId = typeof id === "string" ? parseInt(id) : id;
+
+    // Admin has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("admin_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("admin_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
+
+    // Optimistic update - remove from list
+    setNotifications((prev) => prev.filter((n) => n.id !== numericId));
+
+    const [_, error] = await apiNotifications.delete(numericId);
+
+    if (error) {
+      console.error("Error deleting notification:", error);
+      // Reload on error
+      if (user) {
+        const [data] = await apiNotifications.getList(user.id, 50);
+        if (data) setNotifications(data.map(mapDbToUi));
+      }
+      alert("שגיאה במחיקת ההודעה");
     }
   };
 
@@ -100,66 +179,145 @@ export default function NotificationsPage() {
   });
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const allCount = notifications.length;
+
+  // Filter options with counts
+  const filterOptions: FilterOption[] = [
+    { id: "all", label: "הכל", count: allCount },
+    { id: "unread", label: "לא נקראו", count: unreadCount },
+  ];
 
   if (!user)
     return (
-      <div className="mobile-container">
-        <p className="text-loading">אנא התחבר כדי לצפות בהודעות</p>
+      <div className={styles.pageContainer}>
+        <p className={styles.loadingText}>אנא התחבר כדי לצפות בהודעות</p>
       </div>
     );
 
   return (
-    <div className="mobile-container">
-      <div className="vector-background" />
+    <div className={styles.pageContainer}>
+      {/* Title */}
+      <div className={styles.titleContainer}>
+        <h1 className={styles.title}>הודעות ועדכונים</h1>
+      </div>
 
-      <h1 className="header-secondary absolute-header-right">
-        הודעות ועדכונים
-      </h1>
+      {/* Filter Tabs */}
+      <div className={styles.filterContainer}>
+        <HomeFilter
+          options={filterOptions}
+          activeOption={filter}
+          onFilterChange={(id) => setFilter(id as "all" | "unread")}
+        />
+      </div>
 
-      <div className="main-content-high">
-        <div className="filter-container">
-          <button
-            onClick={() => setFilter("all")}
-            className={`filter-button ${
-              filter === "all" ? "filter-button-active" : ""
-            }`}
-          >
-            הכל
-          </button>
-          <button
-            onClick={() => setFilter("unread")}
-            className={`filter-button ${
-              filter === "unread" ? "filter-button-active" : ""
-            }`}
-          >
-            לא נקראו
-          </button>
-        </div>
-
+      {/* Notifications List */}
+      <div className={styles.contentContainer}>
         {loading ? (
-          <p className="text-loading">טוען הודעות...</p>
-        ) : (
+          <p className={styles.loadingText}>טוען הודעות...</p>
+        ) : filteredNotifications.length > 0 ? (
           <div className={styles.notificationsList}>
-            {filteredNotifications.length > 0 ? (
-              filteredNotifications.map((notif) => (
-                <NotificationCard
-                  key={notif.id}
-                  notification={notif}
-                  onMarkAsRead={handleMarkAsRead}
-                />
-              ))
-            ) : (
-              <p className="text-empty">אין הודעות להצגה</p>
-            )}
+            {filteredNotifications.map((notif, index) => {
+              // Show hints only on first notification
+              const isFirst = index === 0;
+              // Mark as read hint only on first unread
+              const isFirstUnread = !notif.isRead &&
+                filteredNotifications.findIndex(n => !n.isRead) === index;
+
+              return (
+                <div key={notif.id} className={styles.notificationItem}>
+                  <NewNotificationCard
+                    notification={{
+                      id: notif.id,
+                      title: notif.title,
+                      message: notif.message,
+                      timestamp: notif.timestamp,
+                      isRead: notif.isRead,
+                      activityId: notif.activityId,
+                    }}
+                    onMarkAsRead={handleMarkAsRead}
+                    onDelete={handleDelete}
+                    onActivityClick={handleActivityClick}
+                    showMarkAsReadHint={showMarkAsReadHint && isFirstUnread}
+                    showDeleteHint={showDeleteHint && isFirst}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          /* Empty State */
+          <div className={styles.emptyStateContainer}>
+            <div className={styles.emptyStateContent}>
+              <div className={styles.emptyStateIcon}>
+                <svg width="48" height="49" viewBox="0 0 48 49" fill="none">
+                  {/* Outer dashed circle */}
+                  <circle
+                    cx="24"
+                    cy="24.5"
+                    r="22.9"
+                    stroke="rgba(255, 255, 255, 0.5)"
+                    strokeWidth="2.2"
+                    strokeDasharray="4 4"
+                    fill="none"
+                  />
+                  {/* Inner dashed circle */}
+                  <circle
+                    cx="24"
+                    cy="24.5"
+                    r="11"
+                    stroke="rgba(255, 255, 255, 0.5)"
+                    strokeWidth="2.2"
+                    strokeDasharray="4 4"
+                    fill="none"
+                  />
+                  {/* Horizontal line */}
+                  <line
+                    x1="19.7"
+                    y1="24.5"
+                    x2="28.3"
+                    y2="24.5"
+                    stroke="rgba(255, 245, 245, 0.7)"
+                    strokeWidth="1"
+                  />
+                  {/* Vertical line */}
+                  <line
+                    x1="24"
+                    y1="19.2"
+                    x2="24"
+                    y2="29.8"
+                    stroke="rgba(255, 245, 245, 0.7)"
+                    strokeWidth="1"
+                  />
+                </svg>
+              </div>
+              <p className={styles.emptyStateText}>אין הודעות אחרונות</p>
+            </div>
+
+            {/* Add notification button inside empty state */}
+            <Button size="L" href="/AdminScreens/addNotification">
+              להוספת הודעה
+            </Button>
           </div>
         )}
+      </div>
 
-        <div className={styles.buttonContainer}>
+      {/* Bottom Button - only show when there are notifications */}
+      {filteredNotifications.length > 0 && (
+        <div className={styles.bottomButton}>
           <Button size="L" href="/AdminScreens/addNotification">
-            + הודעה חדשה
+            להוספת הודעה
           </Button>
         </div>
-      </div>
+      )}
+
+      {/* Activity Details Modal */}
+      {selectedActivityId && (
+        <ActivityDetailsModal
+          isOpen={isModalOpen}
+          activityId={selectedActivityId}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }
