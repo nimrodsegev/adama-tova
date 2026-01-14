@@ -12,11 +12,6 @@ import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 import styles from "./UserCalendarPage.module.css";
 
-const CALENDAR_FILTERS = [
-  { id: "all", label: "הכל" },
-  { id: "foryou", label: "בשבילך" },
-];
-
 const INTRESTS_MAPPING: Record<string, string> = {
   מיינדפולנס: "mindfulness",
   "גוף ותנועה": "body_motion",
@@ -39,7 +34,7 @@ export default function NewUserCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // 1. NEW: Dynamic Motion Mode State
+  // Motion Mode State
   const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
     "spouting"
   );
@@ -86,13 +81,12 @@ export default function NewUserCalendarPage() {
     }
   };
 
-  // 2. UPDATED: Switch mode here too
   const handleMotionState = async (
     state: "start" | "end",
     skipFetch?: boolean
   ) => {
     if (state === "start") {
-      setMotionMode("breathing"); // <--- Change to liquid
+      setMotionMode("breathing");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
@@ -108,25 +102,39 @@ export default function NewUserCalendarPage() {
     fetchData();
   }, [selectedDate, user]);
 
-  const filteredActivities = activities.filter((activity: any) => {
-    if (filter === "all") return true;
+  // --- 1. FILTER LOGIC & COUNTS ---
 
-    if (filter === "foryou") {
-      const isRegistered = registeredActivityIds.includes(activity.id);
-      let isInterested = false;
-      if (userProfile?.quiz?.interests) {
-        const myInterests = userProfile.quiz.interests.map(
-          (i: string) => INTRESTS_MAPPING[i] || i
-        );
-        isInterested = myInterests.includes(activity.category);
-      }
-      return isRegistered || isInterested;
+  // A. Calculate "For You" list separately to get the count
+  const forYouActivities = activities.filter((activity) => {
+    const isRegistered = registeredActivityIds.includes(activity.id);
+    let isInterested = false;
+    if (userProfile?.quiz?.interests) {
+      const myInterests = userProfile.quiz.interests.map(
+        (i: string) => INTRESTS_MAPPING[i] || i
+      );
+      isInterested = myInterests.includes(activity.category);
     }
-    return true;
+    return isRegistered || isInterested;
   });
 
+  // B. Define the dynamic filter options
+  const dynamicFilters = [
+    {
+      id: "all",
+      label: "הכל",
+      count: activities.length, // Total count
+    },
+    {
+      id: "foryou",
+      label: "בשבילך",
+      count: forYouActivities.length, // Personalized count
+    },
+  ];
+
+  // C. Determine which list to display based on active filter
+  const displayedActivities = filter === "all" ? activities : forYouActivities;
+
   return (
-    // 3. PASS MODE PROP
     <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer}>
         <main className={styles.mainFrame}>
@@ -143,15 +151,15 @@ export default function NewUserCalendarPage() {
 
           <div className={styles.filterSection}>
             <HomeFilter
-              options={CALENDAR_FILTERS}
+              options={dynamicFilters} // Pass the dynamic options with counts
               activeOption={filter}
               onFilterChange={(newId) => setFilter(newId)}
             />
           </div>
 
           <div className={styles.activitiesList}>
-            {filteredActivities.length > 0
-              ? filteredActivities.map((activity) => {
+            {displayedActivities.length > 0
+              ? displayedActivities.map((activity) => {
                   const isRegistered = registeredActivityIds.includes(
                     activity.id
                   );
@@ -160,7 +168,7 @@ export default function NewUserCalendarPage() {
                       key={activity.id}
                       id={activity.id}
                       title={activity.title}
-                      instructor={activity.instructor || "לא צוין"} // Added instructor
+                      instructor={activity.instructor || "לא צוין"}
                       date={activity.date}
                       startTime={activity.start_time}
                       endTime={activity.end_time}
