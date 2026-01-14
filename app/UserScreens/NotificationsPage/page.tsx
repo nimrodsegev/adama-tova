@@ -6,7 +6,8 @@ import { apiNotifications, supabase } from "@/app/services/db_api";
 import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import Button from "@/lib/components/UI/Button"; // Make sure this path is correct for your project
+import Button from "@/lib/components/UI/Button";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; // <--- 1. Import Wrapper
 import styles from "./UserNotificationPage.module.css";
 
 type Notification = {
@@ -36,11 +37,10 @@ export default function NewUserNotificationPage() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Swipe hints - show until user uses each feature
+  // Swipe hints
   const [showMarkAsReadHint, setShowMarkAsReadHint] = useState(false);
   const [showDeleteHint, setShowDeleteHint] = useState(false);
 
-  // Check if user has used each swipe action
   useEffect(() => {
     const hasUsedMarkAsRead = localStorage.getItem("user_used_mark_as_read");
     const hasUsedDelete = localStorage.getItem("user_used_delete");
@@ -53,7 +53,6 @@ export default function NewUserNotificationPage() {
     }
   }, []);
 
-  // Helper to convert DB record to UI object
   const mapDbToUi = (dbRecord: any): Notification => {
     let type: "info" | "warning" | "success" | "error" = "info";
     const text = (dbRecord.title + " " + dbRecord.message).toLowerCase();
@@ -111,13 +110,9 @@ export default function NewUserNotificationPage() {
   const handleMarkAsRead = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
 
-    // User has learned about swiping - disable both hints for this session and forever
-    if (showMarkAsReadHint) {
+    if (showMarkAsReadHint)
       localStorage.setItem("user_used_mark_as_read", "true");
-    }
-    if (showDeleteHint) {
-      localStorage.setItem("user_used_delete", "true");
-    }
+    if (showDeleteHint) localStorage.setItem("user_used_delete", "true");
     setShowMarkAsReadHint(false);
     setShowDeleteHint(false);
 
@@ -136,58 +131,42 @@ export default function NewUserNotificationPage() {
     }
   };
 
-  // NEW: Handle "Mark All As Read"
   const handleMarkAllAsRead = async () => {
     if (!user) return;
-
-    // 1. Optimistic Update (Instant UI change)
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-
-    // 2. Call API
     const [res, error] = await apiNotifications.markAllAsRead(user.id);
 
     if (error) {
       console.error("Error marking all as read", error);
-      // Revert on error (optional, usually fetching list again is safer)
       const [data] = await apiNotifications.getList(user.id, 50);
       if (data) setNotifications(data.map(mapDbToUi));
     }
   };
 
-  // Handle activity click from notification card
   const handleActivityClick = (activityId: string) => {
     setSelectedActivityId(activityId);
     setIsModalOpen(true);
   };
 
-  // Close modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedActivityId(null);
   };
 
-  // Delete Handler
   const handleDelete = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
 
-    // User has learned about swiping - disable both hints for this session and forever
-    if (showMarkAsReadHint) {
+    if (showMarkAsReadHint)
       localStorage.setItem("user_used_mark_as_read", "true");
-    }
-    if (showDeleteHint) {
-      localStorage.setItem("user_used_delete", "true");
-    }
+    if (showDeleteHint) localStorage.setItem("user_used_delete", "true");
     setShowMarkAsReadHint(false);
     setShowDeleteHint(false);
 
-    // Optimistic update - remove from list
     setNotifications((prev) => prev.filter((n) => n.id !== numericId));
-
     const [_, error] = await apiNotifications.delete(numericId);
 
     if (error) {
       console.error("Error deleting notification:", error);
-      // Reload on error
       if (user) {
         const [data] = await apiNotifications.getList(user.id, 50);
         if (data) setNotifications(data.map(mapDbToUi));
@@ -201,95 +180,80 @@ export default function NewUserNotificationPage() {
     return true;
   });
 
-  if (!user)
-    return (
-      <div className={styles.pageContainer}>
-        <p className="text-loading">אנא התחבר כדי לצפות בהודעות</p>
-      </div>
-    );
-
   return (
-    <div className={styles.pageContainer}>
-      <div className="vector-background" />
+    // <--- 2. Apply Wrapper
+    <SmoothPageWrapper isLoading={loading || !user}>
+      <div className={styles.pageContainer}>
+        <div className="vector-background" />
 
-      {/* Centered Title */}
-      <div className={styles.titleContainer}>
-        <h1 className={styles.title}>הודעות ועדכונים</h1>
-      </div>
+        <div className={styles.titleContainer}>
+          <h1 className={styles.title}>הודעות ועדכונים</h1>
+        </div>
 
-      {/* Centered Filter */}
-      <div className={styles.filterContainer}>
-        <HomeFilter
-          options={NOTIFICATION_FILTERS}
-          activeOption={filter}
-          onFilterChange={(id) => setFilter(id as "all" | "unread")}
-        />
-      </div>
+        <div className={styles.filterContainer}>
+          <HomeFilter
+            options={NOTIFICATION_FILTERS}
+            activeOption={filter}
+            onFilterChange={(id) => setFilter(id as "all" | "unread")}
+          />
+        </div>
 
-      {/* NEW: Mark All As Read Button */}
-      <div className={styles.actionsContainer}>
-        <Button
-          variant="secondary"
-          size="L-short"
-          customBgColor="transparent"
-          customTextColor="var(--color-bg-light-opaque)"
-          customBorderColor="transparent"
-          onClick={handleMarkAllAsRead}
-          disabled={loading || notifications.every((n) => n.isRead)}
-        >
-          סמן הכל כנקרא
-        </Button>
-      </div>
+        <div className={styles.actionsContainer}>
+          <Button
+            variant="secondary"
+            size="L-short"
+            customBgColor="transparent"
+            customTextColor="var(--color-bg-light-opaque)"
+            customBorderColor="transparent"
+            onClick={handleMarkAllAsRead}
+            disabled={loading || notifications.every((n) => n.isRead)}
+          >
+            סמן הכל כנקרא
+          </Button>
+        </div>
 
-      {/* Notifications List */}
-      <div className={styles.contentContainer}>
-        {loading ? (
-          <p className="text-loading">טוען הודעות...</p>
-        ) : (
+        <div className={styles.contentContainer}>
+          {/* Note: Loading state is handled by wrapper, so we just show content here */}
           <div className={styles.notificationsList}>
-            {filteredNotifications.length > 0 ? (
-              filteredNotifications.map((notif, index) => {
-                // Show hints only on first notification
-                const isFirst = index === 0;
-                // Mark as read hint only on first unread
-                const isFirstUnread = !notif.isRead &&
-                  filteredNotifications.findIndex(n => !n.isRead) === index;
+            {filteredNotifications.length > 0
+              ? filteredNotifications.map((notif, index) => {
+                  const isFirst = index === 0;
+                  const isFirstUnread =
+                    !notif.isRead &&
+                    filteredNotifications.findIndex((n) => !n.isRead) === index;
 
-                return (
-                  <div key={notif.id} className={styles.notificationItem}>
-                    <NewNotificationCard
-                      notification={{
-                        id: notif.id,
-                        title: notif.title,
-                        message: notif.message,
-                        timestamp: notif.timestamp,
-                        isRead: notif.isRead,
-                        activityId: notif.activityId,
-                      }}
-                      onMarkAsRead={handleMarkAsRead}
-                      onDelete={handleDelete}
-                      onActivityClick={handleActivityClick}
-                      showMarkAsReadHint={showMarkAsReadHint && isFirstUnread}
-                      showDeleteHint={showDeleteHint && isFirst}
-                    />
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-empty">כל ההודעות שלך נקראו</p>
-            )}
+                  return (
+                    <div key={notif.id} className={styles.notificationItem}>
+                      <NewNotificationCard
+                        notification={{
+                          id: notif.id,
+                          title: notif.title,
+                          message: notif.message,
+                          timestamp: notif.timestamp,
+                          isRead: notif.isRead,
+                          activityId: notif.activityId,
+                        }}
+                        onMarkAsRead={handleMarkAsRead}
+                        onDelete={handleDelete}
+                        onActivityClick={handleActivityClick}
+                        showMarkAsReadHint={showMarkAsReadHint && isFirstUnread}
+                        showDeleteHint={showDeleteHint && isFirst}
+                      />
+                    </div>
+                  );
+                })
+              : !loading && <p className="text-empty">כל ההודעות שלך נקראו</p>}
           </div>
+        </div>
+
+        {selectedActivityId && (
+          <ActivityDetailsModal
+            isOpen={isModalOpen}
+            activityId={selectedActivityId}
+            onClose={handleCloseModal}
+          />
         )}
       </div>
-
-      {/* Activity Details Modal */}
-      {selectedActivityId && (
-        <ActivityDetailsModal
-          isOpen={isModalOpen}
-          activityId={selectedActivityId}
-          onClose={handleCloseModal}
-        />
-      )}
-    </div>
+    </SmoothPageWrapper>
   );
 }
