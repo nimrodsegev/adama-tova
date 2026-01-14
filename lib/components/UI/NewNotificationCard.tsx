@@ -37,7 +37,9 @@ export default function NewNotificationCard({
   const [offset, setOffset] = useState(0);
   const [isSwiped, setIsSwiped] = useState(false);
   const [isHintAnimating, setIsHintAnimating] = useState(false);
+  const [isPeeking, setIsPeeking] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Swipe hint animation - peek to show users they can swipe
   useEffect(() => {
@@ -46,51 +48,80 @@ export default function NewNotificationCard({
 
     if (!shouldShowMarkAsRead && !shouldShowDelete) return;
 
+    const PEEK_MS = 1000;  // Must match CSS transition duration
+    const HOLD_MS = 300;   // Small pause at max peek position
+
     const timeouts: NodeJS.Timeout[] = [];
-    let currentDelay = 1000; // Initial delay
+    let currentDelay = 4000; // Initial delay - 4 seconds to let user see the page
 
     // First: Show mark as read hint (if applicable)
     if (shouldShowMarkAsRead) {
       const peekTimeout = setTimeout(() => {
+        setIsPeeking(true);
         setIsHintAnimating(true);
         setSwipeDirection("left");
-        setOffset(-120);
 
-        // Return to center
+        // Apply offset after two frames to ensure CSS class is fully applied
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setOffset(-120);
+          });
+        });
+
+        // Return to center after peek + hold
         const returnTimeout = setTimeout(() => {
           setOffset(0);
-          setTimeout(() => {
+
+          // Cleanup after return animation completes
+          const cleanupTimeout = setTimeout(() => {
             setSwipeDirection(null);
-          }, 600);
-        }, 1000);
+            setIsPeeking(false);
+            setIsHintAnimating(false);
+          }, PEEK_MS);
+          timeouts.push(cleanupTimeout);
+        }, PEEK_MS + HOLD_MS);
         timeouts.push(returnTimeout);
       }, currentDelay);
       timeouts.push(peekTimeout);
-      currentDelay += 2000; // Wait for first animation to complete
+      currentDelay += (PEEK_MS * 2 + HOLD_MS + 300); // Wait for full animation cycle
     }
 
     // Second: Show delete hint (if applicable)
     if (shouldShowDelete) {
       const deleteHintTimeout = setTimeout(() => {
+        setIsPeeking(true);
         setIsHintAnimating(true);
         setSwipeDirection("right");
-        setOffset(120);
 
-        // Return to center
+        // Apply offset after two frames to ensure CSS class is fully applied
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setOffset(120);
+          });
+        });
+
+        // Return to center after peek + hold
         const returnTimeout = setTimeout(() => {
           setOffset(0);
-          setTimeout(() => {
+
+          // Cleanup after return animation completes
+          const cleanupTimeout = setTimeout(() => {
             setSwipeDirection(null);
+            setIsPeeking(false);
             setIsHintAnimating(false);
-          }, 600);
-        }, 1000);
+          }, PEEK_MS);
+          timeouts.push(cleanupTimeout);
+        }, PEEK_MS + HOLD_MS);
         timeouts.push(returnTimeout);
       }, currentDelay);
       timeouts.push(deleteHintTimeout);
     } else {
-      // If only mark as read hint, clean up after it
+      // Safety cleanup if only mark-as-read hint is shown
       const cleanupTimeout = setTimeout(() => {
         setIsHintAnimating(false);
+        setIsPeeking(false);
+        setSwipeDirection(null);
+        setOffset(0);
       }, currentDelay);
       timeouts.push(cleanupTimeout);
     }
@@ -101,8 +132,8 @@ export default function NewNotificationCard({
   }, [showMarkAsReadHint, showDeleteHint, notification.isRead]);
 
   const minSwipeDistance = 50;
-  const maxSwipeOffset = -125;
-  const maxDeleteOffset = 125; // Positive for right swipe (delete)
+  const maxSwipeOffset = -120; // Match action box width (7.5rem ≈ 120px)
+  const maxDeleteOffset = 120; // Positive for right swipe (delete)
 
   const formatTime = (dateInput: string | Date) => {
     const date = new Date(dateInput);
@@ -117,6 +148,8 @@ export default function NewNotificationCard({
     setTouchStart(e.targetTouches[0].clientX);
     setIsSwiped(false);
     setSwipeDirection(null);
+    setIsPeeking(false); // Exit peek mode so real swipes are instant
+    setIsDragging(true);
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
@@ -138,6 +171,8 @@ export default function NewNotificationCard({
   };
 
   const onTouchEnd = () => {
+    setIsDragging(false);
+
     if (!touchStart || !touchEnd) {
       setOffset(0);
       setSwipeDirection(null);
@@ -180,8 +215,14 @@ export default function NewNotificationCard({
     setTouchEnd(null);
   };
 
+  // Divider line only shows when swiping/peeking
+  const dividerClass =
+    swipeDirection === "left" ? styles.showRightDivider :
+    swipeDirection === "right" ? styles.showLeftDivider :
+    "";
+
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isPeeking ? styles.peek : ''}`}>
       {/* RIGHT SIDE - Mark as Read (shows when swiping left) */}
       {swipeDirection === "left" && (
         <div className={styles.revealMask} style={{ width: Math.abs(offset) }}>
@@ -208,7 +249,7 @@ export default function NewNotificationCard({
 
       {/* FOREGROUND CARD (Slides Left or Right) */}
       <div
-        className={`${styles.card} ${isHintAnimating ? styles.hintAnimating : ''}`}
+        className={`${styles.card} ${isHintAnimating ? styles.hintAnimating : ''} ${isDragging ? styles.dragging : ''} ${dividerClass}`}
         style={{
           transform: `translateX(${offset}px)`,
           opacity: isSwiped ? 0.7 : 1,

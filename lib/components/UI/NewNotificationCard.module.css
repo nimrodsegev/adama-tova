@@ -1,10 +1,11 @@
-/* Container - Holds the static Glass Background & Border */
+/* Container - Holds the static Glass Background */
 .container {
   position: relative;
+  box-sizing: border-box;
   width: 100%;
   max-width: 21.5625rem; /* ~345px */
 
-  min-height: 5.625rem;
+  min-height: 7.8125rem; /* 125px from Figma */
   height: auto;
 
   /* --- GLASS EFFECT --- */
@@ -12,9 +13,9 @@
   backdrop-filter: blur(0.625rem); /* 10px Blur for Glass Effect */
   -webkit-backdrop-filter: blur(0.625rem); /* Safari support */
 
-  /* Container Stroke */
+  /* Outer border always visible on container */
   border: 0.0625rem solid #f9f9f9;
-  border-radius: var(--radius-sm);
+  border-radius: 0.5625rem; /* 9px */
 
   user-select: none;
   direction: rtl;
@@ -40,25 +41,30 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+
+  /* No transition by default - real swipes must be instant */
+  transition: none;
+  will-change: width;
+}
+
+/* During peek animation, animate the mask width */
+.peek .revealMask {
+  transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* --- SWIPE ACTION BOX --- */
 .swipeActionBox {
   width: 7.5rem;
-  height: 100%; /* Fills container height completely */
+  height: 100%;
 
-  /* NO STROKE (Uses container's border due to overflow:hidden) */
+  /* No border - only card draws divider line */
+  box-sizing: border-box;
   border: none;
+  border-radius: 0;
   margin: 0;
 
   background: rgba(179, 126, 179, 0.5);
-  /* Optional: Inner radius just on left side if you want it to look separate, 
-     but usually for full fill we keep it square or match container radius.
-     Let's keep inner radius small for aesthetics. */
-  border-top-left-radius: var(--radius-xs);
-  border-bottom-left-radius: var(--radius-xs);
 
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -96,6 +102,15 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  /* No transition by default - real swipes must be instant */
+  transition: none;
+  will-change: width;
+}
+
+/* During peek animation, animate the mask width */
+.peek .deleteRevealMask {
+  transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* --- DELETE ACTION BOX --- */
@@ -103,14 +118,14 @@
   width: 7.5rem;
   height: 100%;
 
+  /* No border - only card draws divider line */
+  box-sizing: border-box;
   border: none;
+  border-radius: 0;
   margin: 0;
 
   background: rgba(167, 0, 0, 0.7);
-  border-top-right-radius: var(--radius-xs);
-  border-bottom-right-radius: var(--radius-xs);
 
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -142,7 +157,7 @@
 
   flex-grow: 1;
   width: 100%;
-  min-height: 5.625rem;
+  min-height: 7.8125rem; /* 125px from Figma */
 
   display: flex;
   flex-direction: column;
@@ -154,13 +169,35 @@
   /* Transparent so Glass BG shows through */
   background: transparent;
 
+  /* No border at rest - container handles outer stroke */
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  /* Fast transition for real swipes */
   transition: transform 0.1s linear;
   touch-action: pan-y;
+  will-change: transform;
 }
 
-/* Smooth transition for swipe hint animation */
-.card.hintAnimating {
-  transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+/* Smooth transition for swipe hint animation - only during peek */
+.peek .card.hintAnimating {
+  transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* No transition during real swipe - card follows finger exactly */
+.card.dragging {
+  transition: none !important;
+}
+
+/* Divider line on right edge (when swiping left to reveal mark-as-read) */
+.card.showRightDivider {
+  box-shadow: inset -1px 0 0 #f9f9f9;
+}
+
+/* Divider line on left edge (when swiping right to reveal delete) */
+.card.showLeftDivider {
+  box-shadow: inset 1px 0 0 #f9f9f9;
 }
 
 /* HEADER */
