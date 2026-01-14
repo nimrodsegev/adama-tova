@@ -19,7 +19,8 @@ interface NewNotificationCardProps {
   onMarkAsRead?: (id: string | number) => void;
   onDelete?: (id: string | number) => void;
   onActivityClick?: (activityId: string) => void;
-  showSwipeHint?: boolean;
+  showMarkAsReadHint?: boolean;
+  showDeleteHint?: boolean;
 }
 
 export default function NewNotificationCard({
@@ -27,7 +28,8 @@ export default function NewNotificationCard({
   onMarkAsRead,
   onDelete,
   onActivityClick,
-  showSwipeHint = false,
+  showMarkAsReadHint = false,
+  showDeleteHint = false,
 }: NewNotificationCardProps) {
   const { t } = useIvrita();
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -39,25 +41,64 @@ export default function NewNotificationCard({
 
   // Swipe hint animation - peek to show users they can swipe
   useEffect(() => {
-    if (showSwipeHint && !notification.isRead) {
-      // Wait a moment, then peek
+    const shouldShowMarkAsRead = showMarkAsReadHint && !notification.isRead;
+    const shouldShowDelete = showDeleteHint;
+
+    if (!shouldShowMarkAsRead && !shouldShowDelete) return;
+
+    const timeouts: NodeJS.Timeout[] = [];
+    let currentDelay = 1000; // Initial delay
+
+    // First: Show mark as read hint (if applicable)
+    if (shouldShowMarkAsRead) {
       const peekTimeout = setTimeout(() => {
         setIsHintAnimating(true);
-        setOffset(-120); // Show more of the סמן כנקרא
+        setSwipeDirection("left");
+        setOffset(-120);
 
-        // Hold, then return smoothly
-        setTimeout(() => {
+        // Return to center
+        const returnTimeout = setTimeout(() => {
           setOffset(0);
-          // Remove hint class after animation completes
           setTimeout(() => {
-            setIsHintAnimating(false);
-          }, 800);
-        }, 1200); // Hold peek longer
-      }, 800); // Delay before peek starts
-
-      return () => clearTimeout(peekTimeout);
+            setSwipeDirection(null);
+          }, 600);
+        }, 1000);
+        timeouts.push(returnTimeout);
+      }, currentDelay);
+      timeouts.push(peekTimeout);
+      currentDelay += 2000; // Wait for first animation to complete
     }
-  }, [showSwipeHint, notification.isRead]);
+
+    // Second: Show delete hint (if applicable)
+    if (shouldShowDelete) {
+      const deleteHintTimeout = setTimeout(() => {
+        setIsHintAnimating(true);
+        setSwipeDirection("right");
+        setOffset(120);
+
+        // Return to center
+        const returnTimeout = setTimeout(() => {
+          setOffset(0);
+          setTimeout(() => {
+            setSwipeDirection(null);
+            setIsHintAnimating(false);
+          }, 600);
+        }, 1000);
+        timeouts.push(returnTimeout);
+      }, currentDelay);
+      timeouts.push(deleteHintTimeout);
+    } else {
+      // If only mark as read hint, clean up after it
+      const cleanupTimeout = setTimeout(() => {
+        setIsHintAnimating(false);
+      }, currentDelay);
+      timeouts.push(cleanupTimeout);
+    }
+
+    return () => {
+      timeouts.forEach(t => clearTimeout(t));
+    };
+  }, [showMarkAsReadHint, showDeleteHint, notification.isRead]);
 
   const minSwipeDistance = 50;
   const maxSwipeOffset = -125;

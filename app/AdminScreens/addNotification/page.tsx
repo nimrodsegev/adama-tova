@@ -61,19 +61,18 @@ export default function AddNotificationPage() {
         );
         if (error) throw error;
       } else if (targetType === "date") {
-        const [activities, fetchError] = await apiActivities.getByDate(
-          selectedDate
+        const [res, error] = await apiActivities.notifyByDate(
+          selectedDate,
+          title,
+          message
         );
-        if (fetchError) throw fetchError;
-        if (activities && activities.length > 0) {
-          const promises = activities.map((act: any) =>
-            apiActivities.notifyParticipants(act.id, title, message)
-          );
-          await Promise.all(promises);
-        } else {
-          alert("לא נמצאו פעילויות בתאריך שנבחר");
-          setIsSubmitting(false);
-          return;
+        if (error) {
+          if (error.includes("No activities found")) {
+            alert("לא נמצאו פעילויות בתאריך שנבחר");
+            setIsSubmitting(false);
+            return;
+          }
+          throw error;
         }
       } else if (targetType === "circle") {
         // New logic for Circle notification

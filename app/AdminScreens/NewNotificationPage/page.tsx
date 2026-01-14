@@ -29,14 +29,20 @@ export default function AdminNotificationsPage() {
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Swipe hint - show until admin uses "mark as read" for the first time
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  // Swipe hints - show until admin uses each feature
+  const [showMarkAsReadHint, setShowMarkAsReadHint] = useState(false);
+  const [showDeleteHint, setShowDeleteHint] = useState(false);
 
-  // Check if admin has ever used mark as read
+  // Check if admin has used each swipe action
   useEffect(() => {
     const hasUsedMarkAsRead = localStorage.getItem("admin_used_mark_as_read");
+    const hasUsedDelete = localStorage.getItem("admin_used_delete");
+
     if (!hasUsedMarkAsRead) {
-      setShowSwipeHint(true);
+      setShowMarkAsReadHint(true);
+    }
+    if (!hasUsedDelete) {
+      setShowDeleteHint(true);
     }
   }, []);
 
@@ -99,11 +105,15 @@ export default function AdminNotificationsPage() {
   const handleMarkAsRead = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
 
-    // Admin has learned about mark as read - disable hint forever
-    if (showSwipeHint) {
-      setShowSwipeHint(false);
+    // Admin has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
       localStorage.setItem("admin_used_mark_as_read", "true");
     }
+    if (showDeleteHint) {
+      localStorage.setItem("admin_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
 
     // Optimistic update
     setNotifications((prev) =>
@@ -136,6 +146,16 @@ export default function AdminNotificationsPage() {
   // Delete Handler
   const handleDelete = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
+
+    // Admin has learned about swiping - disable both hints for this session and forever
+    if (showMarkAsReadHint) {
+      localStorage.setItem("admin_used_mark_as_read", "true");
+    }
+    if (showDeleteHint) {
+      localStorage.setItem("admin_used_delete", "true");
+    }
+    setShowMarkAsReadHint(false);
+    setShowDeleteHint(false);
 
     // Optimistic update - remove from list
     setNotifications((prev) => prev.filter((n) => n.id !== numericId));
@@ -197,8 +217,10 @@ export default function AdminNotificationsPage() {
         ) : filteredNotifications.length > 0 ? (
           <div className={styles.notificationsList}>
             {filteredNotifications.map((notif, index) => {
-              // Show swipe hint only on first unread notification
-              const isFirstUnread = showSwipeHint && !notif.isRead &&
+              // Show hints only on first notification
+              const isFirst = index === 0;
+              // Mark as read hint only on first unread
+              const isFirstUnread = !notif.isRead &&
                 filteredNotifications.findIndex(n => !n.isRead) === index;
 
               return (
@@ -215,7 +237,8 @@ export default function AdminNotificationsPage() {
                     onMarkAsRead={handleMarkAsRead}
                     onDelete={handleDelete}
                     onActivityClick={handleActivityClick}
-                    showSwipeHint={isFirstUnread}
+                    showMarkAsReadHint={showMarkAsReadHint && isFirstUnread}
+                    showDeleteHint={showDeleteHint && isFirst}
                   />
                 </div>
               );
