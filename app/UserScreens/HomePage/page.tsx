@@ -40,6 +40,14 @@ const OPENING_HOURS = {
   3: { open: "16:00", close: "22:00" },
 };
 
+// Helper: Check if activity is in the future
+const isActivityInFuture = (activity: Activity) => {
+  if (!activity.date) return false;
+  const timeString = activity.start_time || "00:00";
+  const activityDateTime = new Date(`${activity.date}T${timeString}`);
+  return activityDateTime >= new Date();
+};
+
 export default function NewUserHomePage() {
   const { user, userProfile } = useUser();
   const [activeFilter, setActiveFilter] = useState<"recommended" | "yours">(
@@ -52,16 +60,11 @@ export default function NewUserHomePage() {
     []
   );
 
-  // Loading States
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Motion Mode State
   const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
     "spouting"
   );
-
-  // Background Circles State
   const [bgCircleConfig, setBgCircleConfig] = useState({
     radius: 0.07,
     x: 0.47,
@@ -77,46 +80,30 @@ export default function NewUserHomePage() {
     return OPENING_HOURS[today] || null;
   })();
 
-  // --- UPDATED RESIZE LOGIC (Width + Height) ---
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-
-      // 1. Base Config (Standard Phones ~390x844)
       let newConfig = { radius: 0.07, x: 0.47, y: 0.125 };
 
-      // 2. Width Adjustments
       if (width < 380) {
-        // Small width (iPhone SE width etc)
         newConfig.radius = 0.06;
-        newConfig.x = 0.5; // Center it
+        newConfig.x = 0.5;
         newConfig.y = 0.125;
       } else if (width > 600) {
-        // Tablet / Desktop
         newConfig.radius = 0.12;
         newConfig.x = 0.5;
         newConfig.y = 0.15;
       }
 
-      // 3. Height Adjustments (Cascading overrides matching CSS)
-
-      // < 800px (Medium-Short)
-      if (height < 800) {
-        // Shift slightly up
-        newConfig.y = 0.11;
-      }
-
-      // < 700px (Short) - Content moves up significantly in CSS
+      if (height < 800) newConfig.y = 0.11;
       if (height < 700) {
-        newConfig.radius = Math.min(newConfig.radius, 0.06); // Shrink slightly
-        newConfig.y = 0.1; // Move up to avoid overlap
+        newConfig.radius = Math.min(newConfig.radius, 0.06);
+        newConfig.y = 0.1;
       }
-
-      // < 600px (Very Short)
       if (height < 600) {
-        newConfig.radius = Math.min(newConfig.radius, 0.05); // Shrink more
-        newConfig.y = 0.08; // Move way up
+        newConfig.radius = Math.min(newConfig.radius, 0.05);
+        newConfig.y = 0.08;
       }
 
       setBgCircleConfig(newConfig);
@@ -153,9 +140,13 @@ export default function NewUserHomePage() {
       ]);
 
       if (activities && userBranches) {
-        const branchFiltered = activities.filter(
+        // 1. Filter by Branch
+        let validActivities = activities.filter(
           (act: Activity) => !act.branch || userBranches.includes(act.branch)
         );
+
+        // 2. Filter by Future Date/Time
+        validActivities = validActivities.filter(isActivityInFuture);
 
         const processList = (list: Activity[]) => {
           const unique: Activity[] = [];
@@ -170,10 +161,10 @@ export default function NewUserHomePage() {
         };
 
         const regList = processList(
-          branchFiltered.filter((act: Activity) => approvedIds.includes(act.id))
+          validActivities.filter((act: Activity) => approvedIds.includes(act.id))
         );
 
-        const candidates = branchFiltered.filter(
+        const candidates = validActivities.filter(
           (act: Activity) => !allInteractedIds.includes(act.id)
         );
         const suggList = processList(candidates);
