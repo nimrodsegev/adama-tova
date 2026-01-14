@@ -12,6 +12,7 @@ interface NewAdminActivityCardProps {
   currentParticipants: number;
   maxParticipants: number;
   onClick?: () => void;
+  onRegistrationsClick?: () => void;
 }
 
 const NewAdminActivityCard: React.FC<NewAdminActivityCardProps> = ({
@@ -22,6 +23,7 @@ const NewAdminActivityCard: React.FC<NewAdminActivityCardProps> = ({
   currentParticipants,
   maxParticipants,
   onClick,
+  onRegistrationsClick,
 }) => {
   const formatTime = (time: string) => time.slice(0, 5);
   const isOverCapacity = currentParticipants > maxParticipants;
@@ -47,7 +49,14 @@ const NewAdminActivityCard: React.FC<NewAdminActivityCardProps> = ({
       </p>
 
       {/* Registration link with arrow - bottom left */}
-      <button className={styles.registrationLink} type="button">
+      <button
+        className={styles.registrationLink}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRegistrationsClick?.();
+        }}
+      >
         לכל הנרשמים
         <span className={styles.registrationArrow}></span>
       </button>

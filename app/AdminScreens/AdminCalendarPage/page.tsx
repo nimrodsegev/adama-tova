@@ -9,6 +9,7 @@ import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 
 import styles from "./AdminCalendarPage.module.css";
 
@@ -25,6 +26,11 @@ export default function AdminCalendarPage() {
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+
+  // Registrations modal state
+  const [registrationsActivityId, setRegistrationsActivityId] = useState<string | null>(null);
+  const [registrationsActivityTitle, setRegistrationsActivityTitle] = useState<string>("");
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] = useState(false);
 
   const fetchData = async () => {
     setActivities([]);
@@ -94,6 +100,20 @@ export default function AdminCalendarPage() {
     setSelectedActivityId(null);
   };
 
+  // Handle registrations click
+  const handleRegistrationsClick = (activityId: string, activityTitle: string) => {
+    setRegistrationsActivityId(activityId);
+    setRegistrationsActivityTitle(activityTitle);
+    setIsRegistrationsModalOpen(true);
+  };
+
+  // Handle registrations modal close
+  const handleRegistrationsModalClose = () => {
+    setIsRegistrationsModalOpen(false);
+    setRegistrationsActivityId(null);
+    setRegistrationsActivityTitle("");
+  };
+
   return (
     <div className={styles.pageContainer}>
       {/* Loading overlay */}
@@ -149,6 +169,7 @@ export default function AdminCalendarPage() {
                     currentParticipants={activity.current_participants || 0}
                     maxParticipants={activity.max_participants || 0}
                     onClick={() => handleActivityClick(activity.id)}
+                    onRegistrationsClick={() => handleRegistrationsClick(activity.id, activity.title)}
                   />
                 ))
               : !loading && (
@@ -165,6 +186,16 @@ export default function AdminCalendarPage() {
           isOpen={isActivityModalOpen}
           onClose={handleActivityModalClose}
           onRegistrationChange={fetchData}
+        />
+      )}
+
+      {/* Activity Registrations Modal */}
+      {registrationsActivityId && (
+        <ActivityRegistrationsModal
+          activityId={registrationsActivityId}
+          activityTitle={registrationsActivityTitle}
+          isOpen={isRegistrationsModalOpen}
+          onClose={handleRegistrationsModalClose}
         />
       )}
     </div>
