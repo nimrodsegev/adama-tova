@@ -165,6 +165,7 @@ export default function ActivityRegistrationsModal({
                 {filteredRegistrations.length > 0 ? (
                   filteredRegistrations.map((reg, index) => {
                     const isWaitlist = !reg.if_confirmed;
+                    const isPending = reg.status === 'pending';
                     const user = reg.users;
                     const circle = getCircleHebrew(user);
 
@@ -186,6 +187,9 @@ export default function ActivityRegistrationsModal({
                           <p className={`${styles.userDetail} ${isWaitlist ? styles.userDetailWaitlist : ""}`}>
                             {circle}
                           </p>
+                          {isPending && (
+                            <p className={styles.pendingStatus}>*מותנה באישור מנהל</p>
+                          )}
                         </div>
 
                         {/* Profile Link */}
