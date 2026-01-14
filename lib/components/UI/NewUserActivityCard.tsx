@@ -16,9 +16,10 @@ interface NewUserActivityCardProps {
   id: string;
   title: string;
   instructor: string;
-  date: string; // ISO string for date formatting
+  date: string;
   startTime: string;
-  onMotionChange?: (state: "start" | "end") => void;
+  // UPDATED INTERFACE: Accepts a second boolean argument
+  onMotionChange?: (state: "start" | "end", skipFetch?: boolean) => void;
   isGroup?: boolean;
 }
 
@@ -34,14 +35,12 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   const { user, userProfile } = useUser();
   const isAdmin = userProfile?.role === "admin";
 
-  // Registration States
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
     "none"
   );
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -49,7 +48,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     string | null
   >(null);
 
-  // Formatting
   const formatTime = (time: string) => time.slice(0, 5);
   const dateObj = new Date(date);
   const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
@@ -78,6 +76,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     }
   };
 
+  // --- 1. REGISTER (Open Modal) ---
   const handleActionClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -93,14 +92,25 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
 
     try {
       const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
-      if (res && typeof res === "object" && "success" in res) {
+
+      if (
+        res &&
+        (res.success || res.status === "confirmed" || res.status === "waitlist")
+      ) {
         const isWaitlist = res.if_confirmed === false;
+
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsSuccessModalOpen(true);
+        // DELAY: Wait for wrapper to be fully visible
+        setTimeout(() => {
+          setIsSuccessModalOpen(true);
+
+          // KEY FIX: Pass 'true' to skip data fetching
+          // This hides the wrapper but keeps the card on screen so the modal survives
+          onMotionChange?.("end", true);
+        }, 500);
       } else {
         onMotionChange?.("end");
       }
@@ -123,8 +133,9 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
       );
       if (!error) {
         setRegStatus("none");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        onMotionChange?.("end");
+        setTimeout(() => {
+          onMotionChange?.("end");
+        }, 1000);
       } else {
         onMotionChange?.("end");
       }
@@ -135,15 +146,20 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     }
   };
 
+  // --- 2. CLOSE MODAL (Update Page) ---
   const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false);
+    // Start wrapper again to cover the change
     onMotionChange?.("start");
+
     setTimeout(() => {
+      setIsSuccessModalOpen(false);
+
+      // NOW we fetch data (skipFetch = false/undefined)
+      // This updates the page and moves the card to "Yours"
       onMotionChange?.("end");
-    }, 750);
+    }, 600);
   };
 
-  // Logic for button label
   const getButtonLabel = () => {
     if (regStatus === "confirmed") return "ביטול";
     if (regStatus === "waitlist") return "ממתין לאישור";
@@ -157,7 +173,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         onClick={() => setIsModalOpen(true)}
       >
         <div className={styles.contentStack}>
-          {/* RIGHT SIDE */}
           <div className={styles.textGroup}>
             <h3 className={styles.titleText}>{title}</h3>
             <p className={styles.instructorText}>{instructor}</p>
@@ -166,7 +181,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
             </p>
           </div>
 
-          {/* BOTTOM LEFT ACTION */}
           {!isAdmin && (
             <div className={styles.actionWrapper}>
               <Button
@@ -182,7 +196,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         </div>
       </div>
 
-      {/* MODALS */}
       <ActivityDetailsModal
         activityId={id}
         isOpen={isModalOpen}

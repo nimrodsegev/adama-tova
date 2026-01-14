@@ -2,14 +2,12 @@
  * APP PROVIDERS
  * Combines all context providers for the app.
  * IvritaProvider is wrapped inside UserProvider to access user gender.
- * PageTransitionProvider handles navigation transitions.
  */
 "use client";
 import { ReactNode } from "react";
 import { User } from "@supabase/supabase-js";
 import { UserProvider, useUser } from "@/app/contexts/UserContext";
 import { IvritaProvider, GenderType } from "@/app/contexts/IvritaContext";
-import { PageTransitionProvider } from "@/app/contexts/PageTransitionContext";
 
 /**
  * Inner component that uses UserContext to get gender
@@ -36,7 +34,8 @@ export function AppProviders({
   return (
     <UserProvider initialUser={initialUser}>
       <IvritaWithUser>
-        <PageTransitionProvider>{children}</PageTransitionProvider>
+        {/* PageTransitionProvider REMOVED to avoid conflict with SmoothPageWrapper */}
+        {children}
       </IvritaWithUser>
     </UserProvider>
   );
