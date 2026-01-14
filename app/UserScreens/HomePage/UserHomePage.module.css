@@ -435,7 +435,7 @@
   }
 
   .cardsContainer {
-    max-height: 27rem; /* Ensure list uses available space */
+    max-height: 24rem; /* Ensure list uses available space */
   }
 }
 

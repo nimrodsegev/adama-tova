@@ -97,3 +97,46 @@
   background: rgba(231, 78, 28, 0.2);
   pointer-events: none;
 }
+
+/* ============================================
+   HEIGHT-BASED RESPONSIVENESS
+   ============================================ */
+
+/* Medium-Short screens (below 800px) - e.g. Standard Androids */
+@media (max-height: 50rem) {
+  .activitiesList {
+    /* Switch from top/bottom pinning to a fixed max-height */
+    position: static; /* Removes it from fixed placement relative to window */
+    height: 22rem; /* The requested height */
+    margin-top: 0.5rem; /* Small gap from filter */
+
+    /* Ensure it handles overflow */
+    overflow-y: auto;
+    flex-grow: 0; /* Prevents it from expanding automatically */
+  }
+
+  /* Since we removed position: fixed, mainFrame handles the flow now */
+  .mainFrame {
+    justify-content: flex-start;
+    top: 2rem; /* Move everything up slightly */
+  }
+}
+
+/* Short screens (below 700px) - e.g. iPhone SE */
+@media (max-height: 43.75rem) {
+  .titleText {
+    font-size: 1.75rem;
+  }
+
+  .sliderSection {
+    margin-bottom: 1.5rem; /* Reduce gap */
+  }
+
+  .activitiesList {
+    height: 16rem; /* Shrink list further for very small screens */
+  }
+
+  .mainFrame {
+    top: 1rem;
+  }
+}
