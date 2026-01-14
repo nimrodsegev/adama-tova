@@ -213,6 +213,7 @@ export default function AdminNotificationsPage() {
                       activityId: notif.activityId,
                     }}
                     onMarkAsRead={handleMarkAsRead}
+                    onDelete={handleDelete}
                     onActivityClick={handleActivityClick}
                     showSwipeHint={isFirstUnread}
                   />

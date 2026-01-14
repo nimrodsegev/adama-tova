@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./NewNotificationCard.module.css";
 import Button from "@/lib/components/UI/Button";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 
 export interface NotificationProps {
   id: string | number;
@@ -16,6 +17,7 @@ export interface NotificationProps {
 interface NewNotificationCardProps {
   notification: NotificationProps;
   onMarkAsRead?: (id: string | number) => void;
+  onDelete?: (id: string | number) => void;
   onActivityClick?: (activityId: string) => void;
   showSwipeHint?: boolean;
 }
@@ -23,14 +25,17 @@ interface NewNotificationCardProps {
 export default function NewNotificationCard({
   notification,
   onMarkAsRead,
+  onDelete,
   onActivityClick,
   showSwipeHint = false,
 }: NewNotificationCardProps) {
+  const { t } = useIvrita();
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [offset, setOffset] = useState(0);
   const [isSwiped, setIsSwiped] = useState(false);
   const [isHintAnimating, setIsHintAnimating] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
 
   // Swipe hint animation - peek to show users they can swipe
   useEffect(() => {
@@ -56,6 +61,7 @@ export default function NewNotificationCard({
 
   const minSwipeDistance = 50;
   const maxSwipeOffset = -125;
+  const maxDeleteOffset = 125; // Positive for right swipe (delete)
 
   const formatTime = (dateInput: string | Date) => {
     const date = new Date(dateInput);
@@ -66,33 +72,43 @@ export default function NewNotificationCard({
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
-    if (notification.isRead) return;
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
     setIsSwiped(false);
+    setSwipeDirection(null);
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    if (notification.isRead || touchStart === null) return;
+    if (touchStart === null) return;
     const currentTouch = e.targetTouches[0].clientX;
     const diff = currentTouch - touchStart;
 
-    if (diff < 0) {
+    // Left swipe (negative) - mark as read (only for unread)
+    if (diff < 0 && !notification.isRead) {
       setOffset(Math.max(diff, maxSwipeOffset));
+      setSwipeDirection("left");
+    }
+    // Right swipe (positive) - delete
+    else if (diff > 0) {
+      setOffset(Math.min(diff, maxDeleteOffset));
+      setSwipeDirection("right");
     }
     setTouchEnd(currentTouch);
   };
 
   const onTouchEnd = () => {
-    if (notification.isRead || !touchStart || !touchEnd) {
+    if (!touchStart || !touchEnd) {
       setOffset(0);
+      setSwipeDirection(null);
       return;
     }
 
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe && onMarkAsRead) {
+    // Left swipe - mark as read
+    if (isLeftSwipe && onMarkAsRead && !notification.isRead) {
       setOffset(maxSwipeOffset);
       setIsSwiped(true);
 
@@ -100,9 +116,23 @@ export default function NewNotificationCard({
         onMarkAsRead(notification.id);
         setOffset(0);
         setIsSwiped(false);
+        setSwipeDirection(null);
+      }, 500);
+    }
+    // Right swipe - delete
+    else if (isRightSwipe && onDelete) {
+      setOffset(maxDeleteOffset);
+      setIsSwiped(true);
+
+      setTimeout(() => {
+        onDelete(notification.id);
+        setOffset(0);
+        setIsSwiped(false);
+        setSwipeDirection(null);
       }, 500);
     } else {
       setOffset(0);
+      setSwipeDirection(null);
     }
 
     setTouchStart(null);
@@ -111,19 +141,31 @@ export default function NewNotificationCard({
 
   return (
     <div className={styles.container}>
-      {/* MASK & ACTION BOX */}
-      <div className={styles.revealMask} style={{ width: Math.abs(offset) }}>
-        <div className={styles.swipeActionBox}>
-          <span className={styles.swipeText}>
-            סמן
-            <br />
-            כנקרא
-          </span>
-          <div className={styles.swipeArrow}>←</div>
+      {/* RIGHT SIDE - Mark as Read (shows when swiping left) */}
+      {swipeDirection === "left" && (
+        <div className={styles.revealMask} style={{ width: Math.abs(offset) }}>
+          <div className={styles.swipeActionBox}>
+            <span className={styles.swipeText}>
+              {t("[סמן|סמני]")}
+              <br />
+              כנקרא
+            </span>
+            <div className={styles.swipeArrow}>←</div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* FOREGROUND CARD (Slides Left) */}
+      {/* LEFT SIDE - Delete (shows when swiping right) */}
+      {swipeDirection === "right" && (
+        <div className={styles.deleteRevealMask} style={{ width: Math.abs(offset) }}>
+          <div className={styles.deleteActionBox}>
+            <span className={styles.deleteText}>{t("[מחק|מחקי]")}</span>
+            <div className={styles.deleteArrow}>→</div>
+          </div>
+        </div>
+      )}
+
+      {/* FOREGROUND CARD (Slides Left or Right) */}
       <div
         className={`${styles.card} ${isHintAnimating ? styles.hintAnimating : ''}`}
         style={{
