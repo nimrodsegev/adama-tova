@@ -16,8 +16,13 @@ type ActivityDetailsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onRegistrationChange?: () => void;
-  // UPDATED: Allow passing skipFetch to match parent
   onMotionChange?: (state: "start" | "end", skipFetch?: boolean) => void;
+};
+
+// Branch Name Mapping
+const BRANCH_MAPPING: Record<string, string> = {
+  satria: "סתריה",
+  nahalal: "נהלל",
 };
 
 export default function ActivityDetailsModal({
@@ -269,7 +274,11 @@ export default function ActivityDetailsModal({
   const isGroup = activity?.is_group || !!activity?.series_id;
   const instructor = activity?.instructor || "";
   const location = activity?.location || "";
-  const branch = activity?.branch || "המרכז";
+
+  // --- MAP BRANCH HERE ---
+  const rawBranch = activity?.branch;
+  const branch = BRANCH_MAPPING[rawBranch] || rawBranch || "המרכז";
+
   const description = activity?.description || "";
   const remainingSpots = Math.max(
     0,
