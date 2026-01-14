@@ -19,6 +19,14 @@ const INTRESTS_MAPPING: Record<string, string> = {
   "יצירה וחומר": "creation_material",
 };
 
+// Helper: Check if activity is in the future
+const isActivityInFuture = (activity: any) => {
+  if (!activity.date) return false;
+  const timeString = activity.start_time || "00:00";
+  const activityDateTime = new Date(`${activity.date}T${timeString}`);
+  return activityDateTime >= new Date();
+};
+
 export default function NewUserCalendarPage() {
   const { user, userProfile } = useUser();
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -64,9 +72,15 @@ export default function NewUserCalendarPage() {
 
       if (!actError) {
         const validBranches = userBranches || ["nahalal", "satria"];
-        const filtered = actData.filter(
+        
+        // 1. Filter by Branch
+        let filtered = actData.filter(
           (a: any) => !a.branch || validBranches.includes(a.branch)
         );
+
+        // 2. Filter by Time (Future Only)
+        filtered = filtered.filter(isActivityInFuture);
+
         setActivities(filtered);
       }
 
