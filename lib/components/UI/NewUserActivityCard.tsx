@@ -18,7 +18,6 @@ interface NewUserActivityCardProps {
   instructor: string;
   date: string;
   startTime: string;
-  // UPDATED INTERFACE: Accepts a second boolean argument
   onMotionChange?: (state: "start" | "end", skipFetch?: boolean) => void;
   isGroup?: boolean;
 }
@@ -76,7 +75,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     }
   };
 
-  // --- 1. REGISTER (Open Modal) ---
   const handleActionClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -93,8 +91,11 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     try {
       const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
 
+      // FIX: Check if 'res' is an object to satisfy TypeScript
       if (
         res &&
+        typeof res === "object" &&
+        ("success" in res || "status" in res) &&
         (res.success || res.status === "confirmed" || res.status === "waitlist")
       ) {
         const isWaitlist = res.if_confirmed === false;
@@ -103,12 +104,8 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        // DELAY: Wait for wrapper to be fully visible
         setTimeout(() => {
           setIsSuccessModalOpen(true);
-
-          // KEY FIX: Pass 'true' to skip data fetching
-          // This hides the wrapper but keeps the card on screen so the modal survives
           onMotionChange?.("end", true);
         }, 500);
       } else {
@@ -146,16 +143,10 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     }
   };
 
-  // --- 2. CLOSE MODAL (Update Page) ---
   const handleSuccessModalClose = () => {
-    // Start wrapper again to cover the change
     onMotionChange?.("start");
-
     setTimeout(() => {
       setIsSuccessModalOpen(false);
-
-      // NOW we fetch data (skipFetch = false/undefined)
-      // This updates the page and moves the card to "Yours"
       onMotionChange?.("end");
     }, 600);
   };
