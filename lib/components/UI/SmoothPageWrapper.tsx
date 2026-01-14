@@ -5,25 +5,38 @@ import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import { useUser } from "@/app/contexts/UserContext";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
+// Define the exact types allowed by your OrganicCircles component
+type AllowedModes =
+  | "static"
+  | "spouting"
+  | "breathing"
+  | "splash"
+  | "loading"
+  | "rolling";
+
 interface SmoothPageWrapperProps {
   children: React.ReactNode;
   isLoading: boolean;
-  mode?: "spouting" | "breathing" | "liquid" | "blob";
-  minDuration?: number; // New optional prop to control time
+  mode?: AllowedModes;
+  minDuration?: number;
+  radiusScale?: number;
+  baseColor?: string;
 }
 
 export default function SmoothPageWrapper({
   children,
   isLoading,
   mode = "spouting",
-  minDuration = 1000, // Default: Wait at least 1 second (1000ms)
+  minDuration = 1000,
+  radiusScale = 1.0,
+  baseColor = "#FFFFFF",
 }: SmoothPageWrapperProps) {
   const { userProfile } = useUser();
 
-  // 1. State to track if the minimum time has passed
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  // 1. Initialize as TRUE so we don't block initially unless loading starts
+  const [minTimeElapsed, setMinTimeElapsed] = useState(true);
 
-  // 2. Responsive Circle Logic
+  // Responsive Config
   const [circleConfig, setCircleConfig] = useState({
     radius: 0.35,
     x: 0.5,
@@ -34,32 +47,53 @@ export default function SmoothPageWrapper({
     return calculateShapeParams(userProfile);
   }, [userProfile]);
 
-  // 3. Start the timer on mount
+  // --- TIMER LOGIC (THE FIX) ---
+
+  // Step A: When loading starts, immediately LOCK the screen (elapsed = false)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setMinTimeElapsed(true);
-    }, minDuration);
+    if (isLoading) {
+      setMinTimeElapsed(false);
+    }
+  }, [isLoading]);
 
-    return () => clearTimeout(timer);
-  }, [minDuration]);
+  // Step B: Whenever the screen is locked, start the timer to UNLOCK it.
+  // This is separate from isLoading, so it won't be cancelled if data loads fast.
+  useEffect(() => {
+    if (!minTimeElapsed) {
+      const timer = setTimeout(() => {
+        setMinTimeElapsed(true);
+      }, minDuration);
 
-  // 4. Handle Resize (Same as before)
+      return () => clearTimeout(timer);
+    }
+  }, [minTimeElapsed, minDuration]);
+
+  // -----------------------------
+
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
+      let newRadius = 0.35;
+      let newY = 0.5;
+
       if (width < 380) {
-        setCircleConfig({ radius: 0.25, x: 0.5, y: 0.45 });
+        newRadius = 0.25;
+        newY = 0.45;
       } else if (width > 600) {
-        setCircleConfig({ radius: 0.35, x: 0.5, y: 0.5 });
+        newRadius = 0.35;
       } else {
-        setCircleConfig({ radius: 0.3, x: 0.5, y: 0.5 });
+        newRadius = 0.3;
       }
 
-      if (height < 700) {
-        setCircleConfig((prev) => ({ ...prev, radius: 0.25 }));
-      }
+      if (height < 700) newRadius = 0.25;
+
+      setCircleConfig({
+        radius: newRadius,
+        x: 0.5,
+        y: newY,
+      });
     };
 
     handleResize();
@@ -67,12 +101,11 @@ export default function SmoothPageWrapper({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 5. Logic: Show loader if Data is loading OR Timer hasn't finished
+  // Show loader if Data is loading OR Timer is still running
   const showLoader = isLoading || !minTimeElapsed;
 
   return (
     <>
-      {/* --- LAYER 1: THE LOADER --- */}
       <div
         style={{
           position: "fixed",
@@ -86,8 +119,6 @@ export default function SmoothPageWrapper({
           alignItems: "center",
           justifyContent: "center",
           zIndex: 99999,
-
-          // Use our new combined boolean
           opacity: showLoader ? 1 : 0,
           pointerEvents: showLoader ? "all" : "none",
           transition: "opacity 0.6s ease-in-out",
@@ -95,21 +126,19 @@ export default function SmoothPageWrapper({
         dir="rtl"
       >
         <OrganicCircles
-          mode={"spouting"}
-          radius={circleConfig.radius}
+          mode={mode}
+          radius={circleConfig.radius * radiusScale}
           position={{ x: circleConfig.x, y: circleConfig.y }}
+          baseColor={baseColor}
           {...shapeParams}
-          baseColor="#FFFFFF"
         />
       </div>
 
-      {/* --- LAYER 2: THE CONTENT --- */}
       <div
         style={{
           opacity: showLoader ? 0 : 1,
           transform: showLoader ? "translateY(20px)" : "translateY(0)",
           transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
-          // Wait for loader to start fading before revealing content
           transitionDelay: "0.2s",
           width: "100%",
           minHeight: "100vh",
