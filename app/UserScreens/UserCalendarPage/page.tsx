@@ -8,7 +8,7 @@ import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 import DaySlider from "@/lib/components/UI/DaySlider";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
-import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; // <--- 1. NEW IMPORT
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 import styles from "./UserCalendarPage.module.css";
 
@@ -36,16 +36,16 @@ export default function NewUserCalendarPage() {
 
   // UI State
   const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(true); // Start true for initial load
+  const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // NOTE: removed shapeParams calculation here because SmoothPageWrapper handles it!
+  // 1. NEW: Dynamic Motion Mode State
+  const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
+    "spouting"
+  );
 
   const fetchData = async () => {
-    // We don't clear activities immediately to avoid content jumping before the animation starts
-    // setActivities([]);
     setLoading(true);
-
     const dateString = selectedDate.toISOString().split("T")[0];
 
     try {
@@ -86,11 +86,13 @@ export default function NewUserCalendarPage() {
     }
   };
 
+  // 2. UPDATED: Switch mode here too
   const handleMotionState = async (
     state: "start" | "end",
     skipFetch?: boolean
   ) => {
     if (state === "start") {
+      setMotionMode("breathing"); // <--- Change to liquid
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
@@ -98,6 +100,7 @@ export default function NewUserCalendarPage() {
         await fetchData();
       }
       setIsProcessing(false);
+      setTimeout(() => setMotionMode("spouting"), 1000);
     }
   };
 
@@ -123,8 +126,8 @@ export default function NewUserCalendarPage() {
   });
 
   return (
-    // <--- 2. WRAPPER IMPLEMENTATION: Combined loading and processing states
-    <SmoothPageWrapper isLoading={loading || isProcessing}>
+    // 3. PASS MODE PROP
+    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer}>
         <main className={styles.mainFrame}>
           <div className={styles.titleContainer}>
@@ -157,8 +160,8 @@ export default function NewUserCalendarPage() {
                       key={activity.id}
                       id={activity.id}
                       title={activity.title}
+                      instructor={activity.instructor || "לא צוין"} // Added instructor
                       date={activity.date}
-                      instructor={activity.instructor || "לא צוין"}
                       startTime={activity.start_time}
                       endTime={activity.end_time}
                       currentParticipants={activity.current_participants || 0}

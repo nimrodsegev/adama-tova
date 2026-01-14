@@ -8,8 +8,8 @@ import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import OpenHours from "@/lib/components/UI/OpenHours";
 import EmptyState from "@/lib/components/UI/EmptyState";
-import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; // <--- 1. Import Wrapper
-import { calculateShapeParams } from "@/app/utils/motionParamsCalculator"; // Needed for background circles
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
 import styles from "./UserHomePage.module.css";
 
@@ -56,6 +56,12 @@ export default function NewUserHomePage() {
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // 1. NEW: Dynamic Motion Mode State
+  // Default is "spouting" for page loads
+  const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
+    "spouting"
+  );
+
   // Background Circles State
   const [bgCircleConfig, setBgCircleConfig] = useState({
     radius: 0.07,
@@ -64,8 +70,6 @@ export default function NewUserHomePage() {
   });
 
   const mountedRef = useRef(false);
-
-  // Shape params for BACKGROUND circles only (wrapper handles its own)
   const shapeParams = userProfile ? calculateShapeParams(userProfile) : {};
 
   const todayHours = (() => {
@@ -99,8 +103,6 @@ export default function NewUserHomePage() {
   }, [user]);
 
   const fetchData = async () => {
-    // Note: We don't set loading(true) here to avoid flashing on re-fetch
-    // unless it is the very first load which is handled by default state
     try {
       const { data: rawRegs } = await supabase
         .from("registrations")
@@ -160,26 +162,26 @@ export default function NewUserHomePage() {
     } catch (e) {
       console.error(e);
     } finally {
-      // Small delay to ensure smooth fade out
       setTimeout(() => setLoading(false), 500);
     }
   };
 
+  // 2. UPDATED: Switch mode when action starts
   const handleMotionState = async (
     state: "start" | "end",
     skipFetch?: boolean
   ) => {
     if (state === "start") {
+      setMotionMode("breathing"); // <--- Change to "liquid" for actions!
       setIsProcessing(true);
-      // Safety timeout in case something gets stuck
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
-      // ONLY fetch if skipFetch is NOT true
       if (!skipFetch) {
         await fetchData();
       }
-      // Always hide the wrapper
       setIsProcessing(false);
+      // Reset back to spouting for next page load (optional)
+      setTimeout(() => setMotionMode("spouting"), 1000);
     }
   };
 
@@ -190,10 +192,9 @@ export default function NewUserHomePage() {
       : suggestedActivities.slice(0, 4);
 
   return (
-    // <--- 2. Apply Wrapper
-    <SmoothPageWrapper isLoading={loading || isProcessing}>
+    // 3. PASS THE MODE PROP
+    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer} dir="rtl">
-        {/* Background Circles - These stay mounted underneath */}
         <OrganicCircles
           mode="breathing"
           radius={bgCircleConfig.radius}
