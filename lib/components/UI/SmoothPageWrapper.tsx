@@ -112,7 +112,7 @@ export default function SmoothPageWrapper({
           top: 0,
           left: 0,
           width: "100vw",
-          height: "100vh",
+          height: "90vh",
           background:
             "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
           display: "flex",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 
@@ -9,6 +9,7 @@ import DaySlider from "@/lib/components/UI/DaySlider";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
 import styles from "./UserCalendarPage.module.css";
 
@@ -19,7 +20,6 @@ const INTRESTS_MAPPING: Record<string, string> = {
   "יצירה וחומר": "creation_material",
 };
 
-// Helper: Check if activity is in the future
 const isActivityInFuture = (activity: any) => {
   if (!activity.date) return false;
   const timeString = activity.start_time || "00:00";
@@ -39,7 +39,10 @@ export default function NewUserCalendarPage() {
 
   // UI State
   const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
+
+  // Loading States
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isListLoading, setIsListLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Motion Mode State
@@ -47,8 +50,15 @@ export default function NewUserCalendarPage() {
     "spouting"
   );
 
+  const mounted = useRef(false);
+
   const fetchData = async () => {
-    setLoading(true);
+    // 1. Logic: If switching dates, show Overlay Loader and clear list
+    if (mounted.current) {
+      setIsListLoading(true);
+      setActivities([]);
+    }
+
     const dateString = selectedDate.toISOString().split("T")[0];
 
     try {
@@ -67,20 +77,17 @@ export default function NewUserCalendarPage() {
             ? apiUser.getUserBranches(user.id)
             : Promise.resolve([null, null]),
           registrationsPromise,
-          new Promise((resolve) => setTimeout(resolve, 500)),
+          new Promise((resolve) => setTimeout(resolve, 500)), // Smooth animation delay
         ]);
 
       if (!actError) {
         const validBranches = userBranches || ["nahalal", "satria"];
-        
-        // 1. Filter by Branch
+
         let filtered = actData.filter(
           (a: any) => !a.branch || validBranches.includes(a.branch)
         );
 
-        // 2. Filter by Time (Future Only)
         filtered = filtered.filter(isActivityInFuture);
-
         setActivities(filtered);
       }
 
@@ -91,7 +98,9 @@ export default function NewUserCalendarPage() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsInitialLoad(false);
+      setIsListLoading(false);
+      mounted.current = true;
     }
   };
 
@@ -116,9 +125,7 @@ export default function NewUserCalendarPage() {
     fetchData();
   }, [selectedDate, user]);
 
-  // --- 1. FILTER LOGIC & COUNTS ---
-
-  // A. Calculate "For You" list separately to get the count
+  // --- FILTER LOGIC ---
   const forYouActivities = activities.filter((activity) => {
     const isRegistered = registeredActivityIds.includes(activity.id);
     let isInterested = false;
@@ -131,26 +138,26 @@ export default function NewUserCalendarPage() {
     return isRegistered || isInterested;
   });
 
-  // B. Define the dynamic filter options
   const dynamicFilters = [
-    {
-      id: "all",
-      label: "הכל",
-      count: activities.length, // Total count
-    },
-    {
-      id: "foryou",
-      label: "בשבילך",
-      count: forYouActivities.length, // Personalized count
-    },
+    { id: "all", label: "הכל", count: activities.length },
+    { id: "foryou", label: "בשבילך", count: forYouActivities.length },
   ];
 
-  // C. Determine which list to display based on active filter
   const displayedActivities = filter === "all" ? activities : forYouActivities;
 
   return (
-    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
+    <SmoothPageWrapper
+      isLoading={isInitialLoad || isProcessing}
+      mode={motionMode}
+    >
       <div className={styles.pageContainer}>
+        {/* 2. LOADING OVERLAY - Outside mainFrame (Same as Admin) */}
+        {isListLoading && (
+          <div className={styles.loadingOverlay}>
+            <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
+          </div>
+        )}
+
         <main className={styles.mainFrame}>
           <div className={styles.titleContainer}>
             <h1 className={styles.titleText}>לוח פעילויות</h1>
@@ -165,7 +172,7 @@ export default function NewUserCalendarPage() {
 
           <div className={styles.filterSection}>
             <HomeFilter
-              options={dynamicFilters} // Pass the dynamic options with counts
+              options={dynamicFilters}
               activeOption={filter}
               onFilterChange={(newId) => setFilter(newId)}
             />
@@ -196,17 +203,9 @@ export default function NewUserCalendarPage() {
                     />
                   );
                 })
-              : !loading && (
-                  <p
-                    className="text-empty"
-                    style={{
-                      color: "white",
-                      marginTop: "2rem",
-                      textAlign: "center",
-                    }}
-                  >
-                    אין פעילויות ליום זה
-                  </p>
+              : // Only show empty text if NOT loading (to prevent flickering)
+                !isListLoading && (
+                  <p className={styles.emptyText}>אין פעילויות ליום זה</p>
                 )}
           </div>
         </main>
