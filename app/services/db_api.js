@@ -1670,4 +1670,40 @@ export const apiUser = {
         .eq('id', userId)
     );
   },
+
+  /**
+   * 📊 GET USER ACTIVITY STATS
+   * Returns count of groups and workshops the user is registered for
+   */
+  async getUserActivityStats(userId) {
+    // Get all registrations for this user with activity details
+    const { data: registrations, error } = await supabase
+      .from("registrations")
+      .select("activity_id, activities!inner(id, is_group)")
+      .eq("user_id", userId)
+      .eq("if_confirmed", true);
+
+    if (error) {
+      console.error("Error fetching user stats:", error.message);
+      return [{ groups: 0, workshops: 0 }, null];
+    }
+
+    if (!registrations || registrations.length === 0) {
+      return [{ groups: 0, workshops: 0 }, null];
+    }
+
+    // Count groups vs workshops
+    let groupCount = 0;
+    let workshopCount = 0;
+
+    registrations.forEach((reg) => {
+      if (reg.activities?.is_group) {
+        groupCount++;
+      } else {
+        workshopCount++;
+      }
+    });
+
+    return [{ groups: groupCount, workshops: workshopCount }, null];
+  },
 };
