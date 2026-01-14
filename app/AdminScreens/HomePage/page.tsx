@@ -16,6 +16,7 @@ import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
 import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 import UserApprovalModal from "@/lib/components/UserApprovalModal/UserApprovalModal";
 import ApprovalConfirmModal from "@/lib/components/ApprovalConfirmModal/ApprovalConfirmModal";
 import styles from "./AdminHomePage.module.css";
@@ -101,6 +102,11 @@ export default function AdminHomePage() {
     null
   );
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+
+  // Registrations modal state
+  const [registrationsActivityId, setRegistrationsActivityId] = useState<string | null>(null);
+  const [registrationsActivityTitle, setRegistrationsActivityTitle] = useState<string>("");
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] = useState(false);
 
   // User details modal state
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -278,6 +284,20 @@ export default function AdminHomePage() {
   const handleActivityModalClose = () => {
     setIsActivityModalOpen(false);
     setSelectedActivityId(null);
+  };
+
+  // Handle registrations click
+  const handleRegistrationsClick = (activityId: string, activityTitle: string) => {
+    setRegistrationsActivityId(activityId);
+    setRegistrationsActivityTitle(activityTitle);
+    setIsRegistrationsModalOpen(true);
+  };
+
+  // Handle registrations modal close
+  const handleRegistrationsModalClose = () => {
+    setIsRegistrationsModalOpen(false);
+    setRegistrationsActivityId(null);
+    setRegistrationsActivityTitle("");
   };
 
   // Handle user approval card click (initial) - opens details modal
@@ -547,6 +567,7 @@ export default function AdminHomePage() {
                   currentParticipants={totalRegistrations}
                   maxParticipants={activity.max_participants || 0}
                   onClick={() => handleActivityClick(activity.id)}
+                  onRegistrationsClick={() => handleRegistrationsClick(activity.id, activity.title)}
                 />
               );
             })
@@ -625,6 +646,16 @@ export default function AdminHomePage() {
           isOpen={isActivityModalOpen}
           onClose={handleActivityModalClose}
           onRegistrationChange={fetchData}
+        />
+      )}
+
+      {/* Activity Registrations Modal */}
+      {registrationsActivityId && (
+        <ActivityRegistrationsModal
+          activityId={registrationsActivityId}
+          activityTitle={registrationsActivityTitle}
+          isOpen={isRegistrationsModalOpen}
+          onClose={handleRegistrationsModalClose}
         />
       )}
 
