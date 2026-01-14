@@ -1,15 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./EditActivityPage.module.css";
 
-// --- Options ---
 const BRANCH_OPTIONS = [
   { value: "satria", label: "סניף סתריה" },
   { value: "nahalal", label: "סניף נהלל" },
 ];
+
+const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
 export default function EditActivityPage() {
   const router = useRouter();
@@ -29,7 +33,14 @@ export default function EditActivityPage() {
     instructor: "",
     maxParticipants: "", 
     description: "",
+    date: "", // YYYY-MM-DD
+    startTime: "",
   });
+
+  // Date UI State
+  const [selectedDay, setSelectedDay] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -37,8 +48,11 @@ export default function EditActivityPage() {
 
   // UI State
   const [isBranchOpen, setIsBranchOpen] = useState(false);
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
 
-  // 1. Load Data
+  // Load Data
   useEffect(() => {
     if (activityId) {
       loadActivity();
@@ -48,7 +62,6 @@ export default function EditActivityPage() {
   const loadActivity = async () => {
     try {
       const [data, error] = await apiActivities.getById(activityId!);
-      
       if (error) {
         alert("Error loading activity");
         router.back();
@@ -62,7 +75,16 @@ export default function EditActivityPage() {
         instructor: data.instructor || "",
         maxParticipants: data.max_participants ? data.max_participants.toString() : "",
         description: data.description || "",
+        date: data.date || "",
+        startTime: data.start_time || "",
       });
+
+      if (data.date) {
+        const [y, m, d] = data.date.split('-');
+        setSelectedYear(y);
+        setSelectedMonth(m);
+        setSelectedDay(d);
+      }
 
       if (data.image_url) {
         setImagePreviewUrl(data.image_url);
@@ -77,6 +99,22 @@ export default function EditActivityPage() {
     }
   };
 
+  // --- FLOATING LABEL FIX ---
+  useLayoutEffect(() => {
+    const updateLabelBackgrounds = () => {
+      const vh = window.innerHeight;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+      const labels = document.querySelectorAll(`.${styles.inputLabel}`) as NodeListOf<HTMLElement>;
+      labels.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty("--bg-y", `${-rect.top}px`);
+      });
+    };
+    updateLabelBackgrounds();
+    window.addEventListener("resize", updateLabelBackgrounds);
+    return () => window.removeEventListener("resize", updateLabelBackgrounds);
+  }, [loading]);
+
   // Handlers
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -89,6 +127,20 @@ export default function EditActivityPage() {
 
   const setFormValue = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleDateChange = (type: 'day' | 'month' | 'year', value: string) => {
+    let d = selectedDay;
+    let m = selectedMonth;
+    let y = selectedYear;
+
+    if (type === 'day') { setSelectedDay(value); d = value; setIsDayOpen(false); }
+    if (type === 'month') { setSelectedMonth(value); m = value; setIsMonthOpen(false); }
+    if (type === 'year') { setSelectedYear(value); y = value; setIsYearOpen(false); }
+
+    if (d && m && y) {
+      setFormData(prev => ({ ...prev, date: `${y}-${m}-${d}` }));
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +157,6 @@ export default function EditActivityPage() {
     setImagePreviewUrl(null);
   };
 
-  // Save Flow
   const handleSaveClick = () => {
     setShowModal(true);
   };
@@ -116,13 +167,16 @@ export default function EditActivityPage() {
 
     try {
       const maxPart = formData.maxParticipants ? parseInt(formData.maxParticipants) : 0;
-
       let imageUrl = imagePreviewUrl; 
       if (imageFile) {
         const [url, error] = await apiActivities.uploadImage(imageFile);
         if (error) throw new Error("Image upload failed");
         imageUrl = url;
       }
+
+      const fullDate = (selectedYear && selectedMonth && selectedDay) 
+        ? `${selectedYear}-${selectedMonth}-${selectedDay}` 
+        : formData.date;
 
       const updates = {
         title: formData.title,
@@ -132,6 +186,8 @@ export default function EditActivityPage() {
         max_participants: maxPart,
         instructor: formData.instructor,
         image_url: imageUrl,
+        date: fullDate,
+        start_time: formData.startTime,
       };
 
       const [_, error] = await apiActivities.update(activityId!, updates);
@@ -175,14 +231,12 @@ export default function EditActivityPage() {
           )}
         </div>
 
-        {/* Branch Dropdown */}
+        {/* Branch Dropdown - Updated Arrow */}
         <div className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownContainer : ''}`}>
           <div className={styles.inputWrapper}>
             <button type="button" onClick={() => setIsBranchOpen(!isBranchOpen)} className={`${styles.dropdownToggle} ${isBranchOpen ? styles.open : ''}`}>
               <span>{BRANCH_OPTIONS.find(o => o.value === formData.branch)?.label || "בחר/י"}</span>
-              <div className={styles.arrowIconWrapper}>
-                <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
+              <span className={`${styles.dropdownArrow} ${isBranchOpen ? styles.open : ''}`}></span>
             </button>
             <label className={styles.inputLabel}>סניף</label>
           </div>
@@ -219,7 +273,7 @@ export default function EditActivityPage() {
           )}
         </div>
 
-        {/* Max Participants - NUMBER INPUT */}
+        {/* Max Participants */}
         <div className={styles.inputWrapper}>
           <input 
             type="number" 
@@ -237,10 +291,74 @@ export default function EditActivityPage() {
           )}
         </div>
 
+        {/* Date Row - Updated Arrows */}
+        <div className={styles.fieldGroup}>
+          <div className={styles.dateLabel}>תאריך</div>
+          <div className={styles.dateRow}>
+            {/* YEAR */}
+            <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
+              <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
+                <span>{selectedYear || "שנה"}</span>
+                <span className={`${styles.dropdownArrow} ${isYearOpen ? styles.open : ''}`}></span>
+              </button>
+              {isYearOpen && (
+                <div className={styles.miniDropdownMenu}>
+                  {YEARS.map(y => (
+                    <button key={y} className={styles.miniDropdownOption} onClick={() => handleDateChange('year', y)}>{y}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* MONTH */}
+            <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
+              <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
+                <span>{selectedMonth || "חודש"}</span>
+                <span className={`${styles.dropdownArrow} ${isMonthOpen ? styles.open : ''}`}></span>
+              </button>
+              {isMonthOpen && (
+                <div className={styles.miniDropdownMenu}>
+                  {MONTHS.map(m => (
+                    <button key={m} className={styles.miniDropdownOption} onClick={() => handleDateChange('month', m)}>{m}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* DAY */}
+            <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
+              <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
+                <span>{selectedDay || "יום"}</span>
+                <span className={`${styles.dropdownArrow} ${isDayOpen ? styles.open : ''}`}></span>
+              </button>
+              {isDayOpen && (
+                <div className={styles.miniDropdownMenu}>
+                  {DAYS.map(d => (
+                    <button key={d} className={styles.miniDropdownOption} onClick={() => handleDateChange('day', d)}>{d}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Time Row */}
+        <div className={styles.fieldGroup}>
+          <div className={styles.dateLabel}>שעה</div>
+          <div className={styles.inputWrapper}>
+              <input 
+                type="time" 
+                name="startTime" 
+                value={formData.startTime} 
+                onChange={handleChange} 
+                className={`${styles.inputField} ${styles.timeInput}`} 
+              />
+          </div>
+        </div>
+
         {/* Image Upload */}
         <div className={styles.inputWrapper}>
           <input type="file" id="editImageUpload" accept="image/*" onChange={handleImageChange} hidden />
-          
           {imageName ? (
             <div className={styles.filePreviewBox}>
               <div style={{display:'flex', alignItems:'center', flex:1, overflow:'hidden'}}>

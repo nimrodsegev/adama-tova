@@ -281,9 +281,7 @@ export default function ProfilePage() {
               התנתק
             </Button>
           </div>
-
         </div>
-
       </main>
     </ProtectedRoute>
   );
