@@ -110,6 +110,9 @@ export default function AdminHomePage() {
   const [selectedGroupName, setSelectedGroupName] = useState<
     string | undefined
   >(undefined);
+  const [selectedRequestDate, setSelectedRequestDate] = useState<
+    string | undefined
+  >(undefined);
   const [selectedRegistrationId, setSelectedRegistrationId] = useState<
     string | null
   >(null);
@@ -278,10 +281,11 @@ export default function AdminHomePage() {
   };
 
   // Handle user approval card click (initial) - opens details modal
-  const handleUserCardClick = (userId: string) => {
+  const handleUserCardClick = (userId: string, requestDate?: string) => {
     setSelectedUserId(userId);
     setSelectedUserType("initial");
     setSelectedGroupName(undefined);
+    setSelectedRequestDate(requestDate);
     setSelectedRegistrationId(null);
     setIsUserModalOpen(true);
   };
@@ -290,11 +294,13 @@ export default function AdminHomePage() {
   const handleGroupCardClick = (
     userId: string,
     groupName: string,
-    registrationId: string
+    registrationId: string,
+    requestDate?: string
   ) => {
     setSelectedUserId(userId);
     setSelectedUserType("group");
     setSelectedGroupName(groupName);
+    setSelectedRequestDate(requestDate);
     setSelectedRegistrationId(registrationId);
     setIsUserModalOpen(true);
   };
@@ -438,7 +444,7 @@ export default function AdminHomePage() {
                         "reject"
                       )
                     }
-                    onClick={() => handleUserCardClick(pendingUser.id)}
+                    onClick={() => handleUserCardClick(pendingUser.id, formatDate(pendingUser.created_at))}
                   />
                 ))}
                 {/* Group approval cards */}
@@ -468,7 +474,8 @@ export default function AdminHomePage() {
                       handleGroupCardClick(
                         reg.users?.id,
                         reg.activities?.title || "",
-                        reg.id
+                        reg.id,
+                        formatDate(reg.created_at)
                       )
                     }
                   />
@@ -627,6 +634,7 @@ export default function AdminHomePage() {
           userId={selectedUserId}
           type={selectedUserType}
           groupName={selectedGroupName}
+          requestDate={selectedRequestDate}
           isOpen={isUserModalOpen}
           onClose={handleUserModalClose}
           onApprove={handleModalApprove}
