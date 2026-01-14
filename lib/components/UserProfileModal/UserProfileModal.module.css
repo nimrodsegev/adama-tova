@@ -1,0 +1,217 @@
+/* UserProfileModal.module.css */
+
+/* Overlay backdrop */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: 1299;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Modal container - full screen */
+.modalContainer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100vw;
+  height: 100dvh;
+  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  z-index: 1300;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+  direction: rtl;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Close button */
+.closeButton {
+  position: absolute;
+  width: 2.75rem;
+  height: 2.75rem;
+  right: 1.25rem;
+  top: 1.25rem;
+  border: 0.0625rem solid rgba(249, 249, 249, 0.5);
+  border-radius: 50%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0.3125rem;
+  transition: transform var(--transition-normal, 0.2s);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+/* Content Frame */
+.contentFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: 24.5625rem; /* 393px */
+  margin: 0 auto;
+}
+
+/* Loading text */
+.loadingText {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(249, 249, 249, 0.84);
+  font-size: 1rem;
+  font-family: var(--font-secondary);
+  width: 100%;
+  direction: rtl;
+  margin-top: 5rem;
+}
+
+/* Header with user name */
+.header {
+  text-align: center;
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 24.5625rem;
+}
+
+.userName {
+  font-family: var(--font-primary);
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 2.125rem;
+  color: rgba(249, 249, 249, 0.84);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* Scrollable Content Container */
+.scrollContainer {
+  flex: 1;
+  width: 100%;
+  max-width: 24.5625rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 1.5rem 6rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* Profile Box (white bordered container) */
+.profileBox {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 1rem;
+  gap: 0.5rem;
+  border: 0.0625rem solid rgba(249, 249, 249, 0.84);
+  border-radius: 0.625rem; /* 10px */
+  background: transparent;
+  direction: rtl;
+}
+
+/* Box Header */
+.boxHeader {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.boxTitle {
+  font-family: var(--font-secondary);
+  font-weight: 300;
+  font-size: 1rem;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+/* Details Grid */
+.detailsGrid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.detailLabel {
+  font-family: var(--font-secondary);
+  font-size: 0.875rem;
+  color: rgba(247, 247, 247, 0.9);
+}
+
+.detailValue {
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  color: rgba(249, 249, 249, 0.84);
+  font-weight: 400;
+  width: 100%;
+  text-align: right;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-height: 700px) {
+  .header {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .profileBox {
+    padding: 0.75rem;
+  }
+}

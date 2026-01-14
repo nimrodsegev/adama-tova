@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
+import UserProfileModal from "@/lib/components/UserProfileModal/UserProfileModal";
 import styles from "./ActivityRegistrationsModal.module.css";
 
 interface Registration {
@@ -59,12 +59,15 @@ export default function ActivityRegistrationsModal({
   isOpen,
   onClose,
 }: ActivityRegistrationsModalProps) {
-  const router = useRouter();
   const [activityTitle, setActivityTitle] = useState(propTitle || "");
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState("all");
+
+  // User profile modal state
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -108,9 +111,13 @@ export default function ActivityRegistrationsModal({
   };
 
   const handleViewProfile = (userId: string) => {
-    // Navigate to user profile or open user modal
-    // For now, we can use the UserApprovalModal pattern
-    console.log("View profile:", userId);
+    setSelectedUserId(userId);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleProfileModalClose = () => {
+    setIsProfileModalOpen(false);
+    setSelectedUserId(null);
   };
 
   if (!isOpen || !mounted) return null;
@@ -214,5 +221,18 @@ export default function ActivityRegistrationsModal({
     </>
   );
 
-  return createPortal(modalContent, document.body);
+  return (
+    <>
+      {createPortal(modalContent, document.body)}
+
+      {/* User Profile Modal */}
+      {selectedUserId && (
+        <UserProfileModal
+          userId={selectedUserId}
+          isOpen={isProfileModalOpen}
+          onClose={handleProfileModalClose}
+        />
+      )}
+    </>
+  );
 }
