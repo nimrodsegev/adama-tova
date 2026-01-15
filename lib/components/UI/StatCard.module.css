@@ -26,10 +26,10 @@
   border: 0.0625rem solid rgba(247, 247, 247, 0.9);
 }
 
-/* Filled state - white background, no border */
+/* Filled state - transparent with border (same as empty) */
 .statCard.filled {
-  background: rgba(247, 247, 247, 0.9);
-  border: none;
+  background: transparent;
+  border: 0.0625rem solid rgba(247, 247, 247, 0.9);
 }
 
 /* Content wrapper for label + value */
@@ -54,7 +54,7 @@
 }
 
 .filled .label {
-  color: #681F02;
+  color: rgba(247, 247, 247, 0.9);
 }
 
 /* Value - different colors for empty/filled */
@@ -71,7 +71,7 @@
 }
 
 .filled .value {
-  color: #681F02;
+  color: rgba(249, 249, 249, 0.84);
 }
 
 /* Empty state message */
