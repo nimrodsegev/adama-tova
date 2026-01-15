@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useMemo, useState } from "react";
 import styles from "./DaySlider.module.css";
 
@@ -28,6 +27,7 @@ const DaySlider: React.FC<DaySliderProps> = ({
   }, [weekOffset]);
 
   const dayNames = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+
   const isForbidden = (dayIndex: number) => ![0, 2, 3, 4, 5].includes(dayIndex);
 
   const isToday = (date: Date) => {

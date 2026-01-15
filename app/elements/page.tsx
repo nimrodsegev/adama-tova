@@ -6,6 +6,7 @@ import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
+import DaySlider from "@/lib/components/UI/DaySlider";
 import {
   HomeFilter,
   ADMIN_FILTER_OPTIONS,
@@ -78,6 +79,7 @@ export default function ElementsPage() {
   const [userFilter, setUserFilter] = useState("recommended");
   const [statusFilter, setStatusFilter] = useState("all");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const handleMarkRead = (id: string | number) => {
     setDemoNotifications((prev) =>
@@ -107,6 +109,31 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          <section className="section">
+            <h2 className="text-section-title">Day Slider</h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Interactive Week Slider - Click days to select
+                </p>
+                <DaySlider
+                  selectedDate={selectedDate}
+                  onDateChange={(date) => {
+                    setSelectedDate(date);
+                    console.log("Selected date:", date);
+                  }}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Selected date: {selectedDate.toLocaleDateString("he-IL")}
+                </p>
+              </div>
+            </div>
+          </section>
           <section className="section">
             <h2 className="text-section-title">Empty State</h2>
             <div
