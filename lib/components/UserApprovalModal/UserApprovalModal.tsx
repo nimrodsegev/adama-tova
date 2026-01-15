@@ -34,6 +34,7 @@ export default function UserApprovalModal({
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState({ groups: 0, workshops: 0 });
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -42,10 +43,20 @@ export default function UserApprovalModal({
 
   useEffect(() => {
     if (isOpen && userId) {
+      setClosing(false);
       loadUser();
       loadStats();
     }
   }, [isOpen, userId]);
+
+  // Handle close with animation
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 400);
+  };
 
   const loadUser = async () => {
     setLoading(true);
@@ -66,10 +77,10 @@ export default function UserApprovalModal({
 
   const modalContent = (
     <>
-      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={handleCloseWithAnimation} />
       <div className={styles.modalContainer}>
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M18 6L6 18M6 6L18 18"
@@ -82,7 +93,7 @@ export default function UserApprovalModal({
         </button>
 
         <div className={styles.contentFrame}>
-          {loading ? (
+          {(loading || closing) ? (
             <div className={styles.loadingContainer}>
               <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
             </div>

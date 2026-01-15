@@ -65,6 +65,7 @@ export default function ActivityRegistrationsModal({
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [closing, setClosing] = useState(false);
 
   // User profile modal state
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -77,6 +78,7 @@ export default function ActivityRegistrationsModal({
 
   useEffect(() => {
     if (isOpen && activityId) {
+      setClosing(false);
       fetchData();
       document.body.style.overflow = "hidden";
     } else {
@@ -87,6 +89,15 @@ export default function ActivityRegistrationsModal({
       document.body.style.overflow = "unset";
     };
   }, [isOpen, activityId]);
+
+  // Handle close with animation
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 400);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -136,11 +147,11 @@ export default function ActivityRegistrationsModal({
 
   const modalContent = (
     <>
-      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={handleCloseWithAnimation} />
 
       <div className={styles.modalContainer}>
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
           <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
             <line x1="2" y1="2" x2="18" y2="18" stroke="#F9F9F9" strokeWidth="1" />
             <line x1="18" y1="2" x2="2" y2="18" stroke="#F9F9F9" strokeWidth="1" />
@@ -148,7 +159,7 @@ export default function ActivityRegistrationsModal({
         </button>
 
         <div className={styles.contentFrame}>
-          {loading ? (
+          {(loading || closing) ? (
             <div className={styles.loadingContainer}>
               <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
             </div>
