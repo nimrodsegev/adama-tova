@@ -7,7 +7,7 @@ import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
 // UI Components
 import DaySlider from "@/lib/components/UI/DaySlider";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
-import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
+import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
@@ -180,29 +180,21 @@ export default function NewUserCalendarPage() {
 
           <div className={styles.activitiesList}>
             {displayedActivities.length > 0
-              ? displayedActivities.map((activity) => {
-                  const isRegistered = registeredActivityIds.includes(
-                    activity.id
-                  );
-                  return (
-                    <NewUserScheduleActivityCard
-                      key={activity.id}
-                      id={activity.id}
-                      title={activity.title}
-                      instructor={activity.instructor || "לא צוין"}
-                      date={activity.date}
-                      startTime={activity.start_time}
-                      endTime={activity.end_time}
-                      currentParticipants={activity.current_participants || 0}
-                      maxParticipants={activity.max_participants || 0}
-                      waitlistCount={activity.waitlist_count || 0}
-                      isGroup={activity.is_group || !!activity.series_id}
-                      isRegistered={isRegistered}
-                      onRegistrationChange={fetchData}
-                      onMotionChange={handleMotionState}
-                    />
-                  );
-                })
+              ? displayedActivities.map((activity) => (
+                  <NewUserActivityCard
+                    key={activity.id}
+                    id={activity.id}
+                    title={activity.title}
+                    instructor={activity.instructor || "לא צוין"}
+                    date={activity.date}
+                    startTime={activity.start_time}
+                    currentParticipants={activity.current_participants || 0}
+                    maxParticipants={activity.max_participants || 0}
+                    waitlistCount={activity.waitlist_count || 0}
+                    isGroup={activity.is_group || !!activity.series_id}
+                    onMotionChange={handleMotionState}
+                  />
+                ))
               : // Only show empty text if NOT loading (to prevent flickering)
                 !isListLoading && (
                   <p className={styles.emptyText}>אין פעילויות ליום זה</p>
