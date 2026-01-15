@@ -180,6 +180,8 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
             <div className={styles.actionWrapper}>
               <Button
                 variant="tertiary"
+                tertiarySize="large"
+                tertiaryWeight="semibold"
                 colorType="orange"
                 onClick={handleActionClick}
                 disabled={loading}

@@ -78,10 +78,54 @@
   background: transparent;
   padding: 0;
   height: auto;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
   justify-content: flex-start;
+
+  /* ⭐ DEFAULT TERTIARY FONT SIZE & WEIGHT - Can be overridden */
+  font-size: var(--font-size-lg); /* Default: 1.125rem / 18px */
+  font-weight: var(--font-weight-normal); /* Default: 400 */
+  line-height: 1.2;
 }
 
+/* Tertiary Size Variants */
+.tertiarySmall {
+  font-size: var(--font-size-sm); /* 0.875rem / 14px */
+}
+
+.tertiaryBase {
+  font-size: var(--font-size-base); /* 1rem / 16px */
+}
+
+.tertiaryMedium {
+  font-size: var(--font-size-md); /* 1.0625rem / 17px */
+}
+
+.tertiaryLarge {
+  font-size: var(--font-size-lg); /* 1.125rem / 18px */
+}
+
+.tertiaryXLarge {
+  font-size: var(--font-size-xl); /* 1.25rem / 20px */
+}
+
+/* Tertiary Weight Variants */
+.tertiaryLight {
+  font-weight: var(--font-weight-light); /* 300 */
+}
+
+.tertiaryNormal {
+  font-weight: var(--font-weight-normal); /* 400 */
+}
+
+.tertiarySemibold {
+  font-weight: var(--font-weight-semibold); /* 600 */
+}
+
+.tertiaryBold {
+  font-weight: var(--font-weight-bold); /* 700 */
+}
+
+/* Color types for tertiary */
 .white {
   color: var(--color-text-secondary);
 }
@@ -99,11 +143,17 @@
   height: 100%;
 }
 
-.chevron {
-  font-size: 1.75rem;
-  line-height: 1;
-  display: inline-block;
-  margin-top: -0.125rem;
+.arrowIcon {
+  /* Inherits color from parent button via currentColor */
+  width: 0.5rem; /* 8px - adjust this value */
+  height: 0.8rem; /* 14px - adjust this value */
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+}
+
+/* Optional: Add hover effect for arrow */
+.tertiary:hover .arrowIcon {
+  transform: translateX(-2px); /* Moves left in RTL */
 }
 
 /* ============================================
@@ -172,8 +222,8 @@
 }
 
 .approve {
-  height: 3rem; /* 24px */
-  padding: 0 1.5rem; /* 12px side padding */
+  height: 3rem; /* 48px */
+  padding: 0 1.5rem; /* 24px side padding */
   background: var(--button-text);
   color: var(--color-text-secondary);
   border-radius: 0.21875rem;
@@ -181,8 +231,8 @@
 }
 
 .reject {
-  height: 3rem; /* 24px */
-  padding: 0 1.5rem; /* 12px side padding */
+  height: 3rem; /* 48px */
+  padding: 0 1.5rem; /* 24px side padding */
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--button-text);
   color: var(--button-text);

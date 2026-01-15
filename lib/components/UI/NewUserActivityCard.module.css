@@ -51,7 +51,7 @@
 .dateTimeText {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); /* 1.0625rem / 17px */
+  font-size: var(--font-size-lg); /* 1.0625rem / 17px */
   line-height: 1.125rem; /* 18px */
   color: var(--color-bordo);
   margin: 0;
@@ -65,7 +65,7 @@
   flex-direction: column;
 
   /* ⭐ CONTROL GAP BETWEEN INSTRUCTOR AND DATE */
-  gap: 0.125rem; /* 4px - adjust this value! Options: 0.125rem (2px), 0.25rem (4px), 0.5rem (8px), 0.75rem (12px) */
+  gap: 0.25rem; /* 4px - adjust this value! Options: 0.125rem (2px), 0.25rem (4px), 0.5rem (8px), 0.75rem (12px) */
 
   width: 100%;
 }
@@ -73,6 +73,6 @@
   display: flex;
   align-items: flex-end; /* Align button to bottom */
   justify-content: flex-start; /* Align to left in RTL (which is visually left) */
-  margin-top: 3.25rem; /* Push to bottom */
+  margin-top: 3.575rem; /* Push to bottom */
   flex-shrink: 0; /* Prevent shrinking */
 }
