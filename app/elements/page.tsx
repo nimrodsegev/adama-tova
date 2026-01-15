@@ -5,6 +5,13 @@ import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
+import {
+  HomeFilter,
+  ADMIN_FILTER_OPTIONS,
+  USER_FILTER_OPTIONS,
+  ADMIN_STATUS_OPTIONS,
+  AVAILABILITY_OPTIONS,
+} from "@/lib/components/UI/HomeFilter";
 import styles from "./elements.module.css";
 
 export default function ElementsPage() {
@@ -65,6 +72,12 @@ export default function ElementsPage() {
     },
   ];
 
+  // Filter states
+  const [adminFilter, setAdminFilter] = useState("pending");
+  const [userFilter, setUserFilter] = useState("recommended");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+
   const handleMarkRead = (id: string | number) => {
     setDemoNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
@@ -93,6 +106,77 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          {/* --- HOME FILTER SECTION --- */}
+          <section className="section">
+            <h2 className="text-section-title">פילטרים (HomeFilter)</h2>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5rem",
+              }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Admin Filter - 2 אפשרויות
+                </p>
+                <HomeFilter
+                  options={ADMIN_FILTER_OPTIONS}
+                  activeOption={adminFilter}
+                  onFilterChange={setAdminFilter}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  User Filter - 2 אפשרויות
+                </p>
+                <HomeFilter
+                  options={USER_FILTER_OPTIONS}
+                  activeOption={userFilter}
+                  onFilterChange={setUserFilter}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Status Filter - 3 אפשרויות
+                </p>
+                <HomeFilter
+                  options={ADMIN_STATUS_OPTIONS}
+                  activeOption={statusFilter}
+                  onFilterChange={setStatusFilter}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Availability Filter - 3 אפשרויות
+                </p>
+                <HomeFilter
+                  options={AVAILABILITY_OPTIONS}
+                  activeOption={availabilityFilter}
+                  onFilterChange={setAvailabilityFilter}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  עם ספירות (Counts)
+                </p>
+                <HomeFilter
+                  options={[
+                    { id: "all", label: "הכל", count: 25 },
+                    { id: "pending", label: "ממתינים", count: 8 },
+                    { id: "approved", label: "מאושרים", count: 17 },
+                  ]}
+                  activeOption="all"
+                  onFilterChange={(id) => console.log("Selected:", id)}
+                />
+              </div>
+            </div>
+          </section>
+
           {/* --- USER APPROVAL CARDS SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">כרטיסי אישור משתמשים</h2>
@@ -156,20 +240,6 @@ export default function ElementsPage() {
                   onReject={() => handleReject("יוסף בן דוד המלמד")}
                 />
               </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  ללא onClick - לא לחיץ
-                </p>
-                <UserApprovalCard
-                  userName="רחל גולדשטיין"
-                  requestDate="14.01.2025"
-                  circle="מעגל נערות"
-                  type="initial"
-                  onApprove={() => handleApprove("רחל גולדשטיין")}
-                  onReject={() => handleReject("רחל גולדשטיין")}
-                />
-              </div>
             </div>
           </section>
 
@@ -212,87 +282,6 @@ export default function ElementsPage() {
                   onMotionChange={handleMotionChange}
                 />
               </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - קבוצתי (יש מקומות)
-                </p>
-                <NewUserActivityCard
-                  id={demoActivities[2].id}
-                  title={demoActivities[2].title}
-                  instructor={demoActivities[2].instructor}
-                  date={demoActivities[2].date}
-                  startTime={demoActivities[2].startTime}
-                  currentParticipants={demoActivities[2].currentParticipants}
-                  maxParticipants={demoActivities[2].maxParticipants}
-                  waitlistCount={demoActivities[2].waitlistCount}
-                  isGroup={true}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* --- SCHEDULE ACTIVITY CARDS SECTION --- */}
-          <section className="section">
-            <h2 className="text-section-title">כרטיסי פעילות - לוח שנה</h2>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserScheduleActivityCard - יוגה
-                </p>
-                <NewUserScheduleActivityCard
-                  id={demoActivities[0].id}
-                  title={demoActivities[0].title}
-                  instructor={demoActivities[0].instructor}
-                  date={demoActivities[0].date}
-                  startTime={demoActivities[0].startTime}
-                  endTime={demoActivities[0].endTime}
-                  currentParticipants={demoActivities[0].currentParticipants}
-                  maxParticipants={demoActivities[0].maxParticipants}
-                  waitlistCount={demoActivities[0].waitlistCount}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserScheduleActivityCard - פילאטיס (מלא)
-                </p>
-                <NewUserScheduleActivityCard
-                  id={demoActivities[1].id}
-                  title={demoActivities[1].title}
-                  instructor={demoActivities[1].instructor}
-                  date={demoActivities[1].date}
-                  startTime={demoActivities[1].startTime}
-                  endTime={demoActivities[1].endTime}
-                  currentParticipants={demoActivities[1].currentParticipants}
-                  maxParticipants={demoActivities[1].maxParticipants}
-                  waitlistCount={demoActivities[1].waitlistCount}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserScheduleActivityCard - מדיטציה (מקומות פנויים)
-                </p>
-                <NewUserScheduleActivityCard
-                  id={demoActivities[2].id}
-                  title={demoActivities[2].title}
-                  instructor={demoActivities[2].instructor}
-                  date={demoActivities[2].date}
-                  startTime={demoActivities[2].startTime}
-                  endTime={demoActivities[2].endTime}
-                  currentParticipants={demoActivities[2].currentParticipants}
-                  maxParticipants={demoActivities[2].maxParticipants}
-                  waitlistCount={demoActivities[2].waitlistCount}
-                  isGroup={true}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
             </div>
           </section>
 
@@ -311,38 +300,6 @@ export default function ElementsPage() {
 
               <div>
                 <p className="text-small mb-xs opacity-75">
-                  Primary - Size L-short
-                </p>
-                <Button variant="primary" size="L-short">
-                  שמירה
-                </Button>
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  Secondary - Size L
-                </p>
-                <Button variant="secondary" size="L">
-                  ביטול
-                </Button>
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">Tertiary - Orange</p>
-                <Button variant="tertiary" colorType="orange">
-                  עריכה
-                </Button>
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">Tertiary - Delete</p>
-                <Button variant="tertiary" colorType="delete">
-                  מחיקה
-                </Button>
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
                   Approve & Reject Buttons
                 </p>
                 <div
@@ -354,40 +311,28 @@ export default function ElementsPage() {
               </div>
 
               <div>
-                <p className="text-small mb-xs opacity-75">WhatsApp Button</p>
-                <Button variant="whatsapp">שלח ווטסאפ</Button>
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  Waiting List Button
-                </p>
-                <Button variant="waiting-list">רשימת המתנה</Button>
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">Login Button</p>
-                <Button variant="login">התחברות</Button>
+                <p className="text-small mb-xs opacity-75">Tertiary - Orange</p>
+                <Button variant="tertiary" colorType="orange">
+                  עריכה
+                </Button>
               </div>
             </div>
           </section>
 
           {/* --- NOTIFICATIONS SECTION --- */}
           <section className="section">
-            <h2 className="text-section-title">התראות (החלק שמאלה לקריאה)</h2>
+            <h2 className="text-section-title">התראות</h2>
             <div
               className="vertical-scroll gap-md"
               style={{ paddingBottom: "20px" }}
             >
-              <p className="text-small mb-xs opacity-75">לא נקרא (עם החלקה)</p>
+              <p className="text-small mb-xs opacity-75">לא נקרא</p>
               <NewNotificationCard
                 notification={demoNotifications[0]}
                 onMarkAsRead={handleMarkRead}
               />
 
-              <p className="text-small mb-xs opacity-75 mt-md">
-                נקרא + כפתור לפעילות
-              </p>
+              <p className="text-small mb-xs opacity-75 mt-md">נקרא + כפתור</p>
               <NewNotificationCard
                 notification={demoNotifications[1]}
                 onMarkAsRead={handleMarkRead}

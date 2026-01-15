@@ -66,7 +66,9 @@ export const HomeFilter: React.FC<HomeFilterProps> = ({
         >
           <span className="home-filter__label">
             {option.label}
-            {option.count !== undefined && ` (${option.count})`}
+            {option.count !== undefined && (
+              <span className="home-filter__count"> ({option.count})</span>
+            )}
           </span>
         </button>
       ))}

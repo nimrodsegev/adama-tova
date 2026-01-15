@@ -18,12 +18,12 @@
   /* SPACING (The "Margin" from container edge)
      We use equal padding and gap to ensure the active button
      is always equidistant from the edges and other buttons. */
-  padding: 0.375rem; /* 6px padding all around */
+  padding: 0.5rem; /* 6px padding all around */
   gap: 0.375rem; /* 6px gap between buttons */
 
   /* Appearance */
   background: rgba(104, 31, 2, 0.3);
-  border-radius: var(--radius-sm, 6px); /* Slightly more rounded container */
+  border-radius: var(--radius-xs, 6px); /* Slightly more rounded container */
 
   /* Interaction */
   direction: rtl;
@@ -44,12 +44,12 @@
   height: auto; /* Let flexbox stretch it to fill container height */
 
   /* Text Spacing */
-  padding: 0 1rem; /* 16px side padding - reduced to fit counts */
+  padding: 0.5rem 0.5rem; /* 16px side padding - reduced to fit counts */
 
   /* Reset Button Styles */
   background: transparent;
   border: none;
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-xs, 6px);
   cursor: pointer;
   white-space: nowrap;
 
@@ -85,8 +85,8 @@
 
 .home-filter__label {
   font-family: var(--font-secondary, sans-serif);
-  font-size: 1rem; /* 16px - reduced to fit counts */
-  font-weight: 400;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary, #f9f9f9);
   line-height: 1;
   pointer-events: none; /* Ensures clicks pass through to button */
@@ -94,6 +94,12 @@
 
 .home-filter__tab--active .home-filter__label {
   font-weight: 700;
+}
+
+/* New rule for the count number */
+.home-filter__count {
+  font-weight: var(--font-weight-light, 300);
+  margin-right: 0.25rem;
 }
 
 /* ============================================
