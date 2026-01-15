@@ -12,6 +12,7 @@ import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/Activity
 import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 
 import styles from "./AdminCalendarPage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 export default function AdminCalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -22,6 +23,9 @@ export default function AdminCalendarPage() {
   // UI State
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
+
+  // Force a "mounting" state for smooth page transition (initial load only)
+  const [mounting, setMounting] = useState(true);
 
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
@@ -54,6 +58,14 @@ export default function AdminCalendarPage() {
   useEffect(() => {
     fetchData();
   }, [selectedDate]);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter activities by availability
   const filteredActivities = activities.filter((activity: any) => {
@@ -115,8 +127,9 @@ export default function AdminCalendarPage() {
   };
 
   return (
+    <SmoothPageWrapper isLoading={mounting}>
     <div className={styles.pageContainer}>
-      {/* Loading overlay */}
+      {/* Loading overlay for date changes */}
       {loading && (
         <div className={styles.loadingOverlay}>
           <OrganicCircles
@@ -199,5 +212,6 @@ export default function AdminCalendarPage() {
         />
       )}
     </div>
+    </SmoothPageWrapper>
   );
 }

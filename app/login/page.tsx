@@ -7,6 +7,8 @@ import styles from "./page.module.css";
 import { createClient } from "@/lib/supabase/client";
 import ForgotPasswordModal from "@/lib/components/ForgotPasswordModal";
 import SignupWizard from "@/app/ApplicationForm/SignupWizard";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from "@/lib/components/UI/CutInput";
 import { useState, useEffect } from "react";
 
 type Mode = "choice" | "signup";
@@ -104,13 +106,13 @@ export default function LoginPage() {
     }
 
     setLoadingAction("login");
+    let shouldResetLoading = true;
 
     try {
       const userExists = await checkUserExists(email);
 
       if (!userExists) {
         setEmailError("אימייל לא נמצא");
-        setLoadingAction(null);
         return;
       }
 
@@ -128,17 +130,18 @@ export default function LoginPage() {
 
           if (profile) {
             if (!profile.is_approved && profile.role === "participant") {
+              shouldResetLoading = false;
               router.replace("/pending-approval");
-              setLoadingAction(null);
               return;
             }
 
             if (!profile.quiz?.completed_at) {
+              shouldResetLoading = false;
               router.replace("/login");
-              setLoadingAction(null);
               return;
             }
 
+            shouldResetLoading = false;
             if (profile.role === "admin") {
               router.replace("/AdminScreens/HomePage");
             } else {
@@ -154,7 +157,9 @@ export default function LoginPage() {
     } catch (err: any) {
       // Error handled
     } finally {
-      setLoadingAction(null);
+      if (shouldResetLoading) {
+        setLoadingAction(null);
+      }
     }
   };
 
@@ -176,13 +181,14 @@ export default function LoginPage() {
 
     setLoadingAction("signup");
     const userExists = await checkUserExists(email);
-    setLoadingAction(null);
 
     if (userExists) {
       setEmailError("אימייל קיים במערכת");
+      setLoadingAction(null);
       return;
     }
 
+    // Keep loading while transitioning to signup wizard
     setSignupType("email");
     setSignupEmail(email);
     setSignupPassword(password);
@@ -191,27 +197,18 @@ export default function LoginPage() {
 
   const handleBackToLogin = async () => {
     setMode("choice");
+    // Brief delay to allow smooth animation to play before revealing login
+    setTimeout(() => setLoadingAction(null), 50);
     if (signupType === "google") {
       await authService.signOut();
     }
   };
 
-  if (!initialCheckDone) {
-    return (
-      <div className={styles.loginContainer}>
-        <div className={styles.content}>
-          <div className={styles.greeting}>
-            <p>טוען...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // LOGIN SCREEN
   if (mode === "choice") {
     return (
-      <div className={styles.loginContainer}>
+      <SmoothPageWrapper isLoading={!initialCheckDone || loadingAction !== null}>
+        <div className={styles.loginContainer}>
         <div className={styles.content}>
           <div className={styles.mainSection}>
             {/* Greeting section */}
@@ -221,49 +218,35 @@ export default function LoginPage() {
             </div>
 
             <div className={styles.loginContent}>
-              {/* Input Wrapper - Email (first) */}
-              <div className={styles.inputWrapper}>
-                {emailError ? (
-                  <span className={styles.fieldError}>{emailError}</span>
-                ) : (
-                  <span className={styles.inputLabel}>אימייל</span>
-                )}
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setEmailError("");
-                  }}
-                  placeholder="adama_tova@gmail.com"
-                  className={`${styles.input} ${styles.inputLtr} ${
-                    emailError ? styles.inputError : ""
-                  }`}
-                  dir="ltr"
-                />
-              </div>
+              {/* Email Input */}
+              <CutInput
+                label="אימייל"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError("");
+                }}
+                placeholder="adama_tova@gmail.com"
+                error={emailError}
+                dir="ltr"
+                textAlign="right"
+              />
 
-              {/* Input Wrapper - Password (second) */}
-              <div className={styles.inputWrapper}>
-                {passwordError ? (
-                  <span className={styles.fieldError}>{passwordError}</span>
-                ) : (
-                  <span className={styles.inputLabel}>סיסמה</span>
-                )}
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordError("");
-                  }}
-                  placeholder="6 תווים או יותר"
-                  className={`${styles.input} ${
-                    passwordError ? styles.inputError : ""
-                  }`}
-                  dir="rtl"
-                />
-              </div>
+              {/* Password Input */}
+              <CutInput
+                label="סיסמה"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
+                placeholder="6 תווים או יותר"
+                error={passwordError}
+                dir="rtl"
+                textAlign="right"
+              />
 
               {/* Action Buttons - New order per Image 1 */}
               <div className={styles.buttonSection}>
@@ -320,7 +303,8 @@ export default function LoginPage() {
             onClose={() => setShowForgotPassword(false)}
           />
         )}
-      </div>
+        </div>
+      </SmoothPageWrapper>
     );
   }
 
