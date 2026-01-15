@@ -13,6 +13,7 @@ interface CutInputProps {
   dir?: "rtl" | "ltr";
   textAlign?: "right" | "left";
   className?: string;
+  tall?: boolean;
 }
 
 export default function CutInput({
@@ -25,6 +26,7 @@ export default function CutInput({
   dir = "rtl",
   textAlign = "right",
   className,
+  tall = false,
 }: CutInputProps) {
   const displayLabel = error || label;
   const isError = !!error;
@@ -55,15 +57,21 @@ export default function CutInput({
     }
   }, [displayLabel]);
 
-  // Build the SVG path with dynamic gap
-  const svgPath = `M${gapEnd} 0.5H306C308.5 0.5 314 2 314.5 8.5C314.5 15.3 314.5 39.3333 314.5 50.5C314.5 53.3333 312.8 59.1 306 59.5C299.2 59.9 105.5 59.6667 9.5 59.5C7 59.5 1 58.5 0.5 52C0.5 45.2 0.5 20.1667 0.5 8.5C0.5 6 2 1 8 0.5C14.8 0.5 172.333 0.5 ${gapStart} 0.5`;
+  // Build the SVG path with dynamic gap - different paths for normal vs tall
+  const svgPath = tall
+    ? `M${gapEnd} 0.5H306C308.5 0.5 314 2 314.5 8.5C314.5 15.3 314.5 92 314.5 103.5C314.5 106.5 312.8 112.1 306 112.5C299.2 112.9 105.5 112.7 9.5 112.5C7 112.5 1 111.5 0.5 105C0.5 98.2 0.5 20.1667 0.5 8.5C0.5 6 2 1 8 0.5C14.8 0.5 172.333 0.5 ${gapStart} 0.5`
+    : `M${gapEnd} 0.5H306C308.5 0.5 314 2 314.5 8.5C314.5 15.3 314.5 39.3333 314.5 50.5C314.5 53.3333 312.8 59.1 306 59.5C299.2 59.9 105.5 59.6667 9.5 59.5C7 59.5 1 58.5 0.5 52C0.5 45.2 0.5 20.1667 0.5 8.5C0.5 6 2 1 8 0.5C14.8 0.5 172.333 0.5 ${gapStart} 0.5`;
+
+  const wrapperClass = tall
+    ? `${styles.wrapper} ${styles.wrapperTall} ${className || ""}`
+    : `${styles.wrapper} ${className || ""}`;
 
   return (
-    <div ref={wrapperRef} className={`${styles.wrapper} ${className || ""}`}>
+    <div ref={wrapperRef} className={wrapperClass}>
       {/* SVG Border with dynamic gap for label */}
       <svg
         className={styles.border}
-        viewBox="0 0 315 61"
+        viewBox={tall ? "0 0 315 114" : "0 0 315 61"}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="none"
@@ -83,16 +91,27 @@ export default function CutInput({
         {displayLabel}
       </span>
 
-      {/* Actual input field */}
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={styles.input}
-        dir={dir}
-        style={{ textAlign }}
-      />
+      {/* Actual input field - use textarea for tall variant */}
+      {tall ? (
+        <textarea
+          value={value}
+          onChange={onChange as unknown as (e: React.ChangeEvent<HTMLTextAreaElement>) => void}
+          placeholder={placeholder}
+          className={`${styles.input} ${styles.inputTall}`}
+          dir={dir}
+          style={{ textAlign }}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={styles.input}
+          dir={dir}
+          style={{ textAlign }}
+        />
+      )}
     </div>
   );
 }

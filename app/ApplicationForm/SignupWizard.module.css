@@ -414,8 +414,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--color-background);
-  background-attachment: fixed;
+  background: transparent;
   border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
@@ -536,8 +535,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--color-background);
-  background-attachment: fixed;
+  background: transparent;
   border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;

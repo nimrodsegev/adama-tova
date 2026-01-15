@@ -6,6 +6,10 @@
   height: 3.75rem; /* 60px - matches original input */
 }
 
+.wrapperTall {
+  height: 7.125rem; /* 114px - taller variant */
+}
+
 /* SVG border - stretched to fill wrapper */
 .border {
   position: absolute;
@@ -83,6 +87,13 @@
 
 .input:focus::placeholder {
   opacity: 0;
+}
+
+/* Tall variant uses textarea - text starts at top */
+.inputTall {
+  padding-top: 1rem;
+  resize: none;
+  overflow-y: auto;
 }
 
 /* ============================================

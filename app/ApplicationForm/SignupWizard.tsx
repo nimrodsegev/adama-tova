@@ -35,6 +35,7 @@ const CIRCLE_OPTIONS = [
   "כוחות הצלה וחילוץ",
   "תושבי העוטף ומפונים",
   "מעגל שני ושלישי של משפחות השכול",
+  "אחר",
 ];
 
 const INTEREST_OPTIONS = [
@@ -689,15 +690,18 @@ export default function SignupWizard({
                   )}
                 </div>
 
-                <div className={styles.inputWrapper}>
-                  <span className={styles.inputLabel}>אחר</span>
-                  <textarea
+                {!circleDropdownOpen && circle === "אחר" && (
+                  <CutInput
+                    label="אחר"
+                    type="text"
                     value={proximity}
                     onChange={(e) => setProximity(e.target.value)}
-                    className={styles.textareaLarge}
+                    placeholder="אם מתאים לך, אפשר לפרט כאן (לא חובה)"
                     dir="rtl"
+                    textAlign="right"
+                    tall
                   />
-                </div>
+                )}
               </div>
             </div>
           </div>
