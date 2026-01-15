@@ -41,7 +41,7 @@
   position: absolute;
   top: -0.5rem; /* -8px - sits on top of the border gap */
   right: 2rem;
-
+  
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-base); /* 16px */

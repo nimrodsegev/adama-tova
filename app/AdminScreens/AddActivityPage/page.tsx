@@ -5,6 +5,7 @@ import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./AddActivityPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from '@/lib/components/UI/CutInput';
 
 // --- Types ---
 type ActivityStatus = "open" | "closed" | "cancelled";
@@ -290,10 +291,15 @@ export default function AddActivityPage() {
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             
-            <div className="input-wrapper">
-              <input type="text" name="title" value={formData.title} onChange={handleChange} className="input-field" placeholder=" " dir="rtl" />
-              <label className={styles.inputLabel}>שם הפעילות</label>
-            </div>
+            <CutInput
+            label="שם הפעילות"
+            value={formData.title}
+            onChange={(e) => setFormValue('title', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
 
             {/* CUSTOM BRANCH DROPDOWN - 🔥 FIX: activeZIndex Class */}
             <div className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownContainer : ''}`}>
@@ -318,23 +324,33 @@ export default function AddActivityPage() {
                 </div>
               )}
             </div>
-
-            <div className="input-wrapper">
-              <input type="text" name="location" value={formData.location} onChange={handleChange} className="input-field" placeholder=" " dir="rtl" />
-              <label className="input-label">
-                מיקום <span className={styles.optionalText}>*לא חובה</span>
-              </label>
-            </div>
-
-            <div className="input-wrapper">
-              <input type="text" name="instructor" value={formData.instructor} onChange={handleChange} className="input-field" placeholder=" " dir="rtl" />
-              <label className="input-label">מנחה</label>
-            </div>
-
-            <div className="input-wrapper">
-              <input type="number" name="max_participants" value={formData.max_participants} onChange={handleChange} className="input-field" placeholder=" " min="1" dir="rtl" />
-              <label className="input-label">מספר משתתפים מקסימלי</label>
-            </div>
+            <CutInput
+            label="מיקום"
+            value={formData.location}
+            onChange={(e) => setFormValue('location', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
+            <CutInput
+            label="מנחה"
+            value={formData.instructor}
+            onChange={(e) => setFormValue('instructor', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
+            <CutInput
+            label="מספר משתתפים מקסימלי"
+            value={formData.max_participants}
+            onChange={(e) => setFormValue('max_participants', e.target.value)}
+            className={styles.cutInput}
+            type="number"
+            dir="rtl"
+            textAlign="right"
+        />  
 
             <div className={styles.uploadWrapper}>
               <input type="file" id="imageUpload" accept="image/*" onChange={handleImageChange} hidden />
@@ -353,10 +369,15 @@ export default function AddActivityPage() {
               </label>
             </div>
 
-            <div className="input-wrapper">
-              <textarea name="description" value={formData.description} onChange={handleChange} className="input-field" style={{height:'auto', paddingTop:'1rem'}} placeholder=" " dir="rtl" rows={4} />
-              <label className="input-label">תיאור</label>
-            </div>
+            <CutInput
+            label="תיאור"
+            value={formData.description}
+            onChange={(e) => setFormValue('description', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
           </div>
         </div>
 
@@ -375,7 +396,7 @@ export default function AddActivityPage() {
                     <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </div>
                 </button>
-                <label className="input-label">סוג פעילות</label>
+                <label className={styles.inputLabel}>סוג פעילות</label>
               </div>
               {isTypeOpen && (
                 <div className={styles.dropdownMenu}>
@@ -400,7 +421,7 @@ export default function AddActivityPage() {
                       <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   </button>
-                  <label className="input-label">תחום עניין</label>
+                  <label className={styles.inputLabel}>תחום עניין</label>
                 </div>
                 {isCategoryOpen && (
                   <div className={styles.dropdownMenu}>
@@ -427,7 +448,7 @@ export default function AddActivityPage() {
                         <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </div>
                     </button>
-                    <label className="input-label">קבוצת יעד</label>
+                    <label className={styles.inputLabel}>קבוצת יעד</label>
                   </div>
                   {isCircleOpen && (
                     <div className={styles.dropdownMenu}>
@@ -440,10 +461,15 @@ export default function AddActivityPage() {
                   )}
                 </div>
 
-                <div className="input-wrapper">
-                  <input type="number" name="weeks" value={formData.weeks} onChange={handleChange} className="input-field" placeholder=" " min="1" dir="rtl" />
-                  <label className="input-label">מספר מפגשים</label>
-                </div>
+                <CutInput
+            label="מספר מפגשים"
+            value={formData.weeks}
+            onChange={(e) => setFormValue('weeks', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+                 />  
               </>
             )}
 
@@ -511,12 +537,15 @@ export default function AddActivityPage() {
             </div>
 
             {formData.type === 'group' && (
-              <div className="input-wrapper" style={{marginTop:'1rem'}}>
-                <input type="url" name="whatsapp_group_url" value={formData.whatsapp_group_url} onChange={handleChange} className="input-field" placeholder=" " dir="ltr" style={{textAlign: 'right'}} />
-                <label className="input-label">
-                  קישור לקבוצת ווטסאפ <span className={styles.optionalText}>*לא חובה</span>
-                </label>
-              </div>
+              <CutInput
+            label="קישור לקבוצת ווטסאפ"
+            value={formData.whatsapp_group_url}
+            onChange={(e) => setFormValue('whatsapp_group_url', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
             )}
           </div>
         </div>
