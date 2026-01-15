@@ -40,7 +40,7 @@
    COLOR VARIANTS
    ============================================ */
 .primary {
-  background: #B37EB3;
+  background: #b37eb3;
   color: var(--color-text-secondary);
 }
 
@@ -56,19 +56,19 @@
 
 /* L size: 44px height */
 .sizeL {
-  height: 2.75rem; /* 44px */
+  height: 3.5rem; /* 44px */
   /* Side padding defines the breathing room, width is automatic */
   padding: 0 2rem; /* 32px - wider buttons */
   border-radius: 0.3125rem;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
 }
 
 /* L-short size: 36px height */
 .sizeLshort {
-  height: 2.25rem; /* 36px */
+  height: 3rem; /* 36px */
   padding: 0 1.25rem; /* 20px */
   border-radius: 0.3125rem;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
 }
 
 /* ============================================
@@ -78,7 +78,7 @@
   background: transparent;
   padding: 0;
   height: auto;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   justify-content: flex-start;
 }
 
@@ -112,7 +112,7 @@
    ============================================ */
 
 .whatsapp {
-  height: 2.25rem; /* 36px */
+  height: 3rem; /* 36px */
   padding: 0 1rem; /* 16px side padding */
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--color-purple);
@@ -129,7 +129,7 @@
 }
 
 .waiting-list {
-  height: 2.25rem; /* 36px */
+  height: 3rem; /* 36px */
   padding: 0 1rem; /* 16px side padding */
   background: var(--color-purple);
   border-radius: var(--radius-sm);
@@ -172,8 +172,8 @@
 }
 
 .approve {
-  height: 1.5rem; /* 24px */
-  padding: 0 0.75rem; /* 12px side padding */
+  height: 3rem; /* 24px */
+  padding: 0 1.5rem; /* 12px side padding */
   background: var(--button-text);
   color: var(--color-text-secondary);
   border-radius: 0.21875rem;
@@ -181,8 +181,8 @@
 }
 
 .reject {
-  height: 1.5rem; /* 24px */
-  padding: 0 0.75rem; /* 12px side padding */
+  height: 3rem; /* 24px */
+  padding: 0 1.5rem; /* 12px side padding */
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--button-text);
   color: var(--button-text);

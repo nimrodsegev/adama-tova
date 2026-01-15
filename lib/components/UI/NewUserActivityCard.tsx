@@ -166,10 +166,14 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         <div className={styles.contentStack}>
           <div className={styles.textGroup}>
             <h3 className={styles.titleText}>{title}</h3>
-            <p className={styles.instructorText}>{instructor}</p>
-            <p className={styles.dateTimeText}>
-              {dayName} {dayMonth} בשעה {formatTime(startTime)}
-            </p>
+
+            {/* ⭐ NEW WRAPPER for instructor and date */}
+            <div className={styles.detailsGroup}>
+              <p className={styles.instructorText}>{instructor}</p>
+              <p className={styles.dateTimeText}>
+                {dayName} {dayMonth} בשעה {formatTime(startTime)}
+              </p>
+            </div>
           </div>
 
           {!isAdmin && (

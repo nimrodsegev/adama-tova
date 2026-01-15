@@ -2,14 +2,12 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* align-items: flex-start anchors content to the RIGHT in RTL */
   align-items: flex-start;
   padding: var(--spacing-lg); /* 1rem / 16px */
-
   width: 100%;
   max-width: 21.5625rem; /* 345px */
-  height: 8.03rem; /* 128.46px */
-
+  min-height: 7rem; /* 128.46px - minimum height */
+  height: auto; /* Allow height to grow based on content */
   background: var(--button-bg-light);
   border-radius: var(--radius-sm);
   direction: rtl;
@@ -18,44 +16,63 @@
 
 .contentStack {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Changed to row to allow side-by-side layout */
   justify-content: space-between;
+  align-items: flex-start;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  gap: var(--spacing-md); /* Space between text and button */
 }
 
 .textGroup {
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* Right alignment */
-  gap: 0.25rem; /* 4px */
+  gap: var(
+    --spacing-lg
+  ); /* Increased gap between title and text below (12px) */
+  width: 70%; /* Takes 70% of parent width */
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .titleText {
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base); /* 1rem / 16px */
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl); /* 1.25rem / 20px */
   line-height: 1.25rem; /* 20px */
-  color: #681f02;
+  color: var(--color-bordo);
   margin: 0;
   text-align: right;
+  width: 100%;
+  word-wrap: break-word; /* Allow long words to break */
 }
 
 .instructorText,
 .dateTimeText {
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-light);
-  font-size: 0.9375rem; /* 15px */
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); /* 1.0625rem / 17px */
   line-height: 1.125rem; /* 18px */
-  color: #681f02;
+  color: var(--color-bordo);
   margin: 0;
   text-align: right;
+  width: 100%;
+  word-wrap: break-word; /* Allow long text to break */
 }
+/* Wrapper for instructor and date to control gap between them */
+.detailsGroup {
+  display: flex;
+  flex-direction: column;
 
+  /* ⭐ CONTROL GAP BETWEEN INSTRUCTOR AND DATE */
+  gap: 0.125rem; /* 4px - adjust this value! Options: 0.125rem (2px), 0.25rem (4px), 0.5rem (8px), 0.75rem (12px) */
+
+  width: 100%;
+}
 .actionWrapper {
   display: flex;
-  /* justify-content: flex-end pushes the button to the LEFT in RTL */
-  justify-content: flex-end;
-  width: 100%;
-  margin-top: auto;
+  align-items: flex-end; /* Align button to bottom */
+  justify-content: flex-start; /* Align to left in RTL (which is visually left) */
+  margin-top: 3.25rem; /* Push to bottom */
+  flex-shrink: 0; /* Prevent shrinking */
 }
