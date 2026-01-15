@@ -6,6 +6,7 @@ import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./EditActivityPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from '@/lib/components/UI/CutInput';
+import Popup from "@/lib/components/UI/Popup";
 
 const BRANCH_OPTIONS = [
   { value: "satria", label: "סניף סתריה" },
@@ -411,16 +412,15 @@ export default function EditActivityPage() {
 
       {/* MODAL */}
       {showModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3 className={styles.modalTitle}>האם תרצה לשלוח עדכון למשתתפים על השינויים שביצעת?</h3>
-            <p className={styles.modalSubtitle}>העדכון ישלח לכל המשתתפים.</p>
-            <div className={styles.modalButtons}>
-              <button onClick={handleConfirmUpdate} className={styles.btnPrimary}>לשלוח עדכון</button>
-              <button onClick={() => { setShowModal(false); /* Close only */ }} className={styles.btnOutline}>לא עכשיו</button>
-            </div>
-          </div>
-        </div>
+        <Popup
+          content="האם תרצה לשלוח עדכון למשתתפים על השינויים שביצעת?"
+          recommendation="העדכון ישלח לכל המשתתפים."
+          primaryButtonText="לשלוח עדכון"
+          primaryButtonAction={handleConfirmUpdate}
+          secondaryButtonText="לא עכשיו"
+          secondaryButtonAction={() => setShowModal(false)}
+          onClose={() => setShowModal(false)}
+        />
       )}
 
     </main>
