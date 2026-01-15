@@ -5,8 +5,8 @@
   justify-content: space-between;
   padding: var(--spacing-md);
   width: 100%;
-  max-width: 393px;
-  height: 99px;
+  max-width: 24.5625rem; /* var(--container-max-width) equivalent */
+  height: 6.1875rem;
   direction: rtl;
   position: relative;
 }
@@ -27,8 +27,8 @@
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-xs);
   gap: var(--spacing-xs);
-  min-width: 44px;
-  height: 59px;
+  min-width: 2.75rem;
+  height: 3.6875rem;
   transition: all var(--transition-fast);
   position: relative;
 }
@@ -44,8 +44,8 @@
 
 .dayName {
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
   line-height: var(--font-size-md);
   text-align: center;
   color: var(--color-text-tertiary);
@@ -75,9 +75,9 @@
 
 .todayDot {
   position: absolute;
-  bottom: 0px;
-  width: 5px;
-  height: 5px;
+  bottom: 0;
+  width: 0.3125rem;
+  height: 0.3125rem;
   background: var(--color-text-primary);
   border-radius: var(--radius-full);
 }
@@ -85,8 +85,8 @@
 .navButton {
   background: transparent;
   border: none;
-  width: 30px;
-  height: 44px;
+  width: 1.875rem;
+  height: 2.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,10 +103,10 @@
 
 .arrowIcon {
   box-sizing: border-box;
-  width: 10px;
-  height: 10px;
-  border-top: 2px solid var(--color-text-secondary);
-  border-right: 2px solid var(--color-text-secondary);
+  width: 0.625rem;
+  height: 0.625rem;
+  border-top: 0.125rem solid var(--color-text-secondary);
+  border-right: 0.125rem solid var(--color-text-secondary);
 }
 
 .nextButton .arrowIcon {
