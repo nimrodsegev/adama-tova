@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import CutInput from '@/lib/components/UI/CutInput';
 import styles from './page.module.css';
 
 export default function ResetPasswordPage() {
@@ -189,47 +190,35 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleSubmit} className={styles.formContent}>
           <div className={styles.inputsContainer}>
             {/* Password Input */}
-            <div className={styles.inputWrapper}>
-              {passwordError ? (
-                <span className={styles.fieldError}>{passwordError}</span>
-              ) : (
-                <span className={styles.inputLabel}>סיסמה חדשה</span>
-              )}
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError('');
-                  setConfirmPasswordError('');
-                }}
-                required
-                className={`${styles.input} ${passwordError ? styles.inputError : ''}`}
-                dir="rtl"
-                placeholder="6 תווים או יותר"
-              />
-            </div>
+            <CutInput
+              label="סיסמה חדשה"
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError('');
+                setConfirmPasswordError('');
+              }}
+              error={passwordError}
+              dir="rtl"
+              textAlign="right"
+              placeholder="6 תווים או יותר"
+            />
 
             {/* Confirm Password Input */}
-            <div className={styles.inputWrapper}>
-              {confirmPasswordError ? (
-                <span className={styles.fieldError}>{confirmPasswordError}</span>
-              ) : (
-                <span className={styles.inputLabel}>הזן שוב סיסמה חדשה</span>
-              )}
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setConfirmPasswordError('');
-                }}
-                required
-                className={`${styles.input} ${confirmPasswordError ? styles.inputError : ''}`}
-                dir="rtl"
-                placeholder="6 תווים או יותר"
-              />
-            </div>
+            <CutInput
+              label="הזן שוב סיסמה חדשה"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setConfirmPasswordError('');
+              }}
+              error={confirmPasswordError}
+              dir="rtl"
+              textAlign="right"
+              placeholder="6 תווים או יותר"
+            />
           </div>
 
           <button

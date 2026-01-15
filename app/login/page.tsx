@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import ForgotPasswordModal from "@/lib/components/ForgotPasswordModal";
 import SignupWizard from "@/app/ApplicationForm/SignupWizard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from "@/lib/components/UI/CutInput";
 import { useState, useEffect } from "react";
 
 type Mode = "choice" | "signup";
@@ -196,6 +197,8 @@ export default function LoginPage() {
 
   const handleBackToLogin = async () => {
     setMode("choice");
+    // Brief delay to allow smooth animation to play before revealing login
+    setTimeout(() => setLoadingAction(null), 50);
     if (signupType === "google") {
       await authService.signOut();
     }
@@ -215,49 +218,35 @@ export default function LoginPage() {
             </div>
 
             <div className={styles.loginContent}>
-              {/* Input Wrapper - Email (first) */}
-              <div className={styles.inputWrapper}>
-                {emailError ? (
-                  <span className={styles.fieldError}>{emailError}</span>
-                ) : (
-                  <span className={styles.inputLabel}>אימייל</span>
-                )}
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setEmailError("");
-                  }}
-                  placeholder="adama_tova@gmail.com"
-                  className={`${styles.input} ${styles.inputLtr} ${
-                    emailError ? styles.inputError : ""
-                  }`}
-                  dir="ltr"
-                />
-              </div>
+              {/* Email Input */}
+              <CutInput
+                label="אימייל"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError("");
+                }}
+                placeholder="adama_tova@gmail.com"
+                error={emailError}
+                dir="ltr"
+                textAlign="right"
+              />
 
-              {/* Input Wrapper - Password (second) */}
-              <div className={styles.inputWrapper}>
-                {passwordError ? (
-                  <span className={styles.fieldError}>{passwordError}</span>
-                ) : (
-                  <span className={styles.inputLabel}>סיסמה</span>
-                )}
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordError("");
-                  }}
-                  placeholder="6 תווים או יותר"
-                  className={`${styles.input} ${
-                    passwordError ? styles.inputError : ""
-                  }`}
-                  dir="rtl"
-                />
-              </div>
+              {/* Password Input */}
+              <CutInput
+                label="סיסמה"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
+                placeholder="6 תווים או יותר"
+                error={passwordError}
+                dir="rtl"
+                textAlign="right"
+              />
 
               {/* Action Buttons - New order per Image 1 */}
               <div className={styles.buttonSection}>

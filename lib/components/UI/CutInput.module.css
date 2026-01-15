@@ -1,0 +1,99 @@
+/* CutInput - Input with SVG border that has a gap for the label */
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 3.75rem; /* 60px - matches original input */
+}
+
+/* SVG border - stretched to fill wrapper */
+.border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.borderPath {
+  stroke: var(--color-text-secondary); /* #F9F9F9 */
+  stroke-width: 1;
+  transition: stroke-width 0.2s ease;
+}
+
+/* Make border more solid when input has autofill */
+.wrapper:has(.input:-webkit-autofill) .borderPath {
+  stroke-width: 2;
+}
+
+.borderPath.borderError {
+  stroke: #A70000;
+  stroke-width: 2;
+}
+
+/* Label - positioned in the gap (right side in RTL) */
+.label {
+  position: absolute;
+  top: -0.5rem; /* -8px - sits on top of the border gap */
+  right: 2rem;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  /* No background needed - the SVG has a gap! */
+  padding: 0 0.25rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.label.labelError {
+  color: #A70000;
+}
+
+/* Input field - fills the wrapper */
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0 1.625rem; /* 26px horizontal - matches original */
+
+  background: transparent;
+  border: none; /* No border - SVG handles it */
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.0625rem; /* 17px */
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  outline: none;
+}
+
+.input::placeholder {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.input:focus::placeholder {
+  opacity: 0;
+}
+
+/* ============================================
+   AUTOFILL FIX - prevent white background fill
+   ============================================ */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  background-color: transparent !important;
+}

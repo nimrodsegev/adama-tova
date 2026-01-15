@@ -64,31 +64,9 @@ export default function PendingApprovalPage() {
     router.push("/login");
   };
 
-  // Show loading state with spouting circles while userProfile is being fetched
-  if (loading) {
-    return (
-      <div className={styles.container}>
-        {/* OrganicCircles in spouting mode during loading */}
-        <OrganicCircles
-          key="pending-approval-loading"
-          mode="spouting"
-          radius={0.35}
-          layers={defaultParams.layers}
-          smoothness={defaultParams.smoothness}
-          complexity={defaultParams.complexity}
-          elongation={defaultParams.elongation}
-          opacity={defaultParams.opacity}
-          strokeWidth={defaultParams.strokeWidth}
-          position={{ x: 0.5, y: 0.5 }}
-          baseColor="#FFFFFF"
-        />
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
-      {/* OrganicCircles with calculated parameters - only renders after profile loads */}
+      {/* OrganicCircles with calculated parameters */}
       <OrganicCircles
         key={`pending-approval-${circleParams.layers}-${circleParams.complexity}`}
         mode="breathing"

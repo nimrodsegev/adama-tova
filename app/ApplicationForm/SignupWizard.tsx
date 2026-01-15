@@ -15,6 +15,8 @@ import styles from "./SignupWizard.module.css";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from "@/lib/components/UI/CutInput";
 
 interface SignupWizardProps {
   signupType: "email" | "google";
@@ -347,6 +349,7 @@ export default function SignupWizard({
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
+    let shouldResetLoading = true;
 
     try {
       let userId: string;
@@ -374,11 +377,15 @@ export default function SignupWizard({
         free_text: freeText || undefined,
       });
 
+      // Keep loading while navigating
+      shouldResetLoading = false;
       router.replace("/pending-approval");
     } catch (err: any) {
       setError(err.message || "שגיאה בשמירה");
     } finally {
-      setLoading(false);
+      if (shouldResetLoading) {
+        setLoading(false);
+      }
     }
   };
 
@@ -405,8 +412,9 @@ export default function SignupWizard({
   };
 
   return (
-    <div className={styles.wizardContainer}>
-      {/* Scroll Snap Container - locked until step 0 is valid */}
+    <SmoothPageWrapper isLoading={loading}>
+      <div className={styles.wizardContainer}>
+        {/* Scroll Snap Container - locked until step 0 is valid */}
       <div
         ref={scrollContainerRef}
         className={`${styles.scrollSnapContainer} ${
@@ -441,45 +449,31 @@ export default function SignupWizard({
 
             <div className={styles.stepContainer}>
               <div className={styles.inputsContainer}>
-                <div className={styles.inputWrapper}>
-                  {nameError ? (
-                    <span className={styles.fieldError}>{nameError}</span>
-                  ) : (
-                    <span className={styles.inputLabel}>שם מלא</span>
-                  )}
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => {
-                      setFullName(e.target.value);
-                      setNameError("");
-                    }}
-                    className={`${styles.input} ${
-                      nameError ? styles.inputError : ""
-                    }`}
-                    dir="rtl"
-                  />
-                </div>
+                <CutInput
+                  label="שם מלא"
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    setNameError("");
+                  }}
+                  error={nameError}
+                  dir="rtl"
+                  textAlign="right"
+                />
 
-                <div className={styles.inputWrapper}>
-                  {phoneError ? (
-                    <span className={styles.fieldError}>{phoneError}</span>
-                  ) : (
-                    <span className={styles.inputLabel}>מספר טלפון</span>
-                  )}
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                      setPhoneError("");
-                    }}
-                    className={`${styles.input} ${
-                      phoneError ? styles.inputError : ""
-                    }`}
-                    dir="rtl"
-                  />
-                </div>
+                <CutInput
+                  label="מספר טלפון"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    setPhoneError("");
+                  }}
+                  error={phoneError}
+                  dir="rtl"
+                  textAlign="right"
+                />
 
                 <div className={styles.genderSelector}>
                   <div className={styles.inputWrapper}>
@@ -773,6 +767,7 @@ export default function SignupWizard({
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </SmoothPageWrapper>
   );
 }
