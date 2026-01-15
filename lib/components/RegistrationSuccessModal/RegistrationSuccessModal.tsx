@@ -28,7 +28,17 @@ export default function RegistrationSuccessModal({
   waitlistPosition = null,
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
+  const [closing, setClosing] = useState(false);
   const { userProfile } = useUser();
+
+  // Handle close with animation
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 400);
+  };
 
   // Calculate shape parameters based on user profile
   const shapeParams = useMemo(() => {
@@ -56,13 +66,13 @@ export default function RegistrationSuccessModal({
   const modalContent = (
     <>
       {/* Overlay backdrop */}
-      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={handleCloseWithAnimation} />
 
       {/* Modal container */}
       <div className={styles.modalContainer}>
         {/* Organic Circles in the background with calculated parameters */}
         <OrganicCircles
-          mode="breathing"
+          mode={closing ? "loading" : "breathing"}
           radius={0.3}
           layers={shapeParams.layers}
           smoothness={shapeParams.smoothness}
@@ -75,7 +85,7 @@ export default function RegistrationSuccessModal({
         />
 
         {/* Close button */}
-        <button className={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
           <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
             <line
               x1="2"
