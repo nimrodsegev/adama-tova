@@ -28,6 +28,28 @@
   position: relative;
 }
 
+/* Fixed Background Circles - stays in place during swipe */
+.backgroundCircles {
+  position: fixed;
+  top: calc(12vh + env(safe-area-inset-top, 0));
+  left: 0;
+  right: 0;
+  width: min(60.5vw, 14.92rem);
+  height: min(60.5vw, 15.13rem);
+  margin: 0 auto;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Spacer to maintain layout where circles used to be */
+.circleSpacer {
+  width: min(60.5vw, 14.92rem);
+  height: min(60.5vw, 15.13rem);
+  flex-shrink: 0;
+  margin-top: 3vh;
+  margin-bottom: 2vh;
+}
+
 /* Scroll Snap Container - horizontal scrolling */
 .scrollSnapContainer {
   display: flex;
@@ -1049,6 +1071,15 @@
     margin-top: -2.5vh;
     margin-bottom: -1vh;
   }
+
+  .circleSpacer {
+    margin-top: -2.5vh;
+    margin-bottom: -1vh;
+  }
+
+  .backgroundCircles {
+    top: calc(10vh + env(safe-area-inset-top, 0));
+  }
 }
 
 /* Small height screens - reduce spacing and sizes */
@@ -1067,6 +1098,19 @@
     height: min(45vw, 10rem);
     margin-top: 2vh;
     margin-bottom: 2vh;
+  }
+
+  .circleSpacer {
+    width: min(45vw, 10rem);
+    height: min(45vw, 10rem);
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+  }
+
+  .backgroundCircles {
+    top: calc(10vh + env(safe-area-inset-top, 0));
+    width: min(45vw, 10rem);
+    height: min(45vw, 10rem);
   }
 
   .input,
@@ -1116,6 +1160,19 @@
     margin-bottom: 1.5vh;
   }
 
+  .circleSpacer {
+    width: min(35vw, 7rem);
+    height: min(35vw, 7rem);
+    margin-top: 1.5vh;
+    margin-bottom: 1.5vh;
+  }
+
+  .backgroundCircles {
+    top: calc(8vh + env(safe-area-inset-top, 0));
+    width: min(35vw, 7rem);
+    height: min(35vw, 7rem);
+  }
+
   .stepTitle {
     font-size: 1rem;
   }
@@ -1163,6 +1220,19 @@
     margin-bottom: 1vh;
   }
 
+  .circleSpacer {
+    width: min(25vw, 5rem);
+    height: min(25vw, 5rem);
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+  }
+
+  .backgroundCircles {
+    top: calc(6vh + env(safe-area-inset-top, 0));
+    width: min(25vw, 5rem);
+    height: min(25vw, 5rem);
+  }
+
   .input,
   .genderWrapper,
   .accordionHeader {
@@ -1197,6 +1267,15 @@
     margin-bottom: 2vh;
   }
 
+  .circleSpacer {
+    margin-top: 3vh;
+    margin-bottom: 2vh;
+  }
+
+  .backgroundCircles {
+    top: calc(14vh + env(safe-area-inset-top, 0));
+  }
+
   .stepContainer {
     margin-top: 1.5rem;
   }
@@ -1214,6 +1293,14 @@
 
   .decorativeCircles {
     margin-top: 4vh;
+  }
+
+  .circleSpacer {
+    margin-top: 4vh;
+  }
+
+  .backgroundCircles {
+    top: calc(16vh + env(safe-area-inset-top, 0));
   }
 
   .stepContainer {
@@ -1293,6 +1380,15 @@
     margin-bottom: 1vh;
   }
 
+  .circleSpacer {
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+  }
+
+  .backgroundCircles {
+    top: calc(10vh + env(safe-area-inset-top, 0));
+  }
+
   .content {
     overflow: visible;
   }
@@ -1351,6 +1447,15 @@
   .decorativeCircles {
     margin-top: 2vh;
     margin-bottom: 1.5vh;
+  }
+
+  .circleSpacer {
+    margin-top: 2vh;
+    margin-bottom: 1.5vh;
+  }
+
+  .backgroundCircles {
+    top: calc(12vh + env(safe-area-inset-top, 0));
   }
 
   .stepContainer {
