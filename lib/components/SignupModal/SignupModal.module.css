@@ -72,21 +72,52 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 4.5rem; /* 72px */
   width: 100%;
-  max-width: 19.6875rem; /* 315px */
+  max-width: 19.875rem; /* 318px */
+}
+
+/* Greeting section */
+.greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  width: 100%;
 }
 
 /* Headline */
 .headline {
   width: 100%;
-  font-family: var(--font-secondary);
+  font-family: var(--font-primary); /* Arfilit */
   font-weight: var(--font-weight-normal);
-  font-size: 1.25rem; /* 20px */
-  line-height: 1.5rem;
+  font-size: 2rem; /* 32px */
+  line-height: 2.125rem; /* 34px */
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary); /* #F9F9F9 */
+  margin: 0;
+}
+
+/* Subtitle */
+.subtitle {
+  width: 100%;
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  font-size: 1rem; /* 16px */
+  line-height: 1.25rem; /* 20px */
   text-align: center;
   color: var(--color-text-secondary); /* #F9F9F9 */
   margin: 0;
+}
+
+/* Form section - wraps inputs and button */
+.formSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem; /* 16px gap between inputs and button */
+  width: 100%;
 }
 
 /* Inputs container */
@@ -97,24 +128,26 @@
   width: 100%;
 }
 
-/* Proceed button - Same style as login button */
+/* Proceed button - Purple style */
 .proceedButton {
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 3.375rem; /* 54px */
-  padding: 1rem 2rem;
+  width: 11.8125rem; /* 189px */
+  height: 2.75rem; /* 44px */
+  padding: 0.75rem 2rem; /* 12px 32px */
+  gap: 0.5rem; /* 8px */
 
-  background: var(--color-text-secondary); /* #F9F9F9 */
-  border-radius: var(--radius-sm); /* 9px */
-  border: 0.0625rem solid #E74E1C;
+  background: #B37EB3; /* purple */
+  border-radius: 0.3125rem; /* 5px */
+  border: none;
 
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem;
-  color: var(--button-text); /* #E74E1C */
+  font-weight: 700;
+  font-size: 1rem; /* 16px */
+  line-height: 1.25rem; /* 20px */
+  color: var(--color-text-secondary); /* #F9F9F9 */
 
   cursor: pointer;
   transition: opacity var(--transition-normal);
