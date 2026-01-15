@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiRegistrations } from "@/app/services/db_api";
+import { apiRegistrations, apiActivities } from "@/app/services/db_api";
 import styles from "./NewUserActivityCard.module.css";
 import Button from "./Button";
+import Image from "next/image";
 
 // Modals
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
@@ -18,6 +20,9 @@ interface NewUserActivityCardProps {
   instructor: string;
   date: string;
   startTime: string;
+  currentParticipants?: number;
+  maxParticipants?: number;
+  waitlistCount?: number;
   onMotionChange?: (state: "start" | "end", skipFetch?: boolean) => void;
   isGroup?: boolean;
 }
@@ -28,6 +33,9 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   instructor,
   date,
   startTime,
+  currentParticipants,
+  maxParticipants,
+  waitlistCount,
   onMotionChange,
   isGroup = false,
 }) => {
@@ -39,6 +47,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   );
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isFull, setIsFull] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -57,8 +66,17 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     .padStart(2, "0")}`;
 
   useEffect(() => {
-    if (user && id) checkRegistrationStatus();
+    if (user && id) {
+      checkRegistrationStatus();
+      checkActivityCapacity();
+    }
   }, [user, id]);
+
+  useEffect(() => {
+    if (currentParticipants !== undefined && maxParticipants !== undefined) {
+      setIsFull(currentParticipants >= maxParticipants);
+    }
+  }, [currentParticipants, maxParticipants]);
 
   const checkRegistrationStatus = async () => {
     const [statusData, error] = await apiRegistrations.getRegistrationStatus(
@@ -75,10 +93,33 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     }
   };
 
+  const checkActivityCapacity = async () => {
+    if (currentParticipants !== undefined && maxParticipants !== undefined) {
+      return;
+    }
+
+    try {
+      const [activityData, error] = await apiActivities.getById(id);
+      if (!error && activityData) {
+        const current = activityData.current_participants || 0;
+        const max = activityData.max_participants || 0;
+        setIsFull(current >= max);
+      }
+    } catch (error) {
+      console.error("Error checking capacity:", error);
+    }
+  };
+
   const handleActionClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user || loading || isAdmin) return;
+    if (!user || loading) return;
+
+    // ⭐ For admin, just open modal (don't register)
+    if (isAdmin) {
+      setIsModalOpen(true);
+      return;
+    }
 
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
@@ -91,7 +132,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     try {
       const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
 
-      // FIX: Check if 'res' is an object to satisfy TypeScript
       if (
         res &&
         typeof res === "object" &&
@@ -152,10 +192,38 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   };
 
   const getButtonLabel = () => {
+    if (isAdmin) return "לכל הנרשמים";
     if (regStatus === "confirmed") return "ביטול";
-    if (regStatus === "waitlist") return "ממתין לאישור";
+    if (regStatus === "waitlist") return "ביטול";
     return "להרשמה";
   };
+
+  const shouldShowClockIcon = () => {
+    return (regStatus === "none" && isFull) || regStatus === "waitlist";
+  };
+
+  const getParticipantsStatus = () => {
+    if (
+      !isAdmin ||
+      currentParticipants === undefined ||
+      maxParticipants === undefined
+    ) {
+      return null;
+    }
+
+    const isFull = currentParticipants >= maxParticipants;
+    const hasWaitlist = waitlistCount && waitlistCount > 0;
+
+    if (isFull && hasWaitlist) {
+      return `${currentParticipants}/${maxParticipants} (${waitlistCount} ברשימת המתנה)`;
+    }
+
+    return `${currentParticipants}/${maxParticipants} נרשמים`;
+  };
+
+  const participantsStatus = getParticipantsStatus();
+  const showFullStatus =
+    isAdmin && isFull && waitlistCount && waitlistCount > 0;
 
   return (
     <>
@@ -166,24 +234,62 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         <div className={styles.contentStack}>
           <div className={styles.textGroup}>
             <h3 className={styles.titleText}>{title}</h3>
-            <p className={styles.instructorText}>{instructor}</p>
-            <p className={styles.dateTimeText}>
-              {dayName} {dayMonth} בשעה {formatTime(startTime)}
-            </p>
+
+            <div className={styles.detailsGroup}>
+              <p className={styles.instructorText}>{instructor}</p>
+              <p className={styles.dateTimeText}>
+                {dayName} {dayMonth} בשעה {formatTime(startTime)}
+              </p>
+
+              {/* Admin participants status */}
+              {isAdmin && participantsStatus && (
+                <p
+                  className={`${styles.participantsText} ${
+                    showFullStatus ? styles.participantsFullText : ""
+                  }`}
+                >
+                  {participantsStatus}
+                </p>
+              )}
+            </div>
           </div>
 
-          {!isAdmin && (
-            <div className={styles.actionWrapper}>
-              <Button
-                variant="tertiary"
-                colorType="orange"
-                onClick={handleActionClick}
-                disabled={loading}
+          {/* ⭐ UPDATED: Different wrapper class for admin */}
+          <div
+            className={
+              isAdmin ? styles.actionWrapperAdmin : styles.actionWrapper
+            }
+          >
+            {/* Clock icon for non-admin users only */}
+            {!isAdmin && shouldShowClockIcon() && (
+              <div
+                className={`${styles.clockIconWrapper} ${
+                  regStatus === "waitlist"
+                    ? styles.clockIconCancel
+                    : styles.clockIconRegister
+                }`}
               >
-                {getButtonLabel()}
-              </Button>
-            </div>
-          )}
+                <Image
+                  src="/icons/clock_icon.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={styles.clockIcon}
+                />
+              </div>
+            )}
+
+            <Button
+              variant="tertiary"
+              tertiarySize={"medium"}
+              tertiaryWeight="semibold"
+              colorType="orange"
+              onClick={handleActionClick}
+              disabled={loading}
+            >
+              {getButtonLabel()}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -191,7 +297,10 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         activityId={id}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRegistrationChange={() => checkRegistrationStatus()}
+        onRegistrationChange={() => {
+          checkRegistrationStatus();
+          checkActivityCapacity();
+        }}
         onMotionChange={onMotionChange}
       />
 
