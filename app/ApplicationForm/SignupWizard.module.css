@@ -333,13 +333,53 @@
   z-index: 60;
 }
 
+/* Wrapper for SVG border approach */
+.genderWrapper {
+  position: relative;
+  width: 100%;
+  height: 3.75rem; /* 60px - matches CutInput */
+}
+
+/* SVG border - stretched to fill wrapper */
+.genderBorder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.genderBorderPath {
+  stroke: var(--color-text-secondary); /* #F9F9F9 */
+  stroke-width: 1;
+}
+
+/* Label - positioned in the gap (no background needed) */
+.genderLabel {
+  position: absolute;
+  top: -0.5rem; /* -8px - sits on top of the border gap */
+  right: 2rem;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base); /* 16px */
+  line-height: 1.1875rem; /* 19px */
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  padding: 0 0.25rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .genderToggle {
   box-sizing: border-box;
   width: 100%;
-  height: 3.7rem; /* ~59.22px */
+  height: 100%;
   padding: 0 1.875rem;
   background: transparent;
-  border: 0.0625rem solid #f9f9f9;
+  border: none; /* No border - SVG handles it */
   border-radius: 0.5625rem; /* 9px */
   display: flex;
   align-items: center;
@@ -357,12 +397,11 @@
 
   direction: rtl;
   cursor: pointer;
-  transition: border-radius 0.2s;
   outline: none;
 }
 
 .genderToggle.open {
-  border-radius: 0.5625rem 0.5625rem 0 0;
+  /* No border radius change needed - SVG handles it */
 }
 
 .accordionPlaceholder {
@@ -411,14 +450,14 @@
 
 .genderDropdown {
   position: absolute;
-  top: 100%;
+  top: 3.25rem; /* Overlap slightly with wrapper to connect borders */
   left: 0;
   right: 0;
-  background: var(--color-background);
-  background-attachment: fixed;
+  background: transparent;
   border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
+  padding-top: 0.5rem; /* Add padding to compensate for overlap */
   z-index: 100;
 }
 
@@ -536,8 +575,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--color-background);
-  background-attachment: fixed;
+  background: transparent;
   border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
@@ -695,6 +733,72 @@
   line-height: 1.25rem; /* 20px */
   text-align: right;
   color: #ffffff;
+}
+
+/* ============================================
+   NEXT ARROW - Left center of page (inside each slide)
+   ============================================ */
+.nextArrow {
+  position: absolute;
+  left: 0.5rem; /* closer to left edge */
+  top: 40%; /* a bit higher than center */
+  width: 2.5625rem; /* 41px */
+  height: 2.5rem; /* 40px */
+  z-index: 50;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transform: translateX(-1.25rem);
+}
+
+.nextArrow svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Slide-in animation */
+.nextArrowVisible {
+  animation: arrowSlideIn 0.6s ease-out forwards;
+}
+
+@keyframes arrowSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-1.25rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide-in + swipe hint animation for first page */
+.nextArrowSwipeHint {
+  animation: arrowSlideIn 0.6s ease-out forwards, arrowSwipeHint 1.2s ease-in-out 0.8s infinite;
+}
+
+@keyframes arrowSwipeHint {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(0.5rem);
+  }
+  60% {
+    transform: translateX(-0.1875rem);
+  }
+}
+
+/* Hidden state */
+.nextArrowHidden {
+  opacity: 0;
+  transform: translateX(-1.25rem);
 }
 
 /* ============================================
@@ -966,9 +1070,13 @@
   }
 
   .input,
-  .genderToggle,
+  .genderWrapper,
   .accordionHeader {
     height: 3.25rem;
+  }
+
+  .genderDropdown {
+    top: 2.75rem; /* Overlap for 3.25rem wrapper */
   }
 
   .genderOption,
@@ -1013,9 +1121,13 @@
   }
 
   .input,
-  .genderToggle,
+  .genderWrapper,
   .accordionHeader {
     height: 2.75rem;
+  }
+
+  .genderDropdown {
+    top: 2.25rem; /* Overlap for 2.75rem wrapper */
   }
 
   .genderOption,
@@ -1052,9 +1164,13 @@
   }
 
   .input,
-  .genderToggle,
+  .genderWrapper,
   .accordionHeader {
     height: 2.5rem;
+  }
+
+  .genderDropdown {
+    top: 2rem; /* Overlap for 2.5rem wrapper */
   }
 
   .stepContainer,

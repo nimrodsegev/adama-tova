@@ -1,0 +1,260 @@
+/* ============================================
+   PAGE LAYOUT & BACKGROUND
+   ============================================ */
+.pageOverride {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed; 
+  inset: 0; 
+  width: 100%;
+  height: 100dvh;
+  min-height: 0 !important;
+  max-width: none !important; 
+  overflow: hidden;
+  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  padding: 0 !important; 
+  padding-top: env(safe-area-inset-top) !important;
+  padding-bottom: env(safe-area-inset-bottom) !important;
+  z-index: 1;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-top: 7rem; 
+  margin-bottom: 3rem;
+  z-index: 10;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: var(--container-max-width, 24.5625rem); 
+}
+
+.headerTitle {
+  font-family: 'Arfilit', sans-serif;
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 2.125rem;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   SCROLL CONTAINER
+   ============================================ */
+.scrollContainer {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: var(--container-max-width, 24.5625rem); 
+  padding: 0 1.5rem 6rem 1.5rem; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.scrollContainer::-webkit-scrollbar { display: none; }
+
+/* ============================================
+   INPUTS & LABELS
+   ============================================ */
+.inputWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputField {
+  box-sizing: border-box;
+  width: 100%;
+  height: 3.75rem; 
+  background: transparent;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem; 
+  padding: 0.5rem 1.625rem;
+  
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem;
+  color: #FFFFFF;
+  text-align: right;
+  direction: rtl;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+/* Floating Label */
+.inputLabel {
+  position: absolute;
+  margin-top: 0.15rem;
+  top: -0.6rem;
+  right: 1.5rem;
+  
+  /* Dynamic Background matches page gradient */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100vw var(--vh, 100dvh); 
+  background-position: center var(--bg-y, 0px);
+  
+  padding: 0 0.25rem;
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #F9F9F9;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ============================================
+   GENDER SELECTOR (MATCHING SIGNUP WIZARD)
+   ============================================ */
+.genderSelector {
+  width: 100%;
+  position: relative;
+  z-index: 5; /* Higher z-index for dropdown over other fields */
+}
+
+.genderToggle {
+  box-sizing: border-box;
+  width: 100%;
+  height: 3.75rem; 
+  padding: 0 1.625rem;
+  background: transparent;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem;
+  color: #FFFFFF;
+  
+  direction: rtl;
+  cursor: pointer;
+  transition: border-radius 0.2s;
+}
+
+.genderToggle.open {
+  border-radius: 0.5625rem 0.5625rem 0 0;
+  border-bottom: none;
+}
+
+.accordionPlaceholder {
+  color: rgba(247, 247, 247, 0.7);
+}
+
+/* CSS Arrow Construction */
+.genderToggleArrow {
+  /* Hide text content */
+  font-size: 0;
+  color: transparent;
+  
+  position: relative;
+  width: 1rem;
+  height: 0.5rem;
+  transform-origin: center center;
+  transition: transform 0.2s;
+}
+
+.genderToggleArrow::before,
+.genderToggleArrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.0625rem;
+  background: #f9f9f9;
+}
+
+.genderToggleArrow::before {
+  right: 50%;
+  transform: translateY(-50%) rotate(35deg);
+  transform-origin: right center;
+}
+
+.genderToggleArrow::after {
+  left: 50%;
+  transform: translateY(-50%) rotate(-35deg);
+  transform-origin: left center;
+}
+
+.genderToggleArrow.open {
+  transform: rotate(180deg);
+}
+
+.genderDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  
+  /* Fixed background for transparency effect */
+  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-attachment: fixed;
+  
+  border: 0.0625rem solid #F9F9F9;
+  border-top: none;
+  border-radius: 0 0 0.5625rem 0.5625rem;
+  z-index: 100;
+}
+
+.genderOption {
+  width: 100%;
+  padding: 0.875rem 1.625rem;
+  background: transparent;
+  border: none;
+  border-bottom: 0.0625rem solid rgba(249, 249, 249, 0.3);
+  
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  text-align: right;
+  color: #ffffff;
+  
+  direction: rtl;
+  cursor: pointer;
+}
+
+.genderOption:last-child { border-bottom: none; }
+.genderOption:hover { background: rgba(255, 255, 255, 0.1); }
+.genderOption.selected { background: rgba(255, 255, 255, 0.15); font-weight: 600; }
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.buttonContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.submitButton {
+  background: #926892; 
+  color: rgba(247, 247, 247, 0.9);
+  border: none; 
+  border-radius: 0.3125rem; 
+  padding: 0.5rem 1rem;
+  width: auto; 
+  min-width: 8rem;
+  height: 2.75rem;
+  font-family: var(--font-secondary); 
+  font-size: 1.125rem; 
+  cursor: pointer; 
+  transition: opacity 0.2s;
+}
+.submitButton:hover { opacity: 0.9; }
+.submitButton:disabled { opacity: 0.6; cursor: not-allowed; background: #555; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-height: 700px) {
+  .header { margin-top: 3.5rem; margin-bottom: 1.5rem; }
+  .inputField, .genderToggle { height: 3rem; }
+  .scrollContainer { gap: 1rem; }
+}

@@ -23,11 +23,27 @@ export default function Footer() {
   const safePathname = pathname || "";
   const isHidden = hiddenRoutes.some((route) => safePathname.includes(route));
 
-  if (isHidden || loading || !user || !userProfile) return null;
-  if (userProfile.role === "participant" && !userProfile.is_approved)
+  // 2. FIX: Don't return null on 'loading' if we already have a user.
+  // This prevents flickering during navigation refreshes.
+  // Only hide if we are hidden, or if we are loaded and definitely have no user.
+  if (isHidden) return null;
+
+  // If still loading initially (no user yet), you might want to hide it,
+  // OR show a skeleton. For now, we only hide if loading AND no user.
+  if (loading && !user) return null;
+
+  // If loaded and no user, hide (not logged in)
+  if (!loading && (!user || !userProfile)) return null;
+
+  // Safety check for userProfile just in case
+  if (
+    userProfile &&
+    userProfile.role === "participant" &&
+    !userProfile.is_approved
+  )
     return null;
 
-  const isAdmin = userProfile.role === "admin";
+  const isAdmin = userProfile?.role === "admin";
 
   // Helper: Logic to check if tab is active
   const isTabActive = (currentPath: string, linkHref: string) => {

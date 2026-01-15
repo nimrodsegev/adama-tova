@@ -1,28 +1,30 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { apiActivities, apiUser, supabase } from "@/app/services/db_api";
-import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
 // UI Components
 import DaySlider from "@/lib/components/UI/DaySlider";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
-import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
+import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
 import styles from "./UserCalendarPage.module.css";
-
-const CALENDAR_FILTERS = [
-  { id: "all", label: "הכל" },
-  { id: "foryou", label: "בשבילך" },
-];
 
 const INTRESTS_MAPPING: Record<string, string> = {
   מיינדפולנס: "mindfulness",
   "גוף ותנועה": "body_motion",
   מוזיקה: "music_sound",
   "יצירה וחומר": "creation_material",
+};
+
+const isActivityInFuture = (activity: any) => {
+  if (!activity.date) return false;
+  const timeString = activity.start_time || "00:00";
+  const activityDateTime = new Date(`${activity.date}T${timeString}`);
+  return activityDateTime >= new Date();
 };
 
 export default function NewUserCalendarPage() {
@@ -37,22 +39,29 @@ export default function NewUserCalendarPage() {
 
   // UI State
   const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(false);
+
+  // Loading States
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isListLoading, setIsListLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const shapeParams = useMemo(() => {
-    return calculateShapeParams(userProfile);
-  }, [userProfile]);
+  // Motion Mode State
+  const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
+    "spouting"
+  );
+
+  const mounted = useRef(false);
 
   const fetchData = async () => {
-    // Clear activities and start loading
-    setActivities([]);
-    setLoading(true);
+    // 1. Logic: If switching dates, show Overlay Loader and clear list
+    if (mounted.current) {
+      setIsListLoading(true);
+      setActivities([]);
+    }
 
     const dateString = selectedDate.toISOString().split("T")[0];
 
     try {
-      // 1. Prepare Supabase query for registrations (Active only)
       const registrationsPromise = user
         ? supabase
             .from("registrations")
@@ -61,29 +70,27 @@ export default function NewUserCalendarPage() {
             .in("status", ["confirmed", "waitlist", "approved"])
         : Promise.resolve({ data: [] });
 
-      // 2. Execute all fetches + Delay
-      const [
-        [actData, actError],
-        [userBranches],
-        { data: rawRegs },
-        _, // Delay result
-      ] = await Promise.all([
-        apiActivities.getByDate(dateString),
-        user ? apiUser.getUserBranches(user.id) : Promise.resolve([null, null]),
-        registrationsPromise,
-        new Promise((resolve) => setTimeout(resolve, 500)), // Force 0.5s delay
-      ]);
+      const [[actData, actError], [userBranches], { data: rawRegs }, _] =
+        await Promise.all([
+          apiActivities.getByDate(dateString),
+          user
+            ? apiUser.getUserBranches(user.id)
+            : Promise.resolve([null, null]),
+          registrationsPromise,
+          new Promise((resolve) => setTimeout(resolve, 500)), // Smooth animation delay
+        ]);
 
-      // 3. Process Activities
       if (!actError) {
         const validBranches = userBranches || ["nahalal", "satria"];
-        const filtered = actData.filter(
+
+        let filtered = actData.filter(
           (a: any) => !a.branch || validBranches.includes(a.branch)
         );
+
+        filtered = filtered.filter(isActivityInFuture);
         setActivities(filtered);
       }
 
-      // 4. Process Registrations
       if (rawRegs) {
         const ids = rawRegs.map((r: any) => r.activity_id);
         setRegisteredActivityIds(ids);
@@ -91,17 +98,26 @@ export default function NewUserCalendarPage() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsInitialLoad(false);
+      setIsListLoading(false);
+      mounted.current = true;
     }
   };
 
-  const handleMotionState = async (state: "start" | "end") => {
+  const handleMotionState = async (
+    state: "start" | "end",
+    skipFetch?: boolean
+  ) => {
     if (state === "start") {
+      setMotionMode("breathing");
       setIsProcessing(true);
-      setTimeout(() => setIsProcessing(false), 3000);
+      setTimeout(() => setIsProcessing(false), 5000);
     } else {
-      await fetchData();
+      if (!skipFetch) {
+        await fetchData();
+      }
       setIsProcessing(false);
+      setTimeout(() => setMotionMode("spouting"), 1000);
     }
   };
 
@@ -109,70 +125,36 @@ export default function NewUserCalendarPage() {
     fetchData();
   }, [selectedDate, user]);
 
-  // 🔍 Updated Filtering Logic
-  const filteredActivities = activities.filter((activity: any) => {
-    if (filter === "all") return true;
-
-    if (filter === "foryou") {
-      // Condition A: User is registered
-      const isRegistered = registeredActivityIds.includes(activity.id);
-
-      // Condition B: Matches Interests
-      let isInterested = false;
-      if (userProfile?.quiz?.interests) {
-        const myInterests = userProfile.quiz.interests.map(
-          (i: string) => INTRESTS_MAPPING[i] || i
-        );
-        isInterested = myInterests.includes(activity.category);
-      }
-
-      // Return true if EITHER is true
-      return isRegistered || isInterested;
+  // --- FILTER LOGIC ---
+  const forYouActivities = activities.filter((activity) => {
+    const isRegistered = registeredActivityIds.includes(activity.id);
+    let isInterested = false;
+    if (userProfile?.quiz?.interests) {
+      const myInterests = userProfile.quiz.interests.map(
+        (i: string) => INTRESTS_MAPPING[i] || i
+      );
+      isInterested = myInterests.includes(activity.category);
     }
-
-    return true;
+    return isRegistered || isInterested;
   });
 
-  return (
-    <>
-      {/* Motion overlay - Shows during registration/cancellation */}
-      {isProcessing && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10001,
-            background:
-              "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "all",
-          }}
-        >
-          <OrganicCircles
-            mode="breathing"
-            radius={0.3}
-            {...shapeParams}
-            baseColor="#FFFFFF"
-            position={{ x: 0.5, y: 0.5 }}
-          />
-        </div>
-      )}
+  const dynamicFilters = [
+    { id: "all", label: "הכל", count: activities.length },
+    { id: "foryou", label: "בשבילך", count: forYouActivities.length },
+  ];
 
+  const displayedActivities = filter === "all" ? activities : forYouActivities;
+
+  return (
+    <SmoothPageWrapper
+      isLoading={isInitialLoad || isProcessing}
+      mode={motionMode}
+    >
       <div className={styles.pageContainer}>
-        {/* Loading overlay - Shows during data fetch */}
-        {loading && (
+        {/* 2. LOADING OVERLAY - Outside mainFrame (Same as Admin) */}
+        {isListLoading && (
           <div className={styles.loadingOverlay}>
-            <OrganicCircles
-              mode="loading"
-              radius={0.08}
-              {...shapeParams}
-              baseColor="#FFFFFF"
-            />
+            <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
           </div>
         )}
 
@@ -190,48 +172,36 @@ export default function NewUserCalendarPage() {
 
           <div className={styles.filterSection}>
             <HomeFilter
-              options={CALENDAR_FILTERS}
+              options={dynamicFilters}
               activeOption={filter}
               onFilterChange={(newId) => setFilter(newId)}
             />
           </div>
 
           <div className={styles.activitiesList}>
-            {filteredActivities.length > 0
-              ? filteredActivities.map((activity) => {
-                  const isRegistered = registeredActivityIds.includes(
-                    activity.id
-                  );
-                  return (
-                    <NewUserScheduleActivityCard
-                      key={activity.id}
-                      id={activity.id}
-                      title={activity.title}
-                      date={activity.date}
-                      instructor={activity.instructor || "לא צוין"}
-                      startTime={activity.start_time}
-                      endTime={activity.end_time}
-                      currentParticipants={activity.current_participants || 0}
-                      maxParticipants={activity.max_participants || 0}
-                      waitlistCount={activity.waitlist_count || 0}
-                      isGroup={activity.is_group || !!activity.series_id}
-                      isRegistered={isRegistered}
-                      onRegistrationChange={fetchData}
-                      onMotionChange={handleMotionState}
-                    />
-                  );
-                })
-              : !loading && (
-                  <p
-                    className="text-empty"
-                    style={{ color: "white", marginTop: "2rem" }}
-                  >
-                    אין פעילויות ליום זה
-                  </p>
+            {displayedActivities.length > 0
+              ? displayedActivities.map((activity) => (
+                  <NewUserActivityCard
+                    key={activity.id}
+                    id={activity.id}
+                    title={activity.title}
+                    instructor={activity.instructor || "לא צוין"}
+                    date={activity.date}
+                    startTime={activity.start_time}
+                    currentParticipants={activity.current_participants || 0}
+                    maxParticipants={activity.max_participants || 0}
+                    waitlistCount={activity.waitlist_count || 0}
+                    isGroup={activity.is_group || !!activity.series_id}
+                    onMotionChange={handleMotionState}
+                  />
+                ))
+              : // Only show empty text if NOT loading (to prevent flickering)
+                !isListLoading && (
+                  <p className={styles.emptyText}>אין פעילויות ליום זה</p>
                 )}
           </div>
         </main>
       </div>
-    </>
+    </SmoothPageWrapper>
   );
 }

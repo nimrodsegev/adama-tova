@@ -1,0 +1,85 @@
+/* StatCard - Reusable stat display card */
+/* Matches Figma design: 164px x 80px boxes */
+
+.statCard {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem; /* 16px */
+  gap: 0.625rem; /* 10px */
+
+  width: 10.25rem; /* 164px */
+  min-width: 10.25rem; /* 164px - prevent shrinking */
+  height: 5rem; /* 80px */
+
+  border-radius: 0.5625rem; /* 9px */
+
+  direction: rtl;
+  flex-shrink: 0;
+}
+
+/* Empty state - transparent with border */
+.statCard.empty {
+  background: transparent;
+  border: 0.0625rem solid rgba(247, 247, 247, 0.9);
+}
+
+/* Filled state - transparent with border (same as empty) */
+.statCard.filled {
+  background: transparent;
+  border: 0.0625rem solid rgba(247, 247, 247, 0.9);
+}
+
+/* Content wrapper for label + value */
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+}
+
+/* Label - different colors for empty/filled */
+.label {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.1875rem; /* 19px */
+  text-align: center;
+}
+
+.empty .label {
+  color: rgba(247, 247, 247, 0.9);
+}
+
+.filled .label {
+  color: rgba(247, 247, 247, 0.9);
+}
+
+/* Value - different colors for empty/filled */
+.value {
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  font-size: 1rem; /* 16px */
+  line-height: 1.25rem; /* 20px */
+  text-align: center;
+}
+
+.empty .value {
+  color: rgba(249, 249, 249, 0.84);
+}
+
+.filled .value {
+  color: rgba(249, 249, 249, 0.84);
+}
+
+/* Empty state message */
+.emptyMessage {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.1875rem; /* 19px */
+  text-align: center;
+  color: rgba(247, 247, 247, 0.9);
+}

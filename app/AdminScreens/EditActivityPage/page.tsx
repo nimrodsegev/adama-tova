@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./EditActivityPage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 const BRANCH_OPTIONS = [
   { value: "satria", label: "סניף סתריה" },
@@ -22,6 +23,9 @@ export default function EditActivityPage() {
   const { t } = useIvrita();
 
   const [loading, setLoading] = useState(true);
+
+  // Force a "mounting" state for smooth page transition
+  const [mounting, setMounting] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -51,6 +55,14 @@ export default function EditActivityPage() {
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Load Data
   useEffect(() => {
@@ -202,9 +214,8 @@ export default function EditActivityPage() {
     }
   };
 
-  if (loading) return <div className={styles.pageOverride} style={{alignItems:'center', justifyContent:'center', color:'white'}}>טוען...</div>;
-
   return (
+    <SmoothPageWrapper isLoading={loading || mounting}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       
       <button className="close-button" onClick={() => router.back()}>
@@ -418,5 +429,6 @@ export default function EditActivityPage() {
       )}
 
     </main>
+    </SmoothPageWrapper>
   );
 }

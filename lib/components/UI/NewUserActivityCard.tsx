@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
-import { apiRegistrations } from "@/app/services/db_api";
+import { useIvrita } from "@/app/contexts/IvritaContext";
+import { apiRegistrations, apiActivities } from "@/app/services/db_api";
 import styles from "./NewUserActivityCard.module.css";
 import Button from "./Button";
+import Image from "next/image";
 
 // Modals
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
+import Popup from "@/lib/components/UI/Popup";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
 
@@ -16,9 +19,12 @@ interface NewUserActivityCardProps {
   id: string;
   title: string;
   instructor: string;
-  date: string; // ISO string for date formatting
+  date: string;
   startTime: string;
-  onMotionChange?: (state: "start" | "end") => void;
+  currentParticipants?: number;
+  maxParticipants?: number;
+  waitlistCount?: number;
+  onMotionChange?: (state: "start" | "end", skipFetch?: boolean) => void;
   isGroup?: boolean;
 }
 
@@ -28,20 +34,23 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   instructor,
   date,
   startTime,
+  currentParticipants,
+  maxParticipants,
+  waitlistCount,
   onMotionChange,
   isGroup = false,
 }) => {
   const { user, userProfile } = useUser();
+  const { t } = useIvrita();
   const isAdmin = userProfile?.role === "admin";
 
-  // Registration States
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
     "none"
   );
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isFull, setIsFull] = useState(false);
 
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -49,7 +58,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     string | null
   >(null);
 
-  // Formatting
   const formatTime = (time: string) => time.slice(0, 5);
   const dateObj = new Date(date);
   const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
@@ -60,8 +68,17 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     .padStart(2, "0")}`;
 
   useEffect(() => {
-    if (user && id) checkRegistrationStatus();
+    if (user && id) {
+      checkRegistrationStatus();
+      checkActivityCapacity();
+    }
   }, [user, id]);
+
+  useEffect(() => {
+    if (currentParticipants !== undefined && maxParticipants !== undefined) {
+      setIsFull(currentParticipants >= maxParticipants);
+    }
+  }, [currentParticipants, maxParticipants]);
 
   const checkRegistrationStatus = async () => {
     const [statusData, error] = await apiRegistrations.getRegistrationStatus(
@@ -78,10 +95,32 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     }
   };
 
+  const checkActivityCapacity = async () => {
+    if (currentParticipants !== undefined && maxParticipants !== undefined) {
+      return;
+    }
+
+    try {
+      const [activityData, error] = await apiActivities.getById(id);
+      if (!error && activityData) {
+        const current = activityData.current_participants || 0;
+        const max = activityData.max_participants || 0;
+        setIsFull(current >= max);
+      }
+    } catch (error) {
+      console.error("Error checking capacity:", error);
+    }
+  };
+
   const handleActionClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user || loading || isAdmin) return;
+    if (!user || loading) return;
+
+    if (isAdmin) {
+      setIsModalOpen(true);
+      return;
+    }
 
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
@@ -93,14 +132,23 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
 
     try {
       const [res] = await apiRegistrations.registerUserToActivity(user.id, id);
-      if (res && typeof res === "object" && "success" in res) {
+
+      if (
+        res &&
+        typeof res === "object" &&
+        ("success" in res || "status" in res) &&
+        (res.success || res.status === "confirmed" || res.status === "waitlist")
+      ) {
         const isWaitlist = res.if_confirmed === false;
+
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsSuccessModalOpen(true);
+        setTimeout(() => {
+          setIsSuccessModalOpen(true);
+          onMotionChange?.("end", true);
+        }, 500);
       } else {
         onMotionChange?.("end");
       }
@@ -123,8 +171,9 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
       );
       if (!error) {
         setRegStatus("none");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        onMotionChange?.("end");
+        setTimeout(() => {
+          onMotionChange?.("end");
+        }, 1000);
       } else {
         onMotionChange?.("end");
       }
@@ -136,19 +185,46 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   };
 
   const handleSuccessModalClose = () => {
-    setIsSuccessModalOpen(false);
     onMotionChange?.("start");
     setTimeout(() => {
+      setIsSuccessModalOpen(false);
       onMotionChange?.("end");
-    }, 750);
+    }, 600);
   };
 
-  // Logic for button label
   const getButtonLabel = () => {
+    if (isAdmin) return "לכל הנרשמים";
     if (regStatus === "confirmed") return "ביטול";
-    if (regStatus === "waitlist") return "ממתין לאישור";
+    if (regStatus === "waitlist") return "ביטול";
     return "להרשמה";
   };
+
+  const shouldShowClockIcon = () => {
+    return (regStatus === "none" && isFull) || regStatus === "waitlist";
+  };
+
+  const getParticipantsStatus = () => {
+    if (
+      !isAdmin ||
+      currentParticipants === undefined ||
+      maxParticipants === undefined
+    ) {
+      return null;
+    }
+
+    const isFull = currentParticipants >= maxParticipants;
+    const hasWaitlist = waitlistCount && waitlistCount > 0;
+
+    if (isFull && hasWaitlist) {
+      return `${currentParticipants}/${maxParticipants} (${waitlistCount} ברשימת המתנה)`;
+    }
+
+    return `${currentParticipants}/${maxParticipants} נרשמים`;
+  };
+
+  const participantsStatus = getParticipantsStatus();
+  const showFullStatus =
+    isAdmin && isFull && waitlistCount && waitlistCount > 0;
 
   return (
     <>
@@ -157,48 +233,89 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         onClick={() => setIsModalOpen(true)}
       >
         <div className={styles.contentStack}>
-          {/* RIGHT SIDE */}
           <div className={styles.textGroup}>
             <h3 className={styles.titleText}>{title}</h3>
-            <p className={styles.instructorText}>{instructor}</p>
-            <p className={styles.dateTimeText}>
-              {dayName} {dayMonth} בשעה {formatTime(startTime)}
-            </p>
+
+            <div className={styles.detailsGroup}>
+              <p className={styles.instructorText}>{instructor}</p>
+              <p className={styles.dateTimeText}>
+                {dayName} {dayMonth} בשעה {formatTime(startTime)}
+              </p>
+
+              {isAdmin && participantsStatus && (
+                <p
+                  className={`${styles.participantsText} ${
+                    showFullStatus ? styles.participantsFullText : ""
+                  }`}
+                >
+                  {participantsStatus}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* BOTTOM LEFT ACTION */}
-          {!isAdmin && (
-            <div className={styles.actionWrapper}>
-              <Button
-                variant="tertiary"
-                colorType="orange"
-                onClick={handleActionClick}
-                disabled={loading}
+          <div
+            className={
+              isAdmin ? styles.actionWrapperAdmin : styles.actionWrapper
+            }
+          >
+            {!isAdmin && shouldShowClockIcon() && (
+              <div
+                className={`${styles.clockIconWrapper} ${
+                  regStatus === "waitlist"
+                    ? styles.clockIconCancel
+                    : styles.clockIconRegister
+                }`}
               >
-                {getButtonLabel()}
-              </Button>
-            </div>
-          )}
+                <Image
+                  src="/icons/clock_icon.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={styles.clockIcon}
+                />
+              </div>
+            )}
+
+            <Button
+              variant="tertiary"
+              tertiarySize={"medium"}
+              tertiaryWeight="semibold"
+              colorType="orange"
+              onClick={handleActionClick}
+              disabled={loading}
+            >
+              {getButtonLabel()}
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* MODALS */}
       <ActivityDetailsModal
         activityId={id}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRegistrationChange={() => checkRegistrationStatus()}
+        onRegistrationChange={() => {
+          checkRegistrationStatus();
+          checkActivityCapacity();
+        }}
         onMotionChange={onMotionChange}
       />
 
-      <CancelConfirmationModal
-        isOpen={isCancelModalOpen}
-        onClose={() => setIsCancelModalOpen(false)}
-        onConfirm={handleCancelConfirm}
-        activityTitle={title}
-        activityDate={`${dayName} ${dayMonth}`}
-        activityTime={formatTime(startTime)}
-      />
+      {/* ⭐ UPDATED: Using Popup instead of CancelConfirmationModal */}
+      {isCancelModalOpen && (
+        <Popup
+          content={`${t(
+            "את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
+          )} ל${title} ב${dayName} ${dayMonth} בשעה ${formatTime(startTime)}?`}
+          primaryButtonText="כן, לבטל"
+          primaryButtonAction={handleCancelConfirm}
+          secondaryButtonText="לא"
+          secondaryButtonAction={() => setIsCancelModalOpen(false)}
+          onClose={() => setIsCancelModalOpen(false)}
+          loading={loading}
+        />
+      )}
 
       {isSuccessModalOpen &&
         (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (

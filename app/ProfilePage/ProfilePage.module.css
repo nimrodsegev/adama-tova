@@ -30,12 +30,11 @@
 .header {
   text-align: center;
   margin-top: 5rem; 
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   flex-shrink: 0;
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem);
 }
-
 .userName {
   font-family: 'Arfilit', sans-serif;
   font-weight: 400;
@@ -44,6 +43,7 @@
   color: rgba(249, 249, 249, 0.84);
   margin: 0;
   letter-spacing: 0.02em;
+  
 }
 .adminLabel {
   font-family: var(--font-secondary);
@@ -93,16 +93,34 @@
 }
 
 
+.bodyL{
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  font-style: bold;
+  font-size: 1rem; 
+  color: #F9F9F9;
+  margin: 0;
+  text-align: right;
+}
+.bodyS{
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.875rem; 
+  color: rgba(247, 247, 247, 0.9);
+  margin: 0;
+  text-align: right;
+}
 /* ============================================
    SCROLLABLE CONTENT
    ============================================ */
 .scrollContainer {
   flex: 1;
   width: 100%;
+  max-height: 60%;
   max-width: var(--container-max-width, 24.5625rem);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 1.5rem 6rem 1.5rem; 
+  padding: 0 1.5rem 2rem 1.5rem; 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -291,35 +309,93 @@
    BUTTON STYLES
    ============================================ */
 .editButtonCustom {
-  height: 1.5rem !important; /* 24px */
-  padding: 0 1rem !important;
+  padding: 12px 32px;
+  gap: 8px;
+  width: 72px;
+  height: 44px;
+  /* purple */
+  background: #B37EB3;
+  border-radius: 5px;
   min-width: auto !important;
-  background: rgba(247, 247, 247, 0.9) !important;
-  border: 1px solid #926892 !important;
-  border-radius: 3.5px !important;
-  color: #926892 !important;
   font-family: var(--font-secondary);
-  font-size: 1rem !important;
-  font-weight: 400 !important;
   cursor: pointer;
 }
+.saveButtonCustom{
+  width: 75px;
+  height: 46px;
+  left: 16px;
+  top: 240px;
+  color:#B37EB3;
+  font-size: var(--font-);
+  /* box */
+  background: rgba(247, 247, 247, 0.9);
+  border-radius: 5px;
 
-.settingsContainer {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
 }
-
-.settingsButton {
-  width: 7.125rem !important; 
-  height: 2.75rem !important; 
-  background: #B37EB3 !important; 
-  border-radius: 5px !important;
-  color: #FFFFFF !important;
-  font-family: var(--font-secondary) !important;
-  font-size: 1.125rem !important;
-  border: none !important;
+.buttonsRow{
+  width: 120%;
+  align-self: right;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end; 
+}
+.logOutButton{
+  width: 63px;
+  margin-right: 2.5rem;
+  height: 18px;
+  background: transparent;
+  border-radius: 5px;
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.875rem; 
+  color: var(--color-red-alert);
+}
+.usersList{
+  margin-top: 1rem;
+  margin-right: 4.4rem;
+  width: 63px;
+  height: 18px;
+  background: transparent;
+  border-radius: 5px;
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 0.875rem; 
+  color: rgba(247, 247, 247, 0.9);
+  text-align: right;
+}
+.AddAdminButton{
+  padding: 12px 32px 12px 32px;
+  gap: 8px;
+  /* purple */
+  background: #B37EB3;
+  border-radius: 5px;
+  min-width: auto !important;
+  font-family: var(--font-secondary);
+  cursor: pointer;
+  align-self: center;
+  
+}
+.pressArrow {
+  display: inline-block;
+  width: 0.4375rem; /* 7px */
+  height: 0.4375rem; /* 7px */
+  margin-right: 0.5rem; /* 4px spacing from text */
+  border-left: 0.0625rem solid #F9F9F9; /* 1px */
+  border-bottom: 0.0625rem solid #F9F9F9; /* 1px */
+  transform: rotate(45deg); /* Points left */
+  margin-top: 0.125rem; /* 2px - slightly lower */
+  margin-left: 1.25rem; /* 20px */
+}
+.redPressArrow {
+  display: inline-block;
+  width: 0.4375rem; /* 7px */
+  height: 0.4375rem; /* 7px */
+  margin-right: 0.2rem; /* 4px spacing from text */
+  border-left: 0.0625rem solid var(--color-red-alert); /* 1px */
+  border-bottom: 0.0625rem solid var(--color-red-alert); /* 1px */
+  transform: rotate(45deg); /* Points left */
+  margin-top: 0.125rem; /* 2px - slightly lower */
+  margin-left: 1.25rem; /* 20px */
 }
 
 /* ============================================

@@ -1,54 +1,36 @@
-'use client';
+"use client";
 
-import { useUser } from '@/app/contexts/UserContext';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useUser } from "@/app/contexts/UserContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
 }
 
-export default function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  requireAdmin = false,
+}: ProtectedRouteProps) {
   const { user, loading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
+    // Only redirect if we are DONE loading and there is NO user
     if (!loading && !user) {
-      // Not logged in - redirect to login
-      router.push('/login');
+      router.push("/login");
     }
-    
-    // TODO: Once database is ready, check if requireAdmin and user is not admin
-    // For now, we'll skip admin check since we don't have the users table data yet
+
+    // TODO: Admin check logic would go here
   }, [user, loading, router, requireAdmin]);
 
-  // Show loading while checking auth
-  if (loading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "#F28130",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#EFEFEF",
-          fontFamily: "Ezer Shemesh TRIAL ONLY, sans-serif",
-          fontSize: "1.25rem",
-        }}
-        dir="rtl"
-      >
-        טוען...
-      </div>
-    );
-  }
-
-  // Don't show anything if not authenticated (we're redirecting)
-  if (!user) {
+  // If we are finished loading and have no user, render nothing (waiting for redirect)
+  if (!loading && !user) {
     return null;
   }
 
-  // User is authenticated - show the protected content
+  // RENDER CHILDREN IMMEDIATELY (Even while loading)
+  // This allows ProfilePage to render its SmoothPageWrapper with isLoading={true}
   return <>{children}</>;
 }

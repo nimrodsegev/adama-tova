@@ -1,11 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./AboutPage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 export default function AboutPage() {
+  // Mounting state to ensure smooth entry animation
+  const [mounting, setMounting] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounting(false), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className={styles.aboutContainer}>
+    <SmoothPageWrapper isLoading={mounting}>
+      <div className={styles.aboutContainer}>
       {/* Close Button - Top Right */}
       <Link href="/login" className="close-button">
         <span className="close-button-inner"></span>
@@ -69,6 +80,7 @@ export default function AboutPage() {
           לאתר
         </a>
       </div>
-    </div>
+      </div>
+    </SmoothPageWrapper>
   );
 }

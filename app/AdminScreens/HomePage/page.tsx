@@ -16,9 +16,11 @@ import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
 import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 import UserApprovalModal from "@/lib/components/UserApprovalModal/UserApprovalModal";
 import ApprovalConfirmModal from "@/lib/components/ApprovalConfirmModal/ApprovalConfirmModal";
 import styles from "./AdminHomePage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 interface PendingUser {
   id: string;
@@ -96,11 +98,21 @@ export default function AdminHomePage() {
   >([]);
   const [upcomingActivities, setUpcomingActivities] = useState<Activity[]>([]);
 
+  // Force a "mounting" state to ensure the Wrapper sees "Loading=true"
+  // on the very first render. This forces the orange screen to appear
+  // before fading out.
+  const [mounting, setMounting] = useState(true);
+
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
     null
   );
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+
+  // Registrations modal state
+  const [registrationsActivityId, setRegistrationsActivityId] = useState<string | null>(null);
+  const [registrationsActivityTitle, setRegistrationsActivityTitle] = useState<string>("");
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] = useState(false);
 
   // User details modal state
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -108,6 +120,9 @@ export default function AdminHomePage() {
     "initial"
   );
   const [selectedGroupName, setSelectedGroupName] = useState<
+    string | undefined
+  >(undefined);
+  const [selectedRequestDate, setSelectedRequestDate] = useState<
     string | undefined
   >(undefined);
   const [selectedRegistrationId, setSelectedRegistrationId] = useState<
@@ -132,6 +147,14 @@ export default function AdminHomePage() {
   // Fetch data on mount
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchData = async () => {
@@ -277,11 +300,26 @@ export default function AdminHomePage() {
     setSelectedActivityId(null);
   };
 
+  // Handle registrations click
+  const handleRegistrationsClick = (activityId: string, activityTitle: string) => {
+    setRegistrationsActivityId(activityId);
+    setRegistrationsActivityTitle(activityTitle);
+    setIsRegistrationsModalOpen(true);
+  };
+
+  // Handle registrations modal close
+  const handleRegistrationsModalClose = () => {
+    setIsRegistrationsModalOpen(false);
+    setRegistrationsActivityId(null);
+    setRegistrationsActivityTitle("");
+  };
+
   // Handle user approval card click (initial) - opens details modal
-  const handleUserCardClick = (userId: string) => {
+  const handleUserCardClick = (userId: string, requestDate?: string) => {
     setSelectedUserId(userId);
     setSelectedUserType("initial");
     setSelectedGroupName(undefined);
+    setSelectedRequestDate(requestDate);
     setSelectedRegistrationId(null);
     setIsUserModalOpen(true);
   };
@@ -290,11 +328,13 @@ export default function AdminHomePage() {
   const handleGroupCardClick = (
     userId: string,
     groupName: string,
-    registrationId: string
+    registrationId: string,
+    requestDate?: string
   ) => {
     setSelectedUserId(userId);
     setSelectedUserType("group");
     setSelectedGroupName(groupName);
+    setSelectedRequestDate(requestDate);
     setSelectedRegistrationId(registrationId);
     setIsUserModalOpen(true);
   };
@@ -349,17 +389,10 @@ export default function AdminHomePage() {
     return `${day}.${month}`;
   };
 
-  if (userLoading) {
-    return (
-      <div className={styles.loadingContainer} dir="rtl">
-        טוען...
-      </div>
-    );
-  }
-
   const firstName = userProfile?.full_name?.split(" ")[0] || "מנהל";
 
   return (
+    <SmoothPageWrapper isLoading={userLoading || mounting}>
     <div className={styles.pageContainer} dir="rtl">
       {/* Decorative Circles - positioned at top */}
       <OrganicCircles
@@ -383,21 +416,23 @@ export default function AdminHomePage() {
           <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
         </div>
 
-        {/* Opening Hours Bar */}
-        <button className={styles.openingHoursBar}>
-          <div className={styles.openingHoursContent}>
-            <span className={styles.openingHoursText}>
-              המרחב פתוח היום 16:00 עד 22:00
-            </span>
-            <div className={styles.editButton}>
-              <span className={styles.editText}>עריכה</span>
-              <span className={styles.editArrow}></span>
+        {/* Scrollable Content - includes opening hours, filter, and cards */}
+        <div className={styles.scrollableContent}>
+          {/* Opening Hours Bar */}
+          <button className={styles.openingHoursBar}>
+            <div className={styles.openingHoursContent}>
+              <span className={styles.openingHoursText}>
+                המרחב פתוח היום 16:00 עד 22:00
+              </span>
+              <div className={styles.editButton}>
+                <span className={styles.editText}>עריכה</span>
+                <span className={styles.editArrow}></span>
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
 
-        {/* Filter Tabs with counts */}
-        <div className={styles.filterContainer}>
+          {/* Filter Tabs with counts */}
+          <div className={styles.filterContainer}>
           <HomeFilter
             options={[
               { id: "pending", label: "ממתינים לאישור", count: pendingUsers.length + pendingGroupRegs.length },
@@ -438,7 +473,7 @@ export default function AdminHomePage() {
                         "reject"
                       )
                     }
-                    onClick={() => handleUserCardClick(pendingUser.id)}
+                    onClick={() => handleUserCardClick(pendingUser.id, formatDate(pendingUser.created_at))}
                   />
                 ))}
                 {/* Group approval cards */}
@@ -468,7 +503,8 @@ export default function AdminHomePage() {
                       handleGroupCardClick(
                         reg.users?.id,
                         reg.activities?.title || "",
-                        reg.id
+                        reg.id,
+                        formatDate(reg.created_at)
                       )
                     }
                   />
@@ -540,6 +576,7 @@ export default function AdminHomePage() {
                   currentParticipants={totalRegistrations}
                   maxParticipants={activity.max_participants || 0}
                   onClick={() => handleActivityClick(activity.id)}
+                  onRegistrationsClick={() => handleRegistrationsClick(activity.id, activity.title)}
                 />
               );
             })
@@ -593,6 +630,7 @@ export default function AdminHomePage() {
             </div>
           )}
         </div>
+        </div> {/* End scrollableContent */}
       </div>
 
       {/* Bottom Buttons - gradient only shows when 3+ cards */}
@@ -621,12 +659,23 @@ export default function AdminHomePage() {
         />
       )}
 
+      {/* Activity Registrations Modal */}
+      {registrationsActivityId && (
+        <ActivityRegistrationsModal
+          activityId={registrationsActivityId}
+          activityTitle={registrationsActivityTitle}
+          isOpen={isRegistrationsModalOpen}
+          onClose={handleRegistrationsModalClose}
+        />
+      )}
+
       {/* User Approval Details Modal */}
       {selectedUserId && (
         <UserApprovalModal
           userId={selectedUserId}
           type={selectedUserType}
           groupName={selectedGroupName}
+          requestDate={selectedRequestDate}
           isOpen={isUserModalOpen}
           onClose={handleUserModalClose}
           onApprove={handleModalApprove}
@@ -644,5 +693,6 @@ export default function AdminHomePage() {
         onClose={() => setIsConfirmModalOpen(false)}
       />
     </div>
+    </SmoothPageWrapper>
   );
 }

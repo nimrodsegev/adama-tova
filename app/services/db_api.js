@@ -531,7 +531,8 @@ export const apiActivities = {
           `
           if_confirmed,
           created_at,
-          users ( full_name, email, phone )
+          status,
+          users ( id, full_name, email, phone )
         `
         )
         .eq("activity_id", activityId)
@@ -1507,7 +1508,7 @@ export const apiUser = {
   /**
    * CREATE NEW ADMIN
    */
-  async createAdmin(email, password, fullName, phone) {
+  async createAdmin(email, password, fullName, phone, gender) {
     // 👈 Added phone parameter
     // 1. Sign Up the new user (Auth)
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -1523,6 +1524,14 @@ export const apiUser = {
     const newUserId = authData.user?.id;
     if (!newUserId) return [null, "Auth succeeded but no ID returned."];
 
+    const adminQuiz = {
+      circle: null,
+      free_text: null,
+      interests: [],
+      proximity: null,
+      completed_at: new Date().toISOString()
+    };
+
     // 2. Insert into 'users' table with ADMIN role
     const { error: profileError } = await supabase.from("users").insert([
       {
@@ -1531,6 +1540,9 @@ export const apiUser = {
         email: email,
         phone: phone, // 👈 Save phone to DB
         role: "admin",
+        gender: gender,
+        is_approved: true,
+        quiz: adminQuiz
       },
     ]);
 
@@ -1669,5 +1681,41 @@ export const apiUser = {
         .update({ phone: newPhone })
         .eq('id', userId)
     );
+  },
+
+  /**
+   * 📊 GET USER ACTIVITY STATS
+   * Returns count of groups and workshops the user is registered for
+   */
+  async getUserActivityStats(userId) {
+    // Get all registrations for this user with activity details
+    const { data: registrations, error } = await supabase
+      .from("registrations")
+      .select("activity_id, activities!inner(id, is_group)")
+      .eq("user_id", userId)
+      .eq("if_confirmed", true);
+
+    if (error) {
+      console.error("Error fetching user stats:", error.message);
+      return [{ groups: 0, workshops: 0 }, null];
+    }
+
+    if (!registrations || registrations.length === 0) {
+      return [{ groups: 0, workshops: 0 }, null];
+    }
+
+    // Count groups vs workshops
+    let groupCount = 0;
+    let workshopCount = 0;
+
+    registrations.forEach((reg) => {
+      if (reg.activities?.is_group) {
+        groupCount++;
+      } else {
+        workshopCount++;
+      }
+    });
+
+    return [{ groups: groupCount, workshops: workshopCount }, null];
   },
 };

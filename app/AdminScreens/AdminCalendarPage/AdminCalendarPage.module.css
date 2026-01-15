@@ -1,58 +1,151 @@
-/* AdminCalendarPage.module.css - Page-specific layout */
+/* ============================================
+   ADMIN CALENDAR PAGE
+   Based on Figma design - using rem units
+   ============================================ */
 
-/* Main Frame - Centered and better positioned */
-.mainFrame {
-  position: absolute;
-  width: 100%;
-  max-width: 22.0625rem; /* 353px - centered content width */
-  left: 50%; /* Center horizontally */
-  transform: translateX(-50%); /* Perfect centering */
-  top: 5.4375rem; /* 87px from top */
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xl); /* 24px */
-  padding: 0 var(--spacing-xl); /* 20px horizontal padding */
+.pageContainer {
+  composes: mobile-container from global;
+  background: linear-gradient(
+    180deg,
+    #e74e1c 0%,
+    #de6930 53%,
+    #e79267 87%
+  ) !important;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Header Section - Day slider container */
-.headerSection {
+.mainFrame {
+  position: absolute;
+  width: 23.5rem; /* 376px */
+  left: 0.5rem; /* 8px */
+  top: 4.5625rem; /* 73px */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xl); /* 20px - tighter gap */
-  width: 100%;
+  padding: 0;
+  height: calc(100vh - 4.5625rem);
 }
 
-/* Activities List - Scrollable container with limited visible area */
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  gap: 2rem; /* 32px */
+  width: 23.5rem; /* 376px */
+}
+
+/* ============================================
+   TITLE SECTION
+   ============================================ */
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0;
+  gap: 2rem; /* 32px */
+  width: 21.5625rem; /* 345px */
+}
+
+.titleText {
+  width: 21.5625rem; /* 345px */
+  font-family: var(--font-primary);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 2rem; /* 32px */
+  line-height: 2.125rem; /* 34px */
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* ============================================
+   WEEK SLIDER SECTION
+   ============================================ */
+
+.sliderSection {
+  width: 100%;
+  max-width: 22.5625rem; /* 361px */
+  display: flex;
+  justify-content: center;
+  margin-top: -3rem; /* Move days up */
+}
+
+/* ============================================
+   FILTER SECTION
+   ============================================ */
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem; /* 8px */
+  gap: 0.5rem; /* 8px */
+  width: auto;
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
+  margin-top: -2.5rem; /* Move filter up */
+}
+
+/* ============================================
+   ACTIVITIES LIST
+   ============================================ */
+
 .activitiesList {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center cards */
-  gap: var(--spacing-md); /* 12px between cards */
-  width: 100%;
-  max-height: 28rem; /* 448px - Show ~2.5 cards, rest scroll */
-  overflow-y: auto; /* Enable vertical scrolling */
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  padding-bottom: var(--spacing-lg); /* 16px padding at bottom */
-  padding-right: 0.25rem; /* Space for scrollbar */
-  scrollbar-width: thin; /* Thin scrollbar (Firefox) */
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* White scrollbar */
+  align-items: center;
+  padding: 0;
+  gap: 0.75rem; /* 12px */
+  width: 22.0625rem; /* 353px */
+
+  /* Scrollable area */
+  position: fixed;
+  top: 17.5rem;
+  bottom: 5rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+  z-index: 10;
 }
 
-/* Webkit scrollbar styling */
 .activitiesList::-webkit-scrollbar {
-  width: 0.375rem; /* 6px */
+  display: none;
 }
 
-.activitiesList::-webkit-scrollbar-track {
-  background: transparent;
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.emptyText {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem; /* 16px */
+  line-height: 1.25rem; /* 20px */
+  text-align: center;
+  color: #ffffff;
+  margin-top: 2rem;
 }
 
-.activitiesList::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-full);
-}
+/* ============================================
+   LOADING OVERLAY
+   ============================================ */
 
-.activitiesList::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-modal, 1000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(231, 78, 28, 0.2);
+  pointer-events: none;
 }

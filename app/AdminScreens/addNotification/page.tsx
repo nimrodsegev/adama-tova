@@ -1,41 +1,91 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
+import styles from "./addNotification.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from '@/lib/components/UI/CutInput';
+
+const TARGET_OPTIONS = [
+  { label: "לפי פעילות", value: "activity" },
+  { label: "לפי תאריך", value: "date" },
+  { label: "לפי מעגל", value: "circle" },
+];
+
+const CIRCLE_OPTIONS = [
+  { label: "שורדי נובה", value: "Nova Survivor" },
+  { label: "נפגעי ה-7 באוקטובר", value: "October 7 victim" },
+  { label: "הורים שכולים", value: "Shkulim parents" },
+  { label: "אחים שכולים", value: "Shkulim Siblings" },
+  { label: "משפחות נפגעי ה-7 באוקטובר", value: "Family of october 7 victim" },
+  { label: "כוחות הצלה", value: "Rescue forces" },
+  { label: "תושבי עוטף עזה", value: "Residence of Otef Aza" },
+  { label: "מעגל שני או שלישי", value: "Second or third" },
+];
+
+const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
+
+// --- SVG Path Generator (Dynamic Gap) ---
+// Updated to ensure generous gap for Hebrew text
+const getSvgPath = (label: string) => {
+  const charWidth = 7; // Slightly wider per char for safety
+  const padding = 10;   // Extra padding
+  const labelWidth = (label.length * charWidth) + padding;
+  
+  const totalWidth = 315;
+  const radius = 9; 
+  const rightGapStart = 315 - 32; // ~32px from right edge
+  const gapEnd = rightGapStart - labelWidth;
+
+  // SVG Path Command
+  return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
+};
 
 export default function AddNotificationPage() {
   const router = useRouter();
   const { t } = useIvrita();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const [mounting, setMounting] = useState(true);
 
   // Form State
-  const [targetType, setTargetType] = useState<
-    "" | "activity" | "date" | "circle"
-  >("");
+  const [targetType, setTargetType] = useState<"" | "activity" | "date" | "circle">("");
   const [selectedActivityId, setSelectedActivityId] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
   const [selectedCircle, setSelectedCircle] = useState("");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
+  // Date State
+  const [day, setDay] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+
+  // UI State
+  const [isTargetOpen, setIsTargetOpen] = useState(false);
+  const [isActivityOpen, setIsActivityOpen] = useState(false);
+  const [isCircleOpen, setIsCircleOpen] = useState(false);
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
+  const [isDayOpen, setIsDayOpen] = useState(false);
+
   // Data State
   const [allActivities, setAllActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
-  const [issubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Mapping Hebrew display to English Enums
-  const circleOptions = [
-    { label: "שורדי נובה", value: "Nova Survivor" },
-    { label: "נפגעי ה-7 באוקטובר", value: "October 7 victim" },
-    { label: "הורים שכולים", value: "Shkulim parents" },
-    { label: "אחים שכולים", value: "Shkulim Siblings" },
-    { label: "משפחות נפגעי ה-7 באוקטובר", value: "Family of october 7 victim" },
-    { label: "כוחות הצלה", value: "Rescue forces" },
-    { label: "תושבי עוטף עזה", value: "Residence of Otef Aza" },
-    { label: "מעגל שני או שלישי", value: "Second or third" },
-  ];
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
+  // Fetch Activities
   useEffect(() => {
     if (targetType === "activity" && allActivities.length === 0) {
       const fetchActivities = async () => {
@@ -48,45 +98,23 @@ export default function AddNotificationPage() {
     }
   }, [targetType, allActivities.length]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsSubmitting(true);
-
     try {
       if (targetType === "activity") {
-        const [res, error] = await apiActivities.notifyParticipants(
-          selectedActivityId,
-          title,
-          message
-        );
-        if (error) throw error;
+        if (!selectedActivityId) throw new Error("Please select an activity");
+        await apiActivities.notifyParticipants(selectedActivityId, title, message);
       } else if (targetType === "date") {
-        const [res, error] = await apiActivities.notifyByDate(
-          selectedDate,
-          title,
-          message
-        );
-        if (error) {
-          if (error.includes("No activities found")) {
-            alert("לא נמצאו פעילויות בתאריך שנבחר");
-            setIsSubmitting(false);
-            return;
-          }
-          throw error;
-        }
+        if (!day || !month || !year) throw new Error("Please select a full date");
+        const fullDate = `${year}-${month}-${day}`;
+        await apiActivities.notifyByDate(fullDate, title, message);
       } else if (targetType === "circle") {
-        // New logic for Circle notification
-        const [res, error] = await apiActivities.notifyByCircle(
-          selectedCircle,
-          title,
-          message
-        );
-        if (error) throw error;
+        if (!selectedCircle) throw new Error("Please select a circle");
+        await apiActivities.notifyByCircle(selectedCircle, title, message);
       }
-
       alert("ההודעה נשלחה בהצלחה!");
       router.push("/AdminScreens/HomePage");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending notification:", error);
       alert("שגיאה בשליחת ההודעה");
     } finally {
@@ -94,166 +122,219 @@ export default function AddNotificationPage() {
     }
   };
 
-  return (
-    <main
-      style={{
-        padding: "20px",
-        maxWidth: "600px",
-        margin: "0 auto",
-        direction: "rtl",
-      }}
-    >
-      <h1
-        style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
-      >
-        יצירת הודעה חדשה
-      </h1>
+  const selectedActivityLabel = allActivities.find(a => a.id === selectedActivityId)?.title;
+  const selectedCircleLabel = CIRCLE_OPTIONS.find(c => c.value === selectedCircle)?.label;
+  const selectedTargetLabel = TARGET_OPTIONS.find(t => t.value === targetType)?.label;
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      >
-        {/* Target Audience Selection */}
-        <div>
-          <label style={{ display: "block", marginBottom: "8px" }}>
-            {t("בחר/י קהל יעד:")}
-          </label>
-          <select
-            required
-            value={targetType}
-            onChange={(e) => setTargetType(e.target.value as any)}
-            style={styles.input}
+  return (
+    <SmoothPageWrapper isLoading={mounting}>
+    <main className={`mobile-container ${styles.pageOverride}`}>
+      <button className="close-button" onClick={() => router.back()}>
+        <div className="close-button-inner" />
+        <div className="close-icon" />
+      </button>
+
+      <div className={styles.header}>
+        <h1 className={styles.headerTitle}>יצירת הודעה חדשה</h1>
+      </div>
+
+      <div className={styles.scrollContainer} ref={scrollContainerRef}>
+        
+        {/* --- TARGET AUDIENCE DROPDOWN --- */}
+        <div className={`${styles.dropdownWrapperSVG} ${isTargetOpen ? styles.activeDropdownContainer : ''}`}>
+          <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d={getSvgPath("קהל יעד")} className={styles.dropdownBorderPath} strokeLinecap="round" />
+          </svg>
+          <span className={styles.dropdownLabelSVG}>קהל יעד</span>
+          
+          <button 
+              type="button" 
+              onClick={() => setIsTargetOpen(!isTargetOpen)} 
+              className={`${styles.dropdownToggleSVG} ${isTargetOpen ? styles.open : ''}`}
           >
-            <option value="">{t("-- בחר/י אפשרות --")}</option>
-            <option value="activity">לפי פעילות</option>
-            <option value="date">לפי תאריך</option>
-            <option value="circle">לפי מעגל</option>
-          </select>
+            <span className={!targetType ? styles.dropdownPlaceholder : ''}>
+              {selectedTargetLabel || "בחר/י אפשרות"}
+            </span>
+            <span className={styles.arrowCSS}>▼</span>
+          </button>
+          
+          {isTargetOpen && (
+            <div className={styles.dropdownMenuSVG}>
+              {TARGET_OPTIONS.map(opt => (
+                <button 
+                    key={opt.value} 
+                    type="button" 
+                    onClick={() => { setTargetType(opt.value as any); setIsTargetOpen(false); }} 
+                    className={`${styles.dropdownOption} ${targetType === opt.value ? styles.selected : ''}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Conditional Field: Circle Selection */}
-        {targetType === "circle" && (
-          <div>
-            <label style={{ display: "block", marginBottom: "8px" }}>
-              {t("בחר/י מעגל:")}
-            </label>
-            <select
-              required
-              value={selectedCircle}
-              onChange={(e) => setSelectedCircle(e.target.value)}
-              style={styles.input}
-            >
-              <option value="">{t("-- בחר/י מעגל מהרשימה --")}</option>
-              {circleOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {/* --- CONDITIONAL FIELDS --- */}
 
-        {/* Conditional Field: Activity List */}
+        {/* 1. ACTIVITY SELECT */}
         {targetType === "activity" && (
-          <div>
-            <label style={{ display: "block", marginBottom: "8px" }}>
-              {t("בחר/י סדנא:")}
-            </label>
-            {loadingActivities ? (
-              <p>טוען סדנאות...</p>
-            ) : (
-              <select
-                required
-                value={selectedActivityId}
-                onChange={(e) => setSelectedActivityId(e.target.value)}
-                style={styles.input}
-              >
-                <option value="">{t("-- בחר/י סדנא מהרשימה --")}</option>
-                {allActivities.map((act) => (
-                  <option key={act.id} value={act.id}>
-                    {act.title} | {act.date} | {act.start_time?.slice(0, 5)}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+            <div className={`${styles.dropdownWrapperSVG} ${isActivityOpen ? styles.activeDropdownContainer : ''}`}>
+                <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d={getSvgPath("סדנא")} className={styles.dropdownBorderPath} strokeLinecap="round" />
+                </svg>
+                <span className={styles.dropdownLabelSVG}>סדנא</span>
+
+                <button 
+                    type="button" 
+                    onClick={() => setIsActivityOpen(!isActivityOpen)} 
+                    className={`${styles.dropdownToggleSVG} ${isActivityOpen ? styles.open : ''}`}
+                >
+                <span className={!selectedActivityId ? styles.dropdownPlaceholder : ''}>
+                    {selectedActivityLabel || (loadingActivities ? "טוען..." : "בחר/י סדנא")}
+                </span>
+                <span className={styles.arrowCSS}>▼</span>
+                </button>
+
+                {isActivityOpen && !loadingActivities && (
+                    <div className={styles.dropdownMenuSVG}>
+                    {allActivities.map(act => (
+                        <button 
+                            key={act.id} 
+                            type="button" 
+                            onClick={() => { setSelectedActivityId(act.id); setIsActivityOpen(false); }} 
+                            className={`${styles.dropdownOption} ${selectedActivityId === act.id ? styles.selected : ''}`}
+                        >
+                        {act.title} ({act.date})
+                        </button>
+                    ))}
+                    </div>
+                )}
+            </div>
         )}
 
-        {/* Conditional Field: Date Picker */}
+        {/* 2. CIRCLE SELECT */}
+        {targetType === "circle" && (
+            <div className={`${styles.dropdownWrapperSVG} ${isCircleOpen ? styles.activeDropdownContainer : ''}`}>
+                <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d={getSvgPath("מעגל")} className={styles.dropdownBorderPath} strokeLinecap="round" />
+                </svg>
+                <span className={styles.dropdownLabelSVG}>מעגל</span>
+
+                <button 
+                    type="button" 
+                    onClick={() => setIsCircleOpen(!isCircleOpen)} 
+                    className={`${styles.dropdownToggleSVG} ${isCircleOpen ? styles.open : ''}`}
+                >
+                <span className={!selectedCircle ? styles.dropdownPlaceholder : ''}>
+                    {selectedCircleLabel || "בחר/י מעגל"}
+                </span>
+                <span className={styles.arrowCSS}>▼</span>
+                </button>
+
+                {isCircleOpen && (
+                    <div className={styles.dropdownMenuSVG}>
+                    {CIRCLE_OPTIONS.map(opt => (
+                        <button 
+                            key={opt.value} 
+                            type="button" 
+                            onClick={() => { setSelectedCircle(opt.value); setIsCircleOpen(false); }} 
+                            className={`${styles.dropdownOption} ${selectedCircle === opt.value ? styles.selected : ''}`}
+                        >
+                        {opt.label}
+                        </button>
+                    ))}
+                    </div>
+                )}
+            </div>
+        )}
+
+        {/* 3. DATE SELECT */}
         {targetType === "date" && (
-          <div>
-            <label style={{ display: "block", marginBottom: "8px" }}>
-              {t("בחר/י תאריך:")}
-            </label>
-            <input
-              type="date"
-              required
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              style={styles.input}
-            />
-          </div>
+            <div className={styles.fieldGroup}>
+                <label className={styles.dateLabel}>תאריך</label>
+                <div className={styles.dateRow}>
+                    <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
+                        <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
+                            <span>{year || "שנה"}</span>
+                            <div className={styles.arrowIconWrapper} style={{transform: isYearOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
+                                <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </div>
+                        </button>
+                        {isYearOpen && (
+                            <div className={styles.miniDropdownMenu}>
+                                {YEARS.map(y => (
+                                    <button key={y} className={styles.miniDropdownOption} onClick={() => { setYear(y); setIsYearOpen(false); }}>{y}</button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
+                        <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
+                            <span>{month || "חודש"}</span>
+                            <div className={styles.arrowIconWrapper} style={{transform: isMonthOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
+                                <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </div>
+                        </button>
+                        {isMonthOpen && (
+                            <div className={styles.miniDropdownMenu}>
+                                {MONTHS.map(m => (
+                                    <button key={m} className={styles.miniDropdownOption} onClick={() => { setMonth(m); setIsMonthOpen(false); }}>{m}</button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
+                        <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
+                            <span>{day || "יום"}</span>
+                            <div className={styles.arrowIconWrapper} style={{transform: isDayOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
+                                <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            </div>
+                        </button>
+                        {isDayOpen && (
+                            <div className={styles.miniDropdownMenu}>
+                                {DAYS.map(d => (
+                                    <button key={d} className={styles.miniDropdownOption} onClick={() => { setDay(d); setIsDayOpen(false); }}>{d}</button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
         )}
 
-        <hr />
-
-        {/* Message Content */}
-        <div>
-          <label style={{ display: "block", marginBottom: "8px" }}>
-            כותרת ההודעה:
-          </label>
-          <input
-            type="text"
-            required
-            placeholder={t("[הכנס|הכניסי] כותרת...")}
+        {/* --- COMMON FIELDS --- */}
+        <CutInput
+            label="כותרת ההודעה"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            style={styles.input}
-          />
-        </div>
-
-        <div>
-          <label style={{ display: "block", marginBottom: "8px" }}>
-            טקסט ההודעה:
-          </label>
-          <textarea
-            required
-            rows={5}
-            placeholder={t("[כתוב|כתבי] את תוכן ההודעה כאן...")}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />      
+        <CutInput
+            label="תוכן ההודעה"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            style={{ ...styles.input, resize: "none" }}
-          />
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />    
+        <div className={styles.buttonContainer}>
+            <button 
+                onClick={handleSubmit} 
+                disabled={isSubmitting || !targetType || !title || !message} 
+                className={styles.submitButton}
+            >
+                {isSubmitting ? "שולח..." : "שלח הודעה"}
+            </button>
         </div>
 
-        <button
-          type="submit"
-          disabled={issubmitting || !targetType}
-          style={{
-            ...styles.submitBtn,
-            backgroundColor: issubmitting ? "#9ca3af" : "#10b981",
-          }}
-        >
-          {issubmitting ? "שולח..." : t("שלח/י הודעה לקהל היעד")}
-        </button>
-      </form>
+      </div>
     </main>
+    </SmoothPageWrapper>
   );
 }
-
-const styles = {
-  input: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
-  },
-  submitBtn: {
-    padding: "12px",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontWeight: "bold" as const,
-    cursor: "pointer",
-  },
-};

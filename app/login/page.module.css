@@ -119,6 +119,10 @@
   border-color: var(--color-text-primary);
 }
 
+.input:focus::placeholder {
+  opacity: 0;
+}
+
 /* For email input - LTR text but RTL alignment */
 .inputLtr {
   direction: ltr;

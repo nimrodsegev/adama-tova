@@ -1,0 +1,119 @@
+/* Overlay - Dark backdrop */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+}
+
+/* Modal container - #E74E1C background, 14px radius */
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-lg); /* 16px */
+  gap: var(--spacing-lg); /* 16px */
+  width: auto; /* 345px */
+  max-width: 95%;
+  background: var(--color-orange-main); /* #E74E1C */
+  border-radius: var(--radius-xs); /* 14px */
+  direction: rtl;
+  z-index: var(--z-modal);
+}
+
+/* Modal content wrapper */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl); /* 32px */
+  width: 100%;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Title - Arfilit 32px */
+.title {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-3xl); /* 32px */
+  line-height: 2.125rem; /* 34px */
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary); /* white */
+  margin-bottom: var(--spacing-md);
+}
+
+/* Message container */
+.messageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm); /* 8px */
+  width: 100%;
+}
+
+/* User name display */
+.userName {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg); /* 18px */
+  line-height: 1.25rem; /* 20px */
+  text-align: center;
+  color: var(--color-text-primary); /* white */
+}
+
+/* Message text - Ezer Shemesh 18px */
+.message {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md); /* 18px */
+  line-height: 1.25rem; /* 20px */
+  text-align: center;
+  color: var(--color-text-primary); /* white */
+}
+
+/* Recommendation text - Ezer Shemesh 14px */
+.recommendation {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); /* 14px */
+  line-height: 1.0625rem; /* 17px */
+  text-align: center;
+  color: var(--color-text-secondary); /* #F9F9F9 */
+}
+
+/* Email display */
+.email {
+  margin: 0;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md); /* 14px */
+  line-height: 1.0625rem; /* 17px */
+  text-align: center;
+  color: var(--color-text-secondary);
+  direction: ltr;
+}
+
+/* Buttons container - Row layout */
+.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg); /* 16px */
+  width: 100%;
+}
