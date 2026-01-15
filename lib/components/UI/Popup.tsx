@@ -52,9 +52,6 @@ export default function Popup({
     if (secondaryButtonHref) {
       window.location.href = secondaryButtonHref;
     }
-    if (onClose) {
-      onClose();
-    }
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
