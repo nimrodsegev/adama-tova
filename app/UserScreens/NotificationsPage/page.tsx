@@ -7,7 +7,7 @@ import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import Button from "@/lib/components/UI/Button";
-import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; // <--- 1. Import Wrapper
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import styles from "./UserNotificationPage.module.css";
 
 type Notification = {
@@ -19,11 +19,6 @@ type Notification = {
   title: string;
   activityId?: string;
 };
-
-const NOTIFICATION_FILTERS = [
-  { id: "all", label: "הכל" },
-  { id: "unread", label: "לא נקרא" },
-];
 
 export default function NewUserNotificationPage() {
   const { user } = useUser();
@@ -175,13 +170,22 @@ export default function NewUserNotificationPage() {
     }
   };
 
+  // ⭐ Calculate counts for each filter
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const allCount = notifications.length;
+
+  // ⭐ Dynamic filters with counts
+  const dynamicFilters = [
+    { id: "all", label: "הכל", count: allCount },
+    { id: "unread", label: "לא נקרא", count: unreadCount },
+  ];
+
   const filteredNotifications = notifications.filter((n) => {
     if (filter === "unread") return !n.isRead;
     return true;
   });
 
   return (
-    // <--- 2. Apply Wrapper
     <SmoothPageWrapper isLoading={loading || !user}>
       <div className={styles.pageContainer}>
         <div className="vector-background" />
@@ -192,7 +196,7 @@ export default function NewUserNotificationPage() {
 
         <div className={styles.filterContainer}>
           <HomeFilter
-            options={NOTIFICATION_FILTERS}
+            options={dynamicFilters}
             activeOption={filter}
             onFilterChange={(id) => setFilter(id as "all" | "unread")}
           />
@@ -213,7 +217,6 @@ export default function NewUserNotificationPage() {
         </div>
 
         <div className={styles.contentContainer}>
-          {/* Note: Loading state is handled by wrapper, so we just show content here */}
           <div className={styles.notificationsList}>
             {filteredNotifications.length > 0
               ? filteredNotifications.map((notif, index) => {
