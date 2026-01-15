@@ -21,6 +21,8 @@
   border: none;
   cursor: pointer;
   font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
   text-decoration: none;
   white-space: nowrap; /* Keep text on one line */
   direction: rtl;
@@ -60,7 +62,7 @@
   /* Side padding defines the breathing room, width is automatic */
   padding: 0 2rem; /* 32px - wider buttons */
   border-radius: 0.3125rem;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
 }
 
 /* L-short size: 36px height */

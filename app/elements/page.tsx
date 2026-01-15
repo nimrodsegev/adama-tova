@@ -5,6 +5,7 @@ import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
+import EmptyState from "@/lib/components/UI/EmptyState";
 import {
   HomeFilter,
   ADMIN_FILTER_OPTIONS,
@@ -106,6 +107,68 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          <section className="section">
+            <h2 className="text-section-title">Empty State</h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  With Icon and Button - Default Size
+                </p>
+                <EmptyState
+                  message="אין פעילויות קרובות"
+                  buttonText="להוספת פעילות"
+                  onButtonClick={() => alert("Add activity clicked")}
+                  gap="var(--spacing-sm)"
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75"></p>
+                <EmptyState
+                  message="אין פעילויות קרובות"
+                  buttonText="להוספת פעילות"
+                  onButtonClick={() => alert("Add activity clicked")}
+                  gap="var(--spacing-sm)"
+                />
+              </div>
+              <div>
+                <p className="text-small mb-xs opacity-75"></p>
+                <EmptyState
+                  message="אין פעילויות קרובות"
+                  buttonText="להוספת פעילות"
+                  onButtonClick={() => alert("Add activity clicked")}
+                  gap="var(--spacing-xs)"
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">Without Icon</p>
+                <EmptyState message="אין התראות חדשות" showIcon={false} />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Message Only - No Button
+                </p>
+                <EmptyState message="רשימת ההמתנה ריקה" />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Small Icon (50px) with Tight Gap
+                </p>
+                <EmptyState
+                  message="אין משתמשים ממתינים"
+                  buttonText="הזמן משתמש"
+                  onButtonClick={() => alert("Invite user clicked")}
+                  iconSize={50}
+                  gap="var(--spacing-xs)"
+                />
+              </div>
+            </div>
+          </section>
           {/* --- NOTIFICATIONS SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">התראות (החלק שמאלה לקריאה)</h2>
@@ -414,28 +477,6 @@ export default function ElementsPage() {
                   עריכה
                 </Button>
               </div>
-            </div>
-          </section>
-
-          {/* --- NOTIFICATIONS SECTION --- */}
-          <section className="section">
-            <h2 className="text-section-title">התראות</h2>
-            <div
-              className="vertical-scroll gap-md"
-              style={{ paddingBottom: "20px" }}
-            >
-              <p className="text-small mb-xs opacity-75">לא נקרא</p>
-              <NewNotificationCard
-                notification={demoNotifications[0]}
-                onMarkAsRead={handleMarkRead}
-              />
-
-              <p className="text-small mb-xs opacity-75 mt-md">נקרא + כפתור</p>
-              <NewNotificationCard
-                notification={demoNotifications[1]}
-                onMarkAsRead={handleMarkRead}
-                onActivityClick={(id) => alert(`Navigating to activity: ${id}`)}
-              />
             </div>
           </section>
         </div>

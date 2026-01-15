@@ -1,6 +1,6 @@
 "use client";
-
 import React from "react";
+import Image from "next/image";
 import Button from "./Button";
 import styles from "./EmptyState.module.css";
 
@@ -10,6 +10,8 @@ interface EmptyStateProps {
   buttonHref?: string;
   showIcon?: boolean;
   onButtonClick?: () => void;
+  iconSize?: number; // Size in pixels for the icon
+  gap?: string; // Gap between elements (e.g., "var(--spacing-md)")
 }
 
 export default function EmptyState({
@@ -18,58 +20,24 @@ export default function EmptyState({
   buttonHref,
   showIcon = true,
   onButtonClick,
+  iconSize = 71, // Default size matching original
+  gap = "var(--spacing-sm)", // Default gap
 }: EmptyStateProps) {
   return (
-    <div className={styles.emptyStateContainer}>
-      {/* Icon - Dashed circle with plus */}
+    <div className={styles.emptyStateContainer} style={{ gap }}>
+      {/* Icon - Using plus.svg */}
       {showIcon && (
-        <div className={styles.iconContainer}>
-          <svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 71 72"
-            fill="none"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            {/* Outer dashed circle */}
-            <circle
-              cx="35.5"
-              cy="36"
-              r="34.4"
-              stroke="var(--color-text-muted)"
-              strokeWidth="2.2"
-              strokeDasharray="4 4"
-              fill="none"
-            />
-            {/* Inner dashed circle */}
-            <circle
-              cx="35.5"
-              cy="36"
-              r="16.38"
-              stroke="var(--color-text-muted)"
-              strokeWidth="2.2"
-              strokeDasharray="4 4"
-              fill="none"
-            />
-            {/* Horizontal line (minus) */}
-            <line
-              x1="29.2"
-              y1="36"
-              x2="41.81"
-              y2="36"
-              stroke="var(--color-text-tertiary)"
-              strokeWidth="1"
-            />
-            {/* Vertical line (plus) */}
-            <line
-              x1="35.5"
-              y1="28.09"
-              x2="35.5"
-              y2="43.35"
-              stroke="var(--color-text-tertiary)"
-              strokeWidth="1"
-            />
-          </svg>
+        <div
+          className={styles.iconContainer}
+          style={{ width: iconSize, height: iconSize }}
+        >
+          <Image
+            src="/icons/plus.svg"
+            alt="Add icon"
+            width={iconSize}
+            height={iconSize}
+            priority
+          />
         </div>
       )}
 
