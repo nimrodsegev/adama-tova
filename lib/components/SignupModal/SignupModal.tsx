@@ -26,7 +26,7 @@ export default function SignupModal({
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [entering, setEntering] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
   const [closing, setClosing] = useState(false);
   const { userProfile } = useUser();
 
@@ -43,14 +43,20 @@ export default function SignupModal({
 
   // Handle entering animation when modal opens
   useEffect(() => {
-    if (isOpen && mounted) {
-      setEntering(true);
+    if (isOpen && mounted && !hasEntered) {
       const timer = setTimeout(() => {
-        setEntering(false);
+        setHasEntered(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, mounted]);
+  }, [isOpen, mounted, hasEntered]);
+
+  // Reset hasEntered when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setHasEntered(false);
+    }
+  }, [isOpen]);
 
   // Email validation
   const validateEmail = (email: string): string | null => {
@@ -135,8 +141,8 @@ export default function SignupModal({
 
   if (!isOpen || !mounted) return null;
 
-  // Show loading animation when entering or closing
-  const showLoadingAnimation = entering || closing;
+  // Show loading animation when entering (not yet entered) or closing
+  const showLoadingAnimation = !hasEntered || closing;
 
   const modalContent = (
     <>
