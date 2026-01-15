@@ -215,7 +215,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     const hasWaitlist = waitlistCount && waitlistCount > 0;
 
     if (isFull && hasWaitlist) {
-      return `מלא - ${waitlistCount} ברשימת המתנה`;
+      return `${currentParticipants}/${maxParticipants} (${waitlistCount} ברשימת המתנה)`;
     }
 
     return `${currentParticipants}/${maxParticipants} נרשמים`;
