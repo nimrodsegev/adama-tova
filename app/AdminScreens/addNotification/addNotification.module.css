@@ -12,7 +12,10 @@
   min-height: 0 !important;
   max-width: none !important; 
   overflow: hidden;
+  
+  /* Page Background */
   background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  
   padding: 0 !important; 
   padding-top: env(safe-area-inset-top) !important;
   padding-bottom: env(safe-area-inset-bottom) !important;
@@ -54,21 +57,29 @@
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  overflow: visible; 
+  overflow: visible; /* Important: allows dropdowns to float over other content */
 }
 .scrollContainer::-webkit-scrollbar { display: none; }
 
 /* ============================================
-   DROPDOWNS (Figma Style)
+   CUT INPUT OVERRIDES
+   ============================================ */
+.cutInput {
+  width: 100%;
+  height: 3.75rem !important; /* 60px */
+}
+
+/* ============================================
+   SVG DROPDOWNS (Figma Design)
    ============================================ */
 .dropdownWrapperSVG {
   position: relative;
   width: 100%;
-  height: 3.75rem; /* 60px exactly */
+  height: 3.75rem; /* 60px */
   z-index: 60; 
 }
 
-/* Ensure active dropdown covers others */
+/* Ensure active dropdown covers inputs below it */
 .activeDropdownContainer {
   z-index: 200 !important;
 }
@@ -86,69 +97,69 @@
 
 .dropdownBorderPath {
   stroke: #F9F9F9;
-  stroke-width: 1; /* 1px solid */
+  stroke-width: 1;
 }
 
-/* The Label (Figma: Size 15px, Weight 400) */
+/* The Label - Positioned in the gap */
 .dropdownLabelSVG {
   position: absolute;
-  top: -0.6rem; /* Sits in the gap */
-  right: 10.48%;  /* ~33px from right to match Figma 10.48% */
+  top: -0.6rem; /* Sits in the border gap */
+  right: 2.5rem;  /* Aligned with CSS path gap calculation */
   
   font-family: var(--font-secondary);
-  font-weight: 400; /* Regular */
-  font-size: 0.9375rem; /* 15px */
-  line-height: 1.1875rem; /* 19px */
+  font-weight: 400; /* Regular weight (Figma) */
+  font-size: 0.9375rem; /* 15px (Figma) */
+  line-height: 1.1875rem;
   color: #F9F9F9;
   text-align: right;
   
-  padding: 0 0.3rem;
+  padding: 0 0.25rem;
   pointer-events: none;
   z-index: 2; 
 }
 
-/* The Toggle Button (Figma: Size 16px, Weight 300) */
+/* The Toggle Button (Clickable) */
 .dropdownToggleSVG {
   box-sizing: border-box;
   width: 100%;
   height: 100%;
   padding: 0 1.875rem; /* ~30px padding */
   background: transparent;
-  border: none; 
-  border-radius: 0.5625rem; /* 9px */
+  border: none; /* Border handled by SVG */
+  border-radius: 0.5625rem;
   
   display: flex;
   align-items: center;
   justify-content: space-between;
   
   font-family: var(--font-secondary);
-  font-weight: 300; /* Light */
-  font-size: 1rem; /* 16px */
-  line-height: 1.1875rem; /* 19px */
-  color: #F9F9F9;
+  font-weight: 300; /* Light weight (Figma) */
+  font-size: 1rem; /* 16px (Figma) */
+  line-height: 1.1875rem;
+  color: #f9f9f9;
   
   direction: rtl;
   cursor: pointer;
   outline: none;
+  position: relative;
   z-index: 2;
 }
 
 .dropdownPlaceholder { 
-  color: #F9F9F9; /* Figma shows white color for placeholder too */
-  opacity: 1; 
+  color: #F9F9F9; /* Figma shows white color */
 }
 
 /* The Menu - OPAQUE Background */
 .dropdownMenuSVG {
   position: absolute;
-  top: 3.25rem; /* Overlap to merge borders */
+  top: 3.25rem; /* Slight overlap to connect borders */
   left: 0;
   right: 0;
   
-  /* Solid Gradient Background */
+  /* Opaque Gradient Background matching the page */
   background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
   
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
   padding-top: 0.5rem;
@@ -189,7 +200,7 @@
   border-bottom: none;
 }
 
-/* Arrow Animation */
+/* Arrow Animation (CSS Only) */
 .arrowCSS {
   font-size: 0;
   color: transparent;
@@ -205,7 +216,7 @@
   top: 50%;
   width: 0.55rem;
   height: 0.0625rem;
-  background: #F9F9F9;
+  background: #f9f9f9;
 }
 .arrowCSS::before {
   right: 50%;

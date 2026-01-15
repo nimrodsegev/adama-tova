@@ -133,7 +133,6 @@ export default function ProfilePage() {
     await apiUser.updateUserInterests(user.id, selectedInterests);
     await apiUser.updateUserBranches(user.id, branches);
     setIsEditingExtras(false);
-    window.location.reload();
     setSaving(false);
   };
 

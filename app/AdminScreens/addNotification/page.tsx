@@ -8,6 +8,7 @@ import styles from "./addNotification.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from '@/lib/components/UI/CutInput';
 
+// --- Options ---
 const TARGET_OPTIONS = [
   { label: "לפי פעילות", value: "activity" },
   { label: "לפי תאריך", value: "date" },
@@ -25,24 +26,25 @@ const CIRCLE_OPTIONS = [
   { label: "מעגל שני או שלישי", value: "Second or third" },
 ];
 
+// --- Date Helpers ---
 const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
 const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
 // --- SVG Path Generator (Dynamic Gap) ---
-// Updated to ensure generous gap for Hebrew text
+// Calculates the gap based on label length so the border doesn't cut text
 const getSvgPath = (label: string) => {
-  const charWidth = 7; // Slightly wider per char for safety
-  const padding = 10;   // Extra padding
+  const charWidth = 9; // Tuned for Hebrew fonts
+  const padding = 14; 
   const labelWidth = (label.length * charWidth) + padding;
   
   const totalWidth = 315;
   const radius = 9; 
-  const rightGapStart = 315 - 32; // ~32px from right edge
+  const rightGapStart = 315 - 32; // ~32px from right edge (matching CSS right: 2rem)
   const gapEnd = rightGapStart - labelWidth;
 
-  // SVG Path Command
+  // Draw the border with the calculated gap
   return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
 };
 
@@ -65,7 +67,7 @@ export default function AddNotificationPage() {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
 
-  // UI State
+  // UI State (Dropdowns)
   const [isTargetOpen, setIsTargetOpen] = useState(false);
   const [isActivityOpen, setIsActivityOpen] = useState(false);
   const [isCircleOpen, setIsCircleOpen] = useState(false);
@@ -140,7 +142,7 @@ export default function AddNotificationPage() {
 
       <div className={styles.scrollContainer} ref={scrollContainerRef}>
         
-        {/* --- TARGET AUDIENCE DROPDOWN --- */}
+        {/* --- TARGET AUDIENCE DROPDOWN (SVG STYLE) --- */}
         <div className={`${styles.dropdownWrapperSVG} ${isTargetOpen ? styles.activeDropdownContainer : ''}`}>
           <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <path d={getSvgPath("קהל יעד")} className={styles.dropdownBorderPath} strokeLinecap="round" />
@@ -176,7 +178,7 @@ export default function AddNotificationPage() {
 
         {/* --- CONDITIONAL FIELDS --- */}
 
-        {/* 1. ACTIVITY SELECT */}
+        {/* 1. ACTIVITY SELECT (SVG STYLE) */}
         {targetType === "activity" && (
             <div className={`${styles.dropdownWrapperSVG} ${isActivityOpen ? styles.activeDropdownContainer : ''}`}>
                 <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -212,7 +214,7 @@ export default function AddNotificationPage() {
             </div>
         )}
 
-        {/* 2. CIRCLE SELECT */}
+        {/* 2. CIRCLE SELECT (SVG STYLE) */}
         {targetType === "circle" && (
             <div className={`${styles.dropdownWrapperSVG} ${isCircleOpen ? styles.activeDropdownContainer : ''}`}>
                 <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -248,11 +250,12 @@ export default function AddNotificationPage() {
             </div>
         )}
 
-        {/* 3. DATE SELECT */}
+        {/* 3. DATE SELECT (Mini Dropdowns) */}
         {targetType === "date" && (
             <div className={styles.fieldGroup}>
                 <label className={styles.dateLabel}>תאריך</label>
                 <div className={styles.dateRow}>
+                    {/* YEAR */}
                     <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
                         <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
                             <span>{year || "שנה"}</span>
@@ -269,6 +272,7 @@ export default function AddNotificationPage() {
                         )}
                     </div>
 
+                    {/* MONTH */}
                     <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
                         <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
                             <span>{month || "חודש"}</span>
@@ -285,6 +289,7 @@ export default function AddNotificationPage() {
                         )}
                     </div>
 
+                    {/* DAY */}
                     <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
                         <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
                             <span>{day || "יום"}</span>
