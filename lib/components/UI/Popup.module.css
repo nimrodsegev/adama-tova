@@ -19,8 +19,8 @@
   align-items: flex-start;
   padding: var(--spacing-lg); /* 16px */
   gap: var(--spacing-lg); /* 16px */
-  width: 21.5625rem; /* 345px */
-  max-width: 90%;
+  width: auto; /* 345px */
+  max-width: 95%;
   background: var(--color-orange-main); /* #E74E1C */
   border-radius: var(--radius-xs); /* 14px */
   direction: rtl;

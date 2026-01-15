@@ -117,6 +117,151 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          <section className="section">
+            <h2 className="text-section-title">
+              Popup Component - Interactive
+            </h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Basic Popup - Title, Content, Two Buttons
+                </p>
+                <Button
+                  variant="primary"
+                  size="L"
+                  onClick={() => setShowPopup1(true)}
+                >
+                  פתח פופאפ בסיסי
+                </Button>
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">With User Name</p>
+                <Button
+                  variant="primary"
+                  size="L"
+                  onClick={() => setShowPopup2(true)}
+                >
+                  פופאפ עם שם משתמש
+                </Button>
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Without Title - With Email
+                </p>
+                <Button
+                  variant="primary"
+                  size="L"
+                  onClick={() => setShowPopup3(true)}
+                >
+                  פופאפ עם מייל
+                </Button>
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  With Loading State
+                </p>
+                <Button
+                  variant="primary"
+                  size="L"
+                  onClick={() => setShowPopup4(true)}
+                >
+                  פופאפ עם טעינה
+                </Button>
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Single Button Only
+                </p>
+                <Button
+                  variant="primary"
+                  size="L"
+                  onClick={() => setShowPopup5(true)}
+                >
+                  פופאפ עם כפתור אחד
+                </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* Popups - Rendered at the end of the component */}
+          {showPopup1 && (
+            <Popup
+              title="שכחת סיסמה?"
+              content="לשינוי הסיסמה ישלח מייל לכתובת המייל שלך"
+              recommendation="מומלץ לבצע את הפעולה במחשב או דרך דפדפן בסמארטפון"
+              primaryButtonText="כן, שלח מייל"
+              primaryButtonAction={() => {
+                alert("Primary button clicked");
+                setShowPopup1(false);
+              }}
+              secondaryButtonText="ביטול"
+              secondaryButtonAction={() => setShowPopup1(false)}
+              onClose={() => setShowPopup1(false)}
+            />
+          )}
+
+          {showPopup2 && (
+            <Popup
+              title="אישור משתמש"
+              userName="שרה לוי"
+              content="האם ברצונך לאשר את המשתמש?"
+              primaryButtonText="אשר"
+              primaryButtonAction={() => {
+                alert("Approved!");
+                setShowPopup2(false);
+              }}
+              secondaryButtonText="סרב"
+              secondaryButtonAction={() => setShowPopup2(false)}
+              onClose={() => setShowPopup2(false)}
+            />
+          )}
+
+          {showPopup3 && (
+            <Popup
+              content="מייל אישור נשלח לכתובת:"
+              email="user@example.com"
+              recommendation="אנא בדוק את תיבת הדואר שלך"
+              primaryButtonText="סגור"
+              primaryButtonAction={() => setShowPopup3(false)}
+              onClose={() => setShowPopup3(false)}
+            />
+          )}
+
+          {showPopup4 && (
+            <Popup
+              title="שולח מייל"
+              content="אנא המתן בזמן שאנו שולחים את המייל"
+              primaryButtonText="שלח"
+              primaryButtonAction={() => {
+                setIsLoading(true);
+                setTimeout(() => {
+                  setIsLoading(false);
+                  setShowPopup4(false);
+                  alert("Email sent!");
+                }, 2000);
+              }}
+              secondaryButtonText="ביטול"
+              secondaryButtonAction={() => setShowPopup4(false)}
+              loading={isLoading}
+              onClose={() => setShowPopup4(false)}
+            />
+          )}
+
+          {showPopup5 && (
+            <Popup
+              title="הצלחה!"
+              content="הפעולה בוצעה בהצלחה"
+              primaryButtonText="סגור"
+              primaryButtonAction={() => setShowPopup5(false)}
+              onClose={() => setShowPopup5(false)}
+            />
+          )}
           {/* --- ACTIVITY CARDS SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>

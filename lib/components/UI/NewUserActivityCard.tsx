@@ -281,7 +281,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
 
             <Button
               variant="tertiary"
-              tertiarySize={isAdmin ? "base" : "medium"}
+              tertiarySize={"medium"}
               tertiaryWeight="semibold"
               colorType="orange"
               onClick={handleActionClick}
