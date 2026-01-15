@@ -536,8 +536,22 @@ export default function SignupWizard({
                 />
 
                 <div className={styles.genderSelector}>
-                  <div className={styles.inputWrapper}>
-                    <span className={styles.inputLabel}>מין</span>
+                  <div className={styles.genderWrapper}>
+                    {/* SVG Border with gap for label */}
+                    <svg
+                      className={styles.genderBorder}
+                      viewBox="0 0 315 61"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      preserveAspectRatio="none"
+                    >
+                      <path
+                        d="M286 0.5H306C308.5 0.5 314 2 314.5 8.5C314.5 15.3 314.5 39.3333 314.5 50.5C314.5 53.3333 312.8 59.1 306 59.5C299.2 59.9 105.5 59.6667 9.5 59.5C7 59.5 1 58.5 0.5 52C0.5 45.2 0.5 20.1667 0.5 8.5C0.5 6 2 1 8 0.5C14.8 0.5 172.333 0.5 254 0.5"
+                        className={styles.genderBorderPath}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span className={styles.genderLabel}>מין</span>
                     <button
                       type="button"
                       onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
