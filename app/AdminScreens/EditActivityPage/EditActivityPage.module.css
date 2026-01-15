@@ -296,20 +296,6 @@
 .saveButton:hover { opacity: 0.9; }
 .saveButton:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Modal */
-.modalOverlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  display: flex; justify-content: center; align-items: center; z-index: 1000;
-}
-.modalContent {
-  background: #fff; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; direction: rtl;
-}
-.modalTitle { color: #333; font-size: 1.2rem; margin-bottom: 0.5rem; }
-.modalSubtitle { color: #666; font-size: 1rem; margin-bottom: 1.5rem; }
-.modalButtons { display: flex; gap: 1rem; justify-content: center; }
-.btnPrimary { background: #E74E1C; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
-.btnOutline { background: transparent; color: #666; border: 1px solid #ccc; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
-
 /* ============================================
    IMAGE UPLOAD (SVG BORDER STYLE)
    ============================================ */

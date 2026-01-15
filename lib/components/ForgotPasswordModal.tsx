@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import styles from "./ForgotPasswordModal.module.css";
+import Popup from "@/lib/components/UI/Popup";
 
 interface ForgotPasswordModalProps {
   email: string;
@@ -38,53 +38,28 @@ export default function ForgotPasswordModal({
   // Success state - Email sent
   if (sent) {
     return (
-      <div className={styles.overlay}>
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h2 className={styles.title}>מייל נשלח!</h2>
-            <div className={styles.messageContainer}>
-              <p className={styles.message}>שלחנו מייל עם קישור לשינוי הסיסמה.</p>
-              <p className={styles.message}>בדוק את תיבת הדואר שלך</p>
-            </div>
-            <div className={styles.buttons}>
-              <button onClick={onClose} className={styles.closeButton}>
-                סגור
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Popup
+        title="מייל נשלח!"
+        content="שלחנו מייל עם קישור לשינוי הסיסמה. בדוק את תיבת הדואר שלך"
+        secondaryButtonText="סגור"
+        secondaryButtonAction={onClose}
+        onClose={onClose}
+      />
     );
   }
 
   // Initial state - Confirmation
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <div className={styles.modalContent}>
-          <h2 className={styles.title}>שכחת סיסמה?</h2>
-          <div className={styles.messageContainer}>
-            <p className={styles.message}>
-              לשינוי הסיסמה ישלח מייל לכתובת {email}
-            </p>
-            <p className={styles.recommendation}>
-              מומלץ לבצע את הפעולה במחשב או דרך דפדפן בסמארטפון
-            </p>
-          </div>
-          <div className={styles.buttons}>
-            <button
-              onClick={handleSendEmail}
-              disabled={loading}
-              className={styles.primaryButton}
-            >
-              {loading ? "שולח..." : "כן, שלח מייל"}
-            </button>
-            <button onClick={onClose} className={styles.secondaryButton}>
-              ביטול
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Popup
+      title="שכחת סיסמה?"
+      content={`לשינוי הסיסמה ישלח מייל לכתובת ${email}`}
+      recommendation="מומלץ לבצע את הפעולה במחשב או דרך דפדפן בסמארטפון"
+      primaryButtonText="כן, שלח מייל"
+      primaryButtonAction={handleSendEmail}
+      loading={loading}
+      secondaryButtonText="ביטול"
+      secondaryButtonAction={onClose}
+      onClose={onClose}
+    />
   );
 }
