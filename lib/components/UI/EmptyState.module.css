@@ -36,6 +36,7 @@
   text-align: center;
   color: var(--color-text-secondary);
   margin: 0;
+  margin-bottom: 1rem;
 }
 
 .buttonContainer {
@@ -43,6 +44,6 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: var(--spacing-sm); /* Minimal gap to button */
+  margin-top: -0.5rem;
   margin-bottom: 1rem;
 }

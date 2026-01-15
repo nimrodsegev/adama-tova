@@ -113,39 +113,13 @@ export default function ElementsPage() {
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
               <div>
-                <p className="text-small mb-xs opacity-75">
-                  With Icon and Button - Default Size
-                </p>
-                <EmptyState
-                  message="אין פעילויות קרובות"
-                  buttonText="להוספת פעילות"
-                  onButtonClick={() => alert("Add activity clicked")}
-                  gap="var(--spacing-sm)"
-                />
-              </div>
-
-              <div>
                 <p className="text-small mb-xs opacity-75"></p>
                 <EmptyState
                   message="אין פעילויות קרובות"
                   buttonText="להוספת פעילות"
                   onButtonClick={() => alert("Add activity clicked")}
-                  gap="var(--spacing-sm)"
+                  gap="var(--spacing-md)"
                 />
-              </div>
-              <div>
-                <p className="text-small mb-xs opacity-75"></p>
-                <EmptyState
-                  message="אין פעילויות קרובות"
-                  buttonText="להוספת פעילות"
-                  onButtonClick={() => alert("Add activity clicked")}
-                  gap="var(--spacing-xs)"
-                />
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">Without Icon</p>
-                <EmptyState message="אין התראות חדשות" showIcon={false} />
               </div>
 
               <div>
