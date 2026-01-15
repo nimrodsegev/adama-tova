@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const { t } = useIvrita();
   const router = useRouter();
 
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // --- STATE ---
@@ -136,9 +137,12 @@ export default function ProfilePage() {
     setSaving(false);
   };
 
-  const handleToStory = () => {
-    router.push("https://www.adamatova.org/");
+  const handleToUserList = () => {
+    console.log("Navigating to user list");
   };
+  const handleToAddAdmin = () => {
+    router.push("/AdminScreens/CreateNewAdmin");
+  }
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -160,65 +164,25 @@ export default function ProfilePage() {
 
           <div className={styles.scrollContainer} ref={scrollContainerRef}>
             {/* --- SECTION 1: PERSONAL DETAILS --- */}
-            {isEditingPersonal ? (
-              <div className={styles.editModeContainer}>
-                <h2 className={styles.sectionTitle}>פרטים אישיים</h2>
-
-                <div className={styles.inputWrapper}>
-                  <label className={styles.floatingLabel}>טלפון</label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className={`${styles.profileInput} ${styles.profileInputLTR}`}
-                  />
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>אימייל</span>
-                  <span className={styles.detailValue}>
-                    {userProfile?.email || user?.email}
-                  </span>
-                </div>
-
-                <div className={styles.boxFooter}>
-                  <Button
-                    className={styles.editButtonCustom}
-                    onClick={handleSavePersonal}
-                    disabled={saving}
-                  >
-                    {saving ? "שומר..." : "סיימתי"}
-                  </Button>
-                </div>
-              </div>
-            ) : (
               <div className={styles.profileBox}>
                 <div className={styles.boxHeader}>
-                  <span className={styles.boxTitle}>פרטים אישיים</span>
+                  <span className={styles.bodyL}>פרטים אישיים</span>
                 </div>
                 <div className={styles.detailsGrid}>
                   <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>טלפון</span>
+                    <span className={styles.bodyS}>טלפון</span>
                     <span className={styles.detailValue} dir="ltr">
                       {userProfile?.phone || "לא צוין"}
                     </span>
                   </div>
                   <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>אימייל</span>
+                    <span className={styles.bodyS}>אימייל</span>
                     <span className={styles.detailValue}>
                       {userProfile?.email || user?.email}
                     </span>
                   </div>
                 </div>
-                <div className={styles.boxFooter}>
-                  <Button
-                    className={styles.editButtonCustom}
-                    onClick={() => setIsEditingPersonal(true)}
-                  >
-                    עריכה
-                  </Button>
-                </div>
               </div>
-            )}
 
             {/* --- SECTION 2: ADDITIONAL DETAILS --- */}
             {!isAdmin &&
@@ -231,7 +195,7 @@ export default function ProfilePage() {
                     style={{ alignItems: "flex-start", width: "100%" }}
                   >
                     <span
-                      className={styles.detailLabel}
+                      className={styles.bodyS}
                       style={{ color: "#fff" }}
                     >
                       הסניף הקרוב אליי
@@ -269,7 +233,7 @@ export default function ProfilePage() {
                     style={{ alignItems: "flex-start", width: "100%" }}
                   >
                     <span
-                      className={styles.detailLabel}
+                      className={styles.bodyS}
                       style={{ color: "#fff" }}
                     >
                       תחומי עניין
@@ -307,7 +271,7 @@ export default function ProfilePage() {
 
                   <div className={styles.boxFooter}>
                     <Button
-                      className={styles.editButtonCustom}
+                      className={styles.saveButtonCustom}
                       onClick={handleSaveExtras}
                       disabled={saving}
                     >
@@ -356,13 +320,24 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ))}
-
-            <div className={styles.settingsContainer}>
-              <Button className={styles.settingsButton} onClick={handleLogout}>
-                התנתק
-              </Button>
+              {isAdmin && (
+            <div className={styles.buttonsRow}>
+                <Button className={styles.usersList} onClick={handleToUserList}>
+                  רשימת משתמשים
+                  <span className={styles.pressArrow}></span>
+                </Button>
+            </div>)}
+            <div className={styles.buttonsRow}>
+                <Button className={styles.logOutButton} onClick={handleLogout}>
+                  התנתק
+                  <span className={styles.redPressArrow}></span>
+                </Button>
             </div>
           </div>
+          {isAdmin && (
+                <Button className={styles.AddAdminButton} onClick={handleToAddAdmin}>
+                  הוספת מנהל
+                </Button>)}
         </main>
       </SmoothPageWrapper>
     </ProtectedRoute>

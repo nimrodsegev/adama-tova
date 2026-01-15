@@ -461,9 +461,44 @@ export default function SignupWizard({
     </svg>
   );
 
+  // Determine which params to use based on current step
+  const activeCircleParams = useMemo(() => {
+    if (currentStep <= 1) {
+      // Steps 0-1: Use layerCount with default params
+      return {
+        layers: layerCount,
+        smoothness: defaultParams.smoothness,
+        complexity: defaultParams.complexity,
+        elongation: defaultParams.elongation,
+        opacity: 0.8,
+        strokeWidth: 1,
+      };
+    } else {
+      // Steps 2-4: Use calculated params
+      return calculatedParams;
+    }
+  }, [currentStep, layerCount, defaultParams, calculatedParams]);
+
   return (
     <SmoothPageWrapper isLoading={loading}>
       <div className={styles.wizardContainer}>
+        {/* Fixed Background Circles - stays in place during swipe */}
+        <div className={styles.backgroundCircles}>
+          <OrganicCircles
+            key={`background-circles-${activeCircleParams.layers}-${activeCircleParams.complexity}-${activeCircleParams.opacity}-${activeCircleParams.smoothness}-${activeCircleParams.strokeWidth}-${activeCircleParams.elongation}`}
+            mode="static"
+            radius={circleRadius}
+            layers={activeCircleParams.layers}
+            smoothness={activeCircleParams.smoothness}
+            complexity={activeCircleParams.complexity}
+            elongation={activeCircleParams.elongation}
+            opacity={activeCircleParams.opacity}
+            strokeWidth={activeCircleParams.strokeWidth}
+            position={circlePosition}
+            baseColor="#FFFFFF"
+          />
+        </div>
+
         {/* Scroll Snap Container - locked until step 0 is valid */}
       <div
         ref={scrollContainerRef}
@@ -491,21 +526,8 @@ export default function SignupWizard({
               <p className={styles.optionalSubtitle}>&nbsp;</p>
             </div>
 
-            <div className={styles.decorativeCircles}>
-              <OrganicCircles
-                key={`circles-step0-${layerCount}`}
-                mode="static"
-                radius={circleRadius}
-                layers={layerCount}
-                smoothness={defaultParams.smoothness}
-                complexity={defaultParams.complexity}
-                elongation={defaultParams.elongation}
-                opacity={0.8}
-                strokeWidth={1}
-                position={circlePosition}
-                baseColor="#FFFFFF"
-              />
-            </div>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainer}>
               <div className={styles.inputsContainer}>
@@ -622,21 +644,8 @@ export default function SignupWizard({
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
-            <div className={styles.decorativeCircles}>
-              <OrganicCircles
-                key={`circles-step1-${layerCount}`}
-                mode="static"
-                radius={circleRadius}
-                layers={layerCount}
-                smoothness={defaultParams.smoothness}
-                complexity={defaultParams.complexity}
-                elongation={defaultParams.elongation}
-                opacity={0.8}
-                strokeWidth={1}
-                position={circlePosition}
-                baseColor="#FFFFFF"
-              />
-            </div>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.optionsContainer}>
@@ -674,21 +683,8 @@ export default function SignupWizard({
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
-            <div className={styles.decorativeCircles}>
-              <OrganicCircles
-                key={`circles-step2-${interests.length}-${calculatedParams.layers}-${calculatedParams.complexity}`}
-                mode="static"
-                radius={circleRadius}
-                layers={calculatedParams.layers}
-                smoothness={calculatedParams.smoothness}
-                complexity={calculatedParams.complexity}
-                elongation={calculatedParams.elongation}
-                opacity={calculatedParams.opacity}
-                strokeWidth={calculatedParams.strokeWidth}
-                position={circlePosition}
-                baseColor="#FFFFFF"
-              />
-            </div>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.optionsContainer}>
@@ -728,21 +724,8 @@ export default function SignupWizard({
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
 
-            <div className={styles.decorativeCircles}>
-              <OrganicCircles
-                key={`circles-step3-${circle}-${calculatedParams.layers}-${calculatedParams.opacity}`}
-                mode="static"
-                radius={circleRadius}
-                layers={calculatedParams.layers}
-                smoothness={calculatedParams.smoothness}
-                complexity={calculatedParams.complexity}
-                elongation={calculatedParams.elongation}
-                opacity={calculatedParams.opacity}
-                strokeWidth={calculatedParams.strokeWidth}
-                position={circlePosition}
-                baseColor="#FFFFFF"
-              />
-            </div>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.inputsContainer}>
@@ -818,21 +801,8 @@ export default function SignupWizard({
               <p className={styles.optionalSubtitle}>&nbsp;</p>
             </div>
 
-            <div className={styles.decorativeCircles}>
-              <OrganicCircles
-                key={`circles-step4-${freeText.length}-${calculatedParams.layers}`}
-                mode="static"
-                radius={circleRadius}
-                layers={calculatedParams.layers}
-                smoothness={calculatedParams.smoothness}
-                complexity={calculatedParams.complexity}
-                elongation={calculatedParams.elongation}
-                opacity={calculatedParams.opacity}
-                strokeWidth={calculatedParams.strokeWidth}
-                position={circlePosition}
-                baseColor="#FFFFFF"
-              />
-            </div>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.inputsContainer}>
