@@ -223,22 +223,24 @@
 }
 
 .approve {
-  height: 3rem; /* 48px */
-  padding: 0 1.5rem; /* 24px side padding */
+  height: 2.5rem; /* 48px */
+  padding: 0 1rem; /* 24px side padding */
   background: var(--button-text);
   color: var(--color-text-secondary);
   border-radius: 0.21875rem;
   font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .reject {
-  height: 3rem; /* 48px */
-  padding: 0 1.5rem; /* 24px side padding */
+  height: 2.5rem; /* 48px */
+  padding: 0 1rem; /* 24px side padding */
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--button-text);
   color: var(--button-text);
   border-radius: 0.21875rem;
   font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .popup-primary {

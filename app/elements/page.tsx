@@ -4,6 +4,7 @@ import Button from "@/lib/components/UI/Button";
 import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
+import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import styles from "./elements.module.css";
 
 export default function ElementsPage() {
@@ -33,10 +34,10 @@ export default function ElementsPage() {
       id: "activity_1",
       title: "יוגה בוקר",
       instructor: "שרה כהן",
-      date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+      date: new Date(Date.now() + 86400000).toISOString(),
       startTime: "08:00:00",
       endTime: "09:00:00",
-      currentParticipants: 12,
+      currentParticipants: 8,
       maxParticipants: 12,
       waitlistCount: 2,
     },
@@ -44,7 +45,7 @@ export default function ElementsPage() {
       id: "activity_2",
       title: "פילאטיס ערב",
       instructor: "דני לוי",
-      date: new Date(Date.now() + 172800000).toISOString(), // Day after tomorrow
+      date: new Date(Date.now() + 172800000).toISOString(),
       startTime: "18:30:00",
       endTime: "19:30:00",
       currentParticipants: 10,
@@ -55,7 +56,7 @@ export default function ElementsPage() {
       id: "activity_3",
       title: "מדיטציה מודרכת",
       instructor: "רונית אברהם",
-      date: new Date(Date.now() + 259200000).toISOString(), // 3 days from now
+      date: new Date(Date.now() + 259200000).toISOString(),
       startTime: "19:00:00",
       endTime: "20:00:00",
       currentParticipants: 5,
@@ -75,6 +76,14 @@ export default function ElementsPage() {
     console.log(`Motion state: ${state}, Skip fetch: ${skipFetch}`);
   };
 
+  const handleApprove = (userName: string) => {
+    alert(`אישור עבור ${userName}`);
+  };
+
+  const handleReject = (userName: string) => {
+    alert(`דחייה עבור ${userName}`);
+  };
+
   return (
     <div className={styles.scrollableContainer}>
       <div className="mobile-container" style={{ paddingBottom: "8rem" }}>
@@ -84,7 +93,86 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
-          {/* --- ACTIVITY CARDS SECTION --- */}
+          {/* --- USER APPROVAL CARDS SECTION --- */}
+          <section className="section">
+            <h2 className="text-section-title">כרטיסי אישור משתמשים</h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  אישור ראשוני - עם מעגל
+                </p>
+                <UserApprovalCard
+                  userName="שרה לוי"
+                  requestDate="12.01.2025"
+                  circle="מעגל נשים"
+                  type="initial"
+                  onApprove={() => handleApprove("שרה לוי")}
+                  onReject={() => handleReject("שרה לוי")}
+                  onClick={() => alert("לחיצה על כרטיס שרה לוי")}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  אישור ראשוני - ללא מעגל
+                </p>
+                <UserApprovalCard
+                  userName="דוד כהן"
+                  requestDate="15.01.2025"
+                  type="initial"
+                  onApprove={() => handleApprove("דוד כהן")}
+                  onReject={() => handleReject("דוד כהן")}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  אישור קבוצה - עם שם קבוצה
+                </p>
+                <UserApprovalCard
+                  userName="מיכל אברהם"
+                  requestDate="10.01.2025"
+                  circle="מעגל הורים"
+                  groupName="קבוצת פילאטיס בוקר"
+                  type="group"
+                  onApprove={() => handleApprove("מיכל אברהם")}
+                  onReject={() => handleReject("מיכל אברהם")}
+                  onClick={() => alert("לחיצה על כרטיס מיכל אברהם")}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  אישור קבוצה - שם ארוך
+                </p>
+                <UserApprovalCard
+                  userName="יוסף בן דוד המלמד"
+                  requestDate="08.01.2025"
+                  circle="מעגל גברים ונערים"
+                  type="group"
+                  onApprove={() => handleApprove("יוסף בן דוד המלמד")}
+                  onReject={() => handleReject("יוסף בן דוד המלמד")}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  ללא onClick - לא לחיץ
+                </p>
+                <UserApprovalCard
+                  userName="רחל גולדשטיין"
+                  requestDate="14.01.2025"
+                  circle="מעגל נערות"
+                  type="initial"
+                  onApprove={() => handleApprove("רחל גולדשטיין")}
+                  onReject={() => handleReject("רחל גולדשטיין")}
+                />
+              </div>
+            </div>
+          </section>
+
           {/* --- ACTIVITY CARDS SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>
