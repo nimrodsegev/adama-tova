@@ -197,7 +197,7 @@ export default function LoginPage() {
             {/* Greeting section */}
             <div className={styles.greeting}>
               <h1>ברוכה הבאה</h1>
-              <p>להרשמה או התחברות הכניסו פרטים</p>
+              <p>להתחברות הכניסו פרטים</p>
             </div>
 
             <div className={styles.loginContent}>
@@ -233,35 +233,35 @@ export default function LoginPage() {
 
               {/* Action Buttons */}
               <div className={styles.buttonSection}>
-                {/* 1. Row with Login + Google buttons side by side */}
-                <div className={styles.buttonRow}>
-                  <button
-                    className={styles.loginButtonSmall}
-                    onClick={handleLogin}
-                    disabled={loadingAction !== null}
-                  >
-                    {loadingAction === "login" ? "מתחבר..." : "התחבר"}
-                  </button>
-                  <GoogleLoginButton className={styles.googleButtonSmall} />
-                </div>
+                {/* 1. התחבר (Login) */}
+                <button
+                  className={styles.primaryButton}
+                  onClick={handleLogin}
+                  disabled={loadingAction !== null}
+                >
+                  {loadingAction === "login" ? "מתחבר..." : "התחבר"}
+                </button>
 
-                {/* 2. או (OR separator) */}
+                {/* 2. התחבר עם גוגל (Google) */}
+                <GoogleLoginButton className={styles.googleButton} />
+
+                {/* 3. או (OR separator) */}
                 <div className={styles.orSeparator}>
                   <span className={styles.orLine}></span>
                   <span className={styles.orText}>או</span>
                   <span className={styles.orLine}></span>
                 </div>
 
-                {/* 3. יצירת משתמש (Create User) - full width */}
+                {/* 4. יצירת משתמש (Create User) */}
                 <button
                   className={styles.secondaryButton}
                   onClick={handleSignupClick}
                   disabled={loadingAction !== null}
                 >
-                  צור משתמש
+                  יצירת משתמש
                 </button>
 
-                {/* 4. שכחתי סיסמה (Forgot Password) - with arrow */}
+                {/* 5. שכחתי סיסמה (Forgot Password) - with arrow */}
                 <button
                   className={styles.forgotPassword}
                   onClick={() => setShowForgotPassword(true)}

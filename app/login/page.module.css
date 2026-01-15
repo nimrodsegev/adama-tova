@@ -27,7 +27,6 @@
   align-items: center;
   gap: 3.25rem; /* 52px */
   width: 100%;
-  margin-bottom: 4rem; /* Push content higher */
 }
 
 /* Greeting section */
@@ -191,88 +190,7 @@
   width: 100%;
 }
 
-/* Button row - for side by side buttons */
-.buttonRow {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 0.5rem; /* 8px */
-  width: 100%;
-}
-
-/* Small login button (152px) - side by side with Google */
-.loginButtonSmall {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 9.5rem; /* 152px */
-  height: 3.375rem; /* 54px */
-  padding: 1rem 2rem; /* 16px 32px */
-
-  background: var(--color-text-secondary); /* #F9F9F9 */
-  border-radius: var(--radius-sm); /* 9px */
-  border: 1px solid #E74E1C;
-
-  font-family: var(--font-secondary);
-  font-weight: 700;
-  font-size: 1rem; /* 16px */
-  line-height: 1.25rem; /* 20px */
-  color: var(--button-text); /* #E74E1C */
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.loginButtonSmall:hover {
-  opacity: 0.9;
-}
-
-.loginButtonSmall:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Small Google button (152px) - side by side with Login */
-.googleButtonSmall {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 9.5rem; /* 152px */
-  height: 3.375rem; /* 54px */
-  padding: 1rem 0.75rem; /* 16px 12px */
-
-  background: var(--color-text-secondary); /* #F9F9F9 */
-  border-radius: var(--radius-sm); /* 9px */
-  border: 1px solid #E74E1C;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-  direction: rtl;
-}
-
-.googleButtonSmall:hover {
-  opacity: 0.9;
-}
-
-.googleButtonSmall span {
-  font-family: var(--font-secondary);
-  font-weight: 700;
-  font-size: 1rem; /* 16px */
-  line-height: 1.25rem; /* 20px */
-  color: var(--button-text); /* #E74E1C */
-  white-space: nowrap;
-  margin-right: 1.5rem; /* space for icon */
-}
-
-.googleButtonSmall img {
-  position: absolute;
-  right: 0.75rem; /* 12px from right edge */
-  width: 1.1875rem; /* 19px */
-  height: 1.1875rem; /* 19px */
-}
-
-/* Primary button (Login - התחבר) - full width version (kept for compatibility) */
+/* Primary button (Login - התחבר) */
 .primaryButton {
   display: flex;
   justify-content: center;
