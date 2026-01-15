@@ -336,18 +336,6 @@
   cursor: not-allowed;
 }
 
-/* Signup hint message */
-.signupHint {
-  width: 100%;
-  font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: 0.9375rem; /* 15px */
-  line-height: 1.1875rem; /* 19px */
-  text-align: center;
-  color: var(--color-text-secondary); /* #F9F9F9 */
-  margin: 0;
-}
-
 /* OR separator */
 .orSeparator {
   display: flex;
