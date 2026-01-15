@@ -11,6 +11,7 @@ import Image from "next/image";
 
 // Modals
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 import Popup from "@/lib/components/UI/Popup";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
@@ -58,6 +59,10 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     string | null
   >(null);
 
+  // Admin: Registrations modal state
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] =
+    useState(false);
+
   const formatTime = (time: string) => time.slice(0, 5);
   const dateObj = new Date(date);
   const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
@@ -68,11 +73,11 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     .padStart(2, "0")}`;
 
   useEffect(() => {
-    if (user && id) {
+    if (user && id && !isAdmin) {
       checkRegistrationStatus();
       checkActivityCapacity();
     }
-  }, [user, id]);
+  }, [user, id, isAdmin]);
 
   useEffect(() => {
     if (currentParticipants !== undefined && maxParticipants !== undefined) {
@@ -81,6 +86,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   }, [currentParticipants, maxParticipants]);
 
   const checkRegistrationStatus = async () => {
+    if (isAdmin) return;
     const [statusData, error] = await apiRegistrations.getRegistrationStatus(
       user!.id,
       id
@@ -117,8 +123,9 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     e.stopPropagation();
     if (!user || loading) return;
 
+    // ⭐ For admin, open registrations modal
     if (isAdmin) {
-      setIsModalOpen(true);
+      setIsRegistrationsModalOpen(true);
       return;
     }
 
@@ -291,6 +298,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         </div>
       </div>
 
+      {/* Activity Details Modal - Only for regular users or when clicking card body */}
       <ActivityDetailsModal
         activityId={id}
         isOpen={isModalOpen}
@@ -302,11 +310,21 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         onMotionChange={onMotionChange}
       />
 
-      {/* ⭐ UPDATED: Using Popup instead of CancelConfirmationModal */}
-      {isCancelModalOpen && (
+      {/* ⭐ Activity Registrations Modal - For admin when clicking button */}
+      {isAdmin && (
+        <ActivityRegistrationsModal
+          activityId={id}
+          activityTitle={title}
+          isOpen={isRegistrationsModalOpen}
+          onClose={() => setIsRegistrationsModalOpen(false)}
+        />
+      )}
+
+      {/* Cancel Confirmation Popup - Only for regular users */}
+      {!isAdmin && isCancelModalOpen && (
         <Popup
           content={`${t(
-            "את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
+            "?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
           )} ל${title} ב${dayName} ${dayMonth} בשעה ${formatTime(startTime)}?`}
           primaryButtonText="כן, לבטל"
           primaryButtonAction={handleCancelConfirm}
@@ -317,7 +335,9 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         />
       )}
 
-      {isSuccessModalOpen &&
+      {/* Success Modals - Only for regular users */}
+      {!isAdmin &&
+        isSuccessModalOpen &&
         (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
           <GroupRegistrationSuccessModal
             isOpen={isSuccessModalOpen}
