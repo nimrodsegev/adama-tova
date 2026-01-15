@@ -1,9 +1,10 @@
 "use client";
-import { useState, useRef, useMemo, useLayoutEffect } from "react";
+import { useState, useRef, useMemo, useLayoutEffect, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./AddActivityPage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 // --- Types ---
 type ActivityStatus = "open" | "closed" | "cancelled";
@@ -68,10 +69,13 @@ const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString())
 export default function AddActivityPage() {
   const router = useRouter();
   const { t } = useIvrita();
-  
+
+  // Force a "mounting" state for smooth page transition
+  const [mounting, setMounting] = useState(true);
+
   // --- Refs & State ---
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [currentStep, setCurrentStep] = useState(0); 
+  const [currentStep, setCurrentStep] = useState(0);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -155,6 +159,14 @@ export default function AddActivityPage() {
       }
     }
   };
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   // 🔥 UPDATE LABEL BACKGROUNDS (Floating Label Fix)
   useLayoutEffect(() => {
@@ -258,6 +270,7 @@ export default function AddActivityPage() {
   const formattedDate = `${formData.day}.${formData.month}.${formData.year}`;
 
   return (
+    <SmoothPageWrapper isLoading={mounting}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       <button className="close-button" onClick={() => router.back()}>
         <div className="close-button-inner" />
@@ -544,5 +557,6 @@ export default function AddActivityPage() {
         </div>
       </div>
     </main>
+    </SmoothPageWrapper>
   );
 }

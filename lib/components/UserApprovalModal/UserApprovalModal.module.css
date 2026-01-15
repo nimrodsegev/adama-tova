@@ -12,7 +12,6 @@
   height: 100vh;
   background-color: transparent;
   z-index: 999;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
 /* Modal container - FULL SCREEN FROM TOP TO NAVBAR */
@@ -28,7 +27,6 @@
   background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
   z-index: 1000;
   overflow: hidden;
-  animation: slideUp 0.3s ease-out;
   direction: rtl;
   margin: 0 auto;
   display: flex;
@@ -74,8 +72,17 @@
   margin: 0 auto;
 }
 
-/* Loading text */
-.loadingText {
+/* Loading container */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50vh;
+}
+
+/* Error text */
+.errorText {
   text-align: center;
   padding: 3rem;
   color: rgba(249, 249, 249, 0.84);

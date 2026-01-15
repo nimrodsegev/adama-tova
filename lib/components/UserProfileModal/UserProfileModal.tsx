@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { apiUser } from "@/app/services/db_api";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./UserProfileModal.module.css";
 
 type UserProfileModalProps = {
@@ -64,9 +65,11 @@ export default function UserProfileModal({
 
         <div className={styles.contentFrame}>
           {loading ? (
-            <p className={styles.loadingText}>טוען...</p>
+            <div className={styles.loadingContainer}>
+              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+            </div>
           ) : !user ? (
-            <p className={styles.loadingText}>משתמש לא נמצא</p>
+            <p className={styles.errorText}>משתמש לא נמצא</p>
           ) : (
             <>
               {/* Header with User Name */}

@@ -20,6 +20,7 @@ import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsMo
 import UserApprovalModal from "@/lib/components/UserApprovalModal/UserApprovalModal";
 import ApprovalConfirmModal from "@/lib/components/ApprovalConfirmModal/ApprovalConfirmModal";
 import styles from "./AdminHomePage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 interface PendingUser {
   id: string;
@@ -97,6 +98,11 @@ export default function AdminHomePage() {
   >([]);
   const [upcomingActivities, setUpcomingActivities] = useState<Activity[]>([]);
 
+  // Force a "mounting" state to ensure the Wrapper sees "Loading=true"
+  // on the very first render. This forces the orange screen to appear
+  // before fading out.
+  const [mounting, setMounting] = useState(true);
+
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
     null
@@ -141,6 +147,14 @@ export default function AdminHomePage() {
   // Fetch data on mount
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchData = async () => {
@@ -375,17 +389,10 @@ export default function AdminHomePage() {
     return `${day}.${month}`;
   };
 
-  if (userLoading) {
-    return (
-      <div className={styles.loadingContainer} dir="rtl">
-        טוען...
-      </div>
-    );
-  }
-
   const firstName = userProfile?.full_name?.split(" ")[0] || "מנהל";
 
   return (
+    <SmoothPageWrapper isLoading={userLoading || mounting}>
     <div className={styles.pageContainer} dir="rtl">
       {/* Decorative Circles - positioned at top */}
       <OrganicCircles
@@ -683,5 +690,6 @@ export default function AdminHomePage() {
         onClose={() => setIsConfirmModalOpen(false)}
       />
     </div>
+    </SmoothPageWrapper>
   );
 }

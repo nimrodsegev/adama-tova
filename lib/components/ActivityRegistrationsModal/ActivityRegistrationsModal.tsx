@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { apiActivities } from "@/app/services/db_api";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import UserProfileModal from "@/lib/components/UserProfileModal/UserProfileModal";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./ActivityRegistrationsModal.module.css";
 
 interface Registration {
@@ -148,7 +149,9 @@ export default function ActivityRegistrationsModal({
 
         <div className={styles.contentFrame}>
           {loading ? (
-            <p className={styles.loadingText}>טוען...</p>
+            <div className={styles.loadingContainer}>
+              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+            </div>
           ) : (
             <>
               {/* Title */}

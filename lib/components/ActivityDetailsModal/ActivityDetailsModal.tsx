@@ -9,6 +9,7 @@ import Button from "@/lib/components/UI/Button";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./ActivityDetailsModal.module.css";
 
 type ActivityDetailsModalProps = {
@@ -317,7 +318,13 @@ export default function ActivityDetailsModal({
 
             <div className={styles.contentFrame} style={contentFrameStyle}>
               {loading ? (
-                <p className={styles.loadingText}>טוען...</p>
+                <div className={styles.loadingContainer}>
+                  <OrganicCircles
+                    mode="loading"
+                    radius={0.15}
+                    baseColor="#FFFFFF"
+                  />
+                </div>
               ) : (
                 <>
                   {hasImage && (

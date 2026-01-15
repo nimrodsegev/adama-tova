@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { apiUser } from "@/app/services/db_api";
 import StatCard from "@/lib/components/UI/StatCard";
 import { useIvrita } from "@/app/contexts/IvritaContext";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./UserApprovalModal.module.css";
 
 type UserApprovalModalProps = {
@@ -82,9 +83,11 @@ export default function UserApprovalModal({
 
         <div className={styles.contentFrame}>
           {loading ? (
-            <p className={styles.loadingText}>טוען...</p>
+            <div className={styles.loadingContainer}>
+              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+            </div>
           ) : !user ? (
-            <p className={styles.loadingText}>משתמש לא נמצא</p>
+            <p className={styles.errorText}>משתמש לא נמצא</p>
           ) : (
             <>
               {/* Header with User Name */}
