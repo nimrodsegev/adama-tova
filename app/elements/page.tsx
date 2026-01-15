@@ -106,6 +106,146 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          {/* --- NOTIFICATIONS SECTION --- */}
+          <section className="section">
+            <h2 className="text-section-title">התראות (החלק שמאלה לקריאה)</h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  לא נקרא - עם אפשרות סימון כנקרא (החלק שמאלה)
+                </p>
+                <NewNotificationCard
+                  notification={demoNotifications[0]}
+                  onMarkAsRead={handleMarkRead}
+                  showMarkAsReadHint={false}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  נקרא - עם כפתור לפעילות
+                </p>
+                <NewNotificationCard
+                  notification={demoNotifications[1]}
+                  onMarkAsRead={handleMarkRead}
+                  onActivityClick={(id) =>
+                    alert(`Navigating to activity: ${id}`)
+                  }
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  לא נקרא - עם אפשרות מחיקה (החלק ימינה)
+                </p>
+                <NewNotificationCard
+                  notification={{
+                    id: 3,
+                    title: "עדכון חשוב",
+                    message: "יש לנו עדכון חשוב עבורך. החלק ימינה כדי למחוק.",
+                    timestamp: new Date(Date.now() - 7200000).toISOString(),
+                    isRead: false,
+                  }}
+                  onMarkAsRead={handleMarkRead}
+                  onDelete={(id) => alert(`מחיקת הודעה ${id}`)}
+                  showDeleteHint={false}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  הודעה ארוכה - עם טקסט מרובה
+                </p>
+                <NewNotificationCard
+                  notification={{
+                    id: 4,
+                    title: "הודעה ארוכה",
+                    message:
+                      "זו הודעה ארוכה יותר שמכילה הרבה טקסט. היא נועדה להראות איך הכרטיס מתמודד עם תוכן ארוך ומעטפת את הטקסט בצורה נכונה.",
+                    timestamp: new Date(Date.now() - 10800000).toISOString(),
+                    isRead: false,
+                  }}
+                  onMarkAsRead={handleMarkRead}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  נקרא - ללא כפתור פעילות
+                </p>
+                <NewNotificationCard
+                  notification={{
+                    id: 5,
+                    title: "הודעת מערכת",
+                    message: "המערכת תעבור תחזוקה מתוכננת מחר בשעה 02:00.",
+                    timestamp: new Date(Date.now() - 14400000).toISOString(),
+                    isRead: true,
+                  }}
+                  onMarkAsRead={handleMarkRead}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  עם שני כיווני החלקה - סימון ומחיקה
+                </p>
+                <NewNotificationCard
+                  notification={{
+                    id: 6,
+                    title: "הודעה גמישה",
+                    message: "החלק שמאלה לסימון כנקרא, או ימינה למחיקה.",
+                    timestamp: new Date(Date.now() - 18000000).toISOString(),
+                    isRead: false,
+                  }}
+                  onMarkAsRead={handleMarkRead}
+                  onDelete={(id) => alert(`מחיקת הודעה ${id}`)}
+                />
+              </div>
+            </div>
+          </section>
+          {/* --- ACTIVITY CARDS SECTION --- */}
+          <section className="section">
+            <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  NewUserActivityCard - מחר (יש מקומות)
+                </p>
+                <NewUserActivityCard
+                  id={demoActivities[0].id}
+                  title={demoActivities[0].title}
+                  instructor={demoActivities[0].instructor}
+                  date={demoActivities[0].date}
+                  startTime={demoActivities[0].startTime}
+                  currentParticipants={demoActivities[0].currentParticipants}
+                  maxParticipants={demoActivities[0].maxParticipants}
+                  waitlistCount={demoActivities[0].waitlistCount}
+                  onMotionChange={handleMotionChange}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  NewUserActivityCard - מחרתיים (מלא - עם שעון)
+                </p>
+                <NewUserActivityCard
+                  id={demoActivities[1].id}
+                  title={demoActivities[1].title}
+                  instructor={demoActivities[1].instructor}
+                  date={demoActivities[1].date}
+                  startTime={demoActivities[1].startTime}
+                  currentParticipants={demoActivities[1].currentParticipants}
+                  maxParticipants={demoActivities[1].maxParticipants}
+                  waitlistCount={demoActivities[1].waitlistCount}
+                  onMotionChange={handleMotionChange}
+                />
+              </div>
+            </div>
+          </section>
           {/* --- HOME FILTER SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">פילטרים (HomeFilter)</h2>
@@ -238,48 +378,6 @@ export default function ElementsPage() {
                   type="group"
                   onApprove={() => handleApprove("יוסף בן דוד המלמד")}
                   onReject={() => handleReject("יוסף בן דוד המלמד")}
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* --- ACTIVITY CARDS SECTION --- */}
-          <section className="section">
-            <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - מחר (יש מקומות)
-                </p>
-                <NewUserActivityCard
-                  id={demoActivities[0].id}
-                  title={demoActivities[0].title}
-                  instructor={demoActivities[0].instructor}
-                  date={demoActivities[0].date}
-                  startTime={demoActivities[0].startTime}
-                  currentParticipants={demoActivities[0].currentParticipants}
-                  maxParticipants={demoActivities[0].maxParticipants}
-                  waitlistCount={demoActivities[0].waitlistCount}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
-
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - מחרתיים (מלא - עם שעון)
-                </p>
-                <NewUserActivityCard
-                  id={demoActivities[1].id}
-                  title={demoActivities[1].title}
-                  instructor={demoActivities[1].instructor}
-                  date={demoActivities[1].date}
-                  startTime={demoActivities[1].startTime}
-                  currentParticipants={demoActivities[1].currentParticipants}
-                  maxParticipants={demoActivities[1].maxParticipants}
-                  waitlistCount={demoActivities[1].waitlistCount}
-                  onMotionChange={handleMotionChange}
                 />
               </div>
             </div>

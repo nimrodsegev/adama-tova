@@ -241,7 +241,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
               {/* Button without icon */}
               <Button
                 variant="tertiary"
-                tertiarySize="large"
+                tertiarySize="medium"
                 tertiaryWeight="semibold"
                 colorType="orange"
                 onClick={handleActionClick}
