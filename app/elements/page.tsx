@@ -7,6 +7,7 @@ import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActi
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
 import DaySlider from "@/lib/components/UI/DaySlider";
+import Popup from "@/lib/components/UI/Popup";
 import {
   HomeFilter,
   ADMIN_FILTER_OPTIONS,
@@ -80,6 +81,13 @@ export default function ElementsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [selectedDate, setSelectedDate] = useState(new Date());
+  // Add state at the top of your component:
+  const [showPopup1, setShowPopup1] = useState(false);
+  const [showPopup2, setShowPopup2] = useState(false);
+  const [showPopup3, setShowPopup3] = useState(false);
+  const [showPopup4, setShowPopup4] = useState(false);
+  const [showPopup5, setShowPopup5] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleMarkRead = (id: string | number) => {
     setDemoNotifications((prev) =>
@@ -109,6 +117,96 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          <section
+            className="section"
+            style={{ background: "rgba(0, 0, 0, 0.5)" }}
+          >
+            <h2 className="text-section-title">Popup Component</h2>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5rem",
+              }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Basic Popup - Title, Content, Two Buttons
+                </p>
+                <Popup
+                  preview={true}
+                  title="שכחת סיסמה?"
+                  content="לשינוי הסיסמה ישלח מייל לכתובת "
+                  email="user@example.com"
+                  recommendation="מומלץ לבצע את הפעולה במחשב או דרך דפדפן בסמארטפון"
+                  primaryButtonText="כן, שלח מייל"
+                  primaryButtonAction={() => alert("Primary button clicked")}
+                  secondaryButtonText="ביטול"
+                  secondaryButtonAction={() =>
+                    alert("Secondary button clicked")
+                  }
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  With Email Display
+                </p>
+                <Popup
+                  preview={true}
+                  content="האם אתה בטוח שאתה רוצה לסרב לבקשת ישראל ישראלי לאישור ראשוני?"
+                  recommendation="פעולה זו תמנע מהמשתמש לקבל גישה לאפליקציה"
+                  primaryButtonText="סגור"
+                  primaryButtonAction={() => alert("Close clicked")}
+                  secondaryButtonText="ביטול"
+                  secondaryButtonAction={() =>
+                    alert("Secondary button clicked")
+                  }
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Success State - Single Button
+                </p>
+                <Popup
+                  preview={true}
+                  title="מייל נשלח!"
+                  content="שלחנו מייל עם קישור לשינוי הסיסמה. בדוק את תיבת הדואר שלך"
+                  primaryButtonText="סגור"
+                  primaryButtonAction={() => alert("Close clicked")}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  With Loading State
+                </p>
+                <Popup
+                  preview={true}
+                  title="שולח מייל"
+                  content="אנא המתן בזמן שאנו שולחים את המייל"
+                  primaryButtonText="שלח"
+                  primaryButtonAction={() => alert("Send clicked")}
+                  secondaryButtonText="ביטול"
+                  secondaryButtonAction={() => alert("Cancel clicked")}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  Only Secondary Button
+                </p>
+                <Popup
+                  preview={true}
+                  title="אזהרה"
+                  content="האם אתה בטוח שברצונך להמשיך?"
+                  secondaryButtonText="ביטול"
+                  secondaryButtonAction={() => alert("Cancel clicked")}
+                />
+              </div>
+            </div>
+          </section>
           <section className="section">
             <h2 className="text-section-title">Day Slider</h2>
             <div
