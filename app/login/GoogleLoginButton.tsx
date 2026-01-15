@@ -36,7 +36,7 @@ const GoogleLoginButton = ({ className }: GoogleLoginButtonProps) => {
       className={className}
       disabled={loading}
     >
-      <span>{loading ? "...מתחבר" : "התחבר עם גוגל"}</span>
+      <span>{loading ? "מתחבר..." : "התחבר עם גוגל"}</span>
       {!loading && (
         <Image
           src="/icons/google.png"
