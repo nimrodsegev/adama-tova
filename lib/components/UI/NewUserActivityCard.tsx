@@ -3,6 +3,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
+import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiRegistrations, apiActivities } from "@/app/services/db_api";
 import styles from "./NewUserActivityCard.module.css";
 import Button from "./Button";
@@ -10,7 +11,7 @@ import Image from "next/image";
 
 // Modals
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
+import Popup from "@/lib/components/UI/Popup";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
 
@@ -40,6 +41,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   isGroup = false,
 }) => {
   const { user, userProfile } = useUser();
+  const { t } = useIvrita();
   const isAdmin = userProfile?.role === "admin";
 
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
@@ -115,7 +117,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     e.stopPropagation();
     if (!user || loading) return;
 
-    // ⭐ For admin, just open modal (don't register)
     if (isAdmin) {
       setIsModalOpen(true);
       return;
@@ -241,7 +242,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
                 {dayName} {dayMonth} בשעה {formatTime(startTime)}
               </p>
 
-              {/* Admin participants status */}
               {isAdmin && participantsStatus && (
                 <p
                   className={`${styles.participantsText} ${
@@ -254,13 +254,11 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
             </div>
           </div>
 
-          {/* ⭐ UPDATED: Different wrapper class for admin */}
           <div
             className={
               isAdmin ? styles.actionWrapperAdmin : styles.actionWrapper
             }
           >
-            {/* Clock icon for non-admin users only */}
             {!isAdmin && shouldShowClockIcon() && (
               <div
                 className={`${styles.clockIconWrapper} ${
@@ -304,14 +302,20 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         onMotionChange={onMotionChange}
       />
 
-      <CancelConfirmationModal
-        isOpen={isCancelModalOpen}
-        onClose={() => setIsCancelModalOpen(false)}
-        onConfirm={handleCancelConfirm}
-        activityTitle={title}
-        activityDate={`${dayName} ${dayMonth}`}
-        activityTime={formatTime(startTime)}
-      />
+      {/* ⭐ UPDATED: Using Popup instead of CancelConfirmationModal */}
+      {isCancelModalOpen && (
+        <Popup
+          content={`${t(
+            "את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
+          )} ל${title} ב${dayName} ${dayMonth} בשעה ${formatTime(startTime)}?`}
+          primaryButtonText="כן, לבטל"
+          primaryButtonAction={handleCancelConfirm}
+          secondaryButtonText="לא"
+          secondaryButtonAction={() => setIsCancelModalOpen(false)}
+          onClose={() => setIsCancelModalOpen(false)}
+          loading={loading}
+        />
+      )}
 
       {isSuccessModalOpen &&
         (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
