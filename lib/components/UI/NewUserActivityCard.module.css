@@ -65,6 +65,25 @@
   word-wrap: break-word;
 }
 
+/* Participants status text for admin */
+.participantsText {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md);
+  line-height: 1.125rem;
+  color: var(--color-bordo);
+  margin: 0;
+  text-align: right;
+  width: 100%;
+  word-wrap: break-word;
+}
+
+/* Full status with waiting list - orange color */
+.participantsFullText {
+  color: var(--color-orange-main);
+}
+
+/* ⭐ Action wrapper for regular users (with clock icon positioning) */
 .actionWrapper {
   position: relative;
   display: flex;
@@ -76,7 +95,22 @@
   width: auto;
 }
 
-/* ⭐ BASE CLOCK ICON STYLES (shared by both positions) */
+/* ⭐ NEW: Action wrapper for admin (adjust position for longer text) */
+.actionWrapperAdmin {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin-top: auto;
+  flex-shrink: 0;
+  /* ⭐ Adjust these values to control admin button position */
+  top: var(--spacing-xs); /* Remove the 0.1rem offset */
+  margin-bottom: 0.25rem; /* Add some bottom margin if needed */
+  width: auto;
+  left: var(--spacing-lg);
+}
+
+/* Clock icon styles */
 .clockIconWrapper {
   position: absolute;
   display: flex;
@@ -88,24 +122,16 @@
   z-index: 1;
 }
 
-/* ⭐ POSITION 1: For "להרשמה" (Register) button */
 .clockIconRegister {
-  /* ⭐ CONTROL HORIZONTAL POSITION for להרשמה */
-  left: 4.75rem; /* Adjust this value */
-
-  /* ⭐ CONTROL VERTICAL POSITION for להרשמה */
+  left: 4.75rem;
   bottom: 0;
-  margin-bottom: -0.5rem; /* Adjust this value */
+  margin-bottom: -0.5rem;
 }
 
-/* ⭐ POSITION 2: For "ביטול" (Cancel) button */
 .clockIconCancel {
-  /* ⭐ CONTROL HORIZONTAL POSITION for ביטול */
-  left: 3rem; /* Adjust this value - different from register */
-
-  /* ⭐ CONTROL VERTICAL POSITION for ביטול */
+  left: 3rem;
   bottom: 0;
-  margin-bottom: -0.5rem; /* Adjust this value */
+  margin-bottom: -0.5rem;
 }
 
 .clockIcon {

@@ -113,7 +113,13 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   const handleActionClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user || loading || isAdmin) return;
+    if (!user || loading) return;
+
+    // ⭐ For admin, just open modal (don't register)
+    if (isAdmin) {
+      setIsModalOpen(true);
+      return;
+    }
 
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
@@ -186,18 +192,38 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   };
 
   const getButtonLabel = () => {
+    if (isAdmin) return "לכל הנרשמים";
     if (regStatus === "confirmed") return "ביטול";
     if (regStatus === "waitlist") return "ביטול";
     return "להרשמה";
   };
 
-  // ⭐ NEW: Logic to show clock icon
   const shouldShowClockIcon = () => {
-    // Show icon if:
-    // 1. User wants to register but activity is full (regStatus === "none" && isFull)
-    // 2. User is registered to waiting list (regStatus === "waitlist")
     return (regStatus === "none" && isFull) || regStatus === "waitlist";
   };
+
+  const getParticipantsStatus = () => {
+    if (
+      !isAdmin ||
+      currentParticipants === undefined ||
+      maxParticipants === undefined
+    ) {
+      return null;
+    }
+
+    const isFull = currentParticipants >= maxParticipants;
+    const hasWaitlist = waitlistCount && waitlistCount > 0;
+
+    if (isFull && hasWaitlist) {
+      return `מלא - ${waitlistCount} ברשימת המתנה`;
+    }
+
+    return `${currentParticipants}/${maxParticipants} נרשמים`;
+  };
+
+  const participantsStatus = getParticipantsStatus();
+  const showFullStatus =
+    isAdmin && isFull && waitlistCount && waitlistCount > 0;
 
   return (
     <>
@@ -214,43 +240,56 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
               <p className={styles.dateTimeText}>
                 {dayName} {dayMonth} בשעה {formatTime(startTime)}
               </p>
+
+              {/* Admin participants status */}
+              {isAdmin && participantsStatus && (
+                <p
+                  className={`${styles.participantsText} ${
+                    showFullStatus ? styles.participantsFullText : ""
+                  }`}
+                >
+                  {participantsStatus}
+                </p>
+              )}
             </div>
           </div>
 
-          {!isAdmin && (
-            <div className={styles.actionWrapper}>
-              {/* ⭐ UPDATED: Apply different class based on button text */}
-              {shouldShowClockIcon() && (
-                <div
-                  className={`${styles.clockIconWrapper} ${
-                    regStatus === "waitlist"
-                      ? styles.clockIconCancel // "ביטול" position
-                      : styles.clockIconRegister // "להרשמה" position
-                  }`}
-                >
-                  <Image
-                    src="/icons/clock_icon.svg"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className={styles.clockIcon}
-                  />
-                </div>
-              )}
-
-              {/* Button without icon */}
-              <Button
-                variant="tertiary"
-                tertiarySize="medium"
-                tertiaryWeight="semibold"
-                colorType="orange"
-                onClick={handleActionClick}
-                disabled={loading}
+          {/* ⭐ UPDATED: Different wrapper class for admin */}
+          <div
+            className={
+              isAdmin ? styles.actionWrapperAdmin : styles.actionWrapper
+            }
+          >
+            {/* Clock icon for non-admin users only */}
+            {!isAdmin && shouldShowClockIcon() && (
+              <div
+                className={`${styles.clockIconWrapper} ${
+                  regStatus === "waitlist"
+                    ? styles.clockIconCancel
+                    : styles.clockIconRegister
+                }`}
               >
-                {getButtonLabel()}
-              </Button>
-            </div>
-          )}
+                <Image
+                  src="/icons/clock_icon.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={styles.clockIcon}
+                />
+              </div>
+            )}
+
+            <Button
+              variant="tertiary"
+              tertiarySize={isAdmin ? "base" : "medium"}
+              tertiaryWeight="semibold"
+              colorType="orange"
+              onClick={handleActionClick}
+              disabled={loading}
+            >
+              {getButtonLabel()}
+            </Button>
+          </div>
         </div>
       </div>
 

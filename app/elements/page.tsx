@@ -117,6 +117,47 @@ export default function ElementsPage() {
         </div>
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
+          {/* --- ACTIVITY CARDS SECTION --- */}
+          <section className="section">
+            <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  NewUserActivityCard - מחר (יש מקומות)
+                </p>
+                <NewUserActivityCard
+                  id={demoActivities[0].id}
+                  title={demoActivities[0].title}
+                  instructor={demoActivities[0].instructor}
+                  date={demoActivities[0].date}
+                  startTime={demoActivities[0].startTime}
+                  currentParticipants={demoActivities[0].currentParticipants}
+                  maxParticipants={demoActivities[0].maxParticipants}
+                  waitlistCount={demoActivities[0].waitlistCount}
+                  onMotionChange={handleMotionChange}
+                />
+              </div>
+
+              <div>
+                <p className="text-small mb-xs opacity-75">
+                  NewUserActivityCard - מחרתיים (מלא - עם שעון)
+                </p>
+                <NewUserActivityCard
+                  id={demoActivities[1].id}
+                  title={demoActivities[1].title}
+                  instructor={demoActivities[1].instructor}
+                  date={demoActivities[1].date}
+                  startTime={demoActivities[1].startTime}
+                  currentParticipants={demoActivities[1].currentParticipants}
+                  maxParticipants={demoActivities[1].maxParticipants}
+                  waitlistCount={demoActivities[1].waitlistCount}
+                  onMotionChange={handleMotionChange}
+                />
+              </div>
+            </div>
+          </section>
           <section
             className="section"
             style={{ background: "rgba(0, 0, 0, 0.5)" }}
@@ -367,47 +408,7 @@ export default function ElementsPage() {
               </div>
             </div>
           </section>
-          {/* --- ACTIVITY CARDS SECTION --- */}
-          <section className="section">
-            <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - מחר (יש מקומות)
-                </p>
-                <NewUserActivityCard
-                  id={demoActivities[0].id}
-                  title={demoActivities[0].title}
-                  instructor={demoActivities[0].instructor}
-                  date={demoActivities[0].date}
-                  startTime={demoActivities[0].startTime}
-                  currentParticipants={demoActivities[0].currentParticipants}
-                  maxParticipants={demoActivities[0].maxParticipants}
-                  waitlistCount={demoActivities[0].waitlistCount}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
 
-              <div>
-                <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - מחרתיים (מלא - עם שעון)
-                </p>
-                <NewUserActivityCard
-                  id={demoActivities[1].id}
-                  title={demoActivities[1].title}
-                  instructor={demoActivities[1].instructor}
-                  date={demoActivities[1].date}
-                  startTime={demoActivities[1].startTime}
-                  currentParticipants={demoActivities[1].currentParticipants}
-                  maxParticipants={demoActivities[1].maxParticipants}
-                  waitlistCount={demoActivities[1].waitlistCount}
-                  onMotionChange={handleMotionChange}
-                />
-              </div>
-            </div>
-          </section>
           {/* --- HOME FILTER SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">פילטרים (HomeFilter)</h2>
