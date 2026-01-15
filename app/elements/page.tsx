@@ -36,7 +36,7 @@ export default function ElementsPage() {
       date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
       startTime: "08:00:00",
       endTime: "09:00:00",
-      currentParticipants: 8,
+      currentParticipants: 12,
       maxParticipants: 12,
       waitlistCount: 2,
     },
@@ -85,6 +85,7 @@ export default function ElementsPage() {
 
         <div className="main-content" style={{ marginTop: "8rem" }}>
           {/* --- ACTIVITY CARDS SECTION --- */}
+          {/* --- ACTIVITY CARDS SECTION --- */}
           <section className="section">
             <h2 className="text-section-title">כרטיסי פעילות - רגילים</h2>
             <div
@@ -92,7 +93,7 @@ export default function ElementsPage() {
             >
               <div>
                 <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - מחר
+                  NewUserActivityCard - מחר (יש מקומות)
                 </p>
                 <NewUserActivityCard
                   id={demoActivities[0].id}
@@ -100,13 +101,16 @@ export default function ElementsPage() {
                   instructor={demoActivities[0].instructor}
                   date={demoActivities[0].date}
                   startTime={demoActivities[0].startTime}
+                  currentParticipants={demoActivities[0].currentParticipants}
+                  maxParticipants={demoActivities[0].maxParticipants}
+                  waitlistCount={demoActivities[0].waitlistCount}
                   onMotionChange={handleMotionChange}
                 />
               </div>
 
               <div>
                 <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - מחרתיים
+                  NewUserActivityCard - מחרתיים (מלא - עם שעון)
                 </p>
                 <NewUserActivityCard
                   id={demoActivities[1].id}
@@ -114,13 +118,16 @@ export default function ElementsPage() {
                   instructor={demoActivities[1].instructor}
                   date={demoActivities[1].date}
                   startTime={demoActivities[1].startTime}
+                  currentParticipants={demoActivities[1].currentParticipants}
+                  maxParticipants={demoActivities[1].maxParticipants}
+                  waitlistCount={demoActivities[1].waitlistCount}
                   onMotionChange={handleMotionChange}
                 />
               </div>
 
               <div>
                 <p className="text-small mb-xs opacity-75">
-                  NewUserActivityCard - קבוצתי
+                  NewUserActivityCard - קבוצתי (יש מקומות)
                 </p>
                 <NewUserActivityCard
                   id={demoActivities[2].id}
@@ -128,6 +135,9 @@ export default function ElementsPage() {
                   instructor={demoActivities[2].instructor}
                   date={demoActivities[2].date}
                   startTime={demoActivities[2].startTime}
+                  currentParticipants={demoActivities[2].currentParticipants}
+                  maxParticipants={demoActivities[2].maxParticipants}
+                  waitlistCount={demoActivities[2].waitlistCount}
                   isGroup={true}
                   onMotionChange={handleMotionChange}
                 />

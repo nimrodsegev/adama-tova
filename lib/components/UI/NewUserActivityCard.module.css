@@ -3,11 +3,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: var(--spacing-lg); /* 1rem / 16px */
+  padding: var(--spacing-lg);
   width: 100%;
-  max-width: 21.5625rem; /* 345px */
-  min-height: 7rem; /* 128.46px - minimum height */
-  height: auto; /* Allow height to grow based on content */
+  max-width: 21.5625rem;
+  min-height: 6rem;
+  height: auto;
   background: var(--button-bg-light);
   border-radius: var(--radius-sm);
   direction: rtl;
@@ -16,63 +16,99 @@
 
 .contentStack {
   display: flex;
-  flex-direction: row; /* Changed to row to allow side-by-side layout */
+  flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
-  min-height: 100%;
-  gap: var(--spacing-md); /* Space between text and button */
+  height: 100%;
+  gap: var(--spacing-md);
 }
 
 .textGroup {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Right alignment */
-  gap: var(
-    --spacing-lg
-  ); /* Increased gap between title and text below (12px) */
-  width: 70%; /* Takes 70% of parent width */
-  flex-shrink: 0; /* Prevent shrinking */
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  width: 70%;
+  flex-shrink: 0;
 }
 
 .titleText {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xl); /* 1.25rem / 20px */
-  line-height: 1.25rem; /* 20px */
+  font-size: var(--font-size-xl);
+  line-height: 1.25rem;
   color: var(--color-bordo);
   margin: 0;
   text-align: right;
   width: 100%;
-  word-wrap: break-word; /* Allow long words to break */
+  word-wrap: break-word;
+}
+
+.detailsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
 }
 
 .instructorText,
 .dateTimeText {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-lg); /* 1.0625rem / 17px */
-  line-height: 1.125rem; /* 18px */
+  font-size: var(--font-size-md);
+  line-height: 1.125rem;
   color: var(--color-bordo);
   margin: 0;
   text-align: right;
   width: 100%;
-  word-wrap: break-word; /* Allow long text to break */
+  word-wrap: break-word;
 }
-/* Wrapper for instructor and date to control gap between them */
-.detailsGroup {
-  display: flex;
-  flex-direction: column;
 
-  /* ⭐ CONTROL GAP BETWEEN INSTRUCTOR AND DATE */
-  gap: 0.25rem; /* 4px - adjust this value! Options: 0.125rem (2px), 0.25rem (4px), 0.5rem (8px), 0.75rem (12px) */
-
-  width: 100%;
-}
 .actionWrapper {
+  position: relative;
   display: flex;
-  align-items: flex-end; /* Align button to bottom */
-  justify-content: flex-start; /* Align to left in RTL (which is visually left) */
-  margin-top: 3.575rem; /* Push to bottom */
-  flex-shrink: 0; /* Prevent shrinking */
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin-top: auto;
+  flex-shrink: 0;
+  top: 0.1rem;
+  width: auto;
+}
+
+/* ⭐ BASE CLOCK ICON STYLES (shared by both positions) */
+.clockIconWrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+/* ⭐ POSITION 1: For "להרשמה" (Register) button */
+.clockIconRegister {
+  /* ⭐ CONTROL HORIZONTAL POSITION for להרשמה */
+  left: 4.75rem; /* Adjust this value */
+
+  /* ⭐ CONTROL VERTICAL POSITION for להרשמה */
+  bottom: 0;
+  margin-bottom: -0.5rem; /* Adjust this value */
+}
+
+/* ⭐ POSITION 2: For "ביטול" (Cancel) button */
+.clockIconCancel {
+  /* ⭐ CONTROL HORIZONTAL POSITION for ביטול */
+  left: 3rem; /* Adjust this value - different from register */
+
+  /* ⭐ CONTROL VERTICAL POSITION for ביטול */
+  bottom: 0;
+  margin-bottom: -0.5rem; /* Adjust this value */
+}
+
+.clockIcon {
+  width: 2.25rem;
+  height: 2.25rem;
 }

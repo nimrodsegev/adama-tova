@@ -149,6 +149,7 @@
   height: 0.8rem; /* 14px - adjust this value */
   flex-shrink: 0;
   transition: transform var(--transition-normal);
+  margin-top: 0.125rem;
 }
 
 /* Optional: Add hover effect for arrow */
