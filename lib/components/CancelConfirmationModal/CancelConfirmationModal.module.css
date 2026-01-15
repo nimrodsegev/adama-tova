@@ -102,6 +102,15 @@
   color: #ff0000 !important; /* RED */
 }
 
+/* Loading container for closing animation */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {
