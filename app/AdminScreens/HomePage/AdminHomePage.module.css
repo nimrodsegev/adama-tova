@@ -181,6 +181,38 @@
 }
 
 /* ============================================
+   SCROLLABLE CONTENT (Opening hours + Filter + Cards)
+   ============================================ */
+.scrollableContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem; /* 16px */
+  width: 100%;
+
+  max-height: calc(100dvh - 20rem); /* Extend down to navbar area */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.scrollableContent::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.scrollableContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 0.5625rem;
+}
+
+/* ============================================
    FILTER CONTAINER
    ============================================ */
 .filterContainer {
@@ -213,7 +245,7 @@
 }
 
 /* ============================================
-   CARDS CONTAINER (Placeholder)
+   CARDS CONTAINER
    ============================================ */
 .cardsContainer {
   display: flex;
@@ -224,25 +256,6 @@
   gap: 0.5rem; /* 8px */
 
   width: 100%;
-  max-height: 23.6875rem; /* 379px */
-  overflow-y: auto;
-
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.cardsContainer::-webkit-scrollbar {
-  width: 0.375rem;
-}
-
-.cardsContainer::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.cardsContainer::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 0.5625rem;
 }
 
 /* ============================================
@@ -318,9 +331,6 @@
   .bottomButtons {
     width: 20.75rem;
   }
-  .cardsContainer {
-    max-height: 26rem; /* More space for cards */
-  }
 }
 
 /* Wider screens like iPhone 12 Pro (390px) */
@@ -333,9 +343,6 @@
 
 /* Large screens like iPhone 14 Pro Max (430px) - more room for cards */
 @media (min-width: 420px) {
-  .cardsContainer {
-    max-height: 30rem; /* More space for cards on larger screens */
-  }
   .bottomButtons {
     width: 22rem; /* Wider for larger screens */
     transform: translateX(-49.5%); /* Tiny bit more to the right */
@@ -502,8 +509,8 @@
     margin: 0.5rem 0 0 0;
   }
 
-  .cardsContainer {
-    max-height: 18rem;
+  .scrollableContent {
+    max-height: calc(100dvh - 18rem);
   }
 
   .bottomButtons {
@@ -534,8 +541,8 @@
     line-height: 1.75rem;
   }
 
-  .cardsContainer {
-    max-height: 12rem;
+  .scrollableContent {
+    max-height: calc(100dvh - 14rem);
   }
 
   .bottomButtons {

@@ -5,6 +5,7 @@ import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./addNotification.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 // --- Options ---
 const TARGET_OPTIONS = [
@@ -35,6 +36,9 @@ export default function AddNotificationPage() {
   const { t } = useIvrita();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Force a "mounting" state for smooth page transition
+  const [mounting, setMounting] = useState(true);
+
   // Form State
   const [targetType, setTargetType] = useState<"" | "activity" | "date" | "circle">("");
   const [selectedActivityId, setSelectedActivityId] = useState("");
@@ -59,6 +63,14 @@ export default function AddNotificationPage() {
   const [allActivities, setAllActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   // --- FLOATING LABEL BACKGROUND FIX ---
   useLayoutEffect(() => {
@@ -150,6 +162,7 @@ export default function AddNotificationPage() {
   const selectedTargetLabel = TARGET_OPTIONS.find(t => t.value === targetType)?.label;
 
   return (
+    <SmoothPageWrapper isLoading={mounting}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       <button className="close-button" onClick={() => router.back()}>
         <div className="close-button-inner" />
@@ -360,5 +373,6 @@ export default function AddNotificationPage() {
 
       </div>
     </main>
+    </SmoothPageWrapper>
   );
 }

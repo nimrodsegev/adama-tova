@@ -20,6 +20,7 @@ import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsMo
 import UserApprovalModal from "@/lib/components/UserApprovalModal/UserApprovalModal";
 import ApprovalConfirmModal from "@/lib/components/ApprovalConfirmModal/ApprovalConfirmModal";
 import styles from "./AdminHomePage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 interface PendingUser {
   id: string;
@@ -97,6 +98,11 @@ export default function AdminHomePage() {
   >([]);
   const [upcomingActivities, setUpcomingActivities] = useState<Activity[]>([]);
 
+  // Force a "mounting" state to ensure the Wrapper sees "Loading=true"
+  // on the very first render. This forces the orange screen to appear
+  // before fading out.
+  const [mounting, setMounting] = useState(true);
+
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
     null
@@ -141,6 +147,14 @@ export default function AdminHomePage() {
   // Fetch data on mount
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchData = async () => {
@@ -375,17 +389,10 @@ export default function AdminHomePage() {
     return `${day}.${month}`;
   };
 
-  if (userLoading) {
-    return (
-      <div className={styles.loadingContainer} dir="rtl">
-        טוען...
-      </div>
-    );
-  }
-
   const firstName = userProfile?.full_name?.split(" ")[0] || "מנהל";
 
   return (
+    <SmoothPageWrapper isLoading={userLoading || mounting}>
     <div className={styles.pageContainer} dir="rtl">
       {/* Decorative Circles - positioned at top */}
       <OrganicCircles
@@ -409,21 +416,23 @@ export default function AdminHomePage() {
           <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
         </div>
 
-        {/* Opening Hours Bar */}
-        <button className={styles.openingHoursBar}>
-          <div className={styles.openingHoursContent}>
-            <span className={styles.openingHoursText}>
-              המרחב פתוח היום 16:00 עד 22:00
-            </span>
-            <div className={styles.editButton}>
-              <span className={styles.editText}>עריכה</span>
-              <span className={styles.editArrow}></span>
+        {/* Scrollable Content - includes opening hours, filter, and cards */}
+        <div className={styles.scrollableContent}>
+          {/* Opening Hours Bar */}
+          <button className={styles.openingHoursBar}>
+            <div className={styles.openingHoursContent}>
+              <span className={styles.openingHoursText}>
+                המרחב פתוח היום 16:00 עד 22:00
+              </span>
+              <div className={styles.editButton}>
+                <span className={styles.editText}>עריכה</span>
+                <span className={styles.editArrow}></span>
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
 
-        {/* Filter Tabs with counts */}
-        <div className={styles.filterContainer}>
+          {/* Filter Tabs with counts */}
+          <div className={styles.filterContainer}>
           <HomeFilter
             options={[
               { id: "pending", label: "ממתינים לאישור", count: pendingUsers.length + pendingGroupRegs.length },
@@ -621,6 +630,7 @@ export default function AdminHomePage() {
             </div>
           )}
         </div>
+        </div> {/* End scrollableContent */}
       </div>
 
       {/* Bottom Buttons - gradient only shows when 3+ cards */}
@@ -683,5 +693,6 @@ export default function AdminHomePage() {
         onClose={() => setIsConfirmModalOpen(false)}
       />
     </div>
+    </SmoothPageWrapper>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { apiUser } from "@/app/services/db_api";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./UserProfileModal.module.css";
 
 type UserProfileModalProps = {
@@ -19,6 +20,7 @@ export default function UserProfileModal({
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -27,6 +29,7 @@ export default function UserProfileModal({
 
   useEffect(() => {
     if (isOpen && userId) {
+      setClosing(false);
       loadUser();
       document.body.style.overflow = "hidden";
     } else {
@@ -37,6 +40,15 @@ export default function UserProfileModal({
       document.body.style.overflow = "unset";
     };
   }, [isOpen, userId]);
+
+  // Handle close with animation
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 400);
+  };
 
   const loadUser = async () => {
     setLoading(true);
@@ -52,10 +64,10 @@ export default function UserProfileModal({
 
   const modalContent = (
     <>
-      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.overlay} onClick={handleCloseWithAnimation} />
       <div className={styles.modalContainer}>
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
           <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
             <line x1="2" y1="2" x2="18" y2="18" stroke="#F9F9F9" strokeWidth="1" />
             <line x1="18" y1="2" x2="2" y2="18" stroke="#F9F9F9" strokeWidth="1" />
@@ -63,10 +75,12 @@ export default function UserProfileModal({
         </button>
 
         <div className={styles.contentFrame}>
-          {loading ? (
-            <p className={styles.loadingText}>טוען...</p>
+          {(loading || closing) ? (
+            <div className={styles.loadingContainer}>
+              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+            </div>
           ) : !user ? (
-            <p className={styles.loadingText}>משתמש לא נמצא</p>
+            <p className={styles.errorText}>משתמש לא נמצא</p>
           ) : (
             <>
               {/* Header with User Name */}

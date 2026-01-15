@@ -162,6 +162,10 @@
   border-color: var(--color-text-primary);
 }
 
+.input:focus::placeholder {
+  opacity: 0;
+}
+
 /* Floating label above input */
 .inputLabel {
   position: absolute;

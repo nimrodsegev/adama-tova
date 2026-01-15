@@ -8,6 +8,7 @@ import { HomeFilter, FilterOption } from "@/lib/components/UI/HomeFilter";
 import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import styles from "./AdminNotificationsPage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 type Notification = {
   id: number;
@@ -24,6 +25,9 @@ export default function AdminNotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
+
+  // Force a "mounting" state for smooth page transition
+  const [mounting, setMounting] = useState(true);
 
   // Modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
@@ -44,6 +48,14 @@ export default function AdminNotificationsPage() {
     if (!hasUsedDelete) {
       setShowDeleteHint(true);
     }
+  }, []);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   // Helper to convert DB record to UI object
@@ -195,6 +207,7 @@ export default function AdminNotificationsPage() {
     );
 
   return (
+    <SmoothPageWrapper isLoading={loading || mounting}>
     <div className={styles.pageContainer}>
       {/* Title */}
       <div className={styles.titleContainer}>
@@ -319,5 +332,6 @@ export default function AdminNotificationsPage() {
         />
       )}
     </div>
+    </SmoothPageWrapper>
   );
 }
