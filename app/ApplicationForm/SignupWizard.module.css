@@ -696,6 +696,72 @@
 }
 
 /* ============================================
+   NEXT ARROW - Left center of page (inside each slide)
+   ============================================ */
+.nextArrow {
+  position: absolute;
+  left: 0.5rem; /* closer to left edge */
+  top: 40%; /* a bit higher than center */
+  width: 2.5625rem; /* 41px */
+  height: 2.5rem; /* 40px */
+  z-index: 50;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transform: translateX(-1.25rem);
+}
+
+.nextArrow svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Slide-in animation */
+.nextArrowVisible {
+  animation: arrowSlideIn 0.6s ease-out forwards;
+}
+
+@keyframes arrowSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-1.25rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide-in + swipe hint animation for first page */
+.nextArrowSwipeHint {
+  animation: arrowSlideIn 0.6s ease-out forwards, arrowSwipeHint 1.2s ease-in-out 0.8s infinite;
+}
+
+@keyframes arrowSwipeHint {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(0.5rem);
+  }
+  60% {
+    transform: translateX(-0.1875rem);
+  }
+}
+
+/* Hidden state */
+.nextArrowHidden {
+  opacity: 0;
+  transform: translateX(-1.25rem);
+}
+
+/* ============================================
    NAVIGATION (Progress dots)
    ============================================ */
 .navigation {
