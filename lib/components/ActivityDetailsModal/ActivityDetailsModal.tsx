@@ -378,13 +378,11 @@ export default function ActivityDetailsModal({
                             ` (${registrationCount.waitlist} ברשימת המתנה)`}
                         </p>
                       </div>
-
                       <div className={styles.adminRegistrationsButtonSection}>
                         <Button
                           variant="tertiary"
                           tertiarySize="medium"
                           tertiaryWeight="semibold"
-                          colorType="orange"
                           onClick={() => setIsRegistrationsModalOpen(true)}
                         >
                           לכל הנרשמים
