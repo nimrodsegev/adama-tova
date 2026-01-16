@@ -60,7 +60,7 @@ export default function CirclesTester() {
   const [complexity, setComplexity] = useState(0.3);
   const [elongation, setElongation] = useState(1.0);
   const [opacity, setOpacity] = useState(0.8);
-  const [strokeWidth, setStrokeWidth] = useState(1.5);
+  const [strokeWidth, setStrokeWidth] = useState(1);
   const [amplitude, setAmplitude] = useState(0.1);
   const [posX, setPosX] = useState(0.5);
   const [posY, setPosY] = useState(0.25);
@@ -151,7 +151,7 @@ export default function CirclesTester() {
     setComplexity(0.3);
     setElongation(1.0);
     setOpacity(0.8);
-    setStrokeWidth(1.5);
+    setStrokeWidth(1);
     setAmplitude(0.1);
     setPosX(0.5);
     setPosY(0.25);

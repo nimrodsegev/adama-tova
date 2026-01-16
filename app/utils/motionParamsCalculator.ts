@@ -38,13 +38,12 @@ const INTEREST_ADJUSTMENTS: Record<
   string,
   Partial<ShapeParams> & { layersIncrease?: number }
 > = {
-  mindfulness: { elongation: 1.4, smoothness: 1.0, layersIncrease: 1 },
-  body_motion: { complexity: 0.6, smoothness: 0.5, layersIncrease: 1 },
+  mindfulness: { elongation: 1.8, smoothness: 1.2, layersIncrease: 1 },
+  body_motion: { complexity: 0.9, smoothness: 0.5, layersIncrease: 1 },
   music_sound: { smoothness: 0.0, layersIncrease: 1 },
   creation_material: {
     complexity: 0.7,
     elongation: 0.8,
-    strokeWidth: 0.7,
     layersIncrease: 1,
   },
 };
@@ -125,7 +124,7 @@ export function calculateShapeParams(
   return {
     layers: layersMax
       ? 7
-      : Math.max(4, Math.min(7, DEFAULTS.layers + layersInc)),
+      : Math.max(4, Math.min(10, DEFAULTS.layers + layersInc)),
     smoothness: Math.max(0, Math.min(1, avg(vals.smoothness))),
     complexity: Math.max(0, Math.min(5, avg(vals.complexity))),
     elongation: Math.max(0.5, Math.min(3, avg(vals.elongation))),
