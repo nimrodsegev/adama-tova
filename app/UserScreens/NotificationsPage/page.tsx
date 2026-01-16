@@ -211,7 +211,9 @@ export default function NewUserNotificationPage() {
             customTextColor="var(--color-bg-light-opaque)"
             tertiaryArrowDirection="down"
             onClick={handleMarkAllAsRead}
-            disabled={loading || notifications.every((n) => n.isRead)}
+            disabled={loading || unreadCount === 0}
+            // This style hides the button but keeps the physical space (preventing layout jump)
+            style={{ visibility: unreadCount > 0 ? "visible" : "hidden" }}
           >
             סמן הכל כנקרא
           </Button>
