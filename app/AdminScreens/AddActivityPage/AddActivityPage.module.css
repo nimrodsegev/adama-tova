@@ -24,7 +24,7 @@
   
   background: var(--color-background);
   
-  padding: 2rem 0.2rem 1.5rem; /* 48px 4px 24px */
+  padding: 2rem 1.2rem 1.5rem; /* 48px 4px 24px */
   gap: 0.5rem; /* 8px */
   
   /* Desktop shadow */
@@ -35,7 +35,7 @@
 /* Header */
 .header {
   text-align: center;
-  margin-top: 3rem; 
+  margin-top: 3.5rem; 
   margin-bottom: 1.5rem;
   z-index: 10;
   flex-shrink: 0;
@@ -378,8 +378,8 @@
   position: absolute;
   width: auto;
   height: auto;
-  right: 2.5rem; 
-  top: var(--spacing-3xl);
+  right: 1.3rem; /* 20px */
+  top: 2rem; /* 32px */
   border: none;
   outline: none;
   box-shadow: none;
@@ -389,7 +389,7 @@
   align-items: center;
   cursor: pointer;
   z-index: 1201;
-  padding: var(--spacing-xs); 
+  padding: var(--spacing-xs); /* 4px */
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
 }
@@ -402,30 +402,99 @@
   transform: scale(0.95);
 }
 
+/* ... (Keep all existing styles up to the Button/Footer section) ... */
+
 /* ============================================
-   BUTTONS & FOOTER
+   BUTTONS
    ============================================ */
-.submitButtonContainer { display: flex; justify-content: center; align-items: center; margin-top: 1rem; width: 100%; }
+.submitButtonContainer { 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  margin-top: 1rem; 
+  width: 100%; 
+}
+
 .submitButton {
-  display: flex; flex-direction: row; justify-content: center; align-items: center;
-  padding: 0.5rem 1rem; gap: 0.5rem; width: 7.625rem; height: 2.25rem;
-  background: #B37EB3; border-radius: 0.3125rem; border: none;
-  font-family: var(--font-secondary); font-weight: 400; font-size: 1.125rem; line-height: 1.25rem; color: #F9F9F9; cursor: pointer; transition: opacity 0.2s;
+  display: flex; 
+  flex-direction: row; 
+  justify-content: center; 
+  align-items: center;
+  padding: 0.5rem 1rem; 
+  gap: 0.5rem; 
+  width: 7.625rem; 
+  height: 2.25rem;
+  background: #B37EB3; 
+  border-radius: 0.3125rem; 
+  border: none;
+  font-family: var(--font-secondary); 
+  font-weight: 400; 
+  font-size: 1.125rem; 
+  line-height: 1.25rem; 
+  color: #F9F9F9; 
+  cursor: pointer; 
+  transition: opacity 0.2s;
 }
 .submitButton:disabled { opacity: 0.6; cursor: not-allowed; }
-.errorBanner { color: #ffcccc; font-size: 0.9rem; text-align: center; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; margin-top: 1rem; }
-.footer {
-  position: absolute; bottom: 0; left: 0; width: 100%; padding: 1.5rem;
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, #e79267 20%, transparent); 
-  display: flex; justify-content: center; pointer-events: none; z-index: 20;
+.errorBanner { 
+  color: #ffcccc; 
+  font-size: 0.9rem; 
+  text-align: center; 
+  background: rgba(0,0,0,0.2); 
+  padding: 0.5rem; 
+  border-radius: 4px; 
+  margin-top: 1rem; 
 }
-.dotsContainer { display: flex; gap: 8px; pointer-events: auto; direction: ltr; }
-.dot { width: 13.71px; height: 12.27px; background: #E79267; border: 1px solid #E74E1C; border-radius: 50%; transition: all 0.3s ease; }
-.activeDot { background: #E74E1C; border-color: #E74E1C; }
-.nextButtonContainer { width: 100%; display: flex; justify-content: center; margin-top: 2rem; }
-.hiddenArrow { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none; }
-.hiddenArrow::-ms-expand { display: none; }
+
+/* ============================================
+   NAVIGATION (New Progress dots)
+   ============================================ */
+.navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  gap: 0.5rem; /* 8px */
+
+  width: 100%;
+  position: fixed;
+  bottom: 3rem; /* Adjust based on safe area if needed */
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+  pointer-events: none; /* Allows clicking through the empty space */
+}
+
+.progressDots {
+  display: flex;
+  flex-direction: row; /* In RTL this goes Right to Left */
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  gap: 0.5rem; /* 8px */
+  pointer-events: auto; /* Re-enable clicks on the dots themselves */
+}
+
+/* Progress circle container */
+.progressCircle {
+  width: 1.0625rem; /* ~17px */
+  height: 1.0625rem; /* ~17px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  flex-grow: 0;
+  transition: all 0.3s;
+}
+
+/* Progress circle icon (SVG) */
+.progressCircleIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 /* ============================================
    RESPONSIVE DESIGN
@@ -439,6 +508,8 @@
   .scrollSnapSlide { padding-top: 1rem; }
   .pageOverride :global(.input-field), .dropdownToggle, .uploadBox { height: 3rem; }
   .slideContent { gap: 0.75rem; }
+  /* Adjust navigation for small screens */
+  .navigation { bottom: 2rem; }
 }
 
 @media (max-height: 600px) {
@@ -448,7 +519,7 @@
 }
 
 @media (min-height: 800px) {
-  .header { margin-top: 3rem; }
+  .header { margin-top: 3.5rem; }
   .scrollSnapSlide { padding-top: 1rem; }
   .slideContent { gap: 1.25rem; }
 }
@@ -459,5 +530,5 @@
 
 @media (display-mode: standalone) {
   .pageOverride { padding-top: calc(2vh + env(safe-area-inset-top)) !important; }
-  .footer { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+  .navigation { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
 }
