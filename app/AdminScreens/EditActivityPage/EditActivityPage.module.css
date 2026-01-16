@@ -34,8 +34,8 @@
 
 .headerTitle {
   font-family: 'Arfilit', sans-serif;
-  font-weight: 400;
-  font-size: 2rem;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-3xl);
   line-height: 2.125rem;
   color: #FFFFFF;
   margin: 0;
@@ -198,7 +198,7 @@
    DATE ROW
    ============================================ */
 .fieldGroup { width: 100%; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-.dateLabel { width: 100%; font-family: var(--font-secondary); font-weight: 400; font-size: 15px; text-align: right; color: #F9F9F9; margin: 0; }
+.dateLabel { width: 100%; font-family: var(--font-secondary); font-weight: var(--font-weight-normal); font-size: var(--font-size-md); text-align: right; color: #F9F9F9; margin: 0; }
 .dateRow { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0; gap: 8px; width: 100%; direction: rtl; }
 
 .miniDropdownContainer {

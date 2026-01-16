@@ -5,6 +5,8 @@ import { apiUser } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./CreateNewAdmin.module.css";
+import CutInput from "@/lib/components/UI/CutInput";
+import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
 // --- Constants ---
 const GENDER_OPTIONS = [
   { value: "male", label: "זכר" },
@@ -91,102 +93,59 @@ export default function CreateNewAdmin() {
       </div>
 
       <div className={styles.scrollContainer} ref={scrollContainerRef}>
-        
         {/* Full Name */}
-        <div className={styles.inputWrapper}>
-            <input 
-                type="text" 
-                value={fullName} 
-                onChange={(e) => setFullName(e.target.value)} 
-                className={styles.inputField} 
-                placeholder=" "
-            />
-            <label className={styles.inputLabel}>שם מלא</label>
-        </div>
-
+        <CutInput 
+            label="שם מלא" 
+            value={fullName} 
+            onChange={(e) => setFullName(e.target.value)} 
+            className={styles.cutInput} 
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />
+      
         {/* Gender Selector (Added Block) */}
-        <div className={styles.genderSelector}>
-            <div className={styles.inputWrapper}>
-            <span className={styles.inputLabel}>מין</span>
-            <button
-                type="button"
-                onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
-                className={`${styles.genderToggle} ${
-                genderDropdownOpen ? styles.open : ""
-                }`}
-            >
-                <span className={!gender ? styles.accordionPlaceholder : ""}>
-                {gender
-                    ? GENDER_OPTIONS.find((g) => g.value === gender)?.label
-                    : "בחר/י"}
-                </span>
-                <span
-                className={`${styles.genderToggleArrow} ${
-                    genderDropdownOpen ? styles.open : ""
-                }`}
-                >
-                ▼
-                </span>
-            </button>
-            </div>
-            {genderDropdownOpen && (
-            <div className={styles.genderDropdown}>
-                {GENDER_OPTIONS.map((option) => (
-                <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => {
-                        setGender(option.value);
-                    }}
-                    className={`${styles.genderOption} ${
-                    gender === option.value ? styles.selected : ""
-                    }`}
-                >
-                    {option.label}
-                </button>
-                ))}
-            </div>
-            )}
-        </div>
-
+        <UnifiedDropdown
+            label="מין" 
+            placeholder="בחר/י"
+            options={GENDER_OPTIONS}
+            value={gender}
+            onChange={setGender}
+            isOpen={genderDropdownOpen}
+            onToggle={() => setGenderDropdownOpen(!genderDropdownOpen)}
+        />
         {/* Email */}
-        <div className={styles.inputWrapper}>
-            <input 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                className={styles.inputField} 
-                placeholder=" "
-                style={{ direction: 'ltr', textAlign: 'right' }}
-            />
-            <label className={styles.inputLabel}>אימייל</label>
-        </div>
+        <CutInput 
+            label="אימייל" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            className={styles.cutInput} 
+            type="email"
+            dir="ltr"
+            textAlign="right"
+        />
 
         {/* Phone */}
-        <div className={styles.inputWrapper}>
-            <input 
-                type="tel" 
-                value={phone} 
-                onChange={(e) => setPhone(e.target.value)} 
-                className={styles.inputField} 
-                placeholder=" "
-                style={{ direction: 'ltr', textAlign: 'right' }}
-            />
-            <label className={styles.inputLabel}>טלפון</label>
-        </div>
+        <CutInput 
+            label="טלפון" 
+            value={phone} 
+            onChange={(e) => setPhone(e.target.value)} 
+            className={styles.cutInput} 
+            type="tel"
+            dir="ltr"
+            textAlign="right"
+        />
 
         {/* Password */}
-        <div className={styles.inputWrapper}>
-            <input 
-                type="text" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                className={styles.inputField} 
-                placeholder=" "
-                style={{ direction: 'ltr', textAlign: 'right' }}
-            />
-            <label className={styles.inputLabel}>סיסמא</label>
-        </div>
+        <CutInput 
+            label="סיסמא" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            className={styles.cutInput} 
+            type="text"
+            dir="ltr"
+            textAlign="right"
+        />
 
         {/* Submit Button */}
         <div className={styles.buttonContainer}>
