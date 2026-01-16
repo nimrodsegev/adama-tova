@@ -38,7 +38,6 @@
 .openHoursWrapper {
   width: 100%;
   padding-top: 3.5rem;
-
   z-index: 10;
 }
 
@@ -55,70 +54,19 @@
 }
 
 /* ============================================
-   SENTINEL (Invisible)
-   ============================================ */
-.sentinel {
-  width: 100%;
-  height: 1px;
-  background: transparent;
-  visibility: hidden;
-  margin-bottom: -1px; /* Tucks it tight against next element */
-}
-
-/* ============================================
-   GREETING SECTION - STICKY
+   GREETING SECTION - (Now Static)
    ============================================ */
 .greetingSection {
-  position: sticky;
-  top: 4rem; /* Slightly off-screen ensures "stuck" state triggers nicely */
-  z-index: 50;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   padding-top: 1rem;
   padding-bottom: 1rem;
-
-  /* Smooth background transition */
-  transition: all 0.3s ease;
   background: transparent;
+  /* Removed sticky positioning and transition logic */
 }
 
-/* THE "STUCK" STATE */
-.isPinned {
-  /* Match the top color of the gradient */
-  background: #e74e1c;
-
-  /* Add shadow for depth */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-
-  /* Visual tweaks when pinned */
-  border-bottom-left-radius: var(--radius-md);
-  border-bottom-right-radius: var(--radius-md);
-
-  /* Adjust padding slightly to compact it */
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-.isPinned::before {
-  content: "";
-  position: absolute;
-
-  /* Start from the top of the greeting */
-  bottom: 99%;
-  left: 0;
-  right: 0;
-
-  /* Extend upwards enough to cover the STICKY_OFFSET gap */
-  height: 100vh;
-
-  /* Match the background color */
-  background: #e74e1c;
-
-  /* Ensure it doesn't block clicks (though usually nothing is there) */
-  pointer-events: none;
-}
 .greetingTitle {
   font-family: var(--font-primary);
   font-weight: 400;

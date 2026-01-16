@@ -99,10 +99,8 @@ export default function AdminHomePage() {
 
   // FAB & UI State
   const [isFabOpen, setIsFabOpen] = useState(false);
-  const [isPinned, setIsPinned] = useState(false); // Sticky header state
 
-  // Refs for Scroll & Observer
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // Refs for Scroll (Observer ref removed)
   const pageContainerRef = useRef<HTMLDivElement>(null);
 
   // Circle Config State
@@ -159,9 +157,7 @@ export default function AdminHomePage() {
     return OPENING_HOURS[today] || null;
   })();
 
-  const STICKY_OFFSET = "4rem";
-
-  // --- 1. Circle Config Resize Logic (Restored) ---
+  // --- 1. Circle Config Resize Logic ---
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -205,31 +201,7 @@ export default function AdminHomePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // --- 3. Sticky Header Observer ---
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // If sentinel is NOT intersecting, it means we scrolled past it -> Pin header
-        setIsPinned(!entry.isIntersecting);
-      },
-      {
-        root: pageContainerRef.current,
-        threshold: 1.0,
-        rootMargin: `-${STICKY_OFFSET} 0px 0px 0px`,
-      }
-    );
-
-    const currentSentinel = sentinelRef.current;
-    if (currentSentinel) {
-      observer.observe(currentSentinel);
-    }
-
-    return () => {
-      if (currentSentinel) {
-        observer.unobserve(currentSentinel);
-      }
-    };
-  }, []);
+  // --- (Removed Sticky Header Observer) ---
 
   const fetchData = async () => {
     // Users
@@ -402,7 +374,7 @@ export default function AdminHomePage() {
   return (
     <SmoothPageWrapper isLoading={userLoading || mounting}>
       <div className={styles.pageContainer} dir="rtl" ref={pageContainerRef}>
-        {/* 1. Open Hours (Scrolls) */}
+        {/* 1. Open Hours */}
         <div className={styles.openHoursWrapper}>
           {todayHours ? (
             <OpenHours
@@ -415,7 +387,7 @@ export default function AdminHomePage() {
           )}
         </div>
 
-        {/* 2. Circles (Scrolls, uses responsive config) */}
+        {/* 2. Circles */}
         <div className={styles.circlesContainer}>
           <OrganicCircles
             mode="breathing"
@@ -431,20 +403,13 @@ export default function AdminHomePage() {
           />
         </div>
 
-        {/* 3. SENTINEL - Invisible trigger for sticky header */}
-        <div ref={sentinelRef} className={styles.sentinel} />
-
-        {/* 4. Greeting - STICKY + BACKGROUND CHANGE */}
-        <div
-          className={`${styles.greetingSection} ${
-            isPinned ? styles.isPinned : ""
-          }`}
-        >
+        {/* 3. Greeting - (Static) */}
+        <div className={styles.greetingSection}>
           <h1 className={styles.greetingTitle}>היי {firstName},</h1>
           <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
         </div>
 
-        {/* 5. Content (Scrolls) */}
+        {/* 4. Content */}
         <div className={styles.filterContainer}>
           <HomeFilter
             options={[
