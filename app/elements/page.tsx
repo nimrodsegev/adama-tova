@@ -192,7 +192,8 @@ export default function ElementsPage() {
           {showPopup1 && (
             <Popup
               title="שכחת סיסמה?"
-              content="לשינוי הסיסמה ישלח מייל לכתובת המייל שלך"
+              email="user@example.com"
+              content="לשינוי הסיסמה ישלח מייל לכתובת "
               recommendation="מומלץ לבצע את הפעולה במחשב או דרך דפדפן בסמארטפון"
               primaryButtonText="כן, שלח מייל"
               primaryButtonAction={() => {
@@ -207,10 +208,10 @@ export default function ElementsPage() {
 
           {showPopup2 && (
             <Popup
-              title="אישור משתמש"
-              userName="שרה לוי"
-              content="האם ברצונך לאשר את המשתמש?"
-              primaryButtonText="אשר"
+              content="האם אתה בטוח שברצונך לסרב לבקשת
+ישראל ישראלי להצטרפות לקבוצה?"
+              recommendation="פעולה זו תמנע מהמשתמש להשתתף בפעילות זו"
+              primaryButtonText="כן אני בטוח"
               primaryButtonAction={() => {
                 alert("Approved!");
                 setShowPopup2(false);
@@ -223,11 +224,11 @@ export default function ElementsPage() {
 
           {showPopup3 && (
             <Popup
-              content="מייל אישור נשלח לכתובת:"
-              email="user@example.com"
-              recommendation="אנא בדוק את תיבת הדואר שלך"
-              primaryButtonText="סגור"
-              primaryButtonAction={() => setShowPopup3(false)}
+              title="מייל נשלח!"
+              content="שלחנו מייל עם קישור לשינוי ססמא. 
+בדוק את תיבת הדואר שלך"
+              secondaryButtonText="סרב"
+              secondaryButtonAction={() => setShowPopup2(false)}
               onClose={() => setShowPopup3(false)}
             />
           )}

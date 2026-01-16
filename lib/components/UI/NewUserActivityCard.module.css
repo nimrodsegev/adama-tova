@@ -107,7 +107,7 @@
   top: var(--spacing-xs); /* Remove the 0.1rem offset */
   margin-bottom: 0.25rem; /* Add some bottom margin if needed */
   width: auto;
-  left: var(--spacing-lg);
+  left: var(--spacing-2xl);
 }
 
 /* Clock icon styles */

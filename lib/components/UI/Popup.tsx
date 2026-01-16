@@ -134,19 +134,17 @@ export default function Popup({
           {(primaryButtonText || secondaryButtonText) && (
             <div className={styles.buttons}>
               {secondaryButtonText && (
-                <Button
-                  variant="popup-secondary"
-                  onClick={handleSecondaryClick}
-                >
+                <Button variant="reject" onClick={handleSecondaryClick}>
                   {secondaryButtonText}
                 </Button>
               )}
 
               {primaryButtonText && (
                 <Button
-                  variant="popup-primary"
+                  variant="approve"
                   onClick={handlePrimaryClick}
                   disabled={loading}
+                  customBorderColor={"var(--color-white-pure)"}
                 >
                   {loading ? "טוען..." : primaryButtonText}
                 </Button>
