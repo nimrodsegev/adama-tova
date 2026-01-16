@@ -387,3 +387,20 @@
     padding-top: calc(1rem + env(safe-area-inset-top, 0));
   }
 }
+
+/* ============================================
+   DEBUG BUTTON - TEMPORARY
+   ============================================ */
+.debugButton {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.625rem;
+  font-family: monospace;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  z-index: 9999;
+}

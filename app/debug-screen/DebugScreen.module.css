@@ -1,0 +1,323 @@
+.container {
+  min-height: 100dvh;
+  padding: 1rem;
+  padding-top: 3rem;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.75rem;
+  overflow-y: auto;
+}
+
+.backButton {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #333;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.liveSection {
+  background: #2a2a2a;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.liveSection h2 {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: #4fc3f7;
+}
+
+.liveSection p {
+  margin: 0.25rem 0;
+}
+
+.liveSection strong {
+  color: #4caf50;
+}
+
+.section {
+  background: #2a2a2a;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.section h2 {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: #4fc3f7;
+}
+
+.queryRow {
+  margin: 0.25rem 0;
+}
+
+.queryRow span {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: #f44336;
+  color: #fff;
+}
+
+/* Safe area display */
+.safeTop::after { content: env(safe-area-inset-top, "0px"); }
+.safeBottom::after { content: env(safe-area-inset-bottom, "0px"); }
+.safeLeft::after { content: env(safe-area-inset-left, "0px"); }
+.safeRight::after { content: env(safe-area-inset-right, "0px"); }
+
+/* ========================================
+   WIDTH QUERIES - Exact matches (±2px tolerance)
+   ======================================== */
+
+/* 320px - iPhone SE 1st gen */
+@media (min-width: 318px) and (max-width: 322px) {
+  .w320 { background: #4caf50 !important; }
+}
+
+/* 360px */
+@media (min-width: 358px) and (max-width: 362px) {
+  .w360 { background: #4caf50 !important; }
+}
+
+/* 375px - iPhone 6/7/8/SE2/X/12mini */
+@media (min-width: 373px) and (max-width: 377px) {
+  .w375 { background: #4caf50 !important; }
+}
+
+/* 390px - iPhone 12/13/14 */
+@media (min-width: 388px) and (max-width: 392px) {
+  .w390 { background: #4caf50 !important; }
+}
+
+/* 393px - iPhone 14 Pro/15/15 Pro */
+@media (min-width: 391px) and (max-width: 395px) {
+  .w393 { background: #4caf50 !important; }
+}
+
+/* 414px - iPhone 6+/7+/8+/XR/11 */
+@media (min-width: 412px) and (max-width: 416px) {
+  .w414 { background: #4caf50 !important; }
+}
+
+/* 428px - iPhone 12 Pro Max/13 Pro Max */
+@media (min-width: 426px) and (max-width: 430px) {
+  .w428 { background: #4caf50 !important; }
+}
+
+/* 430px - iPhone 14 Plus/Pro Max/15 Plus/Pro Max */
+@media (min-width: 428px) and (max-width: 432px) {
+  .w430 { background: #4caf50 !important; }
+}
+
+/* ========================================
+   HEIGHT QUERIES - Exact matches (±5px tolerance)
+   ======================================== */
+
+/* 568px - iPhone SE 1st */
+@media (min-height: 563px) and (max-height: 573px) {
+  .h568 { background: #4caf50 !important; }
+}
+
+/* 667px - iPhone 6/7/8/SE2/SE3 */
+@media (min-height: 662px) and (max-height: 672px) {
+  .h667 { background: #4caf50 !important; }
+}
+
+/* 736px - iPhone 6+/7+/8+ */
+@media (min-height: 731px) and (max-height: 741px) {
+  .h736 { background: #4caf50 !important; }
+}
+
+/* 812px - iPhone X/XS/11 Pro/12 mini */
+@media (min-height: 807px) and (max-height: 817px) {
+  .h812 { background: #4caf50 !important; }
+}
+
+/* 844px - iPhone 12/13/14 */
+@media (min-height: 839px) and (max-height: 849px) {
+  .h844 { background: #4caf50 !important; }
+}
+
+/* 852px - iPhone 14 Pro/15/15 Pro */
+@media (min-height: 847px) and (max-height: 857px) {
+  .h852 { background: #4caf50 !important; }
+}
+
+/* 896px - iPhone XR/XS Max/11/11 Pro Max */
+@media (min-height: 891px) and (max-height: 901px) {
+  .h896 { background: #4caf50 !important; }
+}
+
+/* 926px - iPhone 12 Pro Max/13 Pro Max/14 Plus */
+@media (min-height: 921px) and (max-height: 931px) {
+  .h926 { background: #4caf50 !important; }
+}
+
+/* 932px - iPhone 14 Pro Max/15 Plus/15 Pro Max */
+@media (min-height: 927px) and (max-height: 937px) {
+  .h932 { background: #4caf50 !important; }
+}
+
+/* ========================================
+   COMBINED DEVICE QUERIES
+   ======================================== */
+
+/* iPhone SE 1st (320×568) */
+@media (min-width: 318px) and (max-width: 322px) and (min-height: 563px) and (max-height: 573px) {
+  .iPhoneSE1 { background: #4caf50 !important; }
+}
+
+/* iPhone 6/7/8/SE2/SE3 (375×667) */
+@media (min-width: 373px) and (max-width: 377px) and (min-height: 662px) and (max-height: 672px) {
+  .iPhone678 { background: #4caf50 !important; }
+}
+
+/* iPhone 6+/7+/8+ (414×736) */
+@media (min-width: 412px) and (max-width: 416px) and (min-height: 731px) and (max-height: 741px) {
+  .iPhone678Plus { background: #4caf50 !important; }
+}
+
+/* iPhone X/XS/11 Pro (375×812) */
+@media (min-width: 373px) and (max-width: 377px) and (min-height: 807px) and (max-height: 817px) {
+  .iPhoneX { background: #4caf50 !important; }
+}
+
+/* iPhone 12 mini (375×812) - same as X */
+@media (min-width: 373px) and (max-width: 377px) and (min-height: 807px) and (max-height: 817px) {
+  .iPhone12mini { background: #4caf50 !important; }
+}
+
+/* iPhone XR/11 (414×896) */
+@media (min-width: 412px) and (max-width: 416px) and (min-height: 891px) and (max-height: 901px) {
+  .iPhoneXR { background: #4caf50 !important; }
+}
+
+/* iPhone 12/13/14 (390×844) */
+@media (min-width: 388px) and (max-width: 392px) and (min-height: 839px) and (max-height: 849px) {
+  .iPhone12 { background: #4caf50 !important; }
+}
+
+/* iPhone 14 Pro/15/15 Pro (393×852) */
+@media (min-width: 391px) and (max-width: 395px) and (min-height: 847px) and (max-height: 857px) {
+  .iPhone14Pro { background: #4caf50 !important; }
+}
+
+/* iPhone 12 Pro Max/13 Pro Max (428×926) */
+@media (min-width: 426px) and (max-width: 430px) and (min-height: 921px) and (max-height: 931px) {
+  .iPhone12ProMax { background: #4caf50 !important; }
+}
+
+/* iPhone 14/15 Pro Max/Plus (430×932) */
+@media (min-width: 428px) and (max-width: 432px) and (min-height: 927px) and (max-height: 937px) {
+  .iPhone14ProMax { background: #4caf50 !important; }
+}
+
+/* ========================================
+   WIDTH RANGES
+   ======================================== */
+
+@media (max-width: 349px) {
+  .wLt350 { background: #4caf50 !important; }
+}
+
+@media (min-width: 350px) and (max-width: 379px) {
+  .w350to380 { background: #4caf50 !important; }
+}
+
+@media (min-width: 380px) and (max-width: 399px) {
+  .w380to400 { background: #4caf50 !important; }
+}
+
+@media (min-width: 400px) and (max-width: 419px) {
+  .w400to420 { background: #4caf50 !important; }
+}
+
+@media (min-width: 420px) and (max-width: 439px) {
+  .w420to440 { background: #4caf50 !important; }
+}
+
+@media (min-width: 440px) {
+  .wGt440 { background: #4caf50 !important; }
+}
+
+/* ========================================
+   HEIGHT RANGES
+   ======================================== */
+
+@media (max-height: 599px) {
+  .hLt600 { background: #4caf50 !important; }
+}
+
+@media (min-height: 600px) and (max-height: 699px) {
+  .h600to700 { background: #4caf50 !important; }
+}
+
+@media (min-height: 700px) and (max-height: 799px) {
+  .h700to800 { background: #4caf50 !important; }
+}
+
+@media (min-height: 800px) and (max-height: 849px) {
+  .h800to850 { background: #4caf50 !important; }
+}
+
+@media (min-height: 850px) and (max-height: 899px) {
+  .h850to900 { background: #4caf50 !important; }
+}
+
+@media (min-height: 900px) and (max-height: 949px) {
+  .h900to950 { background: #4caf50 !important; }
+}
+
+@media (min-height: 950px) {
+  .hGt950 { background: #4caf50 !important; }
+}
+
+/* ========================================
+   VH VS DVH TEST
+   ======================================== */
+
+.vhTest {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.vhBox, .dvhBox {
+  width: 3rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.25rem;
+  font-size: 0.625rem;
+  color: #fff;
+}
+
+.vhBox {
+  height: 10vh;
+  background: #f44336;
+}
+
+.dvhBox {
+  height: 10dvh;
+  background: #4caf50;
+}
+
+.note {
+  margin-top: 0.5rem;
+  color: #888;
+  font-size: 0.625rem;
+}
