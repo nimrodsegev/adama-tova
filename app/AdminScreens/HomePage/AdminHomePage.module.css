@@ -1,57 +1,101 @@
 /* ============================================
    ADMIN HOME PAGE
-   Based on Figma design - iPhone 16 (393x852)
+   Based on User Home Page structure
+   iPhone 16 (393x852)
    ============================================ */
 
 /* Loading State */
 .loadingContainer {
   min-height: 100vh;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #EFEFEF;
+  color: #efefef;
   font-family: var(--font-secondary);
   font-size: 1.25rem;
 }
 
-/* Page Container */
+/* Page Container - Must be relative for absolute children to work */
 .pageContainer {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 5.75rem 1.5rem 1.5rem; /* 92px 24px 24px */
-  gap: 0.5rem; /* 8px */
+  padding: 0 1.5rem 1.5rem; /* Removed top padding */
   isolation: isolate;
 
-  position: relative;
+  position: relative; /* This is key */
   width: 100%;
   max-width: 24.5625rem; /* 393px */
   min-height: 100dvh;
   margin: 0 auto;
 
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  overflow-x: hidden;
 }
 
 /* ============================================
-   DECORATIVE CIRCLES
-   OrganicCircles component positions itself via position prop
+   OPEN HOURS - FIXED AT TOP
    ============================================ */
+.openHoursFixed {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 24.5625rem; /* Match page container */
+  z-index: 100; /* Above everything */
+  padding: 1.5rem 1.5rem 0; /* 24px sides, 24px top */
+}
 
 /* ============================================
-   MAIN CONTENT
+   CIRCLES CONTAINER - NOW SCROLLABLE
+   ============================================ */
+.circlesContainer {
+  position: relative;
+  width: 100%;
+  height: 10rem; /* Space for circles */
+  pointer-events: none; /* Let clicks pass through */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* ============================================
+   MAIN CONTENT - Scrollable Container
    ============================================ */
 .mainContent {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
-  gap: 1rem; /* 16px */
+  gap: 0.75rem; /* 12px */
 
-  width: 21.5625rem; /* 345px */
-  margin-top: 5rem; /* Space below circles */
-  z-index: 1;
+  width: 100%;
+  margin-top: 5.75rem; /* Space for fixed OpenHours */
+  z-index: 5; /* Below OpenHours */
+
+  max-height: calc(100dvh - 7rem); /* Allow scrolling */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
+
+.mainContent::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.mainContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mainContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 0.5625rem;
+}
+
+/* Remove old openHours styles */
 
 /* ============================================
    GREETING SECTION
@@ -62,7 +106,7 @@
   justify-content: center;
   align-items: center;
   padding: 0;
-  gap: 0.5rem; /* 8px */
+  gap: 0.125rem; /* 2px */
 
   width: 100%;
 }
@@ -72,13 +116,13 @@
 
   font-family: var(--font-primary); /* Arfilit */
   font-style: normal;
-  font-weight: 400;
-  font-size: 2rem; /* 32px */
+  font-weight: var(--weight-normal, 400);
+  font-size: var(--font-size-3xl, 2rem); /* 32px */
   line-height: 2.5rem; /* 40px */
   text-align: center;
   letter-spacing: 0.02em;
 
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -87,129 +131,15 @@
 
   font-family: var(--font-secondary); /* Ezer Shemesh */
   font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem; /* 20px */
+  font-weight: var(--weight-semibold, 600);
+  font-size: var(--font-size-xl, 1.25rem); /* 20px */
   line-height: 2rem; /* 32px */
   text-align: center;
   letter-spacing: 0.02em;
 
-  color: #FFFFFF;
+  color: var(--color-white-pure, #ffffff);
   margin: 0;
-}
-
-/* ============================================
-   OPENING HOURS BAR
-   ============================================ */
-.openingHoursBar {
-  box-sizing: border-box;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem; /* 8px */
-  gap: 1rem; /* 16px */
-
-  width: 100%;
-  height: 2.3125rem; /* 37px */
-
-  background: transparent;
-  border: 0.0625rem solid #F9F9F9; /* 1px */
-  border-radius: 0.375rem; /* 6px */
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.openingHoursBar:hover {
-  opacity: 0.9;
-}
-
-.openingHoursContent {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0;
-  gap: 1.375rem; /* 22px */
-
-  width: 100%;
-  justify-content: space-between;
-}
-
-.editButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 0.5rem; /* 8px */
-  margin-right: -1rem; /* moved to the right */
-  margin-left: 1rem;
-  gap: 0.25rem; /* 4px - closer to text */
-}
-
-.editArrow {
-  display: inline-block;
-  width: 0.4375rem; /* 7px */
-  height: 0.4375rem; /* 7px */
-  border-left: 0.0625rem solid #F9F9F9; /* 1px */
-  border-bottom: 0.0625rem solid #F9F9F9; /* 1px */
-  transform: rotate(45deg); /* Points left */
-  margin-top: 0.125rem; /* 2px - slightly lower */
-  margin-left: 1.25rem; /* 20px */
-}
-
-.editText {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.1875rem; /* 19px */
-
-  color: #F9F9F9;
-}
-
-.openingHoursText {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.1875rem; /* 19px */
-  text-align: right;
-  padding-right: 1.75rem; /* 28px */
-
-  color: #FFFFFF;
-}
-
-/* ============================================
-   SCROLLABLE CONTENT (Opening hours + Filter + Cards)
-   ============================================ */
-.scrollableContent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem; /* 16px */
-  width: 100%;
-
-  max-height: calc(100dvh - 20rem); /* Extend down to navbar area */
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.scrollableContent::-webkit-scrollbar {
-  width: 0.375rem;
-}
-
-.scrollableContent::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollableContent::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 0.5625rem;
+  margin-bottom: var(--spacing-md, 0.5rem);
 }
 
 /* ============================================
@@ -240,8 +170,8 @@
   line-height: 1.75rem; /* 28px */
   text-align: right;
 
-  color: #FFFFFF;
-  margin: 1rem 0 0 0; /* 16px top margin */
+  color: #ffffff;
+  margin: 0.5rem 0 0 0; /* 8px top margin */
 }
 
 /* ============================================
@@ -252,58 +182,37 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
-  padding-bottom: 10rem; /* Extra space to scroll past navbar and buttons */
-  gap: 0.5rem; /* 8px */
+  padding-bottom: 6rem; /* Extra space to scroll past navbar and buttons */
+  gap: 0.75rem; /* 12px */
 
+  width: 100%;
+}
+
+.cardsContainer > * {
+  flex-shrink: 0; /* CRITICAL: Prevent cards from shrinking */
   width: 100%;
 }
 
 /* ============================================
    EMPTY STATE
    ============================================ */
-.emptyStateContainer {
-  box-sizing: border-box;
+.emptyState {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  padding: 1rem; /* 16px */
-  gap: 1rem; /* 16px */
-
-  width: 21.5625rem; /* 345px */
-  height: 7.375rem; /* 118px */
-
-  border: 0.0625rem solid #F9F9F9; /* 1px */
-  border-radius: 0.6875rem; /* 11px */
-}
-
-.emptyStateContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-
   width: 100%;
+  min-height: 10rem; /* 160px */
+  padding: 2rem;
 }
 
-/* Icon container for the dashed circles with plus */
-.emptyStateIcon {
-  width: 3.01rem; /* 48.17px */
-  height: 3.07rem; /* 49.15px */
-  flex: none;
-  flex-grow: 0;
-}
-
-.emptyStateText {
-  width: 100%;
+.emptyText {
   font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem; /* 20px */
-  line-height: 1.25rem; /* 20px */
+  font-weight: 300;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.5rem; /* 24px */
   text-align: center;
-
-  color: #F9F9F9;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
 }
 
@@ -413,30 +322,26 @@
 /* Screens smaller than design width (below 393px) */
 @media (max-width: 24.5rem) {
   .pageContainer {
-    padding: 5.75rem 1rem 1.5rem;
+    padding: 0 1rem 1.5rem;
+  }
+
+  .openHoursFixed {
+    padding: 1.5rem 1rem 0;
   }
 
   .mainContent {
     width: calc(100% - 0.5rem);
-  }
-
-  .emptyStateContainer {
-    width: 100%;
-  }
-
-  .openingHoursText {
-    padding-right: 0.5rem;
-  }
-
-  .editArrow {
-    margin-left: 0.5rem;
   }
 }
 
 /* Small screens (below 360px) */
 @media (max-width: 22.5rem) {
   .pageContainer {
-    padding: 4rem 0.75rem 1.5rem;
+    padding: 0 0.75rem 1.5rem;
+  }
+
+  .openHoursFixed {
+    padding: 1.25rem 0.75rem 0;
   }
 
   .mainContent {
@@ -452,14 +357,6 @@
     font-size: 1.125rem;
   }
 
-  .openingHoursText {
-    font-size: 0.875rem;
-  }
-
-  .editText {
-    font-size: 0.875rem;
-  }
-
   .sectionTitle {
     font-size: 1.125rem;
   }
@@ -472,7 +369,11 @@
 /* Very small screens (below 320px) */
 @media (max-width: 20rem) {
   .pageContainer {
-    padding: 3rem 0.5rem 1rem;
+    padding: 0 0.5rem 1rem;
+  }
+
+  .openHoursFixed {
+    padding: 1rem 0.5rem 0;
   }
 
   .mainContent {
@@ -489,19 +390,11 @@
     font-size: 1rem;
   }
 
-  .openingHoursText {
-    font-size: 0.75rem;
-  }
-
-  .editText {
-    font-size: 0.75rem;
-  }
-
   .sectionTitle {
     font-size: 1rem;
   }
 
-  .emptyStateText {
+  .emptyText {
     font-size: 1rem;
   }
 
@@ -519,14 +412,49 @@
   }
 }
 
-/* Short screens (iPhone SE, etc. - below 700px height) */
+/* ============================================
+   HEIGHT-BASED RESPONSIVENESS
+   ============================================ */
+
+/* Medium-Tall screens (below 900px) */
+@media (max-height: 56.25rem) {
+  .openHoursFixed {
+    padding: 1.25rem 1.5rem 0;
+  }
+
+  .mainContent {
+    margin-top: 5rem;
+    max-height: calc(100dvh - 10rem);
+  }
+}
+
+/* Medium-Short screens (below 800px) */
+@media (max-height: 50rem) {
+  .openHoursFixed {
+    padding: 1rem 1.5rem 0;
+  }
+
+  .mainContent {
+    margin-top: 4.5rem;
+    gap: 0.625rem;
+    max-height: calc(100dvh - 5.5rem);
+  }
+
+  .greetingTitle {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+/* Short screens (below 700px / 43.75rem) - e.g., iPhone SE */
 @media (max-height: 43.75rem) {
-  .pageContainer {
-    padding-top: 3rem;
+  .openHoursFixed {
+    padding: 0.75rem 1.5rem 0;
   }
 
   .mainContent {
     margin-top: 4rem;
+    max-height: calc(100dvh - 5rem);
   }
 
   .greetingSection {
@@ -551,10 +479,6 @@
     margin: 0.5rem 0 0 0;
   }
 
-  .scrollableContent {
-    max-height: calc(100dvh - 18rem);
-  }
-
   .fabButton {
     bottom: 6rem;
   }
@@ -568,15 +492,20 @@
   }
 }
 
-/* Very short screens / Google app (below 600px height) */
+/* Very short screens (below 600px / 37.5rem) */
 @media (max-height: 37.5rem) {
-  .pageContainer {
-    padding-top: 2rem;
+  .openHoursFixed {
+    padding: 0.5rem 1.5rem 0;
   }
 
   .mainContent {
-    margin-top: 2.5rem;
+    margin-top: 3.5rem;
     gap: 0.5rem;
+    max-height: calc(100dvh - 4rem);
+  }
+
+  .circlesContainer {
+    height: 8rem; /* Reduce circles height */
   }
 
   .greetingTitle {
@@ -584,8 +513,8 @@
     line-height: 1.75rem;
   }
 
-  .scrollableContent {
-    max-height: calc(100dvh - 14rem);
+  .greetingSubtitle {
+    display: none; /* Hide subtitle to save space */
   }
 
   .fabButton {
