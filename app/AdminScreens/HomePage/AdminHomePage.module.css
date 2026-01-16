@@ -357,20 +357,6 @@
   z-index: 2; /* Above the gradient */
 }
 
-/* Gradient overlay for better readability when scrolling - only when many cards */
-.bottomButtons.showGradient::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: -6.5rem; /* Extend down to navbar */
-  background: linear-gradient(180deg, rgba(247, 247, 247, 0.651) -17.65%, rgba(231, 146, 103, 0.93) 100%);
-  pointer-events: none;
-  z-index: 1;
-  border-radius: 0.5rem;
-}
-
 /* ============================================
    RESPONSIVE - Only for smaller screens
    ============================================ */
@@ -518,14 +504,7 @@
   }
 }
 
-/* iPhone SE specific (around 667px height) */
-@media (max-height: 41.75rem) {
-  .bottomButtons {
-    bottom: 6.5rem;
-  }
-}
-
-/* Very short screens (below 600px height) */
+/* Very short screens / Google app (below 600px height) */
 @media (max-height: 37.5rem) {
   .pageContainer {
     padding-top: 2rem;
@@ -547,5 +526,12 @@
 
   .bottomButtons {
     bottom: 4.5rem;
+  }
+}
+
+/* Safari with toolbar (601-670px) - must come AFTER other height queries */
+@media (min-height: 37.5625rem) and (max-height: 41.875rem) {
+  .bottomButtons {
+    bottom: 7rem; /* higher for Safari toolbar */
   }
 }

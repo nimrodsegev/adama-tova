@@ -411,9 +411,17 @@
 /* ============================================
    RESPONSIVE - Small height screens (iPhone SE, etc.)
    ============================================ */
-@media (max-height: 670px) {
+/* Very small viewports (Google app, etc.) */
+@media (max-height: 600px) {
   .aboutLink {
-    bottom: 1.5rem; /* 24px - lower on small screens */
+    bottom: 0.25rem;
+  }
+}
+
+/* Safari with toolbar (around 620-670px) */
+@media (min-height: 601px) and (max-height: 670px) {
+  .aboutLink {
+    bottom: 4rem;
   }
 }
 
