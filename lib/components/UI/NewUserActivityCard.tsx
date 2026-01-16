@@ -324,7 +324,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
       {!isAdmin && isCancelModalOpen && (
         <Popup
           content={`${t(
-            "?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
+            "את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
           )} ל${title} ב${dayName} ${dayMonth} בשעה ${formatTime(startTime)}?`}
           primaryButtonText="כן, לבטל"
           primaryButtonAction={handleCancelConfirm}

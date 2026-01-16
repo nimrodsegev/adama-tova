@@ -229,7 +229,7 @@
   padding: 0 1rem; /* 24px side padding */
   background: var(--button-text);
   color: var(--color-text-secondary);
-  border-radius: 0.21875rem;
+  border-radius: var(--radius-xs);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }
@@ -240,7 +240,7 @@
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--button-text);
   color: var(--button-text);
-  border-radius: 0.21875rem;
+  border-radius: var(--radius-xs);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }
