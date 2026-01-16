@@ -764,8 +764,8 @@
    ============================================ */
 .nextArrow {
   position: absolute;
-  left: 0.5rem; /* closer to left edge */
-  bottom: 6rem; /* positioned at bottom */
+  left: 2.5rem; /* aligned with text box left edge */
+  bottom: 3rem; /* same level as dots */
   width: 2.5625rem; /* 41px */
   height: 2.5rem; /* 40px */
   z-index: 50;
