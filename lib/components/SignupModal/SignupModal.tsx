@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/app/contexts/UserContext";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
@@ -166,11 +167,17 @@ export default function SignupModal({
         )}
 
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
-          <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
-            <line x1="2" y1="2" x2="18" y2="18" stroke="#F9F9F9" strokeWidth="1" />
-            <line x1="18" y1="2" x2="2" y2="18" stroke="#F9F9F9" strokeWidth="1" />
-          </svg>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseWithAnimation}
+          aria-label="סגור"
+        >
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
+          />
         </button>
 
         {/* Content - hidden during loading animation */}

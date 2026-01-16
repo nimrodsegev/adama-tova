@@ -37,19 +37,18 @@
 /* Close button */
 .closeButton {
   position: absolute;
-  width: 2.75rem;
-  height: 2.75rem;
-  right: 1.25rem;
-  top: 1.25rem;
-  border: 0.0625rem solid rgba(249, 249, 249, 0.5);
-  border-radius: 50%;
+  width: auto;
+  height: auto;
+  right: 1.5rem;
+  top: 3rem;
+  border: none;
   background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 10;
-  padding: 0.3125rem;
+  z-index: 1201;
+  padding: var(--spacing-xs);
   transition: transform var(--transition-normal, 0.2s);
   -webkit-tap-highlight-color: transparent;
 }
@@ -173,9 +172,9 @@
   width: 100%;
   font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: 700;
-  font-size: 1rem; /* 16px */
-  line-height: 1.25rem; /* 20px */
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl); /* 20px */
+  line-height: var(--line-height-snug);
   text-align: right;
   color: rgba(247, 247, 247, 0.9);
   margin: 0;
@@ -189,9 +188,9 @@
   width: 100%;
   font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: 400;
-  font-size: 0.9375rem; /* 15px */
-  line-height: 1.1875rem; /* 19px */
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); /* 17px */
+  line-height: var(--line-height-snug);
   text-align: right;
   color: rgba(247, 247, 247, 0.9);
   margin: 0;
