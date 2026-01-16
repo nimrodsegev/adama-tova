@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image"; // Added for the close icon
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
@@ -9,7 +10,7 @@ import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from '@/lib/components/UI/CutInput';
 import UnifiedDropdown from '@/lib/components/UI/UnifiedDropdown';
 
-// ... (Keep TARGET_OPTIONS, CIRCLE_OPTIONS, DAYS, MONTHS, YEARS constants exactly as they are) ...
+// ... (Constants TARGET_OPTIONS, CIRCLE_OPTIONS, DAYS, MONTHS, YEARS remain unchanged) ...
 const TARGET_OPTIONS = [
   { label: "לפי פעילות", value: "activity" },
   { label: "לפי תאריך", value: "date" },
@@ -47,7 +48,9 @@ export default function AddNotificationPage() {
   const router = useRouter();
   const { t } = useIvrita();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
   const [mounting, setMounting] = useState(true);
+  const [closing, setClosing] = useState(false); // New closing state
 
   // Form State
   const [targetType, setTargetType] = useState<"" | "activity" | "date" | "circle">("");
@@ -73,6 +76,15 @@ export default function AddNotificationPage() {
     const timer = setTimeout(() => { setMounting(false); }, 50);
     return () => clearTimeout(timer);
   }, []);
+
+  // Close Animation Handler
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      router.back();
+    }, 400);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -130,11 +142,20 @@ export default function AddNotificationPage() {
   }));
 
   return (
-    <SmoothPageWrapper isLoading={mounting}>
+    <SmoothPageWrapper isLoading={mounting || closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
-      <button className="close-button" onClick={() => router.back()}>
-        <div className="close-button-inner" />
-        <div className="close-icon" />
+      {/* Updated Close Button */}
+      <button
+        className={styles.closeButton}
+        onClick={handleCloseWithAnimation}
+        aria-label="סגור"
+      >
+        <Image
+          src="/icons/close.svg"
+          alt="Close icon"
+          width={40}
+          height={40}
+        />
       </button>
 
       <div className={styles.header}>

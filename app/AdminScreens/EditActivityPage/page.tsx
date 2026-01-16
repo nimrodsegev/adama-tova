@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import Image from "next/image"; // Added for icon
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
@@ -14,12 +15,12 @@ const BRANCH_OPTIONS = [
   { value: "nahalal", label: "סניף נהלל" },
 ];
 
-const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+const DAYS = Array.from({ length: 31 }, (_, i) => ({ value: (i + 1).toString().padStart(2, '0'), label: (i + 1).toString().padStart(2, '0') }));
+const MONTHS = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString().padStart(2, '0'), label: (i + 1).toString().padStart(2, '0') }));
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
+const YEARS = Array.from({ length: 3 }, (_, i) => ({ value: (CURRENT_YEAR + i).toString(), label: (CURRENT_YEAR + i).toString() }));
 
-// --- SVG Path Generator (Dynamic Gap) ---
+// --- SVG Path Generator (Legacy for Image Upload) ---
 const getSvgPath = (label: string) => {
   const charWidth = 10; 
   const padding = 20; 
@@ -27,7 +28,7 @@ const getSvgPath = (label: string) => {
   
   const totalWidth = 315;
   const radius = 9; 
-  const rightGapStart = 315 - 32; // ~32px from right edge
+  const rightGapStart = 315 - 32; 
   const gapEnd = rightGapStart - labelWidth;
 
   return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
@@ -41,6 +42,7 @@ export default function EditActivityPage() {
 
   const [loading, setLoading] = useState(true);
   const [mounting, setMounting] = useState(true);
+  const [closing, setClosing] = useState(false); // New closing state
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -68,6 +70,15 @@ export default function EditActivityPage() {
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
+
+  // --- Close Animation Handler ---
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      router.back();
+    }, 400);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -138,27 +149,14 @@ export default function EditActivityPage() {
     return () => window.removeEventListener("resize", updateLabelBackgrounds);
   }, [loading]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const setFormValue = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   const handleDateChange = (type: 'day' | 'month' | 'year', value: string) => {
-    let d = selectedDay;
-    let m = selectedMonth;
-    let y = selectedYear;
-
-    if (type === 'day') { setSelectedDay(value); d = value; setIsDayOpen(false); }
-    if (type === 'month') { setSelectedMonth(value); m = value; setIsMonthOpen(false); }
-    if (type === 'year') { setSelectedYear(value); y = value; setIsYearOpen(false); }
-
-    if (d && m && y) {
-      setFormData(prev => ({ ...prev, date: `${y}-${m}-${d}` }));
-    }
+    if (type === 'day') setSelectedDay(value);
+    if (type === 'month') setSelectedMonth(value);
+    if (type === 'year') setSelectedYear(value);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,12 +219,21 @@ export default function EditActivityPage() {
   };
 
   return (
-    <SmoothPageWrapper isLoading={loading || mounting}>
+    <SmoothPageWrapper isLoading={loading || mounting || closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       
-      <button className="close-button" onClick={() => router.back()}>
-        <div className="close-button-inner" />
-        <div className="close-icon" />
+      {/* NEW CLOSE BUTTON */}
+      <button
+        className={styles.closeButton}
+        onClick={handleCloseWithAnimation}
+        aria-label="סגור"
+      >
+        <Image
+          src="/icons/close.svg"
+          alt="Close icon"
+          width={40}
+          height={40}
+        />
       </button>
 
       <div className={styles.header}>
@@ -245,16 +252,22 @@ export default function EditActivityPage() {
             dir="rtl"
             textAlign="right"
         />  
-        {/* Branch Dropdown */}
-        <UnifiedDropdown
-          label="סניף"
-          placeholder=" סניף בחר/י"
-          options={BRANCH_OPTIONS}
-          value={formData.branch}
-          onChange={(value) => setFormValue('branch', value)}
-          isOpen={isBranchOpen}
-          onToggle={() => setIsBranchOpen(!isBranchOpen)}
-        />
+        
+        {/* Branch Dropdown - 🔥 FIX: activeDropdownWrapper Class */}
+        <div 
+          className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownWrapper : ''}`}
+        >
+          <UnifiedDropdown
+            label="סניף"
+            placeholder="בחר/י סניף"
+            options={BRANCH_OPTIONS}
+            value={formData.branch}
+            onChange={(value) => setFormValue('branch', value)}
+            isOpen={isBranchOpen}
+            onToggle={() => setIsBranchOpen(!isBranchOpen)}
+          />
+        </div>
+
         {/* Location */}
         <CutInput
             label="מיקום"
@@ -289,44 +302,56 @@ export default function EditActivityPage() {
 
         {/* Date Row */}
         <div className={styles.fieldGroup}>
-              <div className={styles.dateLabel}>{'תאריך'}</div>
-              <div className={styles.dateRow}>
-                {/* YEAR - 🔥 FIX: activeMiniDropdown Class */}
-                <UnifiedDropdown
-                  label="שנה"
-                  options={YEARS.map(y => ({ value: y, label: y }))}
-                  value={selectedYear}
-                  onChange={(value) => setFormValue('year', value)}
-                  isOpen={isYearOpen}
-                  onToggle={() => setIsYearOpen(!isYearOpen)}
-                  isMini={true}
-                />
-
-                {/* MONTH - 🔥 FIX: activeMiniDropdown Class */}
-                <UnifiedDropdown
-                  label="חודש"
-                  options={MONTHS.map(m => ({ value: m, label: m }))}
-                  value={selectedMonth}
-                  onChange={(value) => setFormValue('month', value)}
-                  isOpen={isMonthOpen}
-                  onToggle={() => setIsMonthOpen(!isMonthOpen)}
-                  isMini={true}
-                />
-
-                {/* DAY - 🔥 FIX: activeMiniDropdown Class */}
-                <UnifiedDropdown
-                  label="יום"
-                  options={DAYS.map(d => ({ value: d, label: d }))}
-                  value={selectedDay}
-                  onChange={(value) => setFormValue('day', value)}
-                  isOpen={isDayOpen}
-                  onToggle={() => setIsDayOpen(!isDayOpen)}
-                  isMini={true}
-                />
-              </div>
+          <div className={styles.dateLabel}>{'תאריך'}</div>
+          <div className={styles.dateRow}>
+            {/* YEAR - 🔥 FIX: activeDropdownWrapper Class */}
+            <div 
+              className={`${styles.miniDropdownWrapper} ${isYearOpen ? styles.activeDropdownWrapper : ''}`}
+            >
+              <UnifiedDropdown
+                label="שנה"
+                options={YEARS}
+                value={selectedYear}
+                onChange={(value) => handleDateChange('year', value)}
+                isOpen={isYearOpen}
+                onToggle={() => setIsYearOpen(!isYearOpen)}
+                isMini={true}
+              />
             </div>
 
-        {/* Time Row (CutInput) */}
+            {/* MONTH - 🔥 FIX: activeDropdownWrapper Class */}
+            <div 
+              className={`${styles.miniDropdownWrapper} ${isMonthOpen ? styles.activeDropdownWrapper : ''}`}
+            >
+              <UnifiedDropdown
+                label="חודש"
+                options={MONTHS}
+                value={selectedMonth}
+                onChange={(value) => handleDateChange('month', value)}
+                isOpen={isMonthOpen}
+                onToggle={() => setIsMonthOpen(!isMonthOpen)}
+                isMini={true}
+              />
+            </div>
+
+            {/* DAY - 🔥 FIX: activeDropdownWrapper Class */}
+            <div 
+              className={`${styles.miniDropdownWrapper} ${isDayOpen ? styles.activeDropdownWrapper : ''}`}
+            >
+              <UnifiedDropdown
+                label="יום"
+                options={DAYS}
+                value={selectedDay}
+                onChange={(value) => handleDateChange('day', value)}
+                isOpen={isDayOpen}
+                onToggle={() => setIsDayOpen(!isDayOpen)}
+                isMini={true}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Time Row */}
         <CutInput
             label="שעה"
             value={formData.startTime}
@@ -337,13 +362,12 @@ export default function EditActivityPage() {
             textAlign="right"
         />  
 
-        {/* Image Upload (SVG Border Wrapper) */}
+        {/* Image Upload (SVG Border Wrapper - Legacy Support) */}
         <div className={styles.imageWrapperSVG}>
-          {/* Dynamic SVG Border for "תמונה" */}
           <svg className={styles.imageBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <path d={getSvgPath("תמונה")} className={styles.imageBorderPath} strokeLinecap="round" />
           </svg>
-          <span className={styles.imageLabelSVG}>תמונה <span className={styles.optionalText}>*</span></span>
+          <span className={styles.imageLabelSVG}>תמונה</span>
 
           <input type="file" id="editImageUpload" accept="image/*" onChange={handleImageChange} hidden />
           {imageName ? (
@@ -361,7 +385,7 @@ export default function EditActivityPage() {
             <label htmlFor="editImageUpload" className={styles.uploadBox}>
               <span className={styles.uploadText}>לחץ/י כאן על מנת לבחור תמונה</span>
               <div className={styles.paperclipWrapper}>
-                <svg className={styles.paperclipIcon} width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="16" height="17" viewBox="0 0 16 17" fill="none">
                   <path d="M14.8131 7.87167L7.92063 14.7642C7.07624 15.6086 5.93102 16.0829 4.73688 16.0829C3.54274 16.0829 2.39751 15.6086 1.55313 14.7642C0.708744 13.9198 0.234375 12.7746 0.234375 11.5804C0.234375 10.3863 0.708744 9.24105 1.55313 8.39667L8.44563 1.50417C9.00855 0.941246 9.77204 0.625 10.5681 0.625C11.3642 0.625 12.1277 0.941246 12.6906 1.50417C13.2536 2.06709 13.5698 2.83058 13.5698 3.62667C13.5698 4.42276 13.2536 5.18625 12.6906 5.74917L5.79063 12.6417C5.50917 12.9231 5.12742 13.0813 4.72938 13.0813C4.33133 13.0813 3.94959 12.9231 3.66813 12.6417C3.38667 12.3602 3.22854 11.9785 3.22854 11.5804C3.22854 11.1824 3.38667 10.8006 3.66813 10.5192L10.0356 4.15917" stroke="#F9F9F9" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
