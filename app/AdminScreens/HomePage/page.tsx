@@ -91,7 +91,6 @@ export default function AdminHomePage() {
   );
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
 
-  // FIX: Fixed the syntax error here by correctly closing the generic brackets <>
   const [pendingGroupRegs, setPendingGroupRegs] = useState<
     PendingGroupRegistration[]
   >([]);
@@ -324,7 +323,6 @@ export default function AdminHomePage() {
         "approve"
       );
     } else if (selectedUserType === "group" && selectedRegistrationId) {
-      // FIX: 'r' is now correctly inferred because pendingGroupRegs is typed
       const reg = pendingGroupRegs.find((r) => r.id === selectedRegistrationId);
       openConfirmForGroup(
         selectedRegistrationId,
@@ -340,7 +338,6 @@ export default function AdminHomePage() {
       const user = pendingUsers.find((u) => u.id === selectedUserId);
       openConfirmForUser(selectedUserId, user?.full_name || "המשתמש", "reject");
     } else if (selectedUserType === "group" && selectedRegistrationId) {
-      // FIX: 'r' is now correctly inferred because pendingGroupRegs is typed
       const reg = pendingGroupRegs.find((r) => r.id === selectedRegistrationId);
       openConfirmForGroup(
         selectedRegistrationId,
@@ -363,30 +360,26 @@ export default function AdminHomePage() {
   return (
     <SmoothPageWrapper isLoading={userLoading || mounting}>
       <div className={styles.pageContainer} dir="rtl">
-        {/* Decorative Circles - positioned at top */}
-        <OrganicCircles
-          mode="breathing"
-          radius={0.08}
-          layers={3}
-          smoothness={0.5}
-          complexity={0.5}
-          elongation={0.3}
-          opacity={0.7}
-          strokeWidth={2.3}
-          position={{ x: 0.5, y: 0.1 }}
-          baseColor="#FFFFFF"
-        />
+        {/* Background circles container */}
+        <div className={styles.backgroundCircles}>
+          <OrganicCircles
+            mode="breathing"
+            radius={0.08}
+            layers={3}
+            smoothness={0.5}
+            complexity={0.5}
+            elongation={0.3}
+            opacity={0.7}
+            strokeWidth={2.3}
+            position={{ x: 0.5, y: 0.1 }}
+            baseColor="#FFFFFF"
+          />
+        </div>
 
-        {/* Main Content */}
+        {/* Main Content - everything scrolls together */}
         <div className={styles.mainContent}>
-          {/* Greeting Section */}
-          <div className={styles.greetingSection}>
-            <h1 className={styles.greetingTitle}>היי {firstName},</h1>
-            <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
-          </div>
-          {/* Scrollable Content - includes opening hours, filter, and cards */}
-          <div className={styles.scrollableContent}>
-            {/* Opening Hours Bar */}
+          {/* Opening Hours Bar */}
+          <div className={styles.openHours}>
             <button className={styles.openingHoursBar}>
               <div className={styles.openingHoursContent}>
                 <span className={styles.openingHoursText}>
@@ -398,128 +391,137 @@ export default function AdminHomePage() {
                 </div>
               </div>
             </button>
+          </div>
 
-            {/* Filter Tabs with counts */}
-            <div className={styles.filterContainer}>
-              <HomeFilter
-                options={[
-                  {
-                    id: "pending",
-                    label: "ממתינים לאישור",
-                    count: pendingUsers.length + pendingGroupRegs.length,
-                  },
-                  {
-                    id: "approved",
-                    label: "המפגשים הבאים",
-                    count: upcomingActivities.length,
-                  },
-                ]}
-                activeOption={activeFilter}
-                onFilterChange={(id) =>
-                  setActiveFilter(id as "pending" | "approved")
-                }
-              />
-            </div>
+          {/* Greeting Section */}
+          <div className={styles.greetingSection}>
+            <h1 className={styles.greetingTitle}>היי {firstName},</h1>
+            <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
+          </div>
 
-            {/* Cards Container */}
-            <div className={styles.cardsContainer}>
-              {activeFilter === "pending" ? (
-                // Pending Users Cards (Initial + Group)
-                pendingUsers.length > 0 || pendingGroupRegs.length > 0 ? (
-                  <>
-                    {/* Initial approval cards */}
-                    {pendingUsers.map((pendingUser) => (
-                      <UserApprovalCard
-                        key={`user-${pendingUser.id}`}
-                        type="initial"
-                        userName={pendingUser.full_name || "משתמש"}
-                        requestDate={formatDate(pendingUser.created_at)}
-                        circle={getCircleHebrew(pendingUser)}
-                        onApprove={() =>
-                          openConfirmForUser(
-                            pendingUser.id,
-                            pendingUser.full_name || "המשתמש",
-                            "approve"
-                          )
-                        }
-                        onReject={() =>
-                          openConfirmForUser(
-                            pendingUser.id,
-                            pendingUser.full_name || "המשתמש",
-                            "reject"
-                          )
-                        }
-                        onClick={() =>
-                          handleUserCardClick(
-                            pendingUser.id,
-                            formatDate(pendingUser.created_at)
-                          )
-                        }
-                      />
-                    ))}
-                    {/* Group approval cards */}
-                    {pendingGroupRegs.map((reg) => (
-                      <UserApprovalCard
-                        key={`group-${reg.id}`}
-                        type="group"
-                        userName={reg.users?.full_name || "משתמש"}
-                        requestDate={formatDate(reg.created_at)}
-                        circle={getCircleHebrew(reg.users)}
-                        groupName={reg.activities?.title}
-                        onApprove={() =>
-                          openConfirmForGroup(
-                            reg.id,
-                            reg.users?.full_name || "המשתמש",
-                            "approve"
-                          )
-                        }
-                        onReject={() =>
-                          openConfirmForGroup(
-                            reg.id,
-                            reg.users?.full_name || "המשתמש",
-                            "reject"
-                          )
-                        }
-                        onClick={() =>
-                          handleGroupCardClick(
-                            reg.users?.id,
-                            reg.activities?.title || "",
-                            reg.id,
-                            formatDate(reg.created_at)
-                          )
-                        }
-                      />
-                    ))}
-                  </>
-                ) : (
-                  <EmptyState message="אין ממתינים לאישור" showIcon={false} />
-                )
-              ) : // Upcoming Activities Cards
-              upcomingActivities.length > 0 ? (
-                upcomingActivities.map((activity) => (
-                  <NewUserActivityCard
-                    key={activity.id}
-                    id={activity.id}
-                    title={activity.title}
-                    instructor={activity.instructor || "לא צוין"}
-                    date={activity.date}
-                    startTime={activity.start_time}
-                    currentParticipants={activity.current_participants || 0}
-                    maxParticipants={activity.max_participants || 0}
-                    waitlistCount={activity.waitlist_count || 0}
-                    isGroup={activity.is_group || !!activity.series_id}
-                  />
-                ))
+          {/* Filter Tabs with counts */}
+          <div className={styles.filterContainer}>
+            <HomeFilter
+              options={[
+                {
+                  id: "pending",
+                  label: "ממתינים לאישור",
+                  count: pendingUsers.length + pendingGroupRegs.length,
+                },
+                {
+                  id: "approved",
+                  label: "המפגשים הבאים",
+                  count: upcomingActivities.length,
+                },
+              ]}
+              activeOption={activeFilter}
+              onFilterChange={(id) =>
+                setActiveFilter(id as "pending" | "approved")
+              }
+            />
+          </div>
+
+          {/* Cards Container */}
+          <div className={styles.cardsContainer}>
+            {activeFilter === "pending" ? (
+              // Pending Users Cards (Initial + Group)
+              pendingUsers.length > 0 || pendingGroupRegs.length > 0 ? (
+                <>
+                  {/* Initial approval cards */}
+                  {pendingUsers.map((pendingUser) => (
+                    <UserApprovalCard
+                      key={`user-${pendingUser.id}`}
+                      type="initial"
+                      userName={pendingUser.full_name || "משתמש"}
+                      requestDate={formatDate(pendingUser.created_at)}
+                      circle={getCircleHebrew(pendingUser)}
+                      onApprove={() =>
+                        openConfirmForUser(
+                          pendingUser.id,
+                          pendingUser.full_name || "המשתמש",
+                          "approve"
+                        )
+                      }
+                      onReject={() =>
+                        openConfirmForUser(
+                          pendingUser.id,
+                          pendingUser.full_name || "המשתמש",
+                          "reject"
+                        )
+                      }
+                      onClick={() =>
+                        handleUserCardClick(
+                          pendingUser.id,
+                          formatDate(pendingUser.created_at)
+                        )
+                      }
+                    />
+                  ))}
+                  {/* Group approval cards */}
+                  {pendingGroupRegs.map((reg) => (
+                    <UserApprovalCard
+                      key={`group-${reg.id}`}
+                      type="group"
+                      userName={reg.users?.full_name || "משתמש"}
+                      requestDate={formatDate(reg.created_at)}
+                      circle={getCircleHebrew(reg.users)}
+                      groupName={reg.activities?.title}
+                      onApprove={() =>
+                        openConfirmForGroup(
+                          reg.id,
+                          reg.users?.full_name || "המשתמש",
+                          "approve"
+                        )
+                      }
+                      onReject={() =>
+                        openConfirmForGroup(
+                          reg.id,
+                          reg.users?.full_name || "המשתמש",
+                          "reject"
+                        )
+                      }
+                      onClick={() =>
+                        handleGroupCardClick(
+                          reg.users?.id,
+                          reg.activities?.title || "",
+                          reg.id,
+                          formatDate(reg.created_at)
+                        )
+                      }
+                    />
+                  ))}
+                </>
               ) : (
-                <EmptyState message="אין מפגשים קרובים" showIcon={false} />
-              )}
-            </div>
-          </div>{" "}
-          {/* End scrollableContent */}
+                <EmptyState message="אין ממתינים לאישור" showIcon={false} />
+              )
+            ) : // Upcoming Activities Cards
+            upcomingActivities.length > 0 ? (
+              upcomingActivities.map((activity) => (
+                <NewUserActivityCard
+                  key={activity.id}
+                  id={activity.id}
+                  title={activity.title}
+                  instructor={activity.instructor || "לא צוין"}
+                  date={activity.date}
+                  startTime={activity.start_time}
+                  currentParticipants={activity.current_participants || 0}
+                  maxParticipants={activity.max_participants || 0}
+                  waitlistCount={activity.waitlist_count || 0}
+                  isGroup={activity.is_group || !!activity.series_id}
+                />
+              ))
+            ) : (
+              <EmptyState message="אין מפגשים קרובים" showIcon={false} />
+            )}
+          </div>
         </div>
 
         {/* Action buttons - visible when FAB is open */}
-        <div className={`${styles.actionButtons} ${isFabOpen ? styles.actionButtonsOpen : ""}`}>
+        <div
+          className={`${styles.actionButtons} ${
+            isFabOpen ? styles.actionButtonsOpen : ""
+          }`}
+        >
           <Button size="L" href="/AdminScreens/addNotification">
             להוספת הודעה
           </Button>
@@ -530,7 +532,9 @@ export default function AdminHomePage() {
 
         {/* FAB button */}
         <button
-          className={`${styles.fabButton} ${isFabOpen ? styles.fabButtonOpen : ""}`}
+          className={`${styles.fabButton} ${
+            isFabOpen ? styles.fabButtonOpen : ""
+          }`}
           onClick={() => setIsFabOpen(!isFabOpen)}
           aria-label={isFabOpen ? "סגור תפריט" : "פתח תפריט"}
         >
