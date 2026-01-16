@@ -150,3 +150,27 @@
     top: calc(50% - 5rem);
   }
 }
+
+/* ============================================
+   PWA VIEWPORT HEIGHTS
+   ============================================ */
+/* iPhone X/XS/11 Pro/12 mini PWA viewport (768px height) */
+@media (min-height: 760px) and (max-height: 780px) {
+  .bottomButtons {
+    bottom: 7rem;
+  }
+}
+
+/* iPhone 12/13/14 PWA viewport (797px height) */
+@media (min-height: 790px) and (max-height: 810px) {
+  .bottomButtons {
+    bottom: 7rem;
+  }
+}
+
+/* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
+@media (min-height: 865px) and (max-height: 885px) {
+  .bottomButtons {
+    bottom: 8rem;
+  }
+}
