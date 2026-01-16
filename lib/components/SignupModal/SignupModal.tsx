@@ -208,7 +208,7 @@ export default function SignupModal({
 
                 {/* Password Input */}
                 <CutInput
-                  label="ססמא"
+                  label="סיסמה"
                   type="password"
                   value={password}
                   onChange={(e) => {
