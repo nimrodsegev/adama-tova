@@ -8,8 +8,8 @@ import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import Button from "@/lib/components/UI/Button";
-import styles from "./AdminCalendarPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import styles from "./AdminCalendarPage.module.css";
 
 export default function AdminCalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -17,6 +17,8 @@ export default function AdminCalendarPage() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [mounting, setMounting] = useState(true);
+
+  // Modal State
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
     null
   );
@@ -71,74 +73,77 @@ export default function AdminCalendarPage() {
     setSelectedActivityId(null);
   };
 
+  const handleCardClick = (id: string) => {
+    setSelectedActivityId(id);
+    setIsActivityModalOpen(true);
+  };
+
   return (
     <SmoothPageWrapper isLoading={mounting}>
       <div className={styles.pageContainer}>
+        {/* LOADING OVERLAY */}
         {loading && (
           <div className={styles.loadingOverlay}>
             <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
           </div>
         )}
 
-        <main className={styles.mainFrame}>
-          <div className={styles.contentWrapper}>
-            <div className={styles.titleContainer}>
-              <h1 className={styles.titleText}>לוח פעילויות</h1>
-            </div>
+        {/* Title Container */}
+        <div className={styles.titleContainer}>
+          <h1 className={styles.titleText}>לוח פעילויות</h1>
+        </div>
 
-            <div className={styles.sliderSection}>
-              <DaySlider
-                selectedDate={selectedDate}
-                onDateChange={setSelectedDate}
-              />
-            </div>
+        {/* Slider Section */}
+        <div className={styles.sliderSection}>
+          <DaySlider
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
+        </div>
 
-            <div className={styles.filterSection}>
-              <HomeFilter
-                options={[
-                  { id: "all", label: "הכל", count: activities.length },
-                  {
-                    id: "waitlist",
-                    label: "רשימת המתנה",
-                    count: waitlistCount,
-                  },
-                  {
-                    id: "available",
-                    label: "מקום פנוי",
-                    count: availableCount,
-                  },
-                ]}
-                activeOption={filter}
-                onFilterChange={(newId) => setFilter(newId)}
-              />
-            </div>
+        {/* Filter Section */}
+        <div className={styles.filterSection}>
+          <HomeFilter
+            options={[
+              { id: "all", label: "הכל", count: activities.length },
+              { id: "waitlist", label: "רשימת המתנה", count: waitlistCount },
+              { id: "available", label: "מקום פנוי", count: availableCount },
+            ]}
+            activeOption={filter}
+            onFilterChange={(newId) => setFilter(newId)}
+          />
+        </div>
 
-            {/* ✅ NEW STRUCTURE: Window Frame -> List Container */}
-            <div className={styles.activitiesScrollFrame}>
-              <div className={styles.activitiesList}>
-                {filteredActivities.length > 0
-                  ? filteredActivities.map((activity) => (
-                      <NewUserActivityCard
-                        key={activity.id}
-                        id={activity.id}
-                        title={activity.title}
-                        instructor={activity.instructor || "לא צוין"}
-                        date={activity.date}
-                        startTime={activity.start_time}
-                        currentParticipants={activity.current_participants || 0}
-                        maxParticipants={activity.max_participants || 0}
-                        waitlistCount={activity.waitlist_count || 0}
-                        isGroup={activity.is_group || !!activity.series_id}
-                      />
-                    ))
-                  : !loading && (
-                      <p className={styles.emptyText}>אין פעילויות ליום זה</p>
-                    )}
-              </div>
-            </div>
+        {/* Content Container with Activities List */}
+        <div className={styles.contentContainer}>
+          <div className={styles.activitiesList}>
+            {filteredActivities.length > 0
+              ? filteredActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className={styles.activityItem}
+                    onClick={() => handleCardClick(activity.id)}
+                  >
+                    <NewUserActivityCard
+                      id={activity.id}
+                      title={activity.title}
+                      instructor={activity.instructor || "לא צוין"}
+                      date={activity.date}
+                      startTime={activity.start_time}
+                      currentParticipants={activity.current_participants || 0}
+                      maxParticipants={activity.max_participants || 0}
+                      waitlistCount={activity.waitlist_count || 0}
+                      isGroup={activity.is_group || !!activity.series_id}
+                    />
+                  </div>
+                ))
+              : !loading && (
+                  <p className={styles.emptyText}>אין פעילויות ליום זה</p>
+                )}
           </div>
-        </main>
+        </div>
 
+        {/* Admin Specific: Modal */}
         {selectedActivityId && (
           <ActivityDetailsModal
             activityId={selectedActivityId}
@@ -148,10 +153,10 @@ export default function AdminCalendarPage() {
           />
         )}
 
-        {/* Bottom Right Button */}
+        {/* Admin Specific: Sticky Button (UPDATED) */}
         <div className={styles.bottomButton}>
-          <Button size="L" href="/AdminScreens/addNotification">
-            להוספת הודעה
+          <Button size="L" href="/AdminScreens/AddActivityPage">
+            להוספת פעילות
           </Button>
         </div>
       </div>
