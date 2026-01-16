@@ -7,6 +7,7 @@ import styles from "./EditActivityPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from '@/lib/components/UI/CutInput';
 import Popup from "@/lib/components/UI/Popup";
+import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
 
 const BRANCH_OPTIONS = [
   { value: "satria", label: "סניף סתריה" },
@@ -46,7 +47,7 @@ export default function EditActivityPage() {
   // Form Data
   const [formData, setFormData] = useState({
     title: "",
-    branch: "",
+    branch: "" as "satria" | "nahalal" | "",
     location: "", 
     instructor: "",
     maxParticipants: "", 
@@ -244,27 +245,16 @@ export default function EditActivityPage() {
             dir="rtl"
             textAlign="right"
         />  
-
         {/* Branch Dropdown */}
-        <div className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownContainer : ''}`}>
-          <div className={styles.inputWrapper}>
-            <button type="button" onClick={() => setIsBranchOpen(!isBranchOpen)} className={`${styles.dropdownToggle} ${isBranchOpen ? styles.open : ''}`}>
-              <span>{BRANCH_OPTIONS.find(o => o.value === formData.branch)?.label || "בחר/י"}</span>
-              <span className={`${styles.dropdownArrow} ${isBranchOpen ? styles.open : ''}`}></span>
-            </button>
-            <label className={styles.inputLabel}>סניף</label>
-          </div>
-          {isBranchOpen && (
-            <div className={styles.dropdownMenu}>
-              {BRANCH_OPTIONS.map(opt => (
-                <button key={opt.value} className={styles.dropdownOption} onClick={() => { setFormValue('branch', opt.value); setIsBranchOpen(false); }}>
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
+        <UnifiedDropdown
+          label="סניף"
+          placeholder=" סניף בחר/י"
+          options={BRANCH_OPTIONS}
+          value={formData.branch}
+          onChange={(value) => setFormValue('branch', value)}
+          isOpen={isBranchOpen}
+          onToggle={() => setIsBranchOpen(!isBranchOpen)}
+        />
         {/* Location */}
         <CutInput
             label="מיקום"
@@ -275,7 +265,6 @@ export default function EditActivityPage() {
             dir="rtl"
             textAlign="right"
         />  
-
         {/* Instructor */}
         <CutInput
             label="מנחה/ה"
@@ -300,51 +289,42 @@ export default function EditActivityPage() {
 
         {/* Date Row */}
         <div className={styles.fieldGroup}>
-          <div className={styles.dateLabel}>תאריך</div>
-          <div className={styles.dateRow}>
-            <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
-              <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
-                <span>{selectedYear || "שנה"}</span>
-                <span className={`${styles.dropdownArrow} ${isYearOpen ? styles.open : ''}`}></span>
-              </button>
-              {isYearOpen && (
-                <div className={styles.miniDropdownMenu}>
-                  {YEARS.map(y => (
-                    <button key={y} className={styles.miniDropdownOption} onClick={() => handleDateChange('year', y)}>{y}</button>
-                  ))}
-                </div>
-              )}
-            </div>
+              <div className={styles.dateLabel}>{'תאריך'}</div>
+              <div className={styles.dateRow}>
+                {/* YEAR - 🔥 FIX: activeMiniDropdown Class */}
+                <UnifiedDropdown
+                  label="שנה"
+                  options={YEARS.map(y => ({ value: y, label: y }))}
+                  value={selectedYear}
+                  onChange={(value) => setFormValue('year', value)}
+                  isOpen={isYearOpen}
+                  onToggle={() => setIsYearOpen(!isYearOpen)}
+                  isMini={true}
+                />
 
-            <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
-              <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
-                <span>{selectedMonth || "חודש"}</span>
-                <span className={`${styles.dropdownArrow} ${isMonthOpen ? styles.open : ''}`}></span>
-              </button>
-              {isMonthOpen && (
-                <div className={styles.miniDropdownMenu}>
-                  {MONTHS.map(m => (
-                    <button key={m} className={styles.miniDropdownOption} onClick={() => handleDateChange('month', m)}>{m}</button>
-                  ))}
-                </div>
-              )}
-            </div>
+                {/* MONTH - 🔥 FIX: activeMiniDropdown Class */}
+                <UnifiedDropdown
+                  label="חודש"
+                  options={MONTHS.map(m => ({ value: m, label: m }))}
+                  value={selectedMonth}
+                  onChange={(value) => setFormValue('month', value)}
+                  isOpen={isMonthOpen}
+                  onToggle={() => setIsMonthOpen(!isMonthOpen)}
+                  isMini={true}
+                />
 
-            <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
-              <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
-                <span>{selectedDay || "יום"}</span>
-                <span className={`${styles.dropdownArrow} ${isDayOpen ? styles.open : ''}`}></span>
-              </button>
-              {isDayOpen && (
-                <div className={styles.miniDropdownMenu}>
-                  {DAYS.map(d => (
-                    <button key={d} className={styles.miniDropdownOption} onClick={() => handleDateChange('day', d)}>{d}</button>
-                  ))}
-                </div>
-              )}
+                {/* DAY - 🔥 FIX: activeMiniDropdown Class */}
+                <UnifiedDropdown
+                  label="יום"
+                  options={DAYS.map(d => ({ value: d, label: d }))}
+                  value={selectedDay}
+                  onChange={(value) => setFormValue('day', value)}
+                  isOpen={isDayOpen}
+                  onToggle={() => setIsDayOpen(!isDayOpen)}
+                  isMini={true}
+                />
+              </div>
             </div>
-          </div>
-        </div>
 
         {/* Time Row (CutInput) */}
         <CutInput
@@ -379,12 +359,12 @@ export default function EditActivityPage() {
             </div>
           ) : (
             <label htmlFor="editImageUpload" className={styles.uploadBox}>
+              <span className={styles.uploadText}>לחץ/י כאן על מנת לבחור תמונה</span>
               <div className={styles.paperclipWrapper}>
                 <svg className={styles.paperclipIcon} width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M14.8131 7.87167L7.92063 14.7642C7.07624 15.6086 5.93102 16.0829 4.73688 16.0829C3.54274 16.0829 2.39751 15.6086 1.55313 14.7642C0.708744 13.9198 0.234375 12.7746 0.234375 11.5804C0.234375 10.3863 0.708744 9.24105 1.55313 8.39667L8.44563 1.50417C9.00855 0.941246 9.77204 0.625 10.5681 0.625C11.3642 0.625 12.1277 0.941246 12.6906 1.50417C13.2536 2.06709 13.5698 2.83058 13.5698 3.62667C13.5698 4.42276 13.2536 5.18625 12.6906 5.74917L5.79063 12.6417C5.50917 12.9231 5.12742 13.0813 4.72938 13.0813C4.33133 13.0813 3.94959 12.9231 3.66813 12.6417C3.38667 12.3602 3.22854 11.9785 3.22854 11.5804C3.22854 11.1824 3.38667 10.8006 3.66813 10.5192L10.0356 4.15917" stroke="#F9F9F9" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <span className={styles.uploadText}>לחץ/י כאן על מנת לבחור תמונה</span>
             </label>
           )}
         </div>

@@ -49,7 +49,7 @@
   overflow-x: hidden;
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem); 
-  padding: 0 1.5rem 6rem 1.5rem; 
+  padding: 0.5rem 1.5rem 6rem 1.5rem; 
   display: flex;
   flex-direction: column;
   align-items: center;

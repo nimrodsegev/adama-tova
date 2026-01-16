@@ -6,6 +6,7 @@ import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./AddActivityPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from '@/lib/components/UI/CutInput';
+import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
 
 // --- Types ---
 type ActivityStatus = "open" | "closed" | "cancelled";
@@ -28,8 +29,8 @@ const BRANCH_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { value: "workshop", label: "סדנה (מפגש בודד)" },
-  { value: "group", label: "קבוצה (סדרת מפגשים)" },
+  { value: "workshop", label: "סדנה" },
+  { value: "group", label: "קבוצה" },
 ];
 
 const CATEGORY_OPTIONS = [
@@ -300,30 +301,16 @@ export default function AddActivityPage() {
             dir="rtl"
             textAlign="right"
         />  
-
             {/* CUSTOM BRANCH DROPDOWN - 🔥 FIX: activeZIndex Class */}
-            <div className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownContainer : ''}`}>
-              <div className="input-wrapper">
-                <button type="button" onClick={() => setIsBranchOpen(!isBranchOpen)} className={`${styles.dropdownToggle} ${isBranchOpen ? styles.open : ''}`}>
-                  <span className={!formData.branch ? styles.dropdownPlaceholder : ''}>
-                    {BRANCH_OPTIONS.find(o => o.value === formData.branch)?.label || "בחר/י"}
-                  </span>
-                  <div className={styles.arrowIconWrapper}>
-                    <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </div>
-                </button>
-                <label className={styles.inputLabel}>סניף</label>
-              </div>
-              {isBranchOpen && (
-                <div className={styles.dropdownMenu}>
-                  {BRANCH_OPTIONS.map(opt => (
-                    <button key={opt.value} type="button" onClick={() => { setFormValue('branch', opt.value); setIsBranchOpen(false); }} className={`${styles.dropdownOption} ${formData.branch === opt.value ? styles.selected : ''}`}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <UnifiedDropdown
+              label="סניף"
+              placeholder="בחר/י סניף"
+              options={BRANCH_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
+              value={formData.branch}
+              onChange={(value) => setFormValue('branch', value)}
+              isOpen={isBranchOpen}
+              onToggle={() => setIsBranchOpen(!isBranchOpen)}
+            />
             <CutInput
             label="מיקום"
             value={formData.location}
@@ -343,7 +330,7 @@ export default function AddActivityPage() {
             textAlign="right"
         />  
             <CutInput
-            label="מספר משתתפים מקסימלי"
+            label="מספר משתתפים"
             value={formData.max_participants}
             onChange={(e) => setFormValue('max_participants', e.target.value)}
             className={styles.cutInput}
@@ -386,89 +373,47 @@ export default function AddActivityPage() {
           <div className={styles.slideContent}>
             
             {/* CUSTOM TYPE DROPDOWN - 🔥 FIX: activeZIndex Class */}
-            <div className={`${styles.dropdownContainer} ${isTypeOpen ? styles.activeDropdownContainer : ''}`}>
-              <div className="input-wrapper">
-                <button type="button" onClick={() => setIsTypeOpen(!isTypeOpen)} className={`${styles.dropdownToggle} ${isTypeOpen ? styles.open : ''}`}>
-                  <span className={!formData.type ? styles.dropdownPlaceholder : ''}>
-                    {TYPE_OPTIONS.find(o => o.value === formData.type)?.label || "בחר/י"}
-                  </span>
-                  <div className={styles.arrowIconWrapper}>
-                    <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </div>
-                </button>
-                <label className={styles.inputLabel}>סוג פעילות</label>
-              </div>
-              {isTypeOpen && (
-                <div className={styles.dropdownMenu}>
-                  {TYPE_OPTIONS.map(opt => (
-                    <button key={opt.value} type="button" onClick={() => { setFormValue('type', opt.value); setIsTypeOpen(false); }} className={`${styles.dropdownOption} ${formData.type === opt.value ? styles.selected : ''}`}>
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
+            <UnifiedDropdown
+              label="סוג פעילות"
+              placeholder="בחר/י"
+              options={TYPE_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
+              value={formData.type}
+              onChange={(value) => setFormValue('type', value)}
+              isOpen={isTypeOpen}
+              onToggle={() => setIsTypeOpen(!isTypeOpen)}
+            />
             {formData.type === 'workshop' && (
               /* CUSTOM CATEGORY DROPDOWN - 🔥 FIX: activeZIndex Class */
-              <div className={`${styles.dropdownContainer} ${isCategoryOpen ? styles.activeDropdownContainer : ''}`}>
-                <div className="input-wrapper">
-                  <button type="button" onClick={() => setIsCategoryOpen(!isCategoryOpen)} className={`${styles.dropdownToggle} ${isCategoryOpen ? styles.open : ''}`}>
-                    <span className={!formData.category ? styles.dropdownPlaceholder : ''}>
-                      {CATEGORY_OPTIONS.find(o => o.value === formData.category)?.label || "בחר/י"}
-                    </span>
-                    <div className={styles.arrowIconWrapper}>
-                      <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                  </button>
-                  <label className={styles.inputLabel}>תחום עניין</label>
-                </div>
-                {isCategoryOpen && (
-                  <div className={styles.dropdownMenu}>
-                    {CATEGORY_OPTIONS.map(opt => (
-                      <button key={opt.value} type="button" onClick={() => { setFormValue('category', opt.value); setIsCategoryOpen(false); }} className={`${styles.dropdownOption} ${formData.category === opt.value ? styles.selected : ''}`}>
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <UnifiedDropdown
+                label="תחום עניין"
+                placeholder="בחר/י"
+                options={CATEGORY_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
+                value={formData.category}
+                onChange={(value) => setFormValue('category', value)}
+                isOpen={isCategoryOpen}
+                onToggle={() => setIsCategoryOpen(!isCategoryOpen)}
+              />
             )}
-
             {formData.type === 'group' && (
               <>
                 {/* CUSTOM CIRCLE DROPDOWN - 🔥 FIX: activeZIndex Class */ }
-                <div className={`${styles.dropdownContainer} ${isCircleOpen ? styles.activeDropdownContainer : ''}`}>
-                  <div className="input-wrapper">
-                    <button type="button" onClick={() => setIsCircleOpen(!isCircleOpen)} className={`${styles.dropdownToggle} ${isCircleOpen ? styles.open : ''}`}>
-                      <span className={!formData.circle ? styles.dropdownPlaceholder : ''}>
-                        {CIRCLE_LABELS[formData.circle] || "בחר/י"}
-                      </span>
-                      <div className={styles.arrowIconWrapper}>
-                        <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      </div>
-                    </button>
-                    <label className={styles.inputLabel}>קבוצת יעד</label>
-                  </div>
-                  {isCircleOpen && (
-                    <div className={styles.dropdownMenu}>
-                      {CIRCLE_OPTIONS.map(opt => (
-                        <button key={opt} type="button" onClick={() => { setFormValue('circle', opt); setIsCircleOpen(false); }} className={`${styles.dropdownOption} ${formData.circle === opt ? styles.selected : ''}`}>
-                          {CIRCLE_LABELS[opt]}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
+                <UnifiedDropdown
+                  label="קבוצת יעד"
+                  placeholder="בחר/י"
+                  options={CIRCLE_OPTIONS.map(opt => ({ value: opt, label: CIRCLE_LABELS[opt] }))}
+                  value={formData.circle}
+                  onChange={(value) => setFormValue('circle', value)}
+                  isOpen={isCircleOpen}
+                  onToggle={() => setIsCircleOpen(!isCircleOpen)}
+                />
                 <CutInput
-            label="מספר מפגשים"
-            value={formData.weeks}
-            onChange={(e) => setFormValue('weeks', e.target.value)}
-            className={styles.cutInput}
-            type="text"
-            dir="rtl"
-            textAlign="right"
+                  label="מספר מפגשים"
+                  value={formData.weeks}
+                  onChange={(e) => setFormValue('weeks', e.target.value)}
+                  className={styles.cutInput}
+                  type="text"
+                  dir="rtl"
+                  textAlign="right"
                  />  
               </>
             )}
@@ -477,55 +422,40 @@ export default function AddActivityPage() {
               <div className={styles.dateLabel}>{formData.type === 'group' ? 'תאריך התחלה' : 'תאריך'}</div>
               <div className={styles.dateRow}>
                 {/* YEAR - 🔥 FIX: activeMiniDropdown Class */}
-                <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
-                  <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
-                    <span>{formData.year || "שנה"}</span>
-                    <div className={styles.arrowIconWrapper} style={{transform: isYearOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
-                      <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                  </button>
-                  {isYearOpen && (
-                    <div className={styles.miniDropdownMenu}>
-                      {YEARS.map(y => (
-                        <button key={y} className={styles.miniDropdownOption} onClick={() => { setFormValue('year', y); setIsYearOpen(false); }}>{y}</button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <UnifiedDropdown
+                  label="שנה"
+                  placeholder="שנה"
+                  options={YEARS.map(y => ({ value: y, label: y }))}
+                  value={formData.year}
+                  onChange={(value) => setFormValue('year', value)}
+                  isOpen={isYearOpen}
+                  onToggle={() => setIsYearOpen(!isYearOpen)}
+                  isMini={true}
+                />
 
                 {/* MONTH - 🔥 FIX: activeMiniDropdown Class */}
-                <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
-                  <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
-                    <span>{formData.month || "חודש"}</span>
-                    <div className={styles.arrowIconWrapper} style={{transform: isMonthOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
-                      <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                  </button>
-                  {isMonthOpen && (
-                    <div className={styles.miniDropdownMenu}>
-                      {MONTHS.map(m => (
-                        <button key={m} className={styles.miniDropdownOption} onClick={() => { setFormValue('month', m); setIsMonthOpen(false); }}>{m}</button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <UnifiedDropdown
+                  label="חודש"
+                  placeholder="חודש"
+                  options={MONTHS.map(m => ({ value: m, label: m }))}
+                  value={formData.month}
+                  onChange={(value) => setFormValue('month', value)}
+                  isOpen={isMonthOpen}
+                  onToggle={() => setIsMonthOpen(!isMonthOpen)}
+                  isMini={true}
+                />
 
                 {/* DAY - 🔥 FIX: activeMiniDropdown Class */}
-                <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
-                  <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
-                    <span>{formData.day || "יום"}</span>
-                    <div className={styles.arrowIconWrapper} style={{transform: isDayOpen ? 'rotate(180deg)' : 'scale(0.8)'}}>
-                      <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                  </button>
-                  {isDayOpen && (
-                    <div className={styles.miniDropdownMenu}>
-                      {DAYS.map(d => (
-                        <button key={d} className={styles.miniDropdownOption} onClick={() => { setFormValue('day', d); setIsDayOpen(false); }}>{d}</button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <UnifiedDropdown
+                  label="יום"
+                  placeholder="יום"
+                  options={DAYS.map(d => ({ value: d, label: d }))}
+                  value={formData.day}
+                  onChange={(value) => setFormValue('day', value)}
+                  isOpen={isDayOpen}
+                  onToggle={() => setIsDayOpen(!isDayOpen)}
+                  isMini={true}
+                />
               </div>
             </div>
 
@@ -535,18 +465,6 @@ export default function AddActivityPage() {
                   <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} className="input-field" style={{ direction: 'ltr', textAlign: 'right' }} />
               </div>
             </div>
-
-            {formData.type === 'group' && (
-              <CutInput
-            label="קישור לקבוצת ווטסאפ"
-            value={formData.whatsapp_group_url}
-            onChange={(e) => setFormValue('whatsapp_group_url', e.target.value)}
-            className={styles.cutInput}
-            type="text"
-            dir="rtl"
-            textAlign="right"
-        />  
-            )}
           </div>
         </div>
 
