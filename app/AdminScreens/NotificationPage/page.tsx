@@ -127,6 +127,18 @@ export default function AdminNotificationsPage() {
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    if (!user) return;
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    const [res, error] = await apiNotifications.markAllAsRead(user.id);
+
+    if (error) {
+      console.error("Error marking all as read", error);
+      const [data] = await apiNotifications.getList(user.id, 50);
+      if (data) setNotifications(data.map(mapDbToUi));
+    }
+  };
+
   const handleDelete = async (id: number | string) => {
     const numericId = typeof id === "string" ? parseInt(id) : id;
     if (showMarkAsReadHint)
@@ -188,11 +200,25 @@ export default function AdminNotificationsPage() {
           />
         </div>
 
+        {/* Actions Container (NEW: Matches User Page) */}
+        <div className={styles.actionsContainer}>
+          <Button
+            variant="tertiary"
+            tertiarySize="medium"
+            tertiaryWeight="semibold"
+            customBgColor="transparent"
+            customTextColor="#F9F9F9" /* White for Admin Gradient */
+            tertiaryArrowDirection="down"
+            onClick={handleMarkAllAsRead}
+            disabled={loading || notifications.every((n) => n.isRead)}
+          >
+            סמן הכל כנקרא
+          </Button>
+        </div>
+
         {/* Content Container (Window Frame) */}
         <div className={styles.contentContainer}>
-          {loading ? (
-            <p className={styles.loadingText}>טוען הודעות...</p>
-          ) : filteredNotifications.length > 0 ? (
+          {filteredNotifications.length > 0 ? (
             /* SCROLLABLE LIST */
             <div className={styles.notificationsList}>
               {filteredNotifications.map((notif, index) => {
@@ -223,58 +249,65 @@ export default function AdminNotificationsPage() {
               })}
             </div>
           ) : (
-            /* EMPTY STATE (Inside content container for alignment) */
-            <div className={styles.emptyWrapper}>
-              <div className={styles.emptyStateContainer}>
-                <div className={styles.emptyStateContent}>
-                  <div className={styles.emptyStateIcon}>
-                    <svg width="48" height="49" viewBox="0 0 48 49" fill="none">
-                      <circle
-                        cx="24"
-                        cy="24.5"
-                        r="22.9"
-                        stroke="rgba(255, 255, 255, 0.5)"
-                        strokeWidth="2.2"
-                        strokeDasharray="4 4"
-                      />
-                      <circle
-                        cx="24"
-                        cy="24.5"
-                        r="11"
-                        stroke="rgba(255, 255, 255, 0.5)"
-                        strokeWidth="2.2"
-                        strokeDasharray="4 4"
-                      />
-                      <line
-                        x1="19.7"
-                        y1="24.5"
-                        x2="28.3"
-                        y2="24.5"
-                        stroke="rgba(255, 245, 245, 0.7)"
-                        strokeWidth="1"
-                      />
-                      <line
-                        x1="24"
-                        y1="19.2"
-                        x2="24"
-                        y2="29.8"
-                        stroke="rgba(255, 245, 245, 0.7)"
-                        strokeWidth="1"
-                      />
-                    </svg>
+            !loading && (
+              /* EMPTY STATE */
+              <div className={styles.emptyWrapper}>
+                <div className={styles.emptyStateContainer}>
+                  <div className={styles.emptyStateContent}>
+                    <div className={styles.emptyStateIcon}>
+                      <svg
+                        width="48"
+                        height="49"
+                        viewBox="0 0 48 49"
+                        fill="none"
+                      >
+                        <circle
+                          cx="24"
+                          cy="24.5"
+                          r="22.9"
+                          stroke="rgba(255, 255, 255, 0.5)"
+                          strokeWidth="2.2"
+                          strokeDasharray="4 4"
+                        />
+                        <circle
+                          cx="24"
+                          cy="24.5"
+                          r="11"
+                          stroke="rgba(255, 255, 255, 0.5)"
+                          strokeWidth="2.2"
+                          strokeDasharray="4 4"
+                        />
+                        <line
+                          x1="19.7"
+                          y1="24.5"
+                          x2="28.3"
+                          y2="24.5"
+                          stroke="rgba(255, 245, 245, 0.7)"
+                          strokeWidth="1"
+                        />
+                        <line
+                          x1="24"
+                          y1="19.2"
+                          x2="24"
+                          y2="29.8"
+                          stroke="rgba(255, 245, 245, 0.7)"
+                          strokeWidth="1"
+                        />
+                      </svg>
+                    </div>
+                    <p className={styles.emptyStateText}>אין הודעות אחרונות</p>
                   </div>
-                  <p className={styles.emptyStateText}>אין הודעות אחרונות</p>
+                  {/* Button inside empty state for better UX */}
+                  <Button size="L" href="/AdminScreens/addNotification">
+                    להוספת הודעה
+                  </Button>
                 </div>
-                {/* Button inside empty state for better UX */}
-                <Button size="L" href="/AdminScreens/addNotification">
-                  להוספת הודעה
-                </Button>
               </div>
-            </div>
+            )
           )}
         </div>
 
-        {/* Sticky Button (Only if list not empty to avoid duplicate buttons) */}
+        {/* Sticky Button (ADMIN SPECIFIC) */}
         {filteredNotifications.length > 0 && (
           <div className={styles.bottomButton}>
             <Button size="L" href="/AdminScreens/addNotification">

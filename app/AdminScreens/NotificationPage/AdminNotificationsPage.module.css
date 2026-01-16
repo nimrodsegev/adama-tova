@@ -12,8 +12,9 @@
   position: relative;
   overflow: hidden; /* Prevent body scroll */
   direction: rtl;
-  padding: var(--spacing-xl, 1.5rem);
-  /* Top padding accounts for headers if needed, otherwise use margin on title */
+  padding: 1.5rem;
+  /* Top padding accounts for headers */
+  padding-top: 5.6875rem;
 }
 
 /* ============================================
@@ -26,7 +27,6 @@
   margin-bottom: 2rem;
   width: 100%;
   flex-shrink: 0;
-  margin-top: var(--spacing-4xl, 3rem);
 }
 
 .title {
@@ -47,7 +47,19 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   ACTIONS (Mark All as Read)
+   ============================================ */
+.actionsContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  width: 100%;
   flex-shrink: 0;
 }
 
@@ -73,9 +85,10 @@
   gap: 1rem;
 
   /* Height Calculation: 
-     100dvh (Viewport) - Top Space (approx 16-18rem)
+     100dvh - Top Elements (Title + Filter + Actions + Pads)
+     Adjust 20rem to tune the visible area
   */
-  max-height: calc(100dvh - 18rem);
+  max-height: calc(100dvh - 20rem);
 
   overflow-y: auto;
   overflow-x: visible; /* Allow shadows/hints to show */
@@ -135,6 +148,12 @@
   gap: 0.5rem;
 }
 
+.emptyStateIcon {
+  /* Ensure SVGs size correctly */
+  width: 3rem;
+  height: 3rem;
+}
+
 .emptyStateText {
   font-family: var(--font-secondary, sans-serif);
   font-size: 1.25rem;
@@ -152,12 +171,6 @@
   z-index: 50;
 }
 
-.loadingText {
-  color: #fff;
-  text-align: center;
-  margin-top: 2rem;
-}
-
 /* ============================================
    RESPONSIVE
    ============================================ */
@@ -173,7 +186,7 @@
     padding-top: 4rem;
   }
   .notificationsList {
-    max-height: calc(100dvh - 14rem);
+    max-height: calc(100dvh - 16rem);
   }
   .bottomButton {
     bottom: 5rem;
