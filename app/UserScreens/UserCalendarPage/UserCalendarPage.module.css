@@ -1,124 +1,141 @@
 /* UserCalendarPage.module.css */
-
 .pageContainer {
-  composes: mobile-container from global;
-  background: linear-gradient(
-    180deg,
-    #e74e1c 0%,
-    #de6930 53%,
-    #e79267 87%
-  ) !important;
-  min-height: 100vh;
+  width: 100%;
+  max-width: var(--container-max-width);
+  min-height: var(--container-min-height);
+  margin: 0 auto;
+  background: var(--color-background);
   position: relative;
   overflow: hidden;
+  direction: rtl;
+  padding: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
 }
 
 .mainFrame {
-  position: absolute;
-  width: 23.5rem;
-  left: 0.5rem;
-  top: 3.5rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  height: calc(100vh - 3.5rem);
+  overflow: hidden;
 }
 
+/* Centered Title Container */
 .titleContainer {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  width: 21.5625rem;
-  margin-bottom: 1.25rem;
+  margin-top: var(--spacing-4xl);
+  margin-bottom: var(--spacing-3xl);
+  overflow-x: hidden;
+  flex-shrink: 0;
 }
 
 .titleText {
   font-family: var(--font-primary);
-  font-weight: 400;
-  font-size: 2rem;
-  line-height: 2.125rem;
-  text-align: center;
-  color: #ffffff;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-normal);
+  line-height: 2.8125rem;
+  color: var(--color-text-primary);
   margin: 0;
+  text-align: center;
 }
 
 .sliderSection {
   width: 100%;
-  max-width: 22.5625rem;
   height: 3.6875rem;
-  margin-bottom: 2.5rem;
-  margin-left: 2rem;
+  margin-bottom: var(--spacing-3xl);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Centered Filter Container */
 .filterSection {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 1.25rem;
-  position: relative;
+  margin-bottom: var(--spacing-md);
+  overflow-x: hidden;
+  flex-shrink: 0;
   z-index: 20;
   pointer-events: auto;
 }
 
+/* Content Container */
+.contentContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Activities List - SCROLLABLE AREA */
 .activitiesList {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  width: 22.0625rem;
-
-  position: fixed;
-  top: 19rem;
-  bottom: 5rem;
-
+  gap: var(--spacing-md);
+  max-height: calc(100dvh - 25rem);
   overflow-y: auto;
-  scrollbar-width: none;
-  z-index: 10;
+  overflow-x: visible;
+  padding: 0.5rem;
+  padding-right: var(--spacing-xs);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-glass) transparent;
 }
 
 .activitiesList::-webkit-scrollbar {
-  display: none;
+  width: 0.375rem;
 }
 
-/* NEW: Matches Admin Page Overlay Exactly */
+.activitiesList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.activitiesList::-webkit-scrollbar-thumb {
+  background: var(--color-border-glass);
+  border-radius: var(--radius-sm);
+}
+
+/* Individual Activity Item - Prevent shrinking */
+.activityItem {
+  width: 100%;
+  min-height: fit-content; /* Ensure card maintains its natural height */
+  flex-shrink: 0; /* CRITICAL: Prevent cards from shrinking */
+  overflow: visible;
+  transition: none;
+}
+
+/* Loading Overlay */
 .loadingOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000; /* High z-index to sit on top */
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Semi-transparent background so you see context but know it's loading */
   background: rgba(231, 78, 28, 0.2);
   pointer-events: none;
 }
 
 .emptyText {
   font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1rem;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
   line-height: 1.25rem;
   text-align: center;
-  color: #ffffff;
-  margin-top: 2rem;
+  color: var(--color-text-primary);
+  margin-top: var(--spacing-3xl);
 }
 
 /* --- RESPONSIVENESS --- */
 @media (max-height: 50rem) {
   .activitiesList {
-    position: static;
-    height: 22rem;
-    margin-top: 0.5rem;
-    overflow-y: auto;
-    flex-grow: 0;
-  }
-  .mainFrame {
-    justify-content: flex-start;
-    top: 2rem;
+    max-height: calc(100dvh - 22rem);
   }
 }
 
@@ -126,13 +143,12 @@
   .titleText {
     font-size: 1.75rem;
   }
+
   .sliderSection {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--spacing-2xl);
   }
+
   .activitiesList {
-    height: 16rem;
-  }
-  .mainFrame {
-    top: 1rem;
+    max-height: calc(100dvh - 20rem);
   }
 }

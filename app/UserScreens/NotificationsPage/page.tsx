@@ -209,6 +209,7 @@ export default function NewUserNotificationPage() {
             tertiaryWeight="semibold"
             customBgColor="transparent"
             customTextColor="var(--color-bg-light-opaque)"
+            tertiaryArrowDirection="down"
             onClick={handleMarkAllAsRead}
             disabled={loading || notifications.every((n) => n.isRead)}
           >

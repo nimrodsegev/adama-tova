@@ -94,7 +94,7 @@ const Button: React.FC<ButtonProps> = ({
       case "up":
         return "M1 7L7 1L13 7";
       case "down":
-        return "M1 1L7 7L13 1";
+        return "M1 5L7 11L13 5";
       case "left":
       default:
         return "M7 1L1 7L7 13";
@@ -117,7 +117,7 @@ const Button: React.FC<ButtonProps> = ({
       return (
         <div className={styles.arrowWrapper}>
           <svg
-            width="8"
+            width="20"
             height="14"
             viewBox="0 0 8 14"
             fill="none"

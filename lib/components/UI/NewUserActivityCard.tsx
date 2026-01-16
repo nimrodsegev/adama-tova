@@ -201,8 +201,8 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
 
   const getButtonLabel = () => {
     if (isAdmin) return "לכל הנרשמים";
-    if (regStatus === "confirmed") return "ביטול";
-    if (regStatus === "waitlist") return "ביטול";
+    if (regStatus === "confirmed") return "לביטול";
+    if (regStatus === "waitlist") return "לביטול";
     return "להרשמה";
   };
 

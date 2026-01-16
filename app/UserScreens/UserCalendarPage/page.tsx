@@ -53,7 +53,7 @@ export default function NewUserCalendarPage() {
   const mounted = useRef(false);
 
   const fetchData = async () => {
-    // 1. Logic: If switching dates, show Overlay Loader and clear list
+    // If switching dates, show Overlay Loader and clear list
     if (mounted.current) {
       setIsListLoading(true);
       setActivities([]);
@@ -151,56 +151,60 @@ export default function NewUserCalendarPage() {
       mode={motionMode}
     >
       <div className={styles.pageContainer}>
-        {/* 2. LOADING OVERLAY - Outside mainFrame (Same as Admin) */}
+        {/* LOADING OVERLAY */}
         {isListLoading && (
           <div className={styles.loadingOverlay}>
             <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
           </div>
         )}
 
-        <main className={styles.mainFrame}>
-          <div className={styles.titleContainer}>
-            <h1 className={styles.titleText}>לוח פעילויות</h1>
-          </div>
+        {/* Title Container */}
+        <div className={styles.titleContainer}>
+          <h1 className={styles.titleText}>לוח פעילויות</h1>
+        </div>
 
-          <div className={styles.sliderSection}>
-            <DaySlider
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-            />
-          </div>
+        {/* Slider Section */}
+        <div className={styles.sliderSection}>
+          <DaySlider
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
+        </div>
 
-          <div className={styles.filterSection}>
-            <HomeFilter
-              options={dynamicFilters}
-              activeOption={filter}
-              onFilterChange={(newId) => setFilter(newId)}
-            />
-          </div>
+        {/* Filter Section */}
+        <div className={styles.filterSection}>
+          <HomeFilter
+            options={dynamicFilters}
+            activeOption={filter}
+            onFilterChange={(newId) => setFilter(newId)}
+          />
+        </div>
 
+        {/* Content Container with Activities List */}
+        <div className={styles.contentContainer}>
           <div className={styles.activitiesList}>
             {displayedActivities.length > 0
               ? displayedActivities.map((activity) => (
-                  <NewUserActivityCard
-                    key={activity.id}
-                    id={activity.id}
-                    title={activity.title}
-                    instructor={activity.instructor || "לא צוין"}
-                    date={activity.date}
-                    startTime={activity.start_time}
-                    currentParticipants={activity.current_participants || 0}
-                    maxParticipants={activity.max_participants || 0}
-                    waitlistCount={activity.waitlist_count || 0}
-                    isGroup={activity.is_group || !!activity.series_id}
-                    onMotionChange={handleMotionState}
-                  />
+                  <div key={activity.id} className={styles.activityItem}>
+                    <NewUserActivityCard
+                      id={activity.id}
+                      title={activity.title}
+                      instructor={activity.instructor || "לא צוין"}
+                      date={activity.date}
+                      startTime={activity.start_time}
+                      currentParticipants={activity.current_participants || 0}
+                      maxParticipants={activity.max_participants || 0}
+                      waitlistCount={activity.waitlist_count || 0}
+                      isGroup={activity.is_group || !!activity.series_id}
+                      onMotionChange={handleMotionState}
+                    />
+                  </div>
                 ))
-              : // Only show empty text if NOT loading (to prevent flickering)
-                !isListLoading && (
+              : !isListLoading && (
                   <p className={styles.emptyText}>אין פעילויות ליום זה</p>
                 )}
           </div>
-        </main>
+        </div>
       </div>
     </SmoothPageWrapper>
   );
