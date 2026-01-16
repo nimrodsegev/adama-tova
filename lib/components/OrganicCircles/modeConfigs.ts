@@ -17,8 +17,8 @@ export const SPLASH_CONFIG: ModeConfig & {
   radius: 0.16,
   opacity: 0.6,
   layers: 4,
-  complexity: 0.6, // Control Splash wiggliness here
-  smoothness: 0.99, // Control Splash smoothness here
+  complexity: 0.4, // Control Splash wiggliness here
+  smoothness: 0.8, // Control Splash smoothness here
 };
 
 export const BREATHING_CONFIG: ModeConfig = {

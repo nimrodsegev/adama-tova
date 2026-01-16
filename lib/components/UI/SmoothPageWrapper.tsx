@@ -21,6 +21,8 @@ interface SmoothPageWrapperProps {
   minDuration?: number;
   radiusScale?: number;
   baseColor?: string;
+  // --- NEW PARAMETER ---
+  disableCircleLoader?: boolean;
 }
 
 export default function SmoothPageWrapper({
@@ -30,6 +32,8 @@ export default function SmoothPageWrapper({
   minDuration = 10,
   radiusScale = 1.0,
   baseColor = "#FFFFFF",
+  // Default is false so it behaves normally unless specified
+  disableCircleLoader = false,
 }: SmoothPageWrapperProps) {
   const { userProfile } = useUser();
 
@@ -47,17 +51,13 @@ export default function SmoothPageWrapper({
     return calculateShapeParams(userProfile);
   }, [userProfile]);
 
-  // --- TIMER LOGIC (THE FIX) ---
-
-  // Step A: When loading starts, immediately LOCK the screen (elapsed = false)
+  // --- TIMER LOGIC ---
   useEffect(() => {
     if (isLoading) {
       setMinTimeElapsed(false);
     }
   }, [isLoading]);
 
-  // Step B: Whenever the screen is locked, start the timer to UNLOCK it.
-  // This is separate from isLoading, so it won't be cancelled if data loads fast.
   useEffect(() => {
     if (!minTimeElapsed) {
       const timer = setTimeout(() => {
@@ -67,8 +67,7 @@ export default function SmoothPageWrapper({
       return () => clearTimeout(timer);
     }
   }, [minTimeElapsed, minDuration]);
-
-  // -----------------------------
+  // -------------------
 
   useEffect(() => {
     const handleResize = () => {
@@ -106,34 +105,43 @@ export default function SmoothPageWrapper({
 
   return (
     <>
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "90vh",
-          background:
-            "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 99999,
-          opacity: showLoader ? 1 : 0,
-          pointerEvents: showLoader ? "all" : "none",
-          transition: "opacity 0.6s ease-in-out",
-        }}
-        dir="rtl"
-      >
-        <OrganicCircles
-          mode={mode}
-          radius={circleConfig.radius * radiusScale}
-          position={{ x: circleConfig.x, y: circleConfig.y }}
-          baseColor={baseColor}
-          {...shapeParams}
-        />
-      </div>
+      {/* ONLY render the circle overlay if disableCircleLoader is FALSE.
+         If it is true, this entire block is skipped.
+      */}
+      {!disableCircleLoader && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "90vh",
+            background:
+              "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99999,
+            opacity: showLoader ? 1 : 0,
+            pointerEvents: showLoader ? "all" : "none",
+            transition: "opacity 0.6s ease-in-out",
+          }}
+          dir="rtl"
+        >
+          <OrganicCircles
+            mode={mode}
+            radius={circleConfig.radius * radiusScale}
+            position={{ x: circleConfig.x, y: circleConfig.y }}
+            baseColor={baseColor}
+            {...shapeParams}
+          />
+        </div>
+      )}
 
+      {/* The content wrapper remains exactly the same. 
+         Even if the circles are disabled, this div will still fade in 
+         smoothly (opacity 0 -> 1) once loading is finished.
+      */}
       <div
         style={{
           opacity: showLoader ? 0 : 1,

@@ -19,7 +19,9 @@ type SignupType = "email" | "google";
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("choice");
-  const [loadingAction, setLoadingAction] = useState<"login" | "signup" | null>(null);
+  const [loadingAction, setLoadingAction] = useState<"login" | "signup" | null>(
+    null
+  );
   const [initialCheckDone, setInitialCheckDone] = useState(false);
 
   // Auth fields
@@ -191,112 +193,115 @@ export default function LoginPage() {
   // LOGIN SCREEN
   if (mode === "choice") {
     return (
-      <SmoothPageWrapper isLoading={!initialCheckDone || loadingAction !== null}>
+      <SmoothPageWrapper
+        isLoading={!initialCheckDone || loadingAction !== null}
+        disableCircleLoader={true}
+      >
         <div className={styles.loginContainer}>
-        <div className={styles.content}>
-          <div className={styles.mainSection}>
-            {/* Greeting section */}
-            <div className={styles.greeting}>
-              <h1>ברוכה הבאה</h1>
-              <p>להתחברות הכניסו פרטים</p>
-            </div>
+          <div className={styles.content}>
+            <div className={styles.mainSection}>
+              {/* Greeting section */}
+              <div className={styles.greeting}>
+                <h1>ברוכה הבאה</h1>
+                <p>להתחברות הכניסו פרטים</p>
+              </div>
 
-            <div className={styles.loginContent}>
-              {/* Email Input */}
-              <CutInput
-                label="אימייל"
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError("");
-                }}
-                error={emailError}
-                dir="ltr"
-                textAlign="right"
-              />
+              <div className={styles.loginContent}>
+                {/* Email Input */}
+                <CutInput
+                  label="אימייל"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError("");
+                  }}
+                  error={emailError}
+                  dir="ltr"
+                  textAlign="right"
+                />
 
-              {/* Password Input */}
-              <CutInput
-                label="סיסמה"
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError("");
-                }}
-                placeholder="6 תווים או יותר"
-                error={passwordError}
-                dir="rtl"
-                textAlign="right"
-              />
+                {/* Password Input */}
+                <CutInput
+                  label="סיסמה"
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError("");
+                  }}
+                  placeholder="6 תווים או יותר"
+                  error={passwordError}
+                  dir="rtl"
+                  textAlign="right"
+                />
 
-              {/* Action Buttons */}
-              <div className={styles.buttonSection}>
-                {/* 1. התחבר (Login) */}
-                <button
-                  className={styles.primaryButton}
-                  onClick={handleLogin}
-                  disabled={loadingAction !== null}
-                >
-                  {loadingAction === "login" ? "מתחבר..." : "התחבר"}
-                </button>
-
-                {/* 2. התחבר עם גוגל (Google) */}
-                <GoogleLoginButton className={styles.googleButton} />
-
-                {/* 3. או (OR separator) */}
-                <div className={styles.orSeparator}>
-                  <span className={styles.orLine}></span>
-                  <span className={styles.orText}>או</span>
-                  <span className={styles.orLine}></span>
-                </div>
-
-                {/* 4. יצירת משתמש (Create User) */}
-                <button
-                  className={styles.secondaryButton}
-                  onClick={handleSignupClick}
-                  disabled={loadingAction !== null}
-                >
-                  יצירת משתמש
-                </button>
-
-                {/* 5. שכחתי סיסמה (Forgot Password) - with arrow */}
-                <div className={styles.forgotPasswordWrapper}>
-                  <Button
-                    variant="tertiary"
-                    colorType="white"
-                    tertiarySize="base"
-                    tertiaryWeight="normal"
-                    onClick={() => setShowForgotPassword(true)}
+                {/* Action Buttons */}
+                <div className={styles.buttonSection}>
+                  {/* 1. התחבר (Login) */}
+                  <button
+                    className={styles.primaryButton}
+                    onClick={handleLogin}
+                    disabled={loadingAction !== null}
                   >
-                    שכחתי סיסמה
-                  </Button>
+                    {loadingAction === "login" ? "מתחבר..." : "התחבר"}
+                  </button>
+
+                  {/* 2. התחבר עם גוגל (Google) */}
+                  <GoogleLoginButton className={styles.googleButton} />
+
+                  {/* 3. או (OR separator) */}
+                  <div className={styles.orSeparator}>
+                    <span className={styles.orLine}></span>
+                    <span className={styles.orText}>או</span>
+                    <span className={styles.orLine}></span>
+                  </div>
+
+                  {/* 4. יצירת משתמש (Create User) */}
+                  <button
+                    className={styles.secondaryButton}
+                    onClick={handleSignupClick}
+                    disabled={loadingAction !== null}
+                  >
+                    יצירת משתמש
+                  </button>
+
+                  {/* 5. שכחתי סיסמה (Forgot Password) - with arrow */}
+                  <div className={styles.forgotPasswordWrapper}>
+                    <Button
+                      variant="tertiary"
+                      colorType="white"
+                      tertiarySize="base"
+                      tertiaryWeight="normal"
+                      onClick={() => setShowForgotPassword(true)}
+                    >
+                      שכחתי סיסמה
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* About Link - "מי אנחנו?" */}
+            <div className={styles.aboutLinkWrapper}>
+              <Button variant="primary" href="/login/about">
+                מי אנחנו?
+              </Button>
+            </div>
           </div>
 
-          {/* About Link - "מי אנחנו?" */}
-          <div className={styles.aboutLinkWrapper}>
-            <Button variant="primary" href="/login/about">
-              מי אנחנו?
-            </Button>
-          </div>
-        </div>
+          {showForgotPassword && (
+            <ForgotPasswordModal
+              email={email}
+              onClose={() => setShowForgotPassword(false)}
+            />
+          )}
 
-        {showForgotPassword && (
-          <ForgotPasswordModal
-            email={email}
-            onClose={() => setShowForgotPassword(false)}
+          <SignupModal
+            isOpen={showSignupModal}
+            onClose={() => setShowSignupModal(false)}
+            onProceed={handleSignupProceed}
           />
-        )}
-
-        <SignupModal
-          isOpen={showSignupModal}
-          onClose={() => setShowSignupModal(false)}
-          onProceed={handleSignupProceed}
-        />
         </div>
       </SmoothPageWrapper>
     );
