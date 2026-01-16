@@ -1470,3 +1470,42 @@
     margin-top: 0;
   }
 }
+
+/* ============================================
+   PWA VIEWPORT HEIGHTS - Arrow & content fix
+   ============================================ */
+/* iPhone X/XS/11 Pro/12 mini PWA viewport (768px height) */
+@media (min-height: 760px) and (max-height: 780px) {
+  .nextArrow {
+    bottom: 7rem;
+  }
+
+  .circleSpacer {
+    height: min(50vw, 12.5rem);
+    margin-bottom: 1rem;
+  }
+}
+
+/* iPhone 12/13/14 PWA viewport (797px height) */
+@media (min-height: 790px) and (max-height: 810px) {
+  .nextArrow {
+    bottom: 7rem;
+  }
+
+  .circleSpacer {
+    height: min(52vw, 13rem);
+    margin-bottom: 1rem;
+  }
+}
+
+/* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
+@media (min-height: 865px) and (max-height: 885px) {
+  .nextArrow {
+    bottom: 8rem;
+  }
+
+  .circleSpacer {
+    height: min(54vw, 13.5rem);
+    margin-bottom: 1.25rem;
+  }
+}
