@@ -308,19 +308,3 @@
   .profileBox { padding: 0.75rem; }
   .profileBox .boxFooter { bottom: 0.75rem; left: 0.75rem; }
 }
-
-/* ============================================
-   DEBUG BUTTON - TEMPORARY
-   ============================================ */
-.debugButton {
-  display: block;
-  margin-top: 1rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.625rem;
-  font-family: monospace;
-  border-radius: 0.25rem;
-  text-decoration: none;
-  text-align: center;
-}
