@@ -3,7 +3,9 @@
 .pageContainer {
   width: 100%;
   max-width: var(--container-max-width, 23.5rem);
-  min-height: 100vh;
+
+  /* 1. Use 100dvh so it fits the mobile screen exactly */
+  height: calc(100dvh - 4.5rem);
   margin: 0 auto;
 
   /* Retaining the Admin Orange Gradient */
@@ -15,10 +17,16 @@
   ) !important;
 
   position: relative;
-  overflow: hidden;
+
+  /* 2. ENABLE scrolling on the main container */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+
   direction: rtl;
   padding: var(--spacing-xl, 1.5rem);
-  padding-bottom: var(--spacing-xl, 1.5rem);
+
+  /* 3. Add Safe Area to bottom padding so background covers the home bar */
+  padding-bottom: calc(var(--spacing-xl, 1.5rem) + env(safe-area-inset-bottom));
 }
 
 /* Centered Title Container */
@@ -37,7 +45,7 @@
   font-size: var(--font-size-3xl, 2rem);
   font-weight: 400;
   line-height: 2.8125rem;
-  color: #ffffff; /* White text for orange background */
+  color: #ffffff;
   margin: 0;
   text-align: center;
 }
@@ -59,7 +67,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: var(--spacing-md, 1rem);
+  margin-bottom: var(--spacing-xs, 0.75rem);
   overflow-x: hidden;
   flex-shrink: 0;
   z-index: 20;
@@ -71,47 +79,31 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* Removed overflow:hidden so it can grow */
 }
 
-/* Activities List - SCROLLABLE AREA */
+/* Activities List - NOW GROWS NATURALLY */
 .activitiesList {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md, 0.75rem);
-  /* Calculate height: Viewport - Top elements */
-  max-height: calc(100vh - 23.5rem);
-  overflow-y: auto;
-  overflow-x: visible;
+
+  /* 4. Removed max-height & overflow-y -> The page scrolls now, not this div */
+  width: 100%;
   padding: 0.5rem;
   padding-right: 0.25rem;
-  padding-bottom: 5rem;
 
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  /* 5. Extra padding at bottom to clear the fixed button */
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
 }
 
-.activitiesList::-webkit-scrollbar {
-  width: 0.375rem;
-}
-
-.activitiesList::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.activitiesList::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-/* Individual Activity Item - Prevent shrinking */
+/* Individual Activity Item */
 .activityItem {
   width: 100%;
   min-height: fit-content;
   flex-shrink: 0;
   overflow: visible;
-  cursor: pointer; /* Added pointer to indicate it's clickable for Admin */
+  cursor: pointer;
 }
 
 /* Empty State */
@@ -141,22 +133,17 @@
 }
 
 /* ============================================
-   BOTTOM BUTTON - Fixed at bottom right
+   BOTTOM BUTTON - Adjusted for Safe Area
    ============================================ */
 .bottomButton {
   position: fixed;
-  bottom: 6rem;
+  /* 6. Lifted to respect the home bar safe area */
+  bottom: calc(6rem + env(safe-area-inset-bottom));
   right: 1.25rem;
   z-index: 50;
 }
 
-/* --- RESPONSIVENESS (Matched to User Page) --- */
-@media (max-height: 50rem) {
-  .activitiesList {
-    max-height: calc(100vh - 22rem);
-  }
-}
-
+/* --- RESPONSIVENESS --- */
 @media (max-height: 43.75rem) {
   .titleText {
     font-size: 1.75rem;
@@ -164,9 +151,5 @@
 
   .sliderSection {
     margin-bottom: 1.5rem;
-  }
-
-  .activitiesList {
-    max-height: calc(100vh - 20rem);
   }
 }
