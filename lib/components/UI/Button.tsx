@@ -11,8 +11,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | "tertiary"
     | "approve"
     | "reject"
-    | "popup-primary"
-    | "popup-secondary"
     | "whatsapp"
     | "waiting-list"
     | "custom"
@@ -21,7 +19,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   // ⭐ NEW: Tertiary-specific props
   tertiarySize?: "small" | "base" | "medium" | "large" | "xlarge";
   tertiaryWeight?: "light" | "normal" | "semibold" | "bold";
-  icon?: React.ReactNode;
+  tertiaryArrowDirection?: "left" | "right" | "up" | "down";
+  icon?: string; // Path to icon in /icons folder
   customBgColor?: string;
   customTextColor?: string;
   customBorderColor?: string;
@@ -36,6 +35,7 @@ const Button: React.FC<ButtonProps> = ({
   colorType = "orange",
   tertiarySize = "large",
   tertiaryWeight = "normal",
+  tertiaryArrowDirection = "left",
   icon,
   customBgColor,
   customTextColor,
@@ -87,6 +87,20 @@ const Button: React.FC<ButtonProps> = ({
     .filter(Boolean)
     .join(" ");
 
+  const getArrowPath = (direction: string) => {
+    switch (direction) {
+      case "right":
+        return "M1 1L7 7L1 13";
+      case "up":
+        return "M1 7L7 1L13 7";
+      case "down":
+        return "M1 1L7 7L13 1";
+      case "left":
+      default:
+        return "M7 1L1 7L7 13";
+    }
+  };
+
   const renderVariantIcon = () => {
     if (variant === "whatsapp") return <div className={styles.whatsappIcon} />;
     if (variant === "waiting-list") {
@@ -99,7 +113,7 @@ const Button: React.FC<ButtonProps> = ({
       );
     }
     if (isTertiary) {
-      // ⭐ Use SVG icon with color matching
+      // ⭐ Use SVG icon with color matching and direction
       return (
         <div className={styles.arrowWrapper}>
           <svg
@@ -111,7 +125,7 @@ const Button: React.FC<ButtonProps> = ({
             className={styles.arrowIcon}
           >
             <path
-              d="M7 1L1 7L7 13"
+              d={getArrowPath(tertiaryArrowDirection)}
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
@@ -126,7 +140,11 @@ const Button: React.FC<ButtonProps> = ({
 
   const content = (
     <>
-      {icon && <span className={styles.startIcon}>{icon}</span>}
+      {icon && (
+        <span className={styles.startIcon}>
+          <Image src={icon} alt="" width={16} height={16} />
+        </span>
+      )}
       <span className={styles.label}>{children}</span>
       {renderVariantIcon()}
     </>

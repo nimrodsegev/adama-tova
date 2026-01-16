@@ -377,18 +377,18 @@ export default function ActivityDetailsModal({
                           {registrationCount.waitlist > 0 &&
                             ` (${registrationCount.waitlist} ברשימת המתנה)`}
                         </p>
+                      </div>
 
-                        <div className={styles.adminRegistrationsButtonSection}>
-                          <Button
-                            variant="tertiary"
-                            tertiarySize="medium"
-                            tertiaryWeight="bold"
-                            colorType="red"
-                            onClick={() => setIsRegistrationsModalOpen(true)}
-                          >
-                            לכל הנרשמים
-                          </Button>
-                        </div>
+                      <div className={styles.adminRegistrationsButtonSection}>
+                        <Button
+                          variant="tertiary"
+                          tertiarySize="medium"
+                          tertiaryWeight="semibold"
+                          colorType="orange"
+                          onClick={() => setIsRegistrationsModalOpen(true)}
+                        >
+                          לכל הנרשמים
+                        </Button>
                       </div>
                     </>
                   )}
@@ -397,35 +397,37 @@ export default function ActivityDetailsModal({
             </div>
 
             {/* Bottom Buttons Container */}
-            {!loading && !closing && isAdmin && (
+            {!loading && !closing && (
               <div className={styles.bottomButtonsContainer}>
                 {isAdmin ? (
                   <>
-                    <Button
-                      size="L"
-                      variant="secondary"
-                      onClick={handleDelete}
-                      disabled={loading}
-                    >
-                      {t("מחיקה")}
-                    </Button>
                     <Button
                       size="L"
                       variant="primary"
                       onClick={handleEdit}
                       disabled={loading}
                     >
-                      {t("עריכה")}
+                      {t("[ערוך|ערכי]")}
+                    </Button>
+                    <Button
+                      size="L"
+                      variant="secondary"
+                      onClick={handleDelete}
+                      disabled={loading}
+                    >
+                      {t("מחק/י")}
                     </Button>
                   </>
                 ) : (
-                  <Button
-                    size="L"
-                    onClick={handleRegistrationToggle}
-                    disabled={loading}
-                  >
-                    {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
-                  </Button>
+                  <>
+                    <Button
+                      size="L"
+                      onClick={handleRegistrationToggle}
+                      disabled={loading}
+                    >
+                      {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
+                    </Button>
+                  </>
                 )}
               </div>
             )}

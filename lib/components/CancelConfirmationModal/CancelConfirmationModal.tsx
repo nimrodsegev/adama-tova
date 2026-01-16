@@ -26,8 +26,9 @@ export default function CancelConfirmationModal({
 
   return (
     <Popup
-      title={t("?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה")}
-      content={`ל${activityTitle} ב${activityDate} בשעה ${activityTime}`}
+      content={`${t(
+        "את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
+      )}\nל${activityTitle} ב${activityDate} בשעה ${activityTime}?`}
       primaryButtonText="לא"
       primaryButtonAction={onClose}
       secondaryButtonText="כן, לבטל"
