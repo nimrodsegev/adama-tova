@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect } from "react";
+import Image from "next/image"; // Added for icon
 import { apiUser } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./CreateNewAdmin.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; // Added wrapper
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
+
 // --- Constants ---
 const GENDER_OPTIONS = [
   { value: "male", label: "זכר" },
@@ -23,11 +26,14 @@ export default function CreateNewAdmin() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [gender, setGender] = useState(""); // Gender State
+  const [gender, setGender] = useState("");
 
   // UI State
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Animation State
+  const [closing, setClosing] = useState(false);
 
   // --- FLOATING LABEL BACKGROUND FIX ---
   useLayoutEffect(() => {
@@ -53,6 +59,15 @@ export default function CreateNewAdmin() {
     };
   }, [genderDropdownOpen]);
 
+  // --- Close Animation Handler ---
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      router.back();
+    }, 400);
+  };
+
   const handleSubmit = async () => {
     if (!fullName || !email || !password || !phone || !gender) {
       alert("נא למלא את כל השדות");
@@ -62,8 +77,6 @@ export default function CreateNewAdmin() {
     setIsSubmitting(true);
 
     try {
-      // Assuming apiUser.createAdmin now accepts gender as a 5th param
-      // or you will update it to handle the object/param.
       const [res, error] = await apiUser.createAdmin(
         email, 
         password, 
@@ -71,8 +84,9 @@ export default function CreateNewAdmin() {
         phone,
         gender
       );
+    
       alert("מנהל נוסף בהצלחה!");
-      router.push("/AdminScreens/HomePage");
+      handleCloseWithAnimation(); // Reuse close logic to exit
     } catch (error: any) {
       console.error("Error creating admin:", error);
       alert("שגיאה ביצירת המנהל: " + (error.message || "אירעה תקלה"));
@@ -82,10 +96,21 @@ export default function CreateNewAdmin() {
   };
 
   return (
+    <SmoothPageWrapper isLoading={closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
-      <button className="close-button" onClick={() => router.back()}>
-        <div className="close-button-inner" />
-        <div className="close-icon" />
+      
+      {/* NEW CLOSE BUTTON */}
+      <button
+        className={styles.closeButton}
+        onClick={handleCloseWithAnimation}
+        aria-label="סגור"
+      >
+        <Image
+          src="/icons/close.svg"
+          alt="Close icon"
+          width={40}
+          height={40}
+        />
       </button>
 
       <div className={styles.header}>
@@ -104,16 +129,21 @@ export default function CreateNewAdmin() {
             textAlign="right"
         />
       
-        {/* Gender Selector (Added Block) */}
-        <UnifiedDropdown
-            label="מין" 
-            placeholder="בחר/י"
-            options={GENDER_OPTIONS}
-            value={gender}
-            onChange={setGender}
-            isOpen={genderDropdownOpen}
-            onToggle={() => setGenderDropdownOpen(!genderDropdownOpen)}
-        />
+        {/* Gender Selector - Wrapped to fix Z-Index */}
+        <div 
+          className={`${styles.dropdownContainer} ${genderDropdownOpen ? styles.activeDropdownWrapper : ''}`}
+        >
+          <UnifiedDropdown
+              label="מין" 
+              placeholder="בחר/י"
+              options={GENDER_OPTIONS}
+              value={gender}
+              onChange={setGender}
+              isOpen={genderDropdownOpen}
+              onToggle={() => setGenderDropdownOpen(!genderDropdownOpen)}
+          />
+        </div>
+
         {/* Email */}
         <CutInput 
             label="אימייל" 
@@ -160,5 +190,6 @@ export default function CreateNewAdmin() {
 
       </div>
     </main>
+    </SmoothPageWrapper>
   );
 }

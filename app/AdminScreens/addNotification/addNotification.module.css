@@ -115,7 +115,36 @@
   width: 100%; 
   direction: rtl; 
 }
+/* ============================================
+   CLOSE BUTTON 
+   ============================================ */
+.closeButton {
+  position: absolute;
+  width: auto;
+  height: auto;
+  right: 2.5rem; /* 24px */
+  top: var(--spacing-3xl); /* 32px */
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1201;
+  padding: var(--spacing-xs); /* 4px */
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
 
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
 /* ============================================
    BUTTONS
    ============================================ */

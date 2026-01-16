@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useUser } from "@/app/contexts/UserContext";
 import {
   apiUser,
@@ -98,6 +99,9 @@ export default function AdminHomePage() {
   const [upcomingActivities, setUpcomingActivities] = useState<Activity[]>([]);
 
   const [mounting, setMounting] = useState(true);
+
+  // FAB menu state
+  const [isFabOpen, setIsFabOpen] = useState(false);
 
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
@@ -514,16 +518,8 @@ export default function AdminHomePage() {
           {/* End scrollableContent */}
         </div>
 
-        {/* Bottom Buttons - gradient only shows when 3+ cards */}
-        <div
-          className={`${styles.bottomButtons} ${
-            (activeFilter === "pending" &&
-              pendingUsers.length + pendingGroupRegs.length >= 3) ||
-            (activeFilter === "approved" && upcomingActivities.length >= 3)
-              ? styles.showGradient
-              : ""
-          }`}
-        >
+        {/* Action buttons - visible when FAB is open */}
+        <div className={`${styles.actionButtons} ${isFabOpen ? styles.actionButtonsOpen : ""}`}>
           <Button size="L" href="/AdminScreens/addNotification">
             להוספת הודעה
           </Button>
@@ -531,6 +527,21 @@ export default function AdminHomePage() {
             להוספת פעילות
           </Button>
         </div>
+
+        {/* FAB button */}
+        <button
+          className={`${styles.fabButton} ${isFabOpen ? styles.fabButtonOpen : ""}`}
+          onClick={() => setIsFabOpen(!isFabOpen)}
+          aria-label={isFabOpen ? "סגור תפריט" : "פתח תפריט"}
+        >
+          <Image
+            src="/icons/plus_fab_icon.svg"
+            alt=""
+            width={56}
+            height={56}
+            className={styles.fabIcon}
+          />
+        </button>
 
         {/* Activity Details Modal */}
         {selectedActivityId && (

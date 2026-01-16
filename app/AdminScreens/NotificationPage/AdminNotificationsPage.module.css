@@ -152,14 +152,13 @@
 }
 
 /* ============================================
-   BOTTOM BUTTON
+   BOTTOM BUTTON - Fixed at bottom right
    ============================================ */
 .bottomButton {
   position: fixed;
-  bottom: 6.5rem; /* Above navbar */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+  bottom: 6rem;
+  right: 1.25rem;
+  z-index: 50;
 }
 
 /* ============================================

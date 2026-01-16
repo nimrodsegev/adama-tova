@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { apiActivities } from "@/app/services/db_api";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import UserProfileModal from "@/lib/components/UserProfileModal/UserProfileModal";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import Button from "@/lib/components/UI/Button";
 import styles from "./ActivityRegistrationsModal.module.css";
 
 interface Registration {
@@ -151,11 +153,17 @@ export default function ActivityRegistrationsModal({
 
       <div className={styles.modalContainer}>
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
-          <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
-            <line x1="2" y1="2" x2="18" y2="18" stroke="#F9F9F9" strokeWidth="1" />
-            <line x1="18" y1="2" x2="2" y2="18" stroke="#F9F9F9" strokeWidth="1" />
-          </svg>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseWithAnimation}
+          aria-label="סגור"
+        >
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
+          />
         </button>
 
         <div className={styles.contentFrame}>
@@ -214,13 +222,25 @@ export default function ActivityRegistrationsModal({
                         </div>
 
                         {/* Profile Link */}
-                        <button
-                          className={`${styles.profileLink} ${isWaitlist ? styles.profileLinkWaitlist : ""}`}
+                        <Button
+                          variant="tertiary"
+                          colorType="white"
+                          tertiarySize="base"
+                          tertiaryWeight="semibold"
                           onClick={() => handleViewProfile(user?.id)}
+                          style={{ alignSelf: 'flex-end' }}
                         >
-                          <span>לצפייה בפרופיל</span>
-                          <span className={`${styles.profileArrow} ${isWaitlist ? styles.profileArrowWaitlist : ""}`} />
-                        </button>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+                            <Image
+                              src="/icons/clock_icon.svg"
+                              alt=""
+                              width={40}
+                              height={40}
+                              style={{ filter: 'brightness(0) invert(1)' }}
+                            />
+                            לצפייה בפרופיל
+                          </span>
+                        </Button>
                       </div>
                     );
                   })

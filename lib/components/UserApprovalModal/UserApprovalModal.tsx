@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { apiUser } from "@/app/services/db_api";
 import StatCard from "@/lib/components/UI/StatCard";
+import Button from "@/lib/components/UI/Button";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./UserApprovalModal.module.css";
@@ -80,16 +82,17 @@ export default function UserApprovalModal({
       <div className={styles.overlay} onClick={handleCloseWithAnimation} />
       <div className={styles.modalContainer}>
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="#F9F9F9"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseWithAnimation}
+          aria-label="סגור"
+        >
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
+          />
         </button>
 
         <div className={styles.contentFrame}>
@@ -125,12 +128,12 @@ export default function UserApprovalModal({
                     </div>
                     {/* Buttons on the left */}
                     <div className={styles.actionButtons}>
-                      <button className={styles.rejectButton} onClick={onReject}>
+                      <Button variant="reject" onClick={onReject}>
                         {t("סרב/י")}
-                      </button>
-                      <button className={styles.approveButton} onClick={onApprove}>
+                      </Button>
+                      <Button variant="approve" onClick={onApprove}>
                         {t("אשר/י")}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>

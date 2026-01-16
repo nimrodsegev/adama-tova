@@ -42,8 +42,8 @@
   position: absolute;
   width: auto;
   height: auto;
-  right: 2.5rem; /* 24px */
-  top: var(--spacing-3xl); /* 32px */
+  right: 1.5rem; /* 24px */
+  top: 3rem; /* 48px */
   border: none;
   outline: none;
   box-shadow: none;
@@ -272,7 +272,7 @@
 
 .bottomButtonsContainer {
   position: fixed;
-  bottom: 3rem;
+  bottom: 4rem;
   left: 0;
   right: 0;
   width: 100%;
@@ -338,7 +338,7 @@
 /* Small phones */
 @media (max-width: 26rem) {
   .closeButton {
-    top: var(--spacing-lg); /* 16px - higher on small phones */
+    top: 2.5rem; /* 40px */
     right: var(--spacing-xl); /* 20px */
   }
 
@@ -350,7 +350,7 @@
 /* Small height screens (iPhone SE, etc.) */
 @media (max-height: 670px) {
   .closeButton {
-    top: var(--spacing-lg); /* 16px */
+    top: 2.5rem; /* 40px */
   }
 
   .contentContainer {
