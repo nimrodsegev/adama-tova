@@ -6,11 +6,14 @@ import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
 import Button from "@/lib/components/UI/Button";
+import Popup from "@/lib/components/UI/Popup";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
+import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./ActivityDetailsModal.module.css";
+import Image from "next/image";
 
 type ActivityDetailsModalProps = {
   activityId: string;
@@ -54,6 +57,9 @@ export default function ActivityDetailsModal({
   const [mounted, setMounted] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] =
+    useState(false);
   const [registrationBackendStatus, setRegistrationBackendStatus] = useState<
     string | null
   >(null);
@@ -69,8 +75,8 @@ export default function ActivityDetailsModal({
 
   useEffect(() => {
     if (isOpen && activityId) {
-      setHideDetailsModal(false); // Reset visibility when opening
-      setClosing(false); // Reset closing state when opening
+      setHideDetailsModal(false);
+      setClosing(false);
       fetchActivityDetails();
       checkRegistrationStatus();
       document.body.style.overflow = "hidden";
@@ -82,7 +88,6 @@ export default function ActivityDetailsModal({
     };
   }, [isOpen, activityId]);
 
-  // Handle close with animation
   const handleCloseWithAnimation = () => {
     setClosing(true);
     setTimeout(() => {
@@ -135,7 +140,6 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // --- 1. REGISTER FLOW ---
   const handleRegistrationToggle = async () => {
     if (!user || loading || isAdmin) return;
 
@@ -144,7 +148,6 @@ export default function ActivityDetailsModal({
       return;
     }
 
-    // A. Start Wrapper FIRST (Fade In)
     onMotionChange?.("start");
     setLoading(true);
 
@@ -157,25 +160,16 @@ export default function ActivityDetailsModal({
       if (res && typeof res === "object" && "success" in res) {
         const isWaitlist = res.if_confirmed === false;
 
-        // Update Local State
         setRegStatus(isWaitlist ? "waitlist" : "confirmed");
         setWaitlistPosition(res.wait_list_place || null);
         setRegistrationBackendStatus(res.status || null);
 
-        // B. Wait for wrapper to cover screen (500ms)
         setTimeout(() => {
-          // Hide the details UI so it doesn't overlap
           setHideDetailsModal(true);
-
-          // Show the Success Modal
           setIsSuccessModalOpen(true);
-
-          // C. Fade Out Wrapper (Skip Fetching Data yet)
-          // This reveals the Success Modal
           onMotionChange?.("end", true);
         }, 500);
       } else {
-        // Error case
         onMotionChange?.("end");
       }
     } catch (error) {
@@ -186,14 +180,10 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // --- 2. CANCEL FLOW ---
   const handleCancelConfirm = async () => {
     if (!user || loading) return;
 
-    // Close the small confirmation modal immediately
     setIsCancelModalOpen(false);
-
-    // A. Start Wrapper FIRST
     onMotionChange?.("start");
     setLoading(true);
 
@@ -204,18 +194,11 @@ export default function ActivityDetailsModal({
       );
 
       if (!error) {
-        // B. Wait for wrapper (600ms)
         setTimeout(() => {
-          // C. Close the Main Modal (Details) BEHIND the wrapper
           onClose();
           setRegStatus("none");
           setWaitlistPosition(null);
-
-          // D. Fade Out Wrapper + Fetch Data
-          // This reveals the underlying page (updated)
           onMotionChange?.("end");
-
-          // Extra safety trigger for parent update
           onRegistrationChange?.();
         }, 600);
       } else {
@@ -229,22 +212,13 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // --- 3. CLOSE SUCCESS MODAL FLOW ---
   const handleSuccessModalClose = () => {
-    // A. Start Wrapper (Fade In)
     onMotionChange?.("start");
 
-    // B. Wait for wrapper (600ms)
     setTimeout(() => {
-      // Close Success Modal
       setIsSuccessModalOpen(false);
-
-      // Close Details Modal
       onClose();
-
-      // C. Fade Out Wrapper + Fetch Data
-      onMotionChange?.("end"); // skipFetch defaults to false -> triggers fetch
-
+      onMotionChange?.("end");
       onRegistrationChange?.();
     }, 600);
   };
@@ -254,15 +228,20 @@ export default function ActivityDetailsModal({
     router.push(`/AdminScreens/EditActivityPage?id=${activityId}`);
   };
 
-  const handleDelete = async () => {
-    if (!confirm(t("האם את/ה בטוח/ה שברצונך למחוק פעילות זו?"))) return;
+  const handleDelete = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     setLoading(true);
     const [_, error] = await apiActivities.delete(activityId);
     if (error) {
       alert("שגיאה במחיקה: " + error);
       setLoading(false);
+      setIsDeleteModalOpen(false);
     } else {
       alert("הפעילות נמחקה בהצלחה");
+      setIsDeleteModalOpen(false);
       onClose();
       onRegistrationChange?.();
     }
@@ -270,7 +249,7 @@ export default function ActivityDetailsModal({
 
   if (!isOpen || !mounted) return null;
 
-  // Formatting...
+  // Formatting
   const formattedTime = activity?.start_time?.slice(0, 5) || "";
   const dateObj = activity?.date ? new Date(activity.date) : null;
   const dayName = dateObj
@@ -286,49 +265,38 @@ export default function ActivityDetailsModal({
   const isGroup = activity?.is_group || !!activity?.series_id;
   const instructor = activity?.instructor || "";
   const location = activity?.location || "";
-
-  // --- MAP BRANCH HERE ---
   const rawBranch = activity?.branch;
   const branch = BRANCH_MAPPING[rawBranch] || rawBranch || "המרכז";
-
   const description = activity?.description || "";
   const remainingSpots = Math.max(
     0,
     registrationCount.total - registrationCount.confirmed
   );
   const hasImage = !!activity?.image_url;
-  const contentFrameStyle = { marginTop: hasImage ? "5rem" : "20vh" };
 
   const modalContent = (
     <>
-      {/* Hide details if we are showing Success Modal */}
       {!hideDetailsModal && (
         <>
           <div className={styles.overlay} onClick={handleCloseWithAnimation} />
           <div className={styles.modalContainer}>
-            <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
-              <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
-                <line
-                  x1="2"
-                  y1="2"
-                  x2="18"
-                  y2="18"
-                  stroke="#F9F9F9"
-                  strokeWidth="1"
-                />
-                <line
-                  x1="18"
-                  y1="2"
-                  x2="2"
-                  y2="18"
-                  stroke="#F9F9F9"
-                  strokeWidth="1"
-                />
-              </svg>
+            {/* Close Button */}
+            <button
+              className={styles.closeButton}
+              onClick={handleCloseWithAnimation}
+              aria-label="סגור"
+            >
+              <Image
+                src="/icons/close.svg"
+                alt="Close icon"
+                width={40}
+                height={40}
+              />
             </button>
 
-            <div className={styles.contentFrame} style={contentFrameStyle}>
-              {(loading || closing) ? (
+            {/* Main Content Container */}
+            <div className={styles.contentContainer}>
+              {loading || closing ? (
                 <div className={styles.loadingContainer}>
                   <OrganicCircles
                     mode="loading"
@@ -338,6 +306,7 @@ export default function ActivityDetailsModal({
                 </div>
               ) : (
                 <>
+                  {/* Image */}
                   {hasImage && (
                     <div className={styles.imageContainer}>
                       <img
@@ -348,77 +317,118 @@ export default function ActivityDetailsModal({
                     </div>
                   )}
 
-                  <h2 className={styles.titleText}>{activity?.title || ""}</h2>
+                  {/* Title Section */}
+                  <div className={styles.titleSection}>
+                    <h2 className={styles.titleText}>
+                      {isGroup ? "קבוצת " : "סדנת "}
+                      {activity?.title || ""}
+                    </h2>
+                  </div>
 
-                  <div className={styles.detailsContainer}>
-                    <div className={styles.textBlock}>
-                      <p className={styles.primaryInfoText}>
+                  {/* Primary Info Section (Date & Time) */}
+                  <div className={styles.primaryInfoSection}>
+                    <div className={styles.dateTimeRow}>
+                      <span className={styles.primaryInfoText}>
                         {dayName} {dayMonth}
-                      </p>
-                      <p className={styles.primaryInfoText}>
+                      </span>
+                      <span className={styles.primaryInfoSeparator}>|</span>
+                      <span className={styles.primaryInfoText}>
                         בשעה {formattedTime}
-                      </p>
-                    </div>
-
-                    <div className={styles.textBlock}>
-                      <p className={styles.secondaryInfoText}>
-                        בסניף {branch} ב{location}
-                      </p>
-                      <p className={styles.secondaryInfoText}>
-                        בהנחיית {instructor}
-                      </p>
-                    </div>
-
-                    <div className={styles.textBlock}>
-                      <p className={styles.secondaryInfoText}>
-                        משתתפים: {registrationCount.confirmed}/
-                        {registrationCount.total}{" "}
-                        {remainingSpots === 0
-                          ? "(לא נותרו מקומות)"
-                          : `(נותרו ${remainingSpots} מקומות)`}
-                        {regStatus === "waitlist" &&
-                          waitlistPosition &&
-                          ` (מיקומך: ${waitlistPosition})`}
-                      </p>
-                    </div>
-
-                    <div className={styles.descriptionBlock}>
-                      <p className={styles.descriptionText}>{description}</p>
+                      </span>
                     </div>
                   </div>
 
-                  <div className={styles.buttonContainer}>
-                    {isAdmin ? (
-                      <>
-                        <Button
-                          size="L"
-                          onClick={handleEdit}
-                          disabled={loading}
-                        >
-                          {t("[ערוך|ערכי]")}
-                        </Button>
-                        <Button
-                          size="L"
-                          variant="secondary"
-                          onClick={handleDelete}
-                          disabled={loading}
-                        >
-                          {loading ? "מוחק..." : t("מחק/י")}
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        size="L"
-                        onClick={handleRegistrationToggle}
-                        disabled={loading}
-                      >
-                        {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
-                      </Button>
-                    )}
+                  {/* Secondary Info Section (Location & Instructor) */}
+                  <div className={styles.secondaryInfoSection}>
+                    <p className={styles.secondaryInfoText}>
+                      בסניף {branch} ב{location}
+                    </p>
+                    <p className={styles.secondaryInfoText}>
+                      בהנחיית {instructor}
+                    </p>
                   </div>
+
+                  {/* Participants Section */}
+                  <div className={styles.participantsSection}>
+                    <p className={styles.secondaryInfoText}>
+                      משתתפים: {registrationCount.confirmed}/
+                      {registrationCount.total}{" "}
+                      {remainingSpots === 0
+                        ? "(לא נותרו מקומות)"
+                        : `(נותרו ${remainingSpots} מקומות)`}
+                      {regStatus === "waitlist" &&
+                        waitlistPosition &&
+                        ` (מיקומך: ${waitlistPosition})`}
+                    </p>
+                  </div>
+
+                  {/* Description Section */}
+                  <div className={styles.descriptionSection}>
+                    <p className={styles.descriptionText}>{description}</p>
+                  </div>
+
+                  {/* Admin: Participants Info & Registrations Button */}
+                  {isAdmin && (
+                    <>
+                      <div className={styles.adminParticipantsSection}>
+                        <p className={styles.adminParticipantsText}>
+                          {registrationCount.confirmed}/
+                          {registrationCount.total} נרשמים
+                          {registrationCount.waitlist > 0 &&
+                            ` (${registrationCount.waitlist} ברשימת המתנה)`}
+                        </p>
+
+                        <div className={styles.adminRegistrationsButtonSection}>
+                          <Button
+                            variant="tertiary"
+                            tertiarySize="medium"
+                            tertiaryWeight="bold"
+                            colorType="red"
+                            onClick={() => setIsRegistrationsModalOpen(true)}
+                          >
+                            לכל הנרשמים
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
+
+            {/* Bottom Buttons Container */}
+            {!loading && !closing && isAdmin && (
+              <div className={styles.bottomButtonsContainer}>
+                {isAdmin ? (
+                  <>
+                    <Button
+                      size="L"
+                      variant="secondary"
+                      onClick={handleDelete}
+                      disabled={loading}
+                    >
+                      {t("מחיקה")}
+                    </Button>
+                    <Button
+                      size="L"
+                      variant="primary"
+                      onClick={handleEdit}
+                      disabled={loading}
+                    >
+                      {t("עריכה")}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    size="L"
+                    onClick={handleRegistrationToggle}
+                    disabled={loading}
+                  >
+                    {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </>
       )}
@@ -426,12 +436,33 @@ export default function ActivityDetailsModal({
       {isCancelModalOpen && (
         <CancelConfirmationModal
           isOpen={isCancelModalOpen}
-          // Only close via X button or explicit close logic
           onClose={() => setIsCancelModalOpen(false)}
           onConfirm={handleCancelConfirm}
           activityTitle={activity?.title || ""}
           activityDate={`${dayName} ${dayMonth}`}
           activityTime={formattedTime}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <Popup
+          content={t("האם את/ה בטוח/ה שברצונך למחוק פעילות זו?")}
+          recommendation="פעולה זו תמחק את הפעילות לצמיתות"
+          primaryButtonText={t("ביטול")}
+          primaryButtonAction={() => setIsDeleteModalOpen(false)}
+          secondaryButtonText={t("כן אני בטוח/ה")}
+          secondaryButtonAction={handleDeleteConfirm}
+          loading={loading}
+          onClose={() => setIsDeleteModalOpen(false)}
+        />
+      )}
+
+      {isAdmin && (
+        <ActivityRegistrationsModal
+          activityId={activityId}
+          activityTitle={activity?.title || ""}
+          isOpen={isRegistrationsModalOpen}
+          onClose={() => setIsRegistrationsModalOpen(false)}
         />
       )}
 

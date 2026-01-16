@@ -25,7 +25,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   customBgColor?: string;
   customTextColor?: string;
   customBorderColor?: string;
-  colorType?: "orange" | "delete" | "white";
+  colorType?: "orange" | "delete" | "white" | "red";
   children: React.ReactNode;
   href?: string;
 }
