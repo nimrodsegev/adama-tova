@@ -187,7 +187,7 @@ export default function ProfilePage() {
             {!isAdmin &&
               (isEditingExtras ? (
                 <div className={styles.editModeContainer}>
-                  <h2 className={styles.sectionTitle}>פרטים נוספים</h2>
+                  <h2 className={styles.bodyL}>פרטים נוספים</h2>
 
                   <div
                     className={styles.detailItem}
@@ -281,7 +281,7 @@ export default function ProfilePage() {
               ) : (
                 <div className={styles.profileBox}>
                   <div className={styles.boxHeader}>
-                    <span className={styles.boxTitle}>פרטים נוספים</span>
+                    <span className={styles.bodyL}>פרטים נוספים</span>
                   </div>
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>

@@ -1,0 +1,223 @@
+/* ============================================
+   UNIFIED DROPDOWN - Solid & Robust
+   ============================================ */
+.dropdownContainer {
+  position: relative;
+  width: 100%;
+  height: 3.75rem; /* 60px - Matches provided CSS */
+  z-index: 60;
+  direction: rtl;
+  background: transparent;
+}
+
+/* HIGH Z-INDEX: Lifts the dropdown above other fields when open */
+.dropdownContainer.active {
+  z-index: 500 !important;
+}
+
+/* ============================================
+   THE BORDER (Fieldset Strategy)
+   ============================================ */
+.borderFieldset {
+  position: absolute;
+  inset: 0;
+  top: -0.35rem; 
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 1.5rem; 
+  
+  pointer-events: none;
+  border: 0.0625rem solid #F9F9F9; /* Matches provided CSS thickness */
+  border-radius: 0.5625rem; /* 9px */
+  transition: border-color 0.2s ease;
+}
+
+.borderLegend {
+  display: block;
+  width: auto;
+  padding: 0;
+  height: 0;
+  font-size: var(--font-size-md); /* Matches inputLabel size */
+  visibility: hidden; 
+  max-width: 100%;
+}
+
+.borderLegend span {
+  padding: 0 0.3rem; 
+  display: inline-block;
+}
+
+/* Open State: Flatten bottom corners */
+.dropdownContainer.active .borderFieldset {
+  border-radius: 0.5625rem 0.5625rem 0 0;
+  border-bottom-color: transparent; 
+}
+
+/* ============================================
+   VISIBLE LABEL
+   ============================================ */
+.dropdownLabel {
+  position: absolute;
+  top: -0.9rem; /* -8px - sits on top of the border gap */
+  right: 1.8rem;
+
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); /* 17px */
+  line-height: 1.1875rem; /* 19px */
+  color: var(--color-text-secondary); /* #F9F9F9 */
+
+  /* No background needed - the SVG has a gap! */
+  padding: 0 0.25rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hide label components for mini dropdowns */
+.dropdownContainer.miniDropdown .dropdownLabel,
+.dropdownContainer.miniDropdown .borderFieldset {
+  display: none;
+}
+
+/* ============================================
+   TOGGLE BUTTON
+   ============================================ */
+.dropdownToggle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Padding matches provided .dropdownToggle */
+  padding: 0 1.625rem; 
+  
+  background: transparent;
+  border: none;
+  border-radius: 0.5625rem;
+  
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: 1rem; 
+  color: #FFFFFF;
+  text-align: right;
+  
+  cursor: pointer;
+  outline: none;
+  z-index: 1;
+}
+
+.placeholder {
+  color: rgba(247, 247, 247, 0.7);
+}
+
+/* ============================================
+   ARROW ICON
+   ============================================ */
+.arrowIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 100%;
+  transition: transform 0.2s ease;
+}
+
+.arrowIcon.rotated {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   MENU (Solid #e26029)
+   ============================================ */
+.dropdownMenu {
+  position: absolute;
+  top: 3.7rem; 
+  left: 0;
+  right: 0;
+  
+  display: flex;
+  flex-direction: column;
+  
+  /* Solid Middle Orange Color */
+  background: #e26029; 
+  padding-top: 0.5rem; /* Add padding to compensate for overlap */
+  border: 1px solid #F9F9F9;
+  border-top: none;
+  border-radius: 0 0 0.5625rem 0.5625rem;
+  
+  z-index: 100;
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.dropdownOption {
+  width: 100%;
+  padding: 0.875rem 1.625rem;
+  
+  background: #e26029;
+  border: none;
+  border-bottom: 0.0625rem solid #F9F9F9;
+  
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  text-align: right;
+  color: #FFFFFF;
+  
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdownOption:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdownOption:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
+   MINI DROPDOWN VARIANT
+   ============================================ */
+.dropdownContainer.miniDropdown {
+  width: 5.875rem;
+  height: 1.75rem;
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.21875rem; 
+  
+}
+
+.dropdownContainer.miniDropdown.active {
+  border-radius: 0.21875rem 0.21875rem 0 0;
+  border-bottom-color: transparent;
+}
+
+.dropdownContainer.miniDropdown .dropdownToggle {
+  padding: 0 0.5625rem;
+  font-size: var(--font-size-base);
+  
+}
+
+.dropdownContainer.miniDropdown .dropdownMenu {
+  top: 100%;
+  border-radius: 0 0 0.21875rem 0.21875rem;
+  right: -0.075rem;
+  width: 102.5%;
+}
+
+.dropdownContainer.miniDropdown .dropdownOption {
+  padding: 0.5rem;
+  font-size: var(--font-size-base);
+  width: 102%;
+  text-align: center;
+  border-bottom: 0.0625rem solid rgba(249, 249, 249, 0.2);
+}
+
+@media (max-height: 700px) {
+  .dropdownContainer { height: 3rem; }
+  .dropdownMenu { top: 2.95rem; }
+}

@@ -37,8 +37,8 @@
 }
 .userName {
   font-family: 'Arfilit', sans-serif;
-  font-weight: 400;
-  font-size: 2rem; 
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-3xl);
   line-height: 2.125rem;
   color: rgba(249, 249, 249, 0.84);
   margin: 0;
@@ -47,8 +47,8 @@
 }
 .adminLabel {
   font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 1rem; 
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-md);
   color: #FFFFFF;
   margin-left: 0.5rem;
 }
