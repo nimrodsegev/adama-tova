@@ -14,7 +14,6 @@
   direction: rtl;
   padding: 1.5rem;
   /* Top padding accounts for headers */
-  padding-top: 5.6875rem;
 }
 
 /* ============================================
@@ -24,7 +23,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-3xl, 2rem);
+  margin-top: var(--spacing-4xl, 3rem);
   width: 100%;
   flex-shrink: 0;
 }

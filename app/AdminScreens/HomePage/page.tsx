@@ -159,6 +159,8 @@ export default function AdminHomePage() {
     return OPENING_HOURS[today] || null;
   })();
 
+  const STICKY_OFFSET = "4rem";
+
   // --- 1. Circle Config Resize Logic (Restored) ---
   useEffect(() => {
     const handleResize = () => {
@@ -213,7 +215,7 @@ export default function AdminHomePage() {
       {
         root: pageContainerRef.current,
         threshold: 1.0,
-        rootMargin: "0px", // Detect exactly at the edge
+        rootMargin: `-${STICKY_OFFSET} 0px 0px 0px`,
       }
     );
 
