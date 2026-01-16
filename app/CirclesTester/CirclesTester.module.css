@@ -1,0 +1,270 @@
+/* Ensure the wrapper allows scrolling */
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  /* Allows content to grow */
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Preview Area */
+.preview {
+  flex: 1;
+  position: relative;
+  /* Min height ensures it doesn't collapse if content is small */
+  min-height: 100vh;
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+}
+
+/* Info Window */
+.infoWindow {
+  position: fixed; /* Ensures it stays on screen while scrolling */
+  width: 16rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  z-index: 1000; /* High Z-Index to sit on top of everything */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  user-select: none; /* Helps with dragging */
+}
+
+.dragHandle {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #555;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  cursor: grab;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+/* Controls Panel */
+.controlsPanel {
+  width: 22rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.98);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  border-left: 1px solid #eee;
+
+  /* Important: Height auto allows it to scroll with the page */
+  height: auto;
+  min-height: 100vh;
+}
+
+/* Responsive - Mobile Stack */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+  .preview {
+    height: 60vh;
+    min-height: 60vh;
+  }
+  .controlsPanel {
+    width: 100%;
+    min-height: auto;
+    border-left: none;
+    border-top: 2px solid #ccc;
+  }
+}
+
+/* ... Rest of your styling for sliders, buttons, text ... */
+.infoSection {
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: #333;
+}
+.infoSection strong {
+  display: block;
+  font-size: 0.7rem;
+  color: #666;
+  margin-bottom: 2px;
+}
+.infoValue {
+  padding: 4px 6px;
+  background: rgba(231, 78, 28, 0.1);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  direction: rtl;
+  text-align: right;
+}
+.infoDivider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 0.5rem 0;
+}
+.valueGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.valueItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 6px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 3px;
+  font-size: 0.7rem;
+}
+.valueItem span:last-child {
+  font-weight: 700;
+  color: #e64a19;
+}
+
+.fixedHeader {
+  padding: 1rem;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.title {
+  font-family: sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+.renderButton {
+  padding: 0.4rem 0.8rem;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.profileSection {
+  border: 1px solid #ffccbc;
+  background: #fff5f2;
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e64a19;
+  margin: 0;
+  text-transform: uppercase;
+}
+.selectInput {
+  width: 100%;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  border: 1px solid #ffccbc;
+  border-radius: 4px;
+  background: white;
+}
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+}
+.checkboxLabel {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #444;
+  cursor: pointer;
+}
+.modeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.modeButton {
+  flex: 1;
+  padding: 0.35rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.modeButtonActive {
+  background: #333;
+  color: white;
+  border-color: #333;
+}
+.scrollableContent {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.parametersGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.fullWidth {
+  grid-column: span 2;
+}
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+}
+.slider {
+  width: 100%;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e64a19;
+  cursor: pointer;
+}
+.colorPicker {
+  width: 100%;
+  height: 2rem;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.resetButton {
+  padding: 0.75rem;
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}

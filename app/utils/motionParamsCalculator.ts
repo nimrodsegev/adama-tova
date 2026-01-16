@@ -33,6 +33,7 @@ const DEFAULTS: ShapeParams = {
   strokeWidth: 1.0,
 };
 
+// 1. INTERESTS (Direct English Keys)
 const INTEREST_ADJUSTMENTS: Record<
   string,
   Partial<ShapeParams> & { layersIncrease?: number }
@@ -48,6 +49,7 @@ const INTEREST_ADJUSTMENTS: Record<
   },
 };
 
+// 2. CIRCLES (Hebrew Mapping Logic)
 const CIRCLE_ADJUSTMENTS: Record<
   string,
   Partial<ShapeParams> & { layersMax?: boolean; layersIncrease?: number }
@@ -57,32 +59,6 @@ const CIRCLE_ADJUSTMENTS: Record<
   "Area/Bereavement": { layersMax: true },
   "Support Group": { layersIncrease: 1 },
 };
-
-function mapInterestToType(interest: string): string | null {
-  const map: Record<string, string> = {
-    מדיטציה: "mindfulness",
-    מיינדפולנס: "mindfulness",
-    הרפיה: "mindfulness",
-    טבע: "mindfulness",
-    יוגה: "body_motion",
-    ריצה: "body_motion",
-    כושר: "body_motion",
-    ספורט: "body_motion",
-    ריקוד: "body_motion",
-    תנועה: "body_motion",
-    מוזיקה: "music_sound",
-    שירה: "music_sound",
-    נגינה: "music_sound",
-    קול: "music_sound",
-    אומנות: "creation_material",
-    כתיבה: "creation_material",
-    יצירה: "creation_material",
-    צילום: "creation_material",
-    עיצוב: "creation_material",
-    ציור: "creation_material",
-  };
-  return map[interest] || null;
-}
 
 function mapCircleToType(circle: string | undefined): string | null {
   if (!circle) return null;
@@ -115,24 +91,33 @@ export function calculateShapeParams(
   let layersInc = 0;
   let layersMax = false;
 
-  (userProfile.quiz?.interests || []).forEach((i) => {
-    const adj = INTEREST_ADJUSTMENTS[mapInterestToType(i) || ""];
+  // 1. Process Interests (Direct lookup)
+  (userProfile.quiz?.interests || []).forEach((interest) => {
+    const adj = INTEREST_ADJUSTMENTS[interest];
     if (adj) {
       if (adj.smoothness !== undefined) vals.smoothness.push(adj.smoothness);
       if (adj.complexity !== undefined) vals.complexity.push(adj.complexity);
       if (adj.elongation !== undefined) vals.elongation.push(adj.elongation);
       if (adj.strokeWidth !== undefined) vals.strokeWidth.push(adj.strokeWidth);
+      if (adj.opacity !== undefined) vals.opacity.push(adj.opacity);
       if (adj.layersIncrease) layersInc += adj.layersIncrease;
     }
   });
 
-  const cAdj =
-    CIRCLE_ADJUSTMENTS[mapCircleToType(userProfile.quiz?.circle) || ""];
-  if (cAdj) {
-    if (cAdj.strokeWidth !== undefined) vals.strokeWidth.push(cAdj.strokeWidth);
-    if (cAdj.opacity !== undefined) vals.opacity.push(cAdj.opacity);
-    if (cAdj.layersMax) layersMax = true;
-    if (cAdj.layersIncrease) layersInc += cAdj.layersIncrease;
+  // 2. Process Circle (Mapped lookup)
+  const circleType = mapCircleToType(userProfile.quiz?.circle);
+  if (circleType) {
+    const cAdj = CIRCLE_ADJUSTMENTS[circleType];
+    if (cAdj) {
+      if (cAdj.smoothness !== undefined) vals.smoothness.push(cAdj.smoothness);
+      if (cAdj.complexity !== undefined) vals.complexity.push(cAdj.complexity);
+      if (cAdj.elongation !== undefined) vals.elongation.push(cAdj.elongation);
+      if (cAdj.strokeWidth !== undefined)
+        vals.strokeWidth.push(cAdj.strokeWidth);
+      if (cAdj.opacity !== undefined) vals.opacity.push(cAdj.opacity);
+      if (cAdj.layersMax) layersMax = true;
+      if (cAdj.layersIncrease) layersInc += cAdj.layersIncrease;
+    }
   }
 
   const avg = (a: number[]) => a.reduce((x, y) => x + y, 0) / a.length;
