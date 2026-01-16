@@ -347,17 +347,17 @@
 /* ============================================
    RESPONSIVE - Small height screens (iPhone SE, etc.)
    ============================================ */
-/* Very small viewports (Google app, etc.) */
-@media (max-height: 600px) {
-  .aboutLinkWrapper {
-    bottom: 0.25rem;
-  }
-}
-
 /* Safari with toolbar (around 620-670px) */
 @media (min-height: 601px) and (max-height: 670px) {
   .aboutLinkWrapper {
     bottom: 4rem;
+  }
+}
+
+/* Very small viewports (Google app, etc.) - must come after Safari query */
+@media (max-height: 650px) {
+  .aboutLinkWrapper {
+    bottom: 1rem !important;
   }
 }
 

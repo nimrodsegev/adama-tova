@@ -82,7 +82,7 @@
   font-weight: var(--font-weight-light);
   font-size: var(--font-size-md);
   color: var(--color-text-secondary);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .input:focus::placeholder {
