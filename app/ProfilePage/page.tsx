@@ -4,6 +4,7 @@ import ProtectedRoute from "@/lib/components/ProtectedRoute";
 import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { apiUser } from "@/app/services/db_api";
 import styles from "./ProfilePage.module.css";
 import Button from "@/lib/components/UI/Button";
@@ -305,6 +306,11 @@ export default function ProfilePage() {
                 הוספת מנהל
               </Button>
             )}
+
+            {/* Debug button - TEMPORARY */}
+            <Link href="/debug-screen" className={styles.debugButton}>
+              DBG
+            </Link>
           </div>
 
           {/* POPUPS */}
