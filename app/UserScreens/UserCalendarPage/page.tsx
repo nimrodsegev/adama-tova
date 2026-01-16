@@ -185,19 +185,20 @@ export default function NewUserCalendarPage() {
           <div className={styles.activitiesList}>
             {displayedActivities.length > 0
               ? displayedActivities.map((activity) => (
-                  <NewUserActivityCard
-                    key={activity.id}
-                    id={activity.id}
-                    title={activity.title}
-                    instructor={activity.instructor || "לא צוין"}
-                    date={activity.date}
-                    startTime={activity.start_time}
-                    currentParticipants={activity.current_participants || 0}
-                    maxParticipants={activity.max_participants || 0}
-                    waitlistCount={activity.waitlist_count || 0}
-                    isGroup={activity.is_group || !!activity.series_id}
-                    onMotionChange={handleMotionState}
-                  />
+                  <div key={activity.id} className={styles.activityItem}>
+                    <NewUserActivityCard
+                      id={activity.id}
+                      title={activity.title}
+                      instructor={activity.instructor || "לא צוין"}
+                      date={activity.date}
+                      startTime={activity.start_time}
+                      currentParticipants={activity.current_participants || 0}
+                      maxParticipants={activity.max_participants || 0}
+                      waitlistCount={activity.waitlist_count || 0}
+                      isGroup={activity.is_group || !!activity.series_id}
+                      onMotionChange={handleMotionState}
+                    />
+                  </div>
                 ))
               : !isListLoading && (
                   <p className={styles.emptyText}>אין פעילויות ליום זה</p>
