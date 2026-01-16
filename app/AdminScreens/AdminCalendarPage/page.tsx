@@ -73,7 +73,6 @@ export default function AdminCalendarPage() {
     setSelectedActivityId(null);
   };
 
-  // Helper to open modal (assuming you want to click the card to edit)
   const handleCardClick = (id: string) => {
     setSelectedActivityId(id);
     setIsActivityModalOpen(true);
@@ -154,10 +153,10 @@ export default function AdminCalendarPage() {
           />
         )}
 
-        {/* Admin Specific: Sticky Button */}
+        {/* Admin Specific: Sticky Button (UPDATED) */}
         <div className={styles.bottomButton}>
-          <Button size="L" href="/AdminScreens/addNotification">
-            להוספת הודעה
+          <Button size="L" href="/AdminScreens/AddActivityPage">
+            להוספת פעילות
           </Button>
         </div>
       </div>

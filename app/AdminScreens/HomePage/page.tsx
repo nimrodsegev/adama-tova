@@ -9,6 +9,7 @@ import {
   apiRegistrations,
 } from "@/app/services/db_api";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import OpenHours from "@/lib/components/UI/OpenHours";
 import { HomeFilter, FilterOption } from "@/lib/components/UI/HomeFilter";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
@@ -58,6 +59,19 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",
 };
+
+const OPENING_HOURS = {
+  0: { open: "16:00", close: "22:00" },
+  2: { open: "16:00", close: "22:00" },
+  3: { open: "16:00", close: "22:00" },
+  5: { open: "16:00", close: "22:00" },
+};
+
+const todayHours = (() => {
+  const today = new Date().getDay();
+  // @ts-ignore
+  return OPENING_HOURS[today] || null;
+})();
 
 // Get Hebrew circle name (from quiz.circle or translate from users.circle)
 const getCircleHebrew = (
@@ -360,37 +374,34 @@ export default function AdminHomePage() {
   return (
     <SmoothPageWrapper isLoading={userLoading || mounting}>
       <div className={styles.pageContainer} dir="rtl">
-        {/* Background circles container */}
-        <div className={styles.backgroundCircles}>
-          <OrganicCircles
-            mode="breathing"
-            radius={0.08}
-            layers={3}
-            smoothness={0.5}
-            complexity={0.5}
-            elongation={0.3}
-            opacity={0.7}
-            strokeWidth={2.3}
-            position={{ x: 0.5, y: 0.1 }}
-            baseColor="#FFFFFF"
-          />
+        <div className={styles.openHoursFixed}>
+          {todayHours ? (
+            <OpenHours
+              startTime={todayHours.open}
+              endTime={todayHours.close}
+              isOpen={true}
+            />
+          ) : (
+            <OpenHours isOpen={false} />
+          )}
         </div>
 
-        {/* Main Content - everything scrolls together */}
+        {/* Main Content - everything scrolls together including circles */}
         <div className={styles.mainContent}>
-          {/* Opening Hours Bar */}
-          <div className={styles.openHours}>
-            <button className={styles.openingHoursBar}>
-              <div className={styles.openingHoursContent}>
-                <span className={styles.openingHoursText}>
-                  המרחב פתוח היום 16:00 עד 22:00
-                </span>
-                <div className={styles.editButton}>
-                  <span className={styles.editText}>עריכה</span>
-                  <span className={styles.editArrow}></span>
-                </div>
-              </div>
-            </button>
+          {/* Decorative Circles - now part of scrollable content */}
+          <div className={styles.circlesContainer}>
+            <OrganicCircles
+              mode="breathing"
+              radius={0.08}
+              layers={4}
+              smoothness={0.5}
+              complexity={0.5}
+              elongation={0.3}
+              opacity={0.7}
+              strokeWidth={2.3}
+              position={{ x: 0.4, y: 0.1 }}
+              baseColor="#FFFFFF"
+            />
           </div>
 
           {/* Greeting Section */}
