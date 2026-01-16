@@ -89,6 +89,19 @@
   opacity: 0;
 }
 
+/* Placeholder alignment variants */
+.placeholderCenter::placeholder {
+  text-align: center;
+}
+
+.placeholderLeft::placeholder {
+  text-align: left;
+}
+
+.placeholderRight::placeholder {
+  text-align: right;
+}
+
 /* Tall variant uses textarea - text starts at top */
 .inputTall {
   padding-top: 1rem;

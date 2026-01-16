@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/app/contexts/UserContext";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import Button from "@/lib/components/UI/Button";
 import styles from "./page.module.css";
 
 export default function PendingApprovalPage() {
@@ -97,9 +98,11 @@ export default function PendingApprovalPage() {
         </p>
 
         {/* Back to registration button */}
-        <button onClick={handleBackToLogin} className={styles.backButton}>
-          לעמוד ההרשמה
-        </button>
+        <div className={styles.backButtonWrapper}>
+          <Button variant="primary" onClick={handleBackToLogin}>
+            לעמוד ההרשמה
+          </Button>
+        </div>
       </div>
     </div>
   );

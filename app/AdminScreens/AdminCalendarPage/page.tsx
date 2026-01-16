@@ -7,6 +7,7 @@ import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
+import Button from "@/lib/components/UI/Button";
 import styles from "./AdminCalendarPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
@@ -146,6 +147,13 @@ export default function AdminCalendarPage() {
             onRegistrationChange={fetchData}
           />
         )}
+
+        {/* Bottom Right Button */}
+        <div className={styles.bottomButton}>
+          <Button size="L" href="/AdminScreens/addNotification">
+            להוספת הודעה
+          </Button>
+        </div>
       </div>
     </SmoothPageWrapper>
   );
