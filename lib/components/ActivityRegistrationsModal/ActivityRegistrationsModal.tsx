@@ -6,6 +6,7 @@ import { apiActivities } from "@/app/services/db_api";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import UserProfileModal from "@/lib/components/UserProfileModal/UserProfileModal";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import Button from "@/lib/components/UI/Button";
 import styles from "./ActivityRegistrationsModal.module.css";
 
 interface Registration {
@@ -214,13 +215,16 @@ export default function ActivityRegistrationsModal({
                         </div>
 
                         {/* Profile Link */}
-                        <button
-                          className={`${styles.profileLink} ${isWaitlist ? styles.profileLinkWaitlist : ""}`}
+                        <Button
+                          variant="tertiary"
+                          colorType="white"
+                          tertiarySize="small"
+                          tertiaryWeight="bold"
                           onClick={() => handleViewProfile(user?.id)}
+                          style={{ alignSelf: 'flex-end' }}
                         >
-                          <span>לצפייה בפרופיל</span>
-                          <span className={`${styles.profileArrow} ${isWaitlist ? styles.profileArrowWaitlist : ""}`} />
-                        </button>
+                          לצפייה בפרופיל
+                        </Button>
                       </div>
                     );
                   })
