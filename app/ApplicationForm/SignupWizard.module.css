@@ -764,7 +764,7 @@
    NEXT ARROW - Left center of page (inside each slide)
    ============================================ */
 .nextArrow {
-  position: absolute;
+  position: fixed;
   left: 2.5rem; /* aligned with text box left edge */
   bottom: 3rem; /* same level as dots */
   width: 2.5625rem; /* 41px */
