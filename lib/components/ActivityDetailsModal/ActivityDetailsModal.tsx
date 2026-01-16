@@ -9,6 +9,7 @@ import Button from "@/lib/components/UI/Button";
 import CancelConfirmationModal from "@/lib/components/CancelConfirmationModal/CancelConfirmationModal";
 import RegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/RegistrationSuccessModal";
 import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessModal/GroupRegistrationSuccessModal";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./ActivityDetailsModal.module.css";
 
 type ActivityDetailsModalProps = {
@@ -57,6 +58,7 @@ export default function ActivityDetailsModal({
     string | null
   >(null);
   const [hideDetailsModal, setHideDetailsModal] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   const isAdmin = userProfile?.role === "admin";
 
@@ -68,6 +70,7 @@ export default function ActivityDetailsModal({
   useEffect(() => {
     if (isOpen && activityId) {
       setHideDetailsModal(false); // Reset visibility when opening
+      setClosing(false); // Reset closing state when opening
       fetchActivityDetails();
       checkRegistrationStatus();
       document.body.style.overflow = "hidden";
@@ -78,6 +81,15 @@ export default function ActivityDetailsModal({
       document.body.style.overflow = "unset";
     };
   }, [isOpen, activityId]);
+
+  // Handle close with animation
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      onClose();
+    }, 400);
+  };
 
   const fetchActivityDetails = async () => {
     setLoading(true);
@@ -292,9 +304,9 @@ export default function ActivityDetailsModal({
       {/* Hide details if we are showing Success Modal */}
       {!hideDetailsModal && (
         <>
-          <div className={styles.overlay} onClick={onClose} />
+          <div className={styles.overlay} onClick={handleCloseWithAnimation} />
           <div className={styles.modalContainer}>
-            <button className={styles.closeButton} onClick={onClose}>
+            <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
               <svg width="19.43" height="19.43" viewBox="0 0 20 20" fill="none">
                 <line
                   x1="2"
@@ -316,8 +328,14 @@ export default function ActivityDetailsModal({
             </button>
 
             <div className={styles.contentFrame} style={contentFrameStyle}>
-              {loading ? (
-                <p className={styles.loadingText}>טוען...</p>
+              {(loading || closing) ? (
+                <div className={styles.loadingContainer}>
+                  <OrganicCircles
+                    mode="loading"
+                    radius={0.15}
+                    baseColor="#FFFFFF"
+                  />
+                </div>
               ) : (
                 <>
                   {hasImage && (

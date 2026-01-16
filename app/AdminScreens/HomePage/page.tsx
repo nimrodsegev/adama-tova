@@ -8,18 +8,16 @@ import {
   apiRegistrations,
 } from "@/app/services/db_api";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
-import {
-  HomeFilter,
-  FilterOption,
-} from "@/lib/components/UI/HomeFilter";
+import { HomeFilter, FilterOption } from "@/lib/components/UI/HomeFilter";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
-import NewAdminActivityCard from "@/lib/components/UI/NewAdminActivityCard";
+import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
+import EmptyState from "@/lib/components/UI/EmptyState";
 import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
-import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 import UserApprovalModal from "@/lib/components/UserApprovalModal/UserApprovalModal";
 import ApprovalConfirmModal from "@/lib/components/ApprovalConfirmModal/ApprovalConfirmModal";
 import styles from "./AdminHomePage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 
 interface PendingUser {
   id: string;
@@ -82,9 +80,8 @@ interface Activity {
   current_participants?: number;
   waitlist_count?: number;
   series_id?: string;
+  is_group?: boolean;
 }
-
-const HEBREW_DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
 export default function AdminHomePage() {
   const { userProfile, loading: userLoading } = useUser();
@@ -92,21 +89,21 @@ export default function AdminHomePage() {
     "pending"
   );
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
+
+  // FIX: Fixed the syntax error here by correctly closing the generic brackets <>
   const [pendingGroupRegs, setPendingGroupRegs] = useState<
     PendingGroupRegistration[]
   >([]);
+
   const [upcomingActivities, setUpcomingActivities] = useState<Activity[]>([]);
+
+  const [mounting, setMounting] = useState(true);
 
   // Activity modal state
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
     null
   );
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
-
-  // Registrations modal state
-  const [registrationsActivityId, setRegistrationsActivityId] = useState<string | null>(null);
-  const [registrationsActivityTitle, setRegistrationsActivityTitle] = useState<string>("");
-  const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] = useState(false);
 
   // User details modal state
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -141,6 +138,14 @@ export default function AdminHomePage() {
   // Fetch data on mount
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Turn off mounting after a tiny delay to trigger the animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchData = async () => {
@@ -180,14 +185,6 @@ export default function AdminHomePage() {
       }
       setUpcomingActivities(deduped);
     }
-  };
-
-  // Format date to DD.MM, יום X
-  const formatDayHebrew = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    return `${day}.${month}, יום ${HEBREW_DAYS[date.getDay()]}`;
   };
 
   // Handle approve user (called after confirmation)
@@ -274,30 +271,10 @@ export default function AdminHomePage() {
     }
   };
 
-  // Handle activity card click
-  const handleActivityClick = (activityId: string) => {
-    setSelectedActivityId(activityId);
-    setIsActivityModalOpen(true);
-  };
-
   // Handle activity modal close
   const handleActivityModalClose = () => {
     setIsActivityModalOpen(false);
     setSelectedActivityId(null);
-  };
-
-  // Handle registrations click
-  const handleRegistrationsClick = (activityId: string, activityTitle: string) => {
-    setRegistrationsActivityId(activityId);
-    setRegistrationsActivityTitle(activityTitle);
-    setIsRegistrationsModalOpen(true);
-  };
-
-  // Handle registrations modal close
-  const handleRegistrationsModalClose = () => {
-    setIsRegistrationsModalOpen(false);
-    setRegistrationsActivityId(null);
-    setRegistrationsActivityTitle("");
   };
 
   // Handle user approval card click (initial) - opens details modal
@@ -343,6 +320,7 @@ export default function AdminHomePage() {
         "approve"
       );
     } else if (selectedUserType === "group" && selectedRegistrationId) {
+      // FIX: 'r' is now correctly inferred because pendingGroupRegs is typed
       const reg = pendingGroupRegs.find((r) => r.id === selectedRegistrationId);
       openConfirmForGroup(
         selectedRegistrationId,
@@ -358,6 +336,7 @@ export default function AdminHomePage() {
       const user = pendingUsers.find((u) => u.id === selectedUserId);
       openConfirmForUser(selectedUserId, user?.full_name || "המשתמש", "reject");
     } else if (selectedUserType === "group" && selectedRegistrationId) {
+      // FIX: 'r' is now correctly inferred because pendingGroupRegs is typed
       const reg = pendingGroupRegs.find((r) => r.id === selectedRegistrationId);
       openConfirmForGroup(
         selectedRegistrationId,
@@ -375,313 +354,218 @@ export default function AdminHomePage() {
     return `${day}.${month}`;
   };
 
-  if (userLoading) {
-    return (
-      <div className={styles.loadingContainer} dir="rtl">
-        טוען...
-      </div>
-    );
-  }
-
   const firstName = userProfile?.full_name?.split(" ")[0] || "מנהל";
 
   return (
-    <div className={styles.pageContainer} dir="rtl">
-      {/* Decorative Circles - positioned at top */}
-      <OrganicCircles
-        mode="breathing"
-        radius={0.08}
-        layers={3}
-        smoothness={0.5}
-        complexity={0.5}
-        elongation={0.3}
-        opacity={0.7}
-        strokeWidth={2.3}
-        position={{ x: 0.5, y: 0.1 }}
-        baseColor="#FFFFFF"
-      />
+    <SmoothPageWrapper isLoading={userLoading || mounting}>
+      <div className={styles.pageContainer} dir="rtl">
+        {/* Decorative Circles - positioned at top */}
+        <OrganicCircles
+          mode="breathing"
+          radius={0.08}
+          layers={3}
+          smoothness={0.5}
+          complexity={0.5}
+          elongation={0.3}
+          opacity={0.7}
+          strokeWidth={2.3}
+          position={{ x: 0.5, y: 0.1 }}
+          baseColor="#FFFFFF"
+        />
 
-      {/* Main Content */}
-      <div className={styles.mainContent}>
-        {/* Greeting Section */}
-        <div className={styles.greetingSection}>
-          <h1 className={styles.greetingTitle}>היי {firstName},</h1>
-          <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
-        </div>
-
-        {/* Opening Hours Bar */}
-        <button className={styles.openingHoursBar}>
-          <div className={styles.openingHoursContent}>
-            <span className={styles.openingHoursText}>
-              המרחב פתוח היום 16:00 עד 22:00
-            </span>
-            <div className={styles.editButton}>
-              <span className={styles.editText}>עריכה</span>
-              <span className={styles.editArrow}></span>
-            </div>
+        {/* Main Content */}
+        <div className={styles.mainContent}>
+          {/* Greeting Section */}
+          <div className={styles.greetingSection}>
+            <h1 className={styles.greetingTitle}>היי {firstName},</h1>
+            <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
           </div>
-        </button>
-
-        {/* Filter Tabs with counts */}
-        <div className={styles.filterContainer}>
-          <HomeFilter
-            options={[
-              { id: "pending", label: "ממתינים לאישור", count: pendingUsers.length + pendingGroupRegs.length },
-              { id: "approved", label: "המפגשים הבאים", count: upcomingActivities.length },
-            ] as FilterOption[]}
-            activeOption={activeFilter}
-            onFilterChange={(id) =>
-              setActiveFilter(id as "pending" | "approved")
-            }
-          />
-        </div>
-
-        {/* Cards Container */}
-        <div className={styles.cardsContainer}>
-          {activeFilter === "pending" ? (
-            // Pending Users Cards (Initial + Group)
-            pendingUsers.length > 0 || pendingGroupRegs.length > 0 ? (
-              <>
-                {/* Initial approval cards */}
-                {pendingUsers.map((pendingUser) => (
-                  <UserApprovalCard
-                    key={`user-${pendingUser.id}`}
-                    type="initial"
-                    userName={pendingUser.full_name || "משתמש"}
-                    requestDate={formatDate(pendingUser.created_at)}
-                    circle={getCircleHebrew(pendingUser)}
-                    onApprove={() =>
-                      openConfirmForUser(
-                        pendingUser.id,
-                        pendingUser.full_name || "המשתמש",
-                        "approve"
-                      )
-                    }
-                    onReject={() =>
-                      openConfirmForUser(
-                        pendingUser.id,
-                        pendingUser.full_name || "המשתמש",
-                        "reject"
-                      )
-                    }
-                    onClick={() => handleUserCardClick(pendingUser.id, formatDate(pendingUser.created_at))}
-                  />
-                ))}
-                {/* Group approval cards */}
-                {pendingGroupRegs.map((reg) => (
-                  <UserApprovalCard
-                    key={`group-${reg.id}`}
-                    type="group"
-                    userName={reg.users?.full_name || "משתמש"}
-                    requestDate={formatDate(reg.created_at)}
-                    circle={getCircleHebrew(reg.users)}
-                    groupName={reg.activities?.title}
-                    onApprove={() =>
-                      openConfirmForGroup(
-                        reg.id,
-                        reg.users?.full_name || "המשתמש",
-                        "approve"
-                      )
-                    }
-                    onReject={() =>
-                      openConfirmForGroup(
-                        reg.id,
-                        reg.users?.full_name || "המשתמש",
-                        "reject"
-                      )
-                    }
-                    onClick={() =>
-                      handleGroupCardClick(
-                        reg.users?.id,
-                        reg.activities?.title || "",
-                        reg.id,
-                        formatDate(reg.created_at)
-                      )
-                    }
-                  />
-                ))}
-              </>
-            ) : (
-              <div className={styles.emptyStateContainer}>
-                <div className={styles.emptyStateContent}>
-                  <div className={styles.emptyStateIcon}>
-                    <svg width="48" height="49" viewBox="0 0 48 49" fill="none">
-                      {/* Outer dashed circle */}
-                      <circle
-                        cx="24"
-                        cy="24.5"
-                        r="22.9"
-                        stroke="rgba(255, 255, 255, 0.5)"
-                        strokeWidth="2.2"
-                        strokeDasharray="4 4"
-                        fill="none"
-                      />
-                      {/* Inner dashed circle */}
-                      <circle
-                        cx="24"
-                        cy="24.5"
-                        r="11"
-                        stroke="rgba(255, 255, 255, 0.5)"
-                        strokeWidth="2.2"
-                        strokeDasharray="4 4"
-                        fill="none"
-                      />
-                      {/* Horizontal line */}
-                      <line
-                        x1="19.7"
-                        y1="24.5"
-                        x2="28.3"
-                        y2="24.5"
-                        stroke="rgba(255, 245, 245, 0.7)"
-                        strokeWidth="1"
-                      />
-                      {/* Vertical line */}
-                      <line
-                        x1="24"
-                        y1="19.2"
-                        x2="24"
-                        y2="29.8"
-                        stroke="rgba(255, 245, 245, 0.7)"
-                        strokeWidth="1"
-                      />
-                    </svg>
-                  </div>
-                  <p className={styles.emptyStateText}>אין ממתינים לאישור</p>
+          {/* Scrollable Content - includes opening hours, filter, and cards */}
+          <div className={styles.scrollableContent}>
+            {/* Opening Hours Bar */}
+            <button className={styles.openingHoursBar}>
+              <div className={styles.openingHoursContent}>
+                <span className={styles.openingHoursText}>
+                  המרחב פתוח היום 16:00 עד 22:00
+                </span>
+                <div className={styles.editButton}>
+                  <span className={styles.editText}>עריכה</span>
+                  <span className={styles.editArrow}></span>
                 </div>
               </div>
-            )
-          ) : // Upcoming Activities Cards
-          upcomingActivities.length > 0 ? (
-            upcomingActivities.map((activity) => {
-              const totalRegistrations =
-                (activity.current_participants || 0) +
-                (activity.waitlist_count || 0);
-              return (
-                <NewAdminActivityCard
-                  key={activity.id}
-                  id={activity.id}
-                  title={activity.title}
-                  instructor={activity.instructor || "לא צוין"}
-                  day={formatDayHebrew(activity.date)}
-                  startTime={activity.start_time}
-                  currentParticipants={totalRegistrations}
-                  maxParticipants={activity.max_participants || 0}
-                  onClick={() => handleActivityClick(activity.id)}
-                  onRegistrationsClick={() => handleRegistrationsClick(activity.id, activity.title)}
-                />
-              );
-            })
-          ) : (
-            <div className={styles.emptyStateContainer}>
-              <div className={styles.emptyStateContent}>
-                <div className={styles.emptyStateIcon}>
-                  <svg width="48" height="49" viewBox="0 0 48 49" fill="none">
-                    {/* Outer dashed circle */}
-                    <circle
-                      cx="24"
-                      cy="24.5"
-                      r="22.9"
-                      stroke="rgba(255, 255, 255, 0.5)"
-                      strokeWidth="2.2"
-                      strokeDasharray="4 4"
-                      fill="none"
-                    />
-                    {/* Inner dashed circle */}
-                    <circle
-                      cx="24"
-                      cy="24.5"
-                      r="11"
-                      stroke="rgba(255, 255, 255, 0.5)"
-                      strokeWidth="2.2"
-                      strokeDasharray="4 4"
-                      fill="none"
-                    />
-                    {/* Horizontal line */}
-                    <line
-                      x1="19.7"
-                      y1="24.5"
-                      x2="28.3"
-                      y2="24.5"
-                      stroke="rgba(255, 245, 245, 0.7)"
-                      strokeWidth="1"
-                    />
-                    {/* Vertical line */}
-                    <line
-                      x1="24"
-                      y1="19.2"
-                      x2="24"
-                      y2="29.8"
-                      stroke="rgba(255, 245, 245, 0.7)"
-                      strokeWidth="1"
-                    />
-                  </svg>
-                </div>
-                <p className={styles.emptyStateText}>אין מפגשים קרובים</p>
-              </div>
+            </button>
+
+            {/* Filter Tabs with counts */}
+            <div className={styles.filterContainer}>
+              <HomeFilter
+                options={[
+                  {
+                    id: "pending",
+                    label: "ממתינים לאישור",
+                    count: pendingUsers.length + pendingGroupRegs.length,
+                  },
+                  {
+                    id: "approved",
+                    label: "המפגשים הבאים",
+                    count: upcomingActivities.length,
+                  },
+                ]}
+                activeOption={activeFilter}
+                onFilterChange={(id) =>
+                  setActiveFilter(id as "pending" | "approved")
+                }
+              />
             </div>
-          )}
+
+            {/* Cards Container */}
+            <div className={styles.cardsContainer}>
+              {activeFilter === "pending" ? (
+                // Pending Users Cards (Initial + Group)
+                pendingUsers.length > 0 || pendingGroupRegs.length > 0 ? (
+                  <>
+                    {/* Initial approval cards */}
+                    {pendingUsers.map((pendingUser) => (
+                      <UserApprovalCard
+                        key={`user-${pendingUser.id}`}
+                        type="initial"
+                        userName={pendingUser.full_name || "משתמש"}
+                        requestDate={formatDate(pendingUser.created_at)}
+                        circle={getCircleHebrew(pendingUser)}
+                        onApprove={() =>
+                          openConfirmForUser(
+                            pendingUser.id,
+                            pendingUser.full_name || "המשתמש",
+                            "approve"
+                          )
+                        }
+                        onReject={() =>
+                          openConfirmForUser(
+                            pendingUser.id,
+                            pendingUser.full_name || "המשתמש",
+                            "reject"
+                          )
+                        }
+                        onClick={() =>
+                          handleUserCardClick(
+                            pendingUser.id,
+                            formatDate(pendingUser.created_at)
+                          )
+                        }
+                      />
+                    ))}
+                    {/* Group approval cards */}
+                    {pendingGroupRegs.map((reg) => (
+                      <UserApprovalCard
+                        key={`group-${reg.id}`}
+                        type="group"
+                        userName={reg.users?.full_name || "משתמש"}
+                        requestDate={formatDate(reg.created_at)}
+                        circle={getCircleHebrew(reg.users)}
+                        groupName={reg.activities?.title}
+                        onApprove={() =>
+                          openConfirmForGroup(
+                            reg.id,
+                            reg.users?.full_name || "המשתמש",
+                            "approve"
+                          )
+                        }
+                        onReject={() =>
+                          openConfirmForGroup(
+                            reg.id,
+                            reg.users?.full_name || "המשתמש",
+                            "reject"
+                          )
+                        }
+                        onClick={() =>
+                          handleGroupCardClick(
+                            reg.users?.id,
+                            reg.activities?.title || "",
+                            reg.id,
+                            formatDate(reg.created_at)
+                          )
+                        }
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <EmptyState message="אין ממתינים לאישור" showIcon={false} />
+                )
+              ) : // Upcoming Activities Cards
+              upcomingActivities.length > 0 ? (
+                upcomingActivities.map((activity) => (
+                  <NewUserActivityCard
+                    key={activity.id}
+                    id={activity.id}
+                    title={activity.title}
+                    instructor={activity.instructor || "לא צוין"}
+                    date={activity.date}
+                    startTime={activity.start_time}
+                    currentParticipants={activity.current_participants || 0}
+                    maxParticipants={activity.max_participants || 0}
+                    waitlistCount={activity.waitlist_count || 0}
+                    isGroup={activity.is_group || !!activity.series_id}
+                  />
+                ))
+              ) : (
+                <EmptyState message="אין מפגשים קרובים" showIcon={false} />
+              )}
+            </div>
+          </div>{" "}
+          {/* End scrollableContent */}
         </div>
+
+        {/* Bottom Buttons - gradient only shows when 3+ cards */}
+        <div
+          className={`${styles.bottomButtons} ${
+            (activeFilter === "pending" &&
+              pendingUsers.length + pendingGroupRegs.length >= 3) ||
+            (activeFilter === "approved" && upcomingActivities.length >= 3)
+              ? styles.showGradient
+              : ""
+          }`}
+        >
+          <Button size="L" href="/AdminScreens/addNotification">
+            להוספת הודעה
+          </Button>
+          <Button size="L" href="/AdminScreens/AddActivityPage">
+            להוספת פעילות
+          </Button>
+        </div>
+
+        {/* Activity Details Modal */}
+        {selectedActivityId && (
+          <ActivityDetailsModal
+            activityId={selectedActivityId}
+            isOpen={isActivityModalOpen}
+            onClose={handleActivityModalClose}
+            onRegistrationChange={fetchData}
+          />
+        )}
+
+        {/* User Approval Details Modal */}
+        {selectedUserId && (
+          <UserApprovalModal
+            userId={selectedUserId}
+            type={selectedUserType}
+            groupName={selectedGroupName}
+            requestDate={selectedRequestDate}
+            isOpen={isUserModalOpen}
+            onClose={handleUserModalClose}
+            onApprove={handleModalApprove}
+            onReject={handleModalReject}
+          />
+        )}
+
+        {/* Confirmation Modal */}
+        <ApprovalConfirmModal
+          isOpen={isConfirmModalOpen}
+          userName={confirmUserName}
+          action={confirmAction}
+          type={confirmType}
+          onConfirm={handleConfirm}
+          onClose={() => setIsConfirmModalOpen(false)}
+        />
       </div>
-
-      {/* Bottom Buttons - gradient only shows when 3+ cards */}
-      <div className={`${styles.bottomButtons} ${
-        (activeFilter === "pending" && pendingUsers.length + pendingGroupRegs.length >= 3) ||
-        (activeFilter === "approved" && upcomingActivities.length >= 3)
-          ? styles.showGradient
-          : ""
-      }`}>
-        {/* Changed size="M" to size="L" to match ButtonProps interface */}
-        <Button size="L" href="/AdminScreens/addNotification">
-          להוספת הודעה
-        </Button>
-        <Button size="L" href="/AdminScreens/AddActivityPage">
-          להוספת פעילות
-        </Button>
-      </div>
-
-      {/* Activity Details Modal */}
-      {selectedActivityId && (
-        <ActivityDetailsModal
-          activityId={selectedActivityId}
-          isOpen={isActivityModalOpen}
-          onClose={handleActivityModalClose}
-          onRegistrationChange={fetchData}
-        />
-      )}
-
-      {/* Activity Registrations Modal */}
-      {registrationsActivityId && (
-        <ActivityRegistrationsModal
-          activityId={registrationsActivityId}
-          activityTitle={registrationsActivityTitle}
-          isOpen={isRegistrationsModalOpen}
-          onClose={handleRegistrationsModalClose}
-        />
-      )}
-
-      {/* User Approval Details Modal */}
-      {selectedUserId && (
-        <UserApprovalModal
-          userId={selectedUserId}
-          type={selectedUserType}
-          groupName={selectedGroupName}
-          requestDate={selectedRequestDate}
-          isOpen={isUserModalOpen}
-          onClose={handleUserModalClose}
-          onApprove={handleModalApprove}
-          onReject={handleModalReject}
-        />
-      )}
-
-      {/* Confirmation Modal */}
-      <ApprovalConfirmModal
-        isOpen={isConfirmModalOpen}
-        userName={confirmUserName}
-        action={confirmAction}
-        type={confirmType}
-        onConfirm={handleConfirm}
-        onClose={() => setIsConfirmModalOpen(false)}
-      />
-    </div>
+    </SmoothPageWrapper>
   );
 }

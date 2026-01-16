@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import { useIvrita } from "@/app/contexts/IvritaContext";
-import styles from "./ApprovalConfirmModal.module.css";
+import Popup from "@/lib/components/UI/Popup";
 
 interface ApprovalConfirmModalProps {
   isOpen: boolean;
@@ -71,30 +70,16 @@ export default function ApprovalConfirmModal({
     }
   };
 
-  const modalContent = (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalContent}>
-          <div className={styles.messageContainer}>
-            <p className={styles.message}>{getTitleText()}</p>
-            <p className={styles.subtitle}>{getSubtitleText()}</p>
-          </div>
-          <div className={styles.buttons}>
-            <button onClick={onClose} className={styles.secondaryButton}>
-              ביטול
-            </button>
-            <button
-              onClick={handleConfirm}
-              disabled={loading}
-              className={styles.primaryButton}
-            >
-              {loading ? (action === "approve" ? "מאשר..." : "מסרב...") : t("כן אני בטוח/ה")}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+  return (
+    <Popup
+      content={getTitleText()}
+      recommendation={getSubtitleText()}
+      primaryButtonText={t("כן אני בטוח/ה")}
+      primaryButtonAction={handleConfirm}
+      loading={loading}
+      secondaryButtonText="ביטול"
+      secondaryButtonAction={onClose}
+      onClose={onClose}
+    />
   );
-
-  return createPortal(modalContent, document.body);
 }

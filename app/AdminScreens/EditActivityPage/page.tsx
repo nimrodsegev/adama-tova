@@ -4,6 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import styles from "./EditActivityPage.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from '@/lib/components/UI/CutInput';
+import Popup from "@/lib/components/UI/Popup";
 
 const BRANCH_OPTIONS = [
   { value: "satria", label: "סניף סתריה" },
@@ -15,6 +18,20 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
+// --- SVG Path Generator (Dynamic Gap) ---
+const getSvgPath = (label: string) => {
+  const charWidth = 10; 
+  const padding = 20; 
+  const labelWidth = (label.length * charWidth) + padding;
+  
+  const totalWidth = 315;
+  const radius = 9; 
+  const rightGapStart = 315 - 32; // ~32px from right edge
+  const gapEnd = rightGapStart - labelWidth;
+
+  return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
+};
+
 export default function EditActivityPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -22,6 +39,7 @@ export default function EditActivityPage() {
   const { t } = useIvrita();
 
   const [loading, setLoading] = useState(true);
+  const [mounting, setMounting] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -37,7 +55,6 @@ export default function EditActivityPage() {
     startTime: "",
   });
 
-  // Date UI State
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
@@ -46,13 +63,18 @@ export default function EditActivityPage() {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageName, setImageName] = useState(""); 
 
-  // UI State
   const [isBranchOpen, setIsBranchOpen] = useState(false);
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isDayOpen, setIsDayOpen] = useState(false);
 
-  // Load Data
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     if (activityId) {
       loadActivity();
@@ -115,14 +137,9 @@ export default function EditActivityPage() {
     return () => window.removeEventListener("resize", updateLabelBackgrounds);
   }, [loading]);
 
-  // Handlers
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleClearField = (field: string) => {
-    setFormData((prev) => ({ ...prev, [field]: "" }));
   };
 
   const setFormValue = (key: string, value: any) => {
@@ -202,9 +219,8 @@ export default function EditActivityPage() {
     }
   };
 
-  if (loading) return <div className={styles.pageOverride} style={{alignItems:'center', justifyContent:'center', color:'white'}}>טוען...</div>;
-
   return (
+    <SmoothPageWrapper isLoading={loading || mounting}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       
       <button className="close-button" onClick={() => router.back()}>
@@ -219,19 +235,17 @@ export default function EditActivityPage() {
       <div className={styles.scrollContainer}>
         
         {/* Title */}
-        <div className={styles.inputWrapper}>
-          <input 
-            type="text" name="title" value={formData.title} onChange={handleChange} className={styles.inputField} 
-          />
-          <label className={styles.inputLabel}>שם הפעילות</label>
-          {formData.title && (
-            <button className={styles.deleteIconBtn} onClick={() => handleClearField('title')}>
-              <svg viewBox="0 0 10 10" fill="none"><path d="M3 3L7 7M7 3L3 7" stroke="#E74E1C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            </button>
-          )}
-        </div>
+        <CutInput
+            label="שם הפעילות"
+            value={formData.title}
+            onChange={(e) => setFormValue('title', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
 
-        {/* Branch Dropdown - Updated Arrow */}
+        {/* Branch Dropdown */}
         <div className={`${styles.dropdownContainer} ${isBranchOpen ? styles.activeDropdownContainer : ''}`}>
           <div className={styles.inputWrapper}>
             <button type="button" onClick={() => setIsBranchOpen(!isBranchOpen)} className={`${styles.dropdownToggle} ${isBranchOpen ? styles.open : ''}`}>
@@ -252,50 +266,42 @@ export default function EditActivityPage() {
         </div>
 
         {/* Location */}
-        <div className={styles.inputWrapper}>
-          <input type="text" name="location" value={formData.location} onChange={handleChange} className={styles.inputField} placeholder=" " />
-          <label className={styles.inputLabel}>מיקום <span className={styles.optionalText}>*לא חובה</span></label>
-          {formData.location && (
-            <button className={styles.deleteIconBtn} onClick={() => handleClearField('location')}>
-              <svg viewBox="0 0 10 10" fill="none"><path d="M3 3L7 7M7 3L3 7" stroke="#E74E1C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            </button>
-          )}
-        </div>
+        <CutInput
+            label="מיקום"
+            value={formData.location}
+            onChange={(e) => setFormValue('location', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
 
         {/* Instructor */}
-        <div className={styles.inputWrapper}>
-          <input type="text" name="instructor" value={formData.instructor} onChange={handleChange} className={styles.inputField} />
-          <label className={styles.inputLabel}>מנחה</label>
-          {formData.instructor && (
-            <button className={styles.deleteIconBtn} onClick={() => handleClearField('instructor')}>
-              <svg viewBox="0 0 10 10" fill="none"><path d="M3 3L7 7M7 3L3 7" stroke="#E74E1C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            </button>
-          )}
-        </div>
+        <CutInput
+            label="מנחה/ה"
+            value={formData.instructor}
+            onChange={(e) => setFormValue('instructor', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
 
         {/* Max Participants */}
-        <div className={styles.inputWrapper}>
-          <input 
-            type="number" 
-            name="maxParticipants" 
-            value={formData.maxParticipants} 
-            onChange={handleChange} 
-            className={styles.inputField}
-            min="0"
-          />
-          <label className={styles.inputLabel}>מספר משתתפים מקסימלי</label>
-          {formData.maxParticipants && (
-            <button className={styles.deleteIconBtn} onClick={() => handleClearField('maxParticipants')}>
-              <svg viewBox="0 0 10 10" fill="none"><path d="M3 3L7 7M7 3L3 7" stroke="#E74E1C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            </button>
-          )}
-        </div>
+        <CutInput
+            label="מספר משתתפים מקסימלי"
+            value={formData.maxParticipants}
+            onChange={(e) => setFormValue('maxParticipants', e.target.value)}
+            className={styles.cutInput}
+            type="number"
+            dir="rtl"
+            textAlign="right"
+        />  
 
-        {/* Date Row - Updated Arrows */}
+        {/* Date Row */}
         <div className={styles.fieldGroup}>
           <div className={styles.dateLabel}>תאריך</div>
           <div className={styles.dateRow}>
-            {/* YEAR */}
             <div className={`${styles.miniDropdownContainer} ${isYearOpen ? styles.activeMiniDropdown : ''}`}>
               <button type="button" onClick={() => setIsYearOpen(!isYearOpen)} className={`${styles.miniDropdownToggle} ${isYearOpen ? styles.open : ''}`}>
                 <span>{selectedYear || "שנה"}</span>
@@ -310,7 +316,6 @@ export default function EditActivityPage() {
               )}
             </div>
 
-            {/* MONTH */}
             <div className={`${styles.miniDropdownContainer} ${isMonthOpen ? styles.activeMiniDropdown : ''}`}>
               <button type="button" onClick={() => setIsMonthOpen(!isMonthOpen)} className={`${styles.miniDropdownToggle} ${isMonthOpen ? styles.open : ''}`}>
                 <span>{selectedMonth || "חודש"}</span>
@@ -325,7 +330,6 @@ export default function EditActivityPage() {
               )}
             </div>
 
-            {/* DAY */}
             <div className={`${styles.miniDropdownContainer} ${isDayOpen ? styles.activeMiniDropdown : ''}`}>
               <button type="button" onClick={() => setIsDayOpen(!isDayOpen)} className={`${styles.miniDropdownToggle} ${isDayOpen ? styles.open : ''}`}>
                 <span>{selectedDay || "יום"}</span>
@@ -342,22 +346,25 @@ export default function EditActivityPage() {
           </div>
         </div>
 
-        {/* Time Row */}
-        <div className={styles.fieldGroup}>
-          <div className={styles.dateLabel}>שעה</div>
-          <div className={styles.inputWrapper}>
-              <input 
-                type="time" 
-                name="startTime" 
-                value={formData.startTime} 
-                onChange={handleChange} 
-                className={`${styles.inputField} ${styles.timeInput}`} 
-              />
-          </div>
-        </div>
+        {/* Time Row (CutInput) */}
+        <CutInput
+            label="שעה"
+            value={formData.startTime}
+            onChange={(e) => setFormValue('startTime', e.target.value)}
+            className={styles.cutInput}
+            type="time"
+            dir="rtl"
+            textAlign="right"
+        />  
 
-        {/* Image Upload */}
-        <div className={styles.inputWrapper}>
+        {/* Image Upload (SVG Border Wrapper) */}
+        <div className={styles.imageWrapperSVG}>
+          {/* Dynamic SVG Border for "תמונה" */}
+          <svg className={styles.imageBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d={getSvgPath("תמונה")} className={styles.imageBorderPath} strokeLinecap="round" />
+          </svg>
+          <span className={styles.imageLabelSVG}>תמונה <span className={styles.optionalText}>*</span></span>
+
           <input type="file" id="editImageUpload" accept="image/*" onChange={handleImageChange} hidden />
           {imageName ? (
             <div className={styles.filePreviewBox}>
@@ -380,19 +387,19 @@ export default function EditActivityPage() {
               <span className={styles.uploadText}>לחץ/י כאן על מנת לבחור תמונה</span>
             </label>
           )}
-          <label className={styles.inputLabel}>תמונה <span className={styles.optionalText}>*לא חובה</span></label>
         </div>
 
         {/* Description */}
         <div className={styles.inputWrapper}>
-          <textarea 
-            name="description" 
-            value={formData.description} 
-            onChange={handleChange} 
-            className={`${styles.inputField} ${styles.descriptionArea}`} 
-            rows={5}
-          />
-          <label className={styles.inputLabel}>תיאור</label>
+          <CutInput
+            label="תיאור"
+            value={formData.description}
+            onChange={(e) => setFormValue('description', e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />  
           
           <div className={styles.saveButtonContainer}>
             <button onClick={handleSaveClick} disabled={saving} className={styles.saveButton}>
@@ -405,18 +412,18 @@ export default function EditActivityPage() {
 
       {/* MODAL */}
       {showModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3 className={styles.modalTitle}>האם תרצה לשלוח עדכון למשתתפים על השינויים שביצעת?</h3>
-            <p className={styles.modalSubtitle}>העדכון ישלח לכל המשתתפים.</p>
-            <div className={styles.modalButtons}>
-              <button onClick={handleConfirmUpdate} className={styles.btnPrimary}>לשלוח עדכון</button>
-              <button onClick={() => { setShowModal(false); /* Close only */ }} className={styles.btnOutline}>לא עכשיו</button>
-            </div>
-          </div>
-        </div>
+        <Popup
+          content="האם תרצה לשלוח עדכון למשתתפים על השינויים שביצעת?"
+          recommendation="העדכון ישלח לכל המשתתפים."
+          primaryButtonText="לשלוח עדכון"
+          primaryButtonAction={handleConfirmUpdate}
+          secondaryButtonText="לא עכשיו"
+          secondaryButtonAction={() => setShowModal(false)}
+          onClose={() => setShowModal(false)}
+        />
       )}
 
     </main>
+    </SmoothPageWrapper>
   );
 }

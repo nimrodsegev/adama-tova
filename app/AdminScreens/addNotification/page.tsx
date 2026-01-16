@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./addNotification.module.css";
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import CutInput from '@/lib/components/UI/CutInput';
 
 // --- Options ---
 const TARGET_OPTIONS = [
@@ -30,10 +32,28 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
+// --- SVG Path Generator (Dynamic Gap) ---
+// Calculates the gap based on label length so the border doesn't cut text
+const getSvgPath = (label: string) => {
+  const charWidth = 9; // Tuned for Hebrew fonts
+  const padding = 14; 
+  const labelWidth = (label.length * charWidth) + padding;
+  
+  const totalWidth = 315;
+  const radius = 9; 
+  const rightGapStart = 315 - 32; // ~32px from right edge (matching CSS right: 2rem)
+  const gapEnd = rightGapStart - labelWidth;
+
+  // Draw the border with the calculated gap
+  return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
+};
+
 export default function AddNotificationPage() {
   const router = useRouter();
   const { t } = useIvrita();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const [mounting, setMounting] = useState(true);
 
   // Form State
   const [targetType, setTargetType] = useState<"" | "activity" | "date" | "circle">("");
@@ -60,31 +80,14 @@ export default function AddNotificationPage() {
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- FLOATING LABEL BACKGROUND FIX ---
-  useLayoutEffect(() => {
-    const updateLabelBackgrounds = () => {
-      const vh = window.innerHeight;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-      const labels = document.querySelectorAll(`.${styles.inputLabel}`) as NodeListOf<HTMLElement>;
-      labels.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        el.style.setProperty("--bg-y", `${-rect.top}px`);
-      });
-    };
-    updateLabelBackgrounds();
-    window.addEventListener("resize", updateLabelBackgrounds);
-    if (scrollContainerRef.current) {
-        scrollContainerRef.current.addEventListener("scroll", updateLabelBackgrounds);
-    }
-    return () => {
-        window.removeEventListener("resize", updateLabelBackgrounds);
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.removeEventListener("scroll", updateLabelBackgrounds);
-        }
-    };
-  }, [targetType, allActivities]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
-  // Fetch Activities when target type changes
+  // Fetch Activities
   useEffect(() => {
     if (targetType === "activity" && allActivities.length === 0) {
       const fetchActivities = async () => {
@@ -99,47 +102,23 @@ export default function AddNotificationPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-
     try {
       if (targetType === "activity") {
         if (!selectedActivityId) throw new Error("Please select an activity");
-        const [res, error] = await apiActivities.notifyParticipants(
-          selectedActivityId,
-          title,
-          message
-        );
-        if (error) throw error;
+        await apiActivities.notifyParticipants(selectedActivityId, title, message);
       } else if (targetType === "date") {
         if (!day || !month || !year) throw new Error("Please select a full date");
         const fullDate = `${year}-${month}-${day}`;
-        const [res, error] = await apiActivities.notifyByDate(
-          fullDate,
-          title,
-          message
-        );
-        if (error) {
-          if (error.includes("No activities found")) {
-            alert("לא נמצאו פעילויות בתאריך שנבחר");
-            setIsSubmitting(false);
-            return;
-          }
-          throw error;
-        }
+        await apiActivities.notifyByDate(fullDate, title, message);
       } else if (targetType === "circle") {
         if (!selectedCircle) throw new Error("Please select a circle");
-        const [res, error] = await apiActivities.notifyByCircle(
-          selectedCircle,
-          title,
-          message
-        );
-        if (error) throw error;
+        await apiActivities.notifyByCircle(selectedCircle, title, message);
       }
-
       alert("ההודעה נשלחה בהצלחה!");
       router.push("/AdminScreens/HomePage");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending notification:", error);
-      alert("שגיאה בשליחת ההודעה: חסרים פרטים או אירעה תקלה");
+      alert("שגיאה בשליחת ההודעה");
     } finally {
       setIsSubmitting(false);
     }
@@ -150,6 +129,7 @@ export default function AddNotificationPage() {
   const selectedTargetLabel = TARGET_OPTIONS.find(t => t.value === targetType)?.label;
 
   return (
+    <SmoothPageWrapper isLoading={mounting}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       <button className="close-button" onClick={() => router.back()}>
         <div className="close-button-inner" />
@@ -162,25 +142,26 @@ export default function AddNotificationPage() {
 
       <div className={styles.scrollContainer} ref={scrollContainerRef}>
         
-        {/* --- TARGET AUDIENCE DROPDOWN --- */}
-        <div className={`${styles.dropdownContainer} ${isTargetOpen ? styles.activeDropdownContainer : ''}`}>
-          <div className={styles.inputWrapper}>
-            <button 
-                type="button" 
-                onClick={() => setIsTargetOpen(!isTargetOpen)} 
-                className={`${styles.dropdownToggle} ${isTargetOpen ? styles.open : ''}`}
-            >
-              <span className={!targetType ? styles.dropdownPlaceholder : ''}>
-                {selectedTargetLabel || "בחר/י אפשרות"}
-              </span>
-              <div className={styles.arrowIconWrapper}>
-                <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-            </button>
-            <label className={styles.inputLabel}>קהל יעד</label>
-          </div>
+        {/* --- TARGET AUDIENCE DROPDOWN (SVG STYLE) --- */}
+        <div className={`${styles.dropdownWrapperSVG} ${isTargetOpen ? styles.activeDropdownContainer : ''}`}>
+          <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d={getSvgPath("קהל יעד")} className={styles.dropdownBorderPath} strokeLinecap="round" />
+          </svg>
+          <span className={styles.dropdownLabelSVG}>קהל יעד</span>
+          
+          <button 
+              type="button" 
+              onClick={() => setIsTargetOpen(!isTargetOpen)} 
+              className={`${styles.dropdownToggleSVG} ${isTargetOpen ? styles.open : ''}`}
+          >
+            <span className={!targetType ? styles.dropdownPlaceholder : ''}>
+              {selectedTargetLabel || "בחר/י אפשרות"}
+            </span>
+            <span className={styles.arrowCSS}>▼</span>
+          </button>
+          
           {isTargetOpen && (
-            <div className={styles.dropdownMenu}>
+            <div className={styles.dropdownMenuSVG}>
               {TARGET_OPTIONS.map(opt => (
                 <button 
                     key={opt.value} 
@@ -197,26 +178,27 @@ export default function AddNotificationPage() {
 
         {/* --- CONDITIONAL FIELDS --- */}
 
-        {/* 1. ACTIVITY SELECT */}
+        {/* 1. ACTIVITY SELECT (SVG STYLE) */}
         {targetType === "activity" && (
-            <div className={`${styles.dropdownContainer} ${isActivityOpen ? styles.activeDropdownContainer : ''}`}>
-                <div className={styles.inputWrapper}>
-                    <button 
-                        type="button" 
-                        onClick={() => setIsActivityOpen(!isActivityOpen)} 
-                        className={`${styles.dropdownToggle} ${isActivityOpen ? styles.open : ''}`}
-                    >
-                    <span className={!selectedActivityId ? styles.dropdownPlaceholder : ''}>
-                        {selectedActivityLabel || (loadingActivities ? "טוען..." : "בחר/י סדנא")}
-                    </span>
-                    <div className={styles.arrowIconWrapper}>
-                        <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                    </button>
-                    <label className={styles.inputLabel}>סדנא</label>
-                </div>
+            <div className={`${styles.dropdownWrapperSVG} ${isActivityOpen ? styles.activeDropdownContainer : ''}`}>
+                <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d={getSvgPath("סדנא")} className={styles.dropdownBorderPath} strokeLinecap="round" />
+                </svg>
+                <span className={styles.dropdownLabelSVG}>סדנא</span>
+
+                <button 
+                    type="button" 
+                    onClick={() => setIsActivityOpen(!isActivityOpen)} 
+                    className={`${styles.dropdownToggleSVG} ${isActivityOpen ? styles.open : ''}`}
+                >
+                <span className={!selectedActivityId ? styles.dropdownPlaceholder : ''}>
+                    {selectedActivityLabel || (loadingActivities ? "טוען..." : "בחר/י סדנא")}
+                </span>
+                <span className={styles.arrowCSS}>▼</span>
+                </button>
+
                 {isActivityOpen && !loadingActivities && (
-                    <div className={styles.dropdownMenu}>
+                    <div className={styles.dropdownMenuSVG}>
                     {allActivities.map(act => (
                         <button 
                             key={act.id} 
@@ -232,26 +214,27 @@ export default function AddNotificationPage() {
             </div>
         )}
 
-        {/* 2. CIRCLE SELECT */}
+        {/* 2. CIRCLE SELECT (SVG STYLE) */}
         {targetType === "circle" && (
-            <div className={`${styles.dropdownContainer} ${isCircleOpen ? styles.activeDropdownContainer : ''}`}>
-                <div className={styles.inputWrapper}>
-                    <button 
-                        type="button" 
-                        onClick={() => setIsCircleOpen(!isCircleOpen)} 
-                        className={`${styles.dropdownToggle} ${isCircleOpen ? styles.open : ''}`}
-                    >
-                    <span className={!selectedCircle ? styles.dropdownPlaceholder : ''}>
-                        {selectedCircleLabel || "בחר/י מעגל"}
-                    </span>
-                    <div className={styles.arrowIconWrapper}>
-                        <svg width="18" height="8" viewBox="0 0 18 8" fill="none"><path d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" stroke="#F9F9F9" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </div>
-                    </button>
-                    <label className={styles.inputLabel}>מעגל</label>
-                </div>
+            <div className={`${styles.dropdownWrapperSVG} ${isCircleOpen ? styles.activeDropdownContainer : ''}`}>
+                <svg className={styles.dropdownBorderSVG} viewBox="0 0 315 61" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d={getSvgPath("מעגל")} className={styles.dropdownBorderPath} strokeLinecap="round" />
+                </svg>
+                <span className={styles.dropdownLabelSVG}>מעגל</span>
+
+                <button 
+                    type="button" 
+                    onClick={() => setIsCircleOpen(!isCircleOpen)} 
+                    className={`${styles.dropdownToggleSVG} ${isCircleOpen ? styles.open : ''}`}
+                >
+                <span className={!selectedCircle ? styles.dropdownPlaceholder : ''}>
+                    {selectedCircleLabel || "בחר/י מעגל"}
+                </span>
+                <span className={styles.arrowCSS}>▼</span>
+                </button>
+
                 {isCircleOpen && (
-                    <div className={styles.dropdownMenu}>
+                    <div className={styles.dropdownMenuSVG}>
                     {CIRCLE_OPTIONS.map(opt => (
                         <button 
                             key={opt.value} 
@@ -267,7 +250,7 @@ export default function AddNotificationPage() {
             </div>
         )}
 
-        {/* 3. DATE SELECT (3 Small Dropdowns) */}
+        {/* 3. DATE SELECT (Mini Dropdowns) */}
         {targetType === "date" && (
             <div className={styles.fieldGroup}>
                 <label className={styles.dateLabel}>תאריך</label>
@@ -327,27 +310,24 @@ export default function AddNotificationPage() {
         )}
 
         {/* --- COMMON FIELDS --- */}
-        <div className={styles.inputWrapper}>
-            <input 
-                type="text" 
-                value={title} 
-                onChange={(e) => setTitle(e.target.value)} 
-                className={styles.inputField} 
-                placeholder=" "
-            />
-            <label className={styles.inputLabel}>כותרת ההודעה</label>
-        </div>
-
-        <div className={styles.inputWrapper}>
-            <textarea 
-                value={message} 
-                onChange={(e) => setMessage(e.target.value)} 
-                className={`${styles.inputField} ${styles.textarea}`} 
-                placeholder=" "
-            />
-            <label className={styles.inputLabel}>תוכן ההודעה</label>
-        </div>
-
+        <CutInput
+            label="כותרת ההודעה"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />      
+        <CutInput
+            label="תוכן ההודעה"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className={styles.cutInput}
+            type="text"
+            dir="rtl"
+            textAlign="right"
+        />    
         <div className={styles.buttonContainer}>
             <button 
                 onClick={handleSubmit} 
@@ -360,5 +340,6 @@ export default function AddNotificationPage() {
 
       </div>
     </main>
+    </SmoothPageWrapper>
   );
 }

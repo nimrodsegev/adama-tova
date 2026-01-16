@@ -1,8 +1,6 @@
 "use client";
-import { createPortal } from "react-dom";
-import { useState, useEffect } from "react";
-import Button from "@/lib/components/UI/Button";
-import styles from "./CancelConfirmationModal.module.css";
+
+import Popup from "@/lib/components/UI/Popup";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 
 type CancelConfirmationModalProps = {
@@ -22,41 +20,19 @@ export default function CancelConfirmationModal({
   activityDate,
   activityTime,
 }: CancelConfirmationModalProps) {
-  const [mounted, setMounted] = useState(false);
   const { t } = useIvrita();
 
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+  if (!isOpen) return null;
 
-  if (!isOpen || !mounted) return null;
-
-  const modalContent = (
-    <>
-      <div className={styles.overlay} onClick={onClose} />
-      <div className={styles.modalContainer}>
-        <div className={styles.contentFrame}>
-          <p className={styles.questionText}>
-            {t("?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה")}
-          </p>
-          <p className={styles.detailsText}>
-            ל{activityTitle} ב{activityDate} בשעה {activityTime}
-          </p>
-        </div>
-
-        <div className={styles.buttonsFrame}>
-          <Button size="L-short" onClick={onClose}>
-            לא
-          </Button>
-
-          <Button size="L-short" onClick={onConfirm}>
-            <span className={styles.confirmButtonText}>כן, לבטל</span>
-          </Button>
-        </div>
-      </div>
-    </>
+  return (
+    <Popup
+      title={t("?את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה")}
+      content={`ל${activityTitle} ב${activityDate} בשעה ${activityTime}`}
+      primaryButtonText="לא"
+      primaryButtonAction={onClose}
+      secondaryButtonText="כן, לבטל"
+      secondaryButtonAction={onConfirm}
+      onClose={onClose}
+    />
   );
-
-  return createPortal(modalContent, document.body);
 }

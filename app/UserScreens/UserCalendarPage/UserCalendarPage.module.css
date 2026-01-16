@@ -1,3 +1,5 @@
+/* UserCalendarPage.module.css */
+
 .pageContainer {
   composes: mobile-container from global;
   background: linear-gradient(
@@ -13,13 +15,12 @@
 
 .mainFrame {
   position: absolute;
-  width: 23.5rem; /* 376px */
-  left: 0.5rem; /* 8px */
-  top: 3.5rem; /* Shipped up */
+  width: 23.5rem;
+  left: 0.5rem;
+  top: 3.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Ensuring the frame doesn't exceed screen height */
   height: calc(100vh - 3.5rem);
 }
 
@@ -37,7 +38,6 @@
   font-size: 2rem;
   line-height: 2.125rem;
   text-align: center;
-  letter-spacing: 0.02em;
   color: #ffffff;
   margin: 0;
 }
@@ -46,7 +46,6 @@
   width: 100%;
   max-width: 22.5625rem;
   height: 3.6875rem;
-  /* Created the requested gap below the slider */
   margin-bottom: 2.5rem;
   margin-left: 2rem;
 }
@@ -57,7 +56,6 @@
   align-items: center;
   width: 100%;
   margin-bottom: 1.25rem;
-
   position: relative;
   z-index: 20;
   pointer-events: auto;
@@ -70,9 +68,8 @@
   gap: 0.75rem;
   width: 22.0625rem;
 
-  /* CONSTRAINT: Stop the list 21rem from the bottom of the viewport */
   position: fixed;
-  top: 19rem; /* Adjusted based on title+slider+filter height */
+  top: 19rem;
   bottom: 5rem;
 
   overflow-y: auto;
@@ -84,58 +81,57 @@
   display: none;
 }
 
+/* NEW: Matches Admin Page Overlay Exactly */
 .loadingOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: var(--z-modal);
+  z-index: 1000; /* High z-index to sit on top */
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Semi-transparent background so you see context but know it's loading */
   background: rgba(231, 78, 28, 0.2);
   pointer-events: none;
 }
 
-/* ============================================
-   HEIGHT-BASED RESPONSIVENESS
-   ============================================ */
+.emptyText {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  text-align: center;
+  color: #ffffff;
+  margin-top: 2rem;
+}
 
-/* Medium-Short screens (below 800px) - e.g. Standard Androids */
+/* --- RESPONSIVENESS --- */
 @media (max-height: 50rem) {
   .activitiesList {
-    /* Switch from top/bottom pinning to a fixed max-height */
-    position: static; /* Removes it from fixed placement relative to window */
-    height: 22rem; /* The requested height */
-    margin-top: 0.5rem; /* Small gap from filter */
-
-    /* Ensure it handles overflow */
+    position: static;
+    height: 22rem;
+    margin-top: 0.5rem;
     overflow-y: auto;
-    flex-grow: 0; /* Prevents it from expanding automatically */
+    flex-grow: 0;
   }
-
-  /* Since we removed position: fixed, mainFrame handles the flow now */
   .mainFrame {
     justify-content: flex-start;
-    top: 2rem; /* Move everything up slightly */
+    top: 2rem;
   }
 }
 
-/* Short screens (below 700px) - e.g. iPhone SE */
 @media (max-height: 43.75rem) {
   .titleText {
     font-size: 1.75rem;
   }
-
   .sliderSection {
-    margin-bottom: 1.5rem; /* Reduce gap */
+    margin-bottom: 1.5rem;
   }
-
   .activitiesList {
-    height: 16rem; /* Shrink list further for very small screens */
+    height: 16rem;
   }
-
   .mainFrame {
     top: 1rem;
   }

@@ -1,19 +1,20 @@
-/* Container - Holds the static Glass Background & Border */
+/* Container - Holds the static Glass Background */
 .container {
   position: relative;
+  box-sizing: border-box;
   width: 100%;
   max-width: 21.5625rem; /* ~345px */
 
-  min-height: 5.625rem;
+  min-height: 6rem; /* 125px */
   height: auto;
 
   /* --- GLASS EFFECT --- */
   background: rgba(104, 31, 2, 0.05);
-  backdrop-filter: blur(0.625rem); /* 10px Blur for Glass Effect */
-  -webkit-backdrop-filter: blur(0.625rem); /* Safari support */
+  backdrop-filter: var(--blur-md); /* 10px Blur */
+  -webkit-backdrop-filter: var(--blur-md);
 
-  /* Container Stroke */
-  border: 0.0625rem solid #f9f9f9;
+  /* Outer border always visible on container */
+  border: 0.0625rem solid var(--color-text-secondary);
   border-radius: var(--radius-sm);
 
   user-select: none;
@@ -22,7 +23,6 @@
   display: flex;
   align-items: stretch;
 
-  /* Clips content so swipe box stays inside border */
   overflow: hidden;
 }
 
@@ -40,25 +40,27 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+
+  transition: none;
+  will-change: width;
+}
+
+.peek .revealMask {
+  transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* --- SWIPE ACTION BOX --- */
 .swipeActionBox {
   width: 7.5rem;
-  height: 100%; /* Fills container height completely */
+  height: 100%;
 
-  /* NO STROKE (Uses container's border due to overflow:hidden) */
+  box-sizing: border-box;
   border: none;
+  border-radius: 0;
   margin: 0;
 
   background: rgba(179, 126, 179, 0.5);
-  /* Optional: Inner radius just on left side if you want it to look separate, 
-     but usually for full fill we keep it square or match container radius.
-     Let's keep inner radius small for aesthetics. */
-  border-top-left-radius: var(--radius-xs);
-  border-bottom-left-radius: var(--radius-xs);
 
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -69,13 +71,15 @@
 
 .swipeText {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
   text-align: center;
   line-height: var(--line-height-tight);
 }
 
 .swipeArrow {
+  margin-top: 0.5rem;
   font-size: var(--font-size-2xl);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-bold);
@@ -96,6 +100,13 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  transition: none;
+  will-change: width;
+}
+
+.peek .deleteRevealMask {
+  transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* --- DELETE ACTION BOX --- */
@@ -103,14 +114,13 @@
   width: 7.5rem;
   height: 100%;
 
+  box-sizing: border-box;
   border: none;
+  border-radius: 0;
   margin: 0;
 
   background: rgba(167, 0, 0, 0.7);
-  border-top-right-radius: var(--radius-xs);
-  border-bottom-right-radius: var(--radius-xs);
 
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -121,13 +131,15 @@
 
 .deleteText {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
   text-align: center;
   line-height: var(--line-height-tight);
 }
 
 .deleteArrow {
+  margin-top: 0.5rem;
   font-size: var(--font-size-2xl);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-bold);
@@ -142,25 +154,41 @@
 
   flex-grow: 1;
   width: 100%;
-  min-height: 5.625rem;
+  min-height: 6.5rem;
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 
   padding: var(--spacing-lg);
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
 
-  /* Transparent so Glass BG shows through */
   background: transparent;
 
-  transition: transform 0.1s linear;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+
+  transition: transform var(--transition-fast);
   touch-action: pan-y;
+  will-change: transform;
 }
 
-/* Smooth transition for swipe hint animation */
-.card.hintAnimating {
-  transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+.peek .card.hintAnimating {
+  transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card.dragging {
+  transition: none !important;
+}
+
+/* Divider lines */
+.card.showRightDivider {
+  box-shadow: inset -1px 0 0 var(--color-text-secondary);
+}
+
+.card.showLeftDivider {
+  box-shadow: inset 1px 0 0 var(--color-text-secondary);
 }
 
 /* HEADER */
@@ -170,7 +198,7 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 0.625rem;
+  gap: var(--spacing-md);
   max-height: 3em;
   overflow: hidden;
 }
@@ -187,27 +215,31 @@
 .pipe,
 .title {
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-lg);
-  line-height: var(--line-height-snug);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  line-height: 1.25rem;
   text-align: right;
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
 .pipe {
-  margin: 0 0.125rem;
+  margin: 0 var(--spacing-xs);
 }
 
 .unreadDot {
   width: 0.6875rem;
   height: 0.6875rem;
-  background: #681f02;
+  background: var(--color-bordo);
   border-radius: var(--radius-full);
   flex: none;
   order: -1;
-  box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-sm);
   margin-top: 0.4rem;
+}
+
+.readText {
+  font-weight: 400 !important; /* Forces normal weight when read */
 }
 
 /* CONTENT CONTAINER */
@@ -215,18 +247,19 @@
   width: 70%;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-normal);
+  font-size: var(--font-size-md);
+  line-height: 1.3rem;
   text-align: right;
   color: var(--color-text-secondary);
   word-wrap: break-word;
-  margin-bottom: 0;
+
+  gap: 0.25rem;
 }
 
 /* BUTTON POSITIONING */
 .buttonPositioner {
   position: absolute;
-  bottom: var(--spacing-lg);
+  bottom: 0.85rem;
   left: var(--spacing-lg);
   z-index: 3;
 }
