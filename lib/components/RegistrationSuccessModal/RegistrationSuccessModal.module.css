@@ -98,14 +98,15 @@
 .messageText {
   width: 100%;
   max-width: 18rem;
-  font-family: var(--font-secondary);
+  font-family: var(--font-primary); /* Arfilit - matches pending approval */
   font-style: normal;
-  font-weight: var(--font-weight-light);
-  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal); /* 400 */
+  font-size: 1rem; /* 16px */
   line-height: 1.5rem;
   text-align: center;
-  color: var(--color-text-primary);
+  color: #ffffff;
   margin: 0;
+  direction: rtl;
 }
 
 /* Sub-message (smaller text for waitlist) */

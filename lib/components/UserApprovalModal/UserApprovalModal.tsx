@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { apiUser } from "@/app/services/db_api";
 import StatCard from "@/lib/components/UI/StatCard";
+import Button from "@/lib/components/UI/Button";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./UserApprovalModal.module.css";
@@ -127,12 +128,12 @@ export default function UserApprovalModal({
                     </div>
                     {/* Buttons on the left */}
                     <div className={styles.actionButtons}>
-                      <button className={styles.rejectButton} onClick={onReject}>
+                      <Button variant="reject" onClick={onReject}>
                         {t("סרב/י")}
-                      </button>
-                      <button className={styles.approveButton} onClick={onApprove}>
+                      </Button>
+                      <Button variant="approve" onClick={onApprove}>
                         {t("אשר/י")}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>

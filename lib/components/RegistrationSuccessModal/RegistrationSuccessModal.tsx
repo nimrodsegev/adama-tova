@@ -118,7 +118,9 @@ export default function RegistrationSuccessModal({
               </>
             ) : (
               <>
-                נרשמת בהצלחה לסדנת {activityTitle}
+                נרשמת בהצלחה לסדנת
+                <br />
+                {activityTitle}
                 <br />
                 בתאריך {activityDate} בשעה {activityTime}
               </>
