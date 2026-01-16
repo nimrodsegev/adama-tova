@@ -80,11 +80,12 @@
   flex-direction: column;
   gap: var(--spacing-md, 0.75rem);
   /* Calculate height: Viewport - Top elements */
-  max-height: calc(100vh - 25rem);
+  max-height: calc(100vh - 23.5rem);
   overflow-y: auto;
   overflow-x: visible;
   padding: 0.5rem;
   padding-right: 0.25rem;
+  padding-bottom: 5rem;
 
   /* Scrollbar styling */
   scrollbar-width: thin;
