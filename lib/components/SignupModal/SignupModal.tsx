@@ -193,7 +193,6 @@ export default function SignupModal({
                     setEmail(e.target.value);
                     setEmailError("");
                   }}
-                  placeholder="adama_tova@gmail.com"
                   error={emailError}
                   dir="ltr"
                   textAlign="right"

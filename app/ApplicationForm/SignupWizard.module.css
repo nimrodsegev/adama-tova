@@ -248,7 +248,7 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-light);
-  font-size: 1rem; /* 16px */
+  font-size: var(--font-size-md); /* 17px */
   line-height: 1.0625rem; /* 17px */
   text-align: right;
 
@@ -261,7 +261,7 @@
 .input::placeholder {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-light);
-  font-size: 1rem;
+  font-size: var(--font-size-md);
   color: rgba(247, 247, 247, 0.7);
 }
 
@@ -296,7 +296,7 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: 1rem; /* 16px */
+  font-size: var(--font-size-md); /* 17px */
   line-height: 1.1875rem; /* 19px */
   text-align: right;
 
@@ -336,7 +336,7 @@
   background-position: 0 var(--bg-y, 0px);
 
   font-family: var(--font-secondary);
-  font-size: 1rem; /* 16px - same as label */
+  font-size: var(--font-size-md); /* 17px - same as label */
   font-weight: var(--font-weight-normal);
   line-height: 1.1875rem; /* 19px */
   text-align: right;
