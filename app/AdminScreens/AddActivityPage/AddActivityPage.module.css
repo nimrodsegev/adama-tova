@@ -316,6 +316,36 @@
 .previewDescription { width: 100%; font-family: var(--font-secondary); font-weight: 400; font-size: 1rem; line-height: 1.1875rem; text-align: right; color: #F9F9F9; white-space: pre-wrap; min-height: 8.375rem; }
 
 /* ============================================
+   CLOSE BUTTON 
+   ============================================ */
+.closeButton {
+  position: absolute;
+  width: auto;
+  height: auto;
+  right: 2.5rem; /* 24px */
+  top: var(--spacing-3xl); /* 32px */
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1201;
+  padding: var(--spacing-xs); /* 4px */
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+/* ============================================
    BUTTONS & FOOTER
    ============================================ */
 .submitButtonContainer { display: flex; justify-content: center; align-items: center; margin-top: 1rem; width: 100%; }

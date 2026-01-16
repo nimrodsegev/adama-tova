@@ -88,7 +88,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  
+  transform: translateY(-0.25rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -111,7 +111,12 @@
 }
 
 .placeholder {
-  color: rgba(247, 247, 247, 0.7);
+  transform: translateY(-0.1rem);
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-light);
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  opacity: 0.6;
 }
 
 /* ============================================
@@ -135,7 +140,7 @@
    ============================================ */
 .dropdownMenu {
   position: absolute;
-  top: 3.7rem; 
+  top: 3.4rem; 
   left: 0;
   right: 0;
   
@@ -146,7 +151,7 @@
   background: #e26029; 
   padding-top: 0.5rem; /* Add padding to compensate for overlap */
   border: 1px solid #F9F9F9;
-  border-top: none;
+  border-top: 0.0625rem solid #F9F9F9; /* White border separating button from options */
   border-radius: 0 0 0.5625rem 0.5625rem;
   
   z-index: 100;
@@ -161,10 +166,10 @@
   background: #e26029;
   border: none;
   border-bottom: 0.0625rem solid #F9F9F9;
-  
+  transform: translateY(-0.25rem);
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   text-align: right;
   color: #FFFFFF;
   
@@ -211,7 +216,7 @@
 
 .dropdownContainer.miniDropdown .dropdownOption {
   padding: 0.5rem;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   width: 102%;
   text-align: center;
   border-bottom: 0.0625rem solid rgba(249, 249, 249, 0.2);

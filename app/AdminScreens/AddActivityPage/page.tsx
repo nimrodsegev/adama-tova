@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useMemo, useLayoutEffect, useEffect } from "react";
+import Image from "next/image"; // Added for the icon
 import { useRouter } from "next/navigation";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
@@ -74,6 +75,7 @@ export default function AddActivityPage() {
 
   // Force a "mounting" state for smooth page transition
   const [mounting, setMounting] = useState(true);
+  const [closing, setClosing] = useState(false); // New closing state
 
   // --- Refs & State ---
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -111,6 +113,15 @@ export default function AddActivityPage() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  // --- Close Animation Handler ---
+  const handleCloseWithAnimation = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      router.back();
+    }, 400);
+  };
 
   // --- Validation ---
   const isStep1Valid = useMemo(() => {
@@ -170,20 +181,18 @@ export default function AddActivityPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 🔥 UPDATE LABEL BACKGROUNDS (Floating Label Fix)
+  // Update label backgrounds
   useLayoutEffect(() => {
     const updateLabelBackgrounds = () => {
       const vh = window.innerHeight;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
 
-      // We need to look inside ALL slides because they might be visible
       const labels = document.querySelectorAll(
         `.${styles.inputLabel}, .${styles.uploadSubtext}`
       ) as NodeListOf<HTMLElement>;
 
       labels.forEach((el) => {
         const rect = el.getBoundingClientRect();
-        // Shift background up by the element's top position
         el.style.setProperty("--bg-y", `${-rect.top}px`);
       });
     };
@@ -191,11 +200,9 @@ export default function AddActivityPage() {
     updateLabelBackgrounds();
     const raf = requestAnimationFrame(updateLabelBackgrounds);
 
-    // Listeners
     window.addEventListener("resize", updateLabelBackgrounds);
     window.addEventListener("orientationchange", updateLabelBackgrounds);
     
-    // Attach scroll listeners to the SLIDES (since they contain the vertical overflow)
     const slides = document.querySelectorAll(`.${styles.scrollSnapSlide}`);
     slides.forEach(slide => {
         slide.addEventListener("scroll", updateLabelBackgrounds, { passive: true });
@@ -272,11 +279,22 @@ export default function AddActivityPage() {
   const formattedDate = `${formData.day}.${formData.month}.${formData.year}`;
 
   return (
-    <SmoothPageWrapper isLoading={mounting}>
+    // Update wrapper to accept closing state
+    <SmoothPageWrapper isLoading={mounting || closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
-      <button className="close-button" onClick={() => router.back()}>
-        <div className="close-button-inner" />
-        <div className="close-icon" />
+      
+      {/* NEW CLOSE BUTTON */}
+      <button
+        className={styles.closeButton}
+        onClick={handleCloseWithAnimation}
+        aria-label="סגור"
+      >
+        <Image
+          src="/icons/close.svg"
+          alt="Close icon"
+          width={40}
+          height={40}
+        />
       </button>
 
       <div className={styles.header}>
@@ -301,7 +319,6 @@ export default function AddActivityPage() {
             dir="rtl"
             textAlign="right"
         />  
-            {/* CUSTOM BRANCH DROPDOWN - 🔥 FIX: activeZIndex Class */}
             <UnifiedDropdown
               label="סניף"
               placeholder="בחר/י סניף"
@@ -330,7 +347,7 @@ export default function AddActivityPage() {
             textAlign="right"
         />  
             <CutInput
-            label="מספר משתתפים"
+            label="מספר משתתפים מקסימלי"
             value={formData.max_participants}
             onChange={(e) => setFormValue('max_participants', e.target.value)}
             className={styles.cutInput}
@@ -372,7 +389,6 @@ export default function AddActivityPage() {
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             
-            {/* CUSTOM TYPE DROPDOWN - 🔥 FIX: activeZIndex Class */}
             <UnifiedDropdown
               label="סוג פעילות"
               placeholder="בחר/י"
@@ -383,7 +399,6 @@ export default function AddActivityPage() {
               onToggle={() => setIsTypeOpen(!isTypeOpen)}
             />
             {formData.type === 'workshop' && (
-              /* CUSTOM CATEGORY DROPDOWN - 🔥 FIX: activeZIndex Class */
               <UnifiedDropdown
                 label="תחום עניין"
                 placeholder="בחר/י"
@@ -396,7 +411,6 @@ export default function AddActivityPage() {
             )}
             {formData.type === 'group' && (
               <>
-                {/* CUSTOM CIRCLE DROPDOWN - 🔥 FIX: activeZIndex Class */ }
                 <UnifiedDropdown
                   label="קבוצת יעד"
                   placeholder="בחר/י"
@@ -421,7 +435,7 @@ export default function AddActivityPage() {
             <div className={styles.fieldGroup}>
               <div className={styles.dateLabel}>{formData.type === 'group' ? 'תאריך התחלה' : 'תאריך'}</div>
               <div className={styles.dateRow}>
-                {/* YEAR - 🔥 FIX: activeMiniDropdown Class */}
+                {/* YEAR */}
                 <UnifiedDropdown
                   label="שנה"
                   placeholder="שנה"
@@ -433,7 +447,7 @@ export default function AddActivityPage() {
                   isMini={true}
                 />
 
-                {/* MONTH - 🔥 FIX: activeMiniDropdown Class */}
+                {/* MONTH */}
                 <UnifiedDropdown
                   label="חודש"
                   placeholder="חודש"
@@ -445,7 +459,7 @@ export default function AddActivityPage() {
                   isMini={true}
                 />
 
-                {/* DAY - 🔥 FIX: activeMiniDropdown Class */}
+                {/* DAY */}
                 <UnifiedDropdown
                   label="יום"
                   placeholder="יום"
