@@ -1,10 +1,7 @@
 "use client";
 import { createPortal } from "react-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useUser } from "@/app/contexts/UserContext";
-import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
-import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./RegistrationSuccessModal.module.css";
 
 type RegistrationSuccessModalProps = {
@@ -29,22 +26,6 @@ export default function RegistrationSuccessModal({
   waitlistPosition = null,
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const { userProfile } = useUser();
-
-  // Handle close with animation
-  const handleCloseWithAnimation = () => {
-    setClosing(true);
-    setTimeout(() => {
-      setClosing(false);
-      onClose();
-    }, 400);
-  };
-
-  // Calculate shape parameters based on user profile
-  const shapeParams = useMemo(() => {
-    return calculateShapeParams(userProfile);
-  }, [userProfile]);
 
   useEffect(() => {
     setMounted(true);
@@ -67,42 +48,61 @@ export default function RegistrationSuccessModal({
   const modalContent = (
     <>
       {/* Overlay backdrop */}
-      <div className={styles.overlay} onClick={handleCloseWithAnimation} />
+      <div className={styles.overlay} onClick={onClose} />
 
-      {/* Modal container */}
-      <div className={styles.modalContainer}>
-        {/* Organic Circles in the background with calculated parameters */}
-        <OrganicCircles
-          mode={closing ? "loading" : "breathing"}
-          radius={0.3}
-          layers={shapeParams.layers}
-          smoothness={shapeParams.smoothness}
-          complexity={shapeParams.complexity}
-          elongation={shapeParams.elongation}
-          opacity={shapeParams.opacity}
-          strokeWidth={shapeParams.strokeWidth}
-          position={{ x: 0.5, y: 0.5 }}
-          baseColor="#FFFFFF"
-        />
-
+      {/* Modal container with gradient background */}
+      <div className={styles.groupModalContainer}>
         {/* Close button */}
         <button
-          className={styles.closeButton}
-          onClick={handleCloseWithAnimation}
+          className={styles.groupCloseButton}
+          onClick={onClose}
           aria-label="סגור"
         >
           <Image
             src="/icons/close.svg"
             alt="Close icon"
-            width={40}
+            width={41}
             height={40}
           />
         </button>
 
         {/* Content Frame */}
-        <div className={styles.contentFrame}>
-          {/* Success message text - TWO LINES */}
-          <p className={styles.messageText}>
+        <div className={styles.groupContentFrame}>
+          {/* Checkmark circle with V icon */}
+          <div className={styles.checkmarkContainer}>
+            <Image
+              src="/icons/checkmark_circle.svg"
+              alt=""
+              width={122}
+              height={124}
+              className={styles.checkmarkCircle}
+            />
+            {/* Checkmark V icon */}
+            <svg
+              className={styles.checkmarkIcon}
+              viewBox="0 0 60 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 38L6 24"
+                stroke="#FFFFFF"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M54 10L20 38"
+                stroke="#FFFFFF"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          {/* Message text */}
+          <p className={styles.groupMessageText}>
             {isWaitlist ? (
               <>
                 הפעילות מלאה - נרשמת לרשימת ההמתנה
@@ -110,7 +110,8 @@ export default function RegistrationSuccessModal({
                 מקום #{waitlistPosition} {isGroup ? `לקבוצת` : `לפעילות`}{" "}
                 {activityTitle}
                 <br />
-                <span className={styles.subMessage}>
+                <br />
+                <span className={styles.groupMessageTextLight}>
                   {isGroup
                     ? "כשיתפנה מקום, בקשתך תועבר לאישור המנהל"
                     : "נעדכן אותך כשיתפנה מקום"}

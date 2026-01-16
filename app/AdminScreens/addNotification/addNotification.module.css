@@ -13,16 +13,15 @@
   max-width: none !important; 
   overflow: hidden;
   background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  padding: 0 !important; 
-  padding-top: env(safe-area-inset-top) !important;
-  padding-bottom: env(safe-area-inset-bottom) !important;
+  padding: 2rem 0.2rem 1.5rem; /* 48px 4px 24px */
+  gap: 0.5rem; /* 8px */
   z-index: 1;
 }
 
 /* Header */
 .header {
   text-align: center;
-  margin-top: 7rem; 
+  margin-top: 4.5rem; 
   margin-bottom: 2rem;
   z-index: 10;
   flex-shrink: 0;
@@ -91,7 +90,7 @@
   width: 100%; 
   display: flex; 
   flex-direction: column; 
-  gap: 8px; 
+  gap: 0.5rem; 
 }
 
 .dateLabel { 
@@ -108,11 +107,9 @@
 .dateRow { 
   display: flex; 
   flex-direction: row; 
-  justify-content: space-between; 
   align-items: center; 
-  padding: 0; 
-  gap: 8px; 
-  width: 100%; 
+  padding: 0.2rem; 
+  gap: 1.2rem; 
   direction: rtl; 
 }
 /* ============================================
@@ -122,8 +119,8 @@
   position: absolute;
   width: auto;
   height: auto;
-  right: 2.5rem; /* 24px */
-  top: var(--spacing-3xl); /* 32px */
+  right: 2rem; /* 24px */
+  top: 2rem; /* 32px */
   border: none;
   outline: none;
   box-shadow: none;
