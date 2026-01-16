@@ -283,15 +283,7 @@ export default function ProfilePage() {
                 </div>
               ))}
 
-            {/* --- ADMIN & LOGOUT BUTTONS --- */}
-            <div className={styles.buttonsRow}>
-              {isAdmin && (
-                <Button className={styles.usersList} onClick={handleToUserList}>
-                  רשימת משתמשים
-                  <span className={styles.pressArrow}></span>
-                </Button>
-              )}
-            </div>
+            {/* --- LOGOUT BUTTON --- */}
             <div className={styles.buttonsRow}>
               <div className={styles.logOutButton}>
                 <Button
