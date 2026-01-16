@@ -6,7 +6,7 @@
   width: 100%;
 
   /* 1. Remove fixed height so padding dictates the size */
-  height: auto;
+  height: 4.5rem;
 
   background-color: transparent;
   border-top: 0.0625rem solid var(--color-white-pure);
