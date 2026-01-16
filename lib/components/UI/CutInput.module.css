@@ -41,10 +41,10 @@
   position: absolute;
   top: -0.5rem; /* -8px - sits on top of the border gap */
   right: 2rem;
-  
+
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base); /* 16px */
+  font-size: var(--font-size-md); /* 17px */
   line-height: 1.1875rem; /* 19px */
   color: var(--color-text-secondary); /* #F9F9F9 */
 
@@ -70,7 +70,7 @@
 
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-light);
-  font-size: var(--font-size-base); /* 16px */
+  font-size: var(--font-size-md); /* 17px */
   line-height: 1.0625rem; /* 17px */
   color: var(--color-text-secondary); /* #F9F9F9 */
 
@@ -80,9 +80,9 @@
 .input::placeholder {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-light);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   color: var(--color-text-secondary);
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .input:focus::placeholder {

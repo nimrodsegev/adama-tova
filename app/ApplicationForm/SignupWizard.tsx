@@ -521,13 +521,13 @@ export default function SignupWizard({
             </button>
           )}
           <div className={styles.content}>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
+
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t("השלם/י פרטים אישיים")}</h2>
               <p className={styles.optionalSubtitle}>&nbsp;</p>
             </div>
-
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainer}>
               <div className={styles.inputsContainer}>
@@ -637,15 +637,15 @@ export default function SignupWizard({
             </button>
           )}
           <div className={styles.content}>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
+
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>
                 {t("הסניף הקרוב [אליך|אלייך]")}
               </h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
-
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.optionsContainer}>
@@ -678,13 +678,13 @@ export default function SignupWizard({
             </button>
           )}
           <div className={styles.content}>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
+
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>{t("מה מעניין אותך?")}</h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
-
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.optionsContainer}>
@@ -717,15 +717,15 @@ export default function SignupWizard({
             </button>
           )}
           <div className={styles.content}>
+            {/* Spacer for fixed circles */}
+            <div className={styles.circleSpacer} />
+
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>
                 {t("מאיזה מקום אישי את/ה מגיע/ה אלינו?")}
               </h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
-
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
 
             <div className={styles.stepContainerLower}>
               <div className={styles.inputsContainer}>

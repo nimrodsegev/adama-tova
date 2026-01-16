@@ -241,3 +241,10 @@
     bottom: 5rem;
   }
 }
+
+/* Safari with toolbar (601-670px) - must come AFTER other height queries */
+@media (min-height: 37.5625rem) and (max-height: 41.875rem) {
+  .bottomButton {
+    bottom: 8rem; /* higher for Safari toolbar */
+  }
+}

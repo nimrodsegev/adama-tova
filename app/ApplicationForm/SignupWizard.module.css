@@ -31,7 +31,7 @@
 /* Fixed Background Circles - stays in place during swipe */
 .backgroundCircles {
   position: fixed;
-  top: calc(12vh + env(safe-area-inset-top, 0));
+  top: calc(4vh + env(safe-area-inset-top, 0));
   left: 0;
   right: 0;
   width: min(60.5vw, 14.92rem);
@@ -44,10 +44,10 @@
 /* Spacer to maintain layout where circles used to be */
 .circleSpacer {
   width: min(60.5vw, 14.92rem);
-  height: min(60.5vw, 15.13rem);
+  height: min(55vw, 14rem);
   flex-shrink: 0;
-  margin-top: 3vh;
-  margin-bottom: 2vh;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
 }
 
 /* Scroll Snap Container - horizontal scrolling */
@@ -112,9 +112,10 @@
   padding: 0;
   gap: 0.25rem;
   width: 100%;
-  max-width: 21.5625rem; /* 345px */
+  max-width: 19.6875rem; /* 315px - matches input containers */
   flex-shrink: 0;
-  height: 5rem; /* FIXED height - ensures circles align on ALL pages */
+  height: auto;
+  margin-bottom: 1rem;
 }
 
 .stepTitle {
@@ -124,7 +125,7 @@
   font-family: var(--font-primary);
   font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: clamp(1rem, 5vw, 1.25rem); /* Responsive font size */
+  font-size: 1.5rem; /* 24px */
   line-height: 1.4;
   text-align: right;
   letter-spacing: 0.02em;
@@ -190,7 +191,7 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
-  margin-top: 0.75rem; /* Matches optionsContainer for consistent content start height */
+  margin-top: 1.5rem;
   overflow: visible;
 }
 
@@ -203,11 +204,12 @@
   width: 100%;
   max-width: 19.6875rem; /* 315px */
   flex: 1;
+  margin-top: 1.5rem;
 }
 
-/* Space between circle and inputs on Step 3 (circle selection) */
+/* Space between header and inputs on Step 3 (circle selection) */
 .stepContainerLower .inputsContainer {
-  margin-top: 1.5rem;
+  margin-top: 0;
 }
 
 /* ============================================
@@ -248,7 +250,7 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-light);
-  font-size: 1rem; /* 16px */
+  font-size: var(--font-size-md); /* 17px */
   line-height: 1.0625rem; /* 17px */
   text-align: right;
 
@@ -261,7 +263,7 @@
 .input::placeholder {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-light);
-  font-size: 1rem;
+  font-size: var(--font-size-md);
   color: rgba(247, 247, 247, 0.7);
 }
 
@@ -296,7 +298,7 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: 1rem; /* 16px */
+  font-size: var(--font-size-md); /* 17px */
   line-height: 1.1875rem; /* 19px */
   text-align: right;
 
@@ -336,7 +338,7 @@
   background-position: 0 var(--bg-y, 0px);
 
   font-family: var(--font-secondary);
-  font-size: 1rem; /* 16px - same as label */
+  font-size: var(--font-size-md); /* 17px - same as label */
   font-weight: var(--font-weight-normal);
   line-height: 1.1875rem; /* 19px */
   text-align: right;
@@ -651,10 +653,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 0;
-  gap: 1rem; /* 16px - matches Figma */
+  gap: 0.625rem; /* 10px - tighter spacing */
   width: 19.6875rem; /* 315px */
   max-width: 100%;
-  margin-top: 0.75rem; /* Push options lower */
+  margin-top: 0; /* margin handled by stepContainerLower */
 }
 
 .optionButton {
@@ -763,7 +765,7 @@
 .nextArrow {
   position: absolute;
   left: 0.5rem; /* closer to left edge */
-  top: 40%; /* a bit higher than center */
+  bottom: 6rem; /* positioned at bottom */
   width: 2.5625rem; /* 41px */
   height: 2.5rem; /* 40px */
   z-index: 50;
@@ -836,11 +838,10 @@
 
   width: 100%;
   position: fixed;
-  bottom: 0;
+  bottom: 3rem;
   left: 0;
   right: 0;
-  padding-top: 1rem;
-  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0));
+  z-index: 100;
   background: transparent;
   pointer-events: none;
 }
@@ -1073,12 +1074,12 @@
   }
 
   .circleSpacer {
-    margin-top: -2.5vh;
-    margin-bottom: -1vh;
+    margin-top: 0;
+    margin-bottom: 1rem;
   }
 
   .backgroundCircles {
-    top: calc(10vh + env(safe-area-inset-top, 0));
+    top: calc(3vh + env(safe-area-inset-top, 0));
   }
 }
 
@@ -1090,7 +1091,7 @@
   }
 
   .headerSection {
-    height: 4.5rem; /* FIXED height for consistent circles */
+    height: auto;
   }
 
   .decorativeCircles {
@@ -1103,12 +1104,12 @@
   .circleSpacer {
     width: min(45vw, 10rem);
     height: min(45vw, 10rem);
-    margin-top: 2vh;
-    margin-bottom: 2vh;
+    margin-top: 0;
+    margin-bottom: 1rem;
   }
 
   .backgroundCircles {
-    top: calc(10vh + env(safe-area-inset-top, 0));
+    top: calc(2vh + env(safe-area-inset-top, 0));
     width: min(45vw, 10rem);
     height: min(45vw, 10rem);
   }
@@ -1150,7 +1151,7 @@
   }
 
   .headerSection {
-    height: 4rem; /* FIXED height for consistent circles */
+    height: auto;
   }
 
   .decorativeCircles {
@@ -1163,18 +1164,18 @@
   .circleSpacer {
     width: min(35vw, 7rem);
     height: min(35vw, 7rem);
-    margin-top: 1.5vh;
-    margin-bottom: 1.5vh;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
   }
 
   .backgroundCircles {
-    top: calc(8vh + env(safe-area-inset-top, 0));
+    top: calc(1vh + env(safe-area-inset-top, 0));
     width: min(35vw, 7rem);
     height: min(35vw, 7rem);
   }
 
   .stepTitle {
-    font-size: 1rem;
+    font-size: 1.25rem;
   }
 
   .input,
@@ -1210,7 +1211,7 @@
 /* Landscape or very short screens */
 @media (max-height: 500px) {
   .headerSection {
-    height: 3.5rem; /* FIXED height for consistent circles */
+    height: auto;
   }
 
   .decorativeCircles {
@@ -1223,12 +1224,12 @@
   .circleSpacer {
     width: min(25vw, 5rem);
     height: min(25vw, 5rem);
-    margin-top: 1vh;
-    margin-bottom: 1vh;
+    margin-top: 0;
+    margin-bottom: 1rem;
   }
 
   .backgroundCircles {
-    top: calc(6vh + env(safe-area-inset-top, 0));
+    top: calc(1vh + env(safe-area-inset-top, 0));
     width: min(25vw, 5rem);
     height: min(25vw, 5rem);
   }
@@ -1268,12 +1269,12 @@
   }
 
   .circleSpacer {
-    margin-top: 3vh;
-    margin-bottom: 2vh;
+    margin-top: 0;
+    margin-bottom: 2rem;
   }
 
   .backgroundCircles {
-    top: calc(14vh + env(safe-area-inset-top, 0));
+    top: calc(5vh + env(safe-area-inset-top, 0));
   }
 
   .stepContainer {
@@ -1281,7 +1282,7 @@
   }
 
   .optionsContainer {
-    margin-top: 1.5rem;
+    margin-top: 0;
   }
 }
 
@@ -1296,11 +1297,12 @@
   }
 
   .circleSpacer {
-    margin-top: 4vh;
+    margin-top: 0;
+    margin-bottom: 2.5rem;
   }
 
   .backgroundCircles {
-    top: calc(16vh + env(safe-area-inset-top, 0));
+    top: calc(6vh + env(safe-area-inset-top, 0));
   }
 
   .stepContainer {
@@ -1308,7 +1310,7 @@
   }
 
   .optionsContainer {
-    margin-top: 1.5rem;
+    margin-top: 0;
   }
 }
 
@@ -1323,7 +1325,7 @@
   }
 
   .headerSection {
-    max-width: 22rem;
+    max-width: 19.6875rem; /* Keep aligned with inputs */
   }
 
   /* Make dots more visible on larger screens */
@@ -1341,7 +1343,7 @@
   }
 
   .headerSection {
-    max-width: 24rem;
+    max-width: 19.6875rem; /* Keep aligned with inputs */
   }
 
   /* Ensure dots are visible on desktop */
@@ -1372,7 +1374,7 @@
   }
 
   .headerSection {
-    height: 4.5rem; /* FIXED height for consistent circles */
+    height: auto;
   }
 
   .decorativeCircles {
@@ -1381,12 +1383,12 @@
   }
 
   .circleSpacer {
-    margin-top: 1vh;
-    margin-bottom: 1vh;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
   }
 
   .backgroundCircles {
-    top: calc(10vh + env(safe-area-inset-top, 0));
+    top: calc(3vh + env(safe-area-inset-top, 0));
   }
 
   .content {
@@ -1394,17 +1396,17 @@
   }
 
   .stepContainer {
-    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
+    margin-top: 1.5rem;
     padding-bottom: 6rem;
     overflow: visible !important;
   }
 
   .optionsContainer {
-    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
+    margin-top: 0;
   }
 
   .stepContainerLower .inputsContainer {
-    margin-top: -1.5rem;
+    margin-top: 0;
   }
 
   .scrollSnapSlide {
@@ -1441,7 +1443,7 @@
   }
 
   .headerSection {
-    height: 5rem; /* FIXED height for consistent circles */
+    height: auto;
   }
 
   .decorativeCircles {
@@ -1450,20 +1452,20 @@
   }
 
   .circleSpacer {
-    margin-top: 2vh;
-    margin-bottom: 1.5vh;
+    margin-top: 0;
+    margin-bottom: 2rem;
   }
 
   .backgroundCircles {
-    top: calc(12vh + env(safe-area-inset-top, 0));
+    top: calc(4vh + env(safe-area-inset-top, 0));
   }
 
   .stepContainer {
-    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
+    margin-top: 1.5rem;
     padding-bottom: 6rem;
   }
 
   .optionsContainer {
-    margin-top: -1.5rem; /* Negative margin to bring content closer to circle */
+    margin-top: 0;
   }
 }
