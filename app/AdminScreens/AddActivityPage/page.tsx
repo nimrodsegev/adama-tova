@@ -65,6 +65,27 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
+// --- CUSTOM SVG ARROW (For TimePicker) ---
+const CustomArrowIcon = ({ className, rotation = 0 }: { className?: string; rotation?: number }) => (
+  <svg 
+    width="24" 
+    height="14" 
+    viewBox="0 0 24 14" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    style={{ transform: `rotate(${rotation}deg)` }}
+  >
+    <path 
+      d="M2 2L12 12L22 2" 
+      stroke="white" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 // --- Custom Time Picker Component ---
 const TimePicker = ({ value, onChange }: { value: string, onChange: (val: string) => void }) => {
   const [hourStr, minStr] = value ? value.split(':') : ["12", "00"];
@@ -85,55 +106,33 @@ const TimePicker = ({ value, onChange }: { value: string, onChange: (val: string
 
   return (
     <div className={styles.timePickerContainer}>
-      {/* Hours Column */}
       <div className={styles.timeColumn}>
         <button type="button" onClick={incrementHour} className={styles.timeButton}>
-           {/* Assuming arrow points Left: 90deg makes it point Up */}
-           <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Up" 
-             width={24} 
-             height={24} 
-             className={styles.arrowUp} 
-           />
+          <CustomArrowIcon rotation={180} />
         </button>
         <span className={styles.timeValue}>{hour.toString().padStart(2, '0')}</span>
         <button type="button" onClick={decrementHour} className={styles.timeButton}>
-           {/* Assuming arrow points Left: -90deg makes it point Down */}
-           <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Down" 
-             width={24} 
-             height={24} 
-             className={styles.arrowDown} 
-           />
+          <CustomArrowIcon rotation={0} />
         </button>
       </div>
-
-      {/* Minutes Column */}
       <div className={styles.timeColumn}>
         <button type="button" onClick={incrementMinute} className={styles.timeButton}>
-          <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Up" 
-             width={24} 
-             height={24} 
-             className={styles.arrowUp} 
-           />
+          <CustomArrowIcon rotation={180} />
         </button>
         <span className={styles.timeValue}>{minute.toString().padStart(2, '0')}</span>
         <button type="button" onClick={decrementMinute} className={styles.timeButton}>
-          <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Down" 
-             width={24} 
-             height={24} 
-             className={styles.arrowDown} 
-           />
+          <CustomArrowIcon rotation={0} />
         </button>
       </div>
     </div>
   );
+};
+
+// --- Helper for Progress Icons ---
+const getProgressCircleIcon = (stepIndex: number, isCurrent: boolean) => {
+  const suffix = isCurrent ? "_filled" : "";
+  // Ensure these files exist in public/icons/
+  return `/icons/progress_circle_${stepIndex + 1}${suffix}.svg`;
 };
 
 export default function AddActivityPage() {
@@ -379,7 +378,6 @@ export default function AddActivityPage() {
 
             <div className={styles.fieldGroup}>
               <div className={styles.dateLabel}>שעה</div>
-              {/* CUSTOM TIME PICKER */}
               <TimePicker value={formData.startTime} onChange={(val) => setFormValue('startTime', val)} />
             </div>
           </div>
@@ -409,9 +407,20 @@ export default function AddActivityPage() {
         </div>
       </div>
 
-      <div className={styles.footer}>
-        <div className={styles.dotsContainer}>
-          {[2, 1, 0].map(s => <div key={s} className={`${styles.dot} ${currentStep === s ? styles.activeDot : ''}`} />)}
+      {/* NAVIGATION DOTS */}
+      <div className={styles.navigation}>
+        <div className={styles.progressDots}>
+          {[0, 1, 2].map((step) => (
+            <div key={step} className={styles.progressCircle}>
+              <Image
+                src={getProgressCircleIcon(step, step === currentStep)}
+                alt={`Step ${step + 1}`}
+                width={17}
+                height={17}
+                className={styles.progressCircleIcon}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </main>
