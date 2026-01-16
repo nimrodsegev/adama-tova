@@ -200,14 +200,14 @@ export default function AdminNotificationsPage() {
           />
         </div>
 
-        {/* Actions Container (NEW: Matches User Page) */}
+        {/* Actions Container */}
         <div className={styles.actionsContainer}>
           <Button
             variant="tertiary"
             tertiarySize="medium"
             tertiaryWeight="semibold"
             customBgColor="transparent"
-            customTextColor="#F9F9F9" /* White for Admin Gradient */
+            customTextColor="#F9F9F9"
             tertiaryArrowDirection="down"
             onClick={handleMarkAllAsRead}
             disabled={loading || notifications.every((n) => n.isRead)}
@@ -216,10 +216,10 @@ export default function AdminNotificationsPage() {
           </Button>
         </div>
 
-        {/* Content Container (Window Frame) */}
+        {/* Content Container */}
         <div className={styles.contentContainer}>
           {filteredNotifications.length > 0 ? (
-            /* SCROLLABLE LIST */
+            /* LIST (Now part of the main scroll flow) */
             <div className={styles.notificationsList}>
               {filteredNotifications.map((notif, index) => {
                 const isFirst = index === 0;
@@ -307,7 +307,7 @@ export default function AdminNotificationsPage() {
           )}
         </div>
 
-        {/* Sticky Button (ADMIN SPECIFIC) */}
+        {/* Sticky Button */}
         {filteredNotifications.length > 0 && (
           <div className={styles.bottomButton}>
             <Button size="L" href="/AdminScreens/addNotification">

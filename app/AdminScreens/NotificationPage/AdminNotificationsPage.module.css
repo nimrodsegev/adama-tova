@@ -3,17 +3,24 @@
 .pageContainer {
   width: 100%;
   max-width: var(--container-max-width, 24.5rem);
-  min-height: 100vh;
+
+  /* --- FIX: OVERRIDE GLOBAL SCROLL LOCK --- */
+  /* instead of letting the div grow (min-height), we fix it to viewport height */
+  height: calc(100dvh - 4.5rem);
+  /* ...and enable scrolling INSIDE this container */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
+  /* ---------------------------------------- */
+
   margin: 0 auto;
 
   /* Admin Orange Gradient */
   background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
 
   position: relative;
-  overflow: hidden; /* Prevent body scroll */
   direction: rtl;
   padding: 1.5rem;
-  /* Top padding accounts for headers */
 }
 
 /* ============================================
@@ -64,19 +71,18 @@
 }
 
 /* ============================================
-   CONTENT FRAME (The Window)
+   CONTENT FRAME
    ============================================ */
 .contentContainer {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden; /* Ensures inner list handles scroll */
-  flex: 1; /* Take remaining height */
+  /* Ensure no overflow restrictions here so padding works */
 }
 
 /* ============================================
-   SCROLLABLE LIST
+   LIST
    ============================================ */
 .notificationsList {
   width: 100%;
@@ -84,34 +90,13 @@
   flex-direction: column;
   gap: 1rem;
 
-  /* Height Calculation: 
-     100dvh - Top Elements (Title + Filter + Actions + Pads)
-     Adjust 20rem to tune the visible area
-  */
-  max-height: calc(100dvh - 20rem);
-
-  overflow-y: auto;
-  overflow-x: visible; /* Allow shadows/hints to show */
+  /* Ensure content is visible */
+  overflow: visible;
 
   /* Cushion for the sticky button */
-  padding-bottom: 7rem;
+  padding-bottom: 5rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-
-  /* Scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.notificationsList::-webkit-scrollbar {
-  width: 0.375rem;
-}
-.notificationsList::-webkit-scrollbar-track {
-  background: transparent;
-}
-.notificationsList::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
 }
 
 .notificationItem {
@@ -149,7 +134,6 @@
 }
 
 .emptyStateIcon {
-  /* Ensure SVGs size correctly */
   width: 3rem;
   height: 3rem;
 }
@@ -184,9 +168,6 @@
 @media (max-height: 43.75rem) {
   .pageContainer {
     padding-top: 4rem;
-  }
-  .notificationsList {
-    max-height: calc(100dvh - 16rem);
   }
   .bottomButton {
     bottom: 5rem;
