@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Button from "@/lib/components/UI/Button";
 import NewNotificationCard from "@/lib/components/UI/NewNotificationCard";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
-import NewUserScheduleActivityCard from "@/lib/components/UI/NewUserScheduleActivityCard";
 import UserApprovalCard from "@/lib/components/UI/UserApprovalCard";
 import EmptyState from "@/lib/components/UI/EmptyState";
 import DaySlider from "@/lib/components/UI/DaySlider";
