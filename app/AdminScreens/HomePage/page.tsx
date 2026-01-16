@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useUser } from "@/app/contexts/UserContext";
 import {
@@ -8,6 +8,7 @@ import {
   apiActivities,
   apiRegistrations,
 } from "@/app/services/db_api";
+import { DEFAULTS } from "@/app/utils/motionParamsCalculator";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import OpenHours from "@/lib/components/UI/OpenHours";
 import { HomeFilter, FilterOption } from "@/lib/components/UI/HomeFilter";
@@ -59,19 +60,6 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",
 };
-
-const OPENING_HOURS = {
-  0: { open: "16:00", close: "22:00" },
-  2: { open: "16:00", close: "22:00" },
-  3: { open: "16:00", close: "22:00" },
-  5: { open: "16:00", close: "22:00" },
-};
-
-const todayHours = (() => {
-  const today = new Date().getDay();
-  // @ts-ignore
-  return OPENING_HOURS[today] || null;
-})();
 
 // Get Hebrew circle name (from quiz.circle or translate from users.circle)
 const getCircleHebrew = (
@@ -152,9 +140,64 @@ export default function AdminHomePage() {
     string | null
   >(null);
 
+  const OPENING_HOURS = {
+    0: { open: "16:00", close: "22:00" },
+    2: { open: "16:00", close: "22:00" },
+    3: { open: "16:00", close: "22:00" },
+    5: { open: "16:00", close: "22:00" },
+  };
+
   // Fetch data on mount
   useEffect(() => {
     fetchData();
+  }, []);
+
+  const [bgCircleConfig, setBgCircleConfig] = useState({
+    radius: 0.07,
+    x: 0.47,
+    y: 0.25,
+  });
+
+  const mountedRef = useRef(false);
+
+  const todayHours = (() => {
+    const today = new Date().getDay();
+    // @ts-ignore
+    return OPENING_HOURS[today] || null;
+  })();
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      let newConfig = { radius: 0.07, x: 0.44, y: 0.1 };
+
+      if (width < 380) {
+        newConfig.radius = 0.06;
+        newConfig.x = 0.5;
+        newConfig.y = 0.25;
+      } else if (width > 600) {
+        newConfig.radius = 0.12;
+        newConfig.x = 0.5;
+        newConfig.y = 0.25;
+      }
+
+      if (height < 800) newConfig.y = 0.11;
+      if (height < 700) {
+        newConfig.radius = Math.min(newConfig.radius, 0.06);
+        newConfig.y = 0.25;
+      }
+      if (height < 600) {
+        newConfig.radius = Math.min(newConfig.radius, 0.05);
+        newConfig.y = 0.17;
+      }
+
+      setBgCircleConfig(newConfig);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Turn off mounting after a tiny delay to trigger the animation
@@ -374,6 +417,8 @@ export default function AdminHomePage() {
   return (
     <SmoothPageWrapper isLoading={userLoading || mounting}>
       <div className={styles.pageContainer} dir="rtl">
+        {/* Opening Hours - Fixed at top above everything */}
+        {/* CONTROLLABLE POSITION COMPONENT */}
         <div className={styles.openHoursFixed}>
           {todayHours ? (
             <OpenHours
@@ -392,14 +437,14 @@ export default function AdminHomePage() {
           <div className={styles.circlesContainer}>
             <OrganicCircles
               mode="breathing"
-              radius={0.08}
-              layers={4}
-              smoothness={0.5}
-              complexity={0.5}
-              elongation={0.3}
-              opacity={0.7}
-              strokeWidth={2.3}
-              position={{ x: 0.4, y: 0.1 }}
+              radius={bgCircleConfig.radius}
+              position={{ x: bgCircleConfig.x, y: bgCircleConfig.y }}
+              layers={DEFAULTS.layers}
+              smoothness={DEFAULTS.smoothness}
+              complexity={DEFAULTS.complexity}
+              elongation={DEFAULTS.elongation}
+              opacity={DEFAULTS.opacity}
+              strokeWidth={DEFAULTS.strokeWidth}
               baseColor="#FFFFFF"
             />
           </div>

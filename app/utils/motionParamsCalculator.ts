@@ -24,7 +24,7 @@ export interface UserProfile {
   role?: "participant" | "admin";
 }
 
-const DEFAULTS: ShapeParams = {
+export const DEFAULTS: ShapeParams = {
   layers: 4,
   smoothness: 0.8,
   complexity: 0.3,
