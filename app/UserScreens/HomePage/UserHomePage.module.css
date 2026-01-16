@@ -15,28 +15,67 @@
   font-size: 1.25rem;
 }
 
-/* Page Container */
+/* Page Container - Must be relative for absolute children to work */
 .pageContainer {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 5.75rem 1.5rem 1.5rem; /* 92px 24px 24px */
-  gap: 0.5rem; /* 8px */
+  padding: 5.75rem 1.5rem 1.5rem;
   isolation: isolate;
 
-  position: relative;
+  position: relative; /* This is key */
   width: 100%;
-  max-width: 24.5625rem; /* 393px */
+  max-width: 24.5625rem;
   min-height: 100dvh;
   margin: 0 auto;
 
   background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  overflow-x: hidden;
 }
 
 /* ============================================
-   DECORATIVE CIRCLES
-   OrganicCircles component positions itself via position prop
+   OPEN HOURS POSITION CONTROL
+   Change 'top' and 'right' to move it anywhere 
+   inside the pageContainer.
    ============================================ */
+.openHours {
+  position: relative;
+
+  /* POSITION CONTROLS - Adjust these */
+  bottom: 2rem; /* Distance from top edge */
+
+  width: 100%;
+
+  z-index: 10; /* Keeps it above the circles */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Background circles container */
+.backgroundCircles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none; /* Let clicks pass through to content */
+}
+
+/* Main Content Layout */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 0.75rem;
+
+  width: 100%;
+  margin-top: 6.5rem; /* Pushes content down to make room for top elements */
+  z-index: 5;
+  position: relative;
+}
 
 /* ============================================
    MAIN CONTENT
@@ -46,11 +85,11 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
-  gap: 0.75rem; /* 16px */
+  gap: 0.75rem;
 
-  width: 21.5625rem; /* 345px */
-  margin-top: 6.5rem; /* Space below circles */
-  z-index: 1;
+  width: 100%; /* Changed to 100% for better scaling */
+  margin-top: 6.5rem;
+  z-index: 5; /* Above backgroundLayer */
 }
 
 /* ============================================
@@ -62,9 +101,10 @@
   justify-content: center;
   align-items: center;
   padding: 0;
-  gap: 0.25rem; /* 8px */
+  gap: 0.125rem; /* 8px */
 
   width: 100%;
+  margin-top: var(--spacing-4xl);
 }
 
 .greetingTitle {
@@ -72,8 +112,8 @@
 
   font-family: var(--font-primary); /* Arfilit */
   font-style: normal;
-  font-weight: 400;
-  font-size: 2rem; /* 32px */
+  font-weight: var(--weight-normal);
+  font-size: var(--font-size-3xl); /* 32px */
   line-height: 2.5rem; /* 40px */
   text-align: center;
   letter-spacing: 0.02em;
@@ -87,14 +127,15 @@
 
   font-family: var(--font-secondary); /* Ezer Shemesh */
   font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem; /* 20px */
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-size-xl); /* 32px */
   line-height: 2rem; /* 32px */
   text-align: center;
   letter-spacing: 0.02em;
 
-  color: #ffffff;
+  color: var(--color-white-pure);
   margin: 0;
+  margin-bottom: var(--spacing-md);
 }
 
 /* ============================================
