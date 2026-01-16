@@ -49,7 +49,7 @@
 .secondary {
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--color-purple);
-  color: var(--color-purple);
+  color: var(--color-purple-text);
 }
 
 /* ============================================
@@ -62,7 +62,8 @@
   /* Side padding defines the breathing room, width is automatic */
   padding: 0 2rem; /* 32px - wider buttons */
   border-radius: 0.3125rem;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* L-short size: 36px height */
@@ -136,6 +137,9 @@
 }
 .delete {
   color: rgba(167, 0, 0, 1);
+}
+.red {
+  color: var(--color-bordo);
 }
 
 .arrowWrapper {
@@ -229,7 +233,7 @@
   padding: 0 1rem; /* 24px side padding */
   background: var(--button-text);
   color: var(--color-text-secondary);
-  border-radius: 0.21875rem;
+  border-radius: var(--radius-xs);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }
@@ -240,7 +244,7 @@
   background: var(--button-bg-light);
   border: 0.0625rem solid var(--button-text);
   color: var(--button-text);
-  border-radius: 0.21875rem;
+  border-radius: var(--radius-xs);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
 }

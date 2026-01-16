@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--z-modal-backdrop);
+  z-index: 1200;
 }
 
 /* Modal container - #E74E1C background, 14px radius */
@@ -19,10 +19,10 @@
   align-items: flex-start;
   padding: var(--spacing-lg); /* 16px */
   gap: var(--spacing-lg); /* 16px */
-  width: auto; /* 345px */
-  max-width: 95%;
+  width: 88%; /* 345px */
+  max-width: 88%;
   background: var(--color-orange-main); /* #E74E1C */
-  border-radius: var(--radius-xs); /* 14px */
+  border-radius: var(--radius-md); /* 14px */
   direction: rtl;
   z-index: var(--z-modal);
 }
@@ -32,7 +32,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xl); /* 32px */
+  gap: var(--spacing-lg); /* 32px */
   width: 100%;
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
@@ -49,15 +49,17 @@
   text-align: center;
   letter-spacing: 0.02em;
   color: var(--color-text-primary); /* white */
-  margin-bottom: var(--spacing-md);
 }
 
 /* Message container */
 .messageContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm); /* 8px */
-  width: 100%;
+  gap: var(--spacing-xs); /* 8px */
+  width: 90%;
+
+  margin-bottom: var(--spacing-md);
+  margin-top: var(--spacing-md);
 }
 
 /* User name display */
@@ -78,7 +80,7 @@
   margin: 0;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-md); /* 18px */
+  font-size: var(--font-size-xl); /* 18px */
   line-height: 1.25rem; /* 20px */
   text-align: center;
   color: var(--color-text-primary); /* white */
@@ -91,9 +93,10 @@
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-md); /* 14px */
-  line-height: 1.0625rem; /* 17px */
+  line-height: 1.375rem;
   text-align: center;
   color: var(--color-text-secondary); /* #F9F9F9 */
+  margin-top: var(--spacing-sm);
 }
 
 /* Email display */
@@ -101,7 +104,7 @@
   margin: 0;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-md); /* 14px */
+  font-size: var(--font-size-xl); /* 14px */
   line-height: 1.0625rem; /* 17px */
   text-align: center;
   color: var(--color-text-secondary);

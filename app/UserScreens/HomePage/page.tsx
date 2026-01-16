@@ -38,9 +38,9 @@ const OPENING_HOURS = {
   0: { open: "16:00", close: "22:00" },
   2: { open: "16:00", close: "22:00" },
   3: { open: "16:00", close: "22:00" },
+  5: { open: "16:00", close: "22:00" },
 };
 
-// Helper: Check if activity is in the future
 const isActivityInFuture = (activity: Activity) => {
   if (!activity.date) return false;
   const timeString = activity.start_time || "00:00";
@@ -68,7 +68,7 @@ export default function NewUserHomePage() {
   const [bgCircleConfig, setBgCircleConfig] = useState({
     radius: 0.07,
     x: 0.47,
-    y: 0.125,
+    y: 0.25,
   });
 
   const mountedRef = useRef(false);
@@ -84,26 +84,26 @@ export default function NewUserHomePage() {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      let newConfig = { radius: 0.07, x: 0.47, y: 0.125 };
+      let newConfig = { radius: 0.07, x: 0.47, y: 0.2 };
 
       if (width < 380) {
         newConfig.radius = 0.06;
         newConfig.x = 0.5;
-        newConfig.y = 0.125;
+        newConfig.y = 0.25;
       } else if (width > 600) {
         newConfig.radius = 0.12;
         newConfig.x = 0.5;
-        newConfig.y = 0.15;
+        newConfig.y = 0.25;
       }
 
       if (height < 800) newConfig.y = 0.11;
       if (height < 700) {
         newConfig.radius = Math.min(newConfig.radius, 0.06);
-        newConfig.y = 0.1;
+        newConfig.y = 0.25;
       }
       if (height < 600) {
         newConfig.radius = Math.min(newConfig.radius, 0.05);
-        newConfig.y = 0.08;
+        newConfig.y = 0.17;
       }
 
       setBgCircleConfig(newConfig);
@@ -140,12 +140,10 @@ export default function NewUserHomePage() {
       ]);
 
       if (activities && userBranches) {
-        // 1. Filter by Branch
         let validActivities = activities.filter(
           (act: Activity) => !act.branch || userBranches.includes(act.branch)
         );
 
-        // 2. Filter by Future Date/Time
         validActivities = validActivities.filter(isActivityInFuture);
 
         const processList = (list: Activity[]) => {
@@ -161,7 +159,9 @@ export default function NewUserHomePage() {
         };
 
         const regList = processList(
-          validActivities.filter((act: Activity) => approvedIds.includes(act.id))
+          validActivities.filter((act: Activity) =>
+            approvedIds.includes(act.id)
+          )
         );
 
         const candidates = validActivities.filter(
@@ -215,28 +215,36 @@ export default function NewUserHomePage() {
   return (
     <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
       <div className={styles.pageContainer} dir="rtl">
-        <OrganicCircles
-          mode="breathing"
-          radius={bgCircleConfig.radius}
-          position={{ x: bgCircleConfig.x, y: bgCircleConfig.y }}
-          // @ts-ignore
-          {...shapeParams}
-          baseColor="#FFFFFF"
-        />
+        {/* Decorative Background Circles */}
+        <div className={styles.backgroundCircles}>
+          <OrganicCircles
+            mode="breathing"
+            radius={bgCircleConfig.radius}
+            position={{ x: bgCircleConfig.x, y: bgCircleConfig.y }}
+            // @ts-ignore
+            {...shapeParams}
+            baseColor="#FFFFFF"
+          />
+        </div>
+
+        {/* CONTROLLABLE POSITION COMPONENT */}
+        <div className={styles.openHours}>
+          {todayHours ? (
+            <OpenHours
+              startTime={todayHours.open}
+              endTime={todayHours.close}
+              isOpen={true}
+            />
+          ) : (
+            <OpenHours isOpen={false} />
+          )}
+        </div>
 
         <div className={styles.mainContent}>
           <div className={styles.greetingSection}>
             <h1 className={styles.greetingTitle}>היי {firstName},</h1>
             <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
           </div>
-
-          {todayHours ? (
-            <OpenHours startTime={todayHours.open} endTime={todayHours.close} />
-          ) : (
-            <div className={styles.closedMessage}>
-              <p className={styles.closedText}>המרחב סגור היום</p>
-            </div>
-          )}
 
           <div className={styles.filterContainer}>
             <HomeFilter

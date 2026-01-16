@@ -204,11 +204,11 @@ export default function NewUserNotificationPage() {
 
         <div className={styles.actionsContainer}>
           <Button
-            variant="secondary"
-            size="L-short"
+            variant="tertiary"
+            tertiarySize="medium"
+            tertiaryWeight="semibold"
             customBgColor="transparent"
             customTextColor="var(--color-bg-light-opaque)"
-            customBorderColor="transparent"
             onClick={handleMarkAllAsRead}
             disabled={loading || notifications.every((n) => n.isRead)}
           >
