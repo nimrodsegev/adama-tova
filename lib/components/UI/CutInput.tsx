@@ -12,6 +12,7 @@ interface CutInputProps {
   error?: string;
   dir?: "rtl" | "ltr";
   textAlign?: "right" | "left";
+  placeholderAlign?: "right" | "left" | "center";
   className?: string;
   tall?: boolean;
 }
@@ -25,6 +26,7 @@ export default function CutInput({
   error,
   dir = "rtl",
   textAlign = "right",
+  placeholderAlign,
   className,
   tall = false,
 }: CutInputProps) {
@@ -97,7 +99,7 @@ export default function CutInput({
           value={value}
           onChange={onChange as unknown as (e: React.ChangeEvent<HTMLTextAreaElement>) => void}
           placeholder={placeholder}
-          className={`${styles.input} ${styles.inputTall}`}
+          className={`${styles.input} ${styles.inputTall}${placeholderAlign === 'center' ? ` ${styles.placeholderCenter}` : ''}${placeholderAlign === 'left' ? ` ${styles.placeholderLeft}` : ''}${placeholderAlign === 'right' ? ` ${styles.placeholderRight}` : ''}`}
           dir={dir}
           style={{ textAlign }}
         />
@@ -107,7 +109,7 @@ export default function CutInput({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={styles.input}
+          className={`${styles.input}${placeholderAlign === 'center' ? ` ${styles.placeholderCenter}` : ''}${placeholderAlign === 'left' ? ` ${styles.placeholderLeft}` : ''}${placeholderAlign === 'right' ? ` ${styles.placeholderRight}` : ''}`}
           dir={dir}
           style={{ textAlign }}
         />

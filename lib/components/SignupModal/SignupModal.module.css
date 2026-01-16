@@ -39,21 +39,20 @@
 /* Close button (top right) */
 .closeButton {
   position: absolute;
-  width: 2.75rem;
-  height: 2.75rem;
-  right: 1.25rem;
-  top: calc(1.25rem + env(safe-area-inset-top, 0));
+  width: auto;
+  height: auto;
+  right: 1.5rem;
+  top: calc(3rem + env(safe-area-inset-top, 0));
 
-  border: 0.0625rem solid var(--color-text-secondary);
-  border-radius: 1.5625rem;
+  border: none;
   background: transparent;
 
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 10;
-  padding: 0.3125rem;
+  z-index: 1201;
+  padding: var(--spacing-xs);
 
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
@@ -146,6 +145,6 @@
   }
 
   .closeButton {
-    top: calc(1rem + env(safe-area-inset-top, 0));
+    top: calc(2.5rem + env(safe-area-inset-top, 0));
   }
 }

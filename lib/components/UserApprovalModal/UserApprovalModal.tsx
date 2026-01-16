@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { apiUser } from "@/app/services/db_api";
 import StatCard from "@/lib/components/UI/StatCard";
 import { useIvrita } from "@/app/contexts/IvritaContext";
@@ -80,16 +81,17 @@ export default function UserApprovalModal({
       <div className={styles.overlay} onClick={handleCloseWithAnimation} />
       <div className={styles.modalContainer}>
         {/* Close Button */}
-        <button className={styles.closeButton} onClick={handleCloseWithAnimation}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M18 6L6 18M6 6L18 18"
-              stroke="#F9F9F9"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseWithAnimation}
+          aria-label="סגור"
+        >
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
+          />
         </button>
 
         <div className={styles.contentFrame}>

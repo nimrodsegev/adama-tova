@@ -1,6 +1,7 @@
 "use client";
 import { createPortal } from "react-dom";
 import { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { useUser } from "@/app/contexts/UserContext";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
@@ -70,25 +71,17 @@ export default function GroupRegistrationSuccessModal({
         />
 
         {/* Close button */}
-        <button className={styles.closeButton} onClick={onClose}>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <line
-              x1="2"
-              y1="2"
-              x2="18"
-              y2="18"
-              stroke="#F9F9F9"
-              strokeWidth="2"
-            />
-            <line
-              x1="18"
-              y1="2"
-              x2="2"
-              y2="18"
-              stroke="#F9F9F9"
-              strokeWidth="2"
-            />
-          </svg>
+        <button
+          className={styles.closeButton}
+          onClick={onClose}
+          aria-label="סגור"
+        >
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
+          />
         </button>
 
         {/* Content Frame */}

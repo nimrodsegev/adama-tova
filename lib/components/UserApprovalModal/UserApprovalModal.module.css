@@ -33,22 +33,21 @@
   flex-direction: column;
 }
 
-/* Close button (top right - adjusted for RTL, so actually top left visually) */
+/* Close button */
 .closeButton {
   position: absolute;
-  width: 2.75rem; /* 44px */
-  height: 2.75rem; /* 44px */
-  right: 1.25rem; /* 20px */
-  top: 1.25rem; /* 20px */
-  border: 0.0625rem solid rgba(249, 249, 249, 0.84);
-  border-radius: 1.5625rem; /* 25px */
+  width: auto;
+  height: auto;
+  right: 1.5rem;
+  top: 3rem;
+  border: none;
   background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 10;
-  padding: 0.3125rem; /* 5px */
+  z-index: 1201;
+  padding: var(--spacing-xs);
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
 }

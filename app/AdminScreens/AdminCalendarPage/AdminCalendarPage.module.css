@@ -163,3 +163,13 @@
   background: rgba(231, 78, 28, 0.2);
   pointer-events: none;
 }
+
+/* ============================================
+   BOTTOM BUTTON - Fixed at bottom right
+   ============================================ */
+.bottomButton {
+  position: fixed;
+  bottom: 6rem;
+  right: 1.25rem;
+  z-index: 50;
+}

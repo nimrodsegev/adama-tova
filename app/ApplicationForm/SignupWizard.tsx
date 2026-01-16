@@ -17,6 +17,7 @@ import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
+import Button from "@/lib/components/UI/Button";
 
 interface SignupWizardProps {
   signupType: "email" | "google";
@@ -642,7 +643,7 @@ export default function SignupWizard({
 
             <div className={styles.headerSection}>
               <h2 className={styles.stepTitle}>
-                {t("הסניף הקרוב [אליך|אלייך]")}
+                הסניף הקרוב אליך
               </h2>
               <p className={styles.optionalSubtitle}>*לא חובה</p>
             </div>
@@ -731,9 +732,6 @@ export default function SignupWizard({
               <div className={styles.inputsContainer}>
                 <div className={styles.accordionContainer}>
                   <div className={styles.inputWrapper}>
-                    <span className={styles.inputLabel}>
-                      {t("מאיזה מקום אישי את/ה מגיע/ה אלינו?")}
-                    </span>
                     <button
                       type="button"
                       onClick={() => setCircleDropdownOpen(!circleDropdownOpen)}
@@ -744,7 +742,7 @@ export default function SignupWizard({
                       <span
                         className={!circle ? styles.accordionPlaceholder : ""}
                       >
-                        {circle || t("בחר/י")}
+                        {circle || "בחר"}
                       </span>
                       <span
                         className={`${styles.accordionArrow} ${
@@ -785,6 +783,7 @@ export default function SignupWizard({
                     placeholder="אם מתאים לך, אפשר לפרט כאן (לא חובה)"
                     dir="rtl"
                     textAlign="right"
+                    placeholderAlign="center"
                     tall
                   />
                 )}
@@ -821,13 +820,15 @@ export default function SignupWizard({
                   />
                 </div>
 
-                <button
+                <Button
+                  variant="approve"
                   onClick={handleSubmit}
                   disabled={loading}
-                  className={styles.submitButton}
+                  customBgColor="#b37eb3"
+                  style={{ alignSelf: 'center' }}
                 >
                   {loading ? "..." : "סיום"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

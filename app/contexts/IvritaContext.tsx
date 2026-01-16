@@ -41,7 +41,7 @@ export function IvritaProvider({
 }) {
   const [gender, setGender] = useState<GenderType>(initialGender);
 
-  const ivritaMode = gender ? GENDER_TO_MODE[gender] ?? ORIGINAL : ORIGINAL;
+  const ivritaMode = gender ? GENDER_TO_MODE[gender] ?? MALE : MALE;
 
   const t = useCallback((text: string): string => {
     if (!text) return text;
