@@ -209,6 +209,11 @@
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
+.cardsContainer > * {
+  flex-shrink: 0; /* CRITICAL: Prevent cards from shrinking */
+  width: 100%;
+}
+
 .cardsContainer::-webkit-scrollbar {
   width: 0.375rem;
 }

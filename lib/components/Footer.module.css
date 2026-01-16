@@ -4,19 +4,16 @@
   left: 0;
   right: 0;
   width: 100%;
-
   /* 1. Remove fixed height so padding dictates the size */
   height: 4.5rem;
-
   background-color: transparent;
   border-top: 0.0625rem solid var(--color-white-pure);
+  border-top-left-radius: var(--radius-sm);
+  border-top-right-radius: var(--radius-sm);
   z-index: 100000;
-
   /* 2. CONTROLS: Adjust these numbers to move elements */
-
   /* Space between the Border Line and the Icons */
   padding-top: 0.6rem;
-
   /* Space between the Icons and the Bottom of phone (Plus Safe Area) */
   /* If icons are too low, INCREASE the 0.6rem here */
   padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
@@ -30,7 +27,6 @@
   align-items: center;
 }
 
-/* ... keep .iconsContainer, .navLink, .iconBox, etc. as they were ... */
 .iconsContainer {
   display: flex;
   justify-content: space-around;
@@ -44,10 +40,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   /* USE GLOBAL VAR: Standard spacing (0.5rem) */
   padding: var(--spacing-sm);
-
   flex: 1;
 }
 
