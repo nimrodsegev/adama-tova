@@ -407,10 +407,10 @@ export default function SignupWizard({
     );
   };
 
-  // Get dot class based on step state - fills up progressively
-  const getDotClass = (stepIndex: number) => {
-    if (stepIndex <= currentStep) return `${styles.dot} ${styles.filledDot}`;
-    return styles.dot;
+  // Progress circle SVG paths (organic blob shapes)
+  const getProgressCircleIcon = (stepIndex: number, isCurrent: boolean) => {
+    const suffix = isCurrent ? "_filled" : "";
+    return `/icons/progress_circle_${stepIndex + 1}${suffix}.svg`;
   };
 
   // Track arrow visibility per step
@@ -837,11 +837,20 @@ export default function SignupWizard({
 
       {error && <p className={styles.error}>{error}</p>}
 
-      {/* Progress Diamonds - Fixed at bottom */}
+      {/* Progress Circles - Fixed at bottom */}
       <div className={styles.navigation}>
         <div className={styles.progressDots}>
           {[0, 1, 2, 3, 4].map((step) => (
-            <div key={step} className={getDotClass(step)} />
+            <div
+              key={step}
+              className={styles.progressCircle}
+            >
+              <img
+                src={getProgressCircleIcon(step, step === currentStep)}
+                alt=""
+                className={styles.progressCircleIcon}
+              />
+            </div>
           ))}
         </div>
       </div>

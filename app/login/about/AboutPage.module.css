@@ -1,3 +1,30 @@
+/* Close Button */
+.closeButton {
+  position: absolute;
+  width: auto;
+  height: auto;
+  right: 1.5rem;
+  top: 3rem;
+  border: none;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+  padding: var(--spacing-xs);
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
 /* About Page Container */
 .aboutContainer {
   display: flex;
@@ -109,69 +136,6 @@
   left: 50%;
   transform: translateX(-50%);
   bottom: 2.5rem; /* 40px from bottom */
-}
-
-/* Button - לאתר (Purple filled) */
-.websiteButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 1rem; /* 8px 16px */
-  gap: 0.5rem;
-
-  min-width: 4.375rem; /* 70px */
-  height: 2.25rem; /* 36px */
-
-  background: #b37eb3; /* purple */
-  border-radius: var(--radius-xs); /* 5px */
-  border: none;
-
-  font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
-  color: var(--color-text-secondary); /* white */
-  text-decoration: none;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.websiteButton:hover {
-  opacity: 0.9;
-}
-
-/* Button - ניווט למרחב (Light with purple border) */
-.navigationButton {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 1rem; /* 8px 16px */
-  gap: 0.5rem;
-
-  height: 2.25rem; /* 36px */
-  white-space: nowrap; /* Keep text on one line */
-
-  background: var(--button-bg-light); /* rgba(247, 247, 247, 0.9) */
-  border: 0.0625rem solid #b37eb3; /* 1px purple border */
-  border-radius: var(--radius-xs); /* 5px */
-
-  font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
-  color: #b37eb3; /* purple */
-  text-decoration: none;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.navigationButton:hover {
-  opacity: 0.9;
 }
 
 /* Taller phones - move content higher */
