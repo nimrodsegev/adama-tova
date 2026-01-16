@@ -72,6 +72,7 @@ export default function AboutPage() {
         <Button
           variant="secondary"
           size="L-short"
+          icon="/icons/google_maps.svg"
           onClick={() => window.open("https://maps.google.com/?q=סתריה", "_blank")}
         >
           ניווט למרחב
