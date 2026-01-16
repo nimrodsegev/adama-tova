@@ -18,8 +18,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 5.6875rem;
-  margin-bottom: var(--spacing-2xl);
+  margin-top: var(--spacing-4xl);
+  margin-bottom: var(--spacing-3xl);
   overflow-x: hidden;
   flex-shrink: 0;
 }
@@ -28,7 +28,7 @@
   font-family: var(--font-primary);
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-normal);
-  line-height: 1.8125rem;
+  line-height: 2.8125rem;
   color: var(--color-text-primary);
   margin: 0;
   text-align: center;
@@ -50,7 +50,8 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  margin-top: var(--spacing-md);
   width: 100%;
   flex-shrink: 0;
 }
@@ -74,7 +75,7 @@
      We use 100dvh (dynamic viewport height) and subtract the top elements + bottom space.
      Adjust '25rem' if the top elements are larger/smaller.
   */
-  max-height: calc(100dvh - 22.5rem);
+  max-height: calc(100dvh - 20.5rem);
 
   overflow-y: auto; /* Enable vertical scroll */
   overflow-x: visible; /* Allow shadows to spill over */
