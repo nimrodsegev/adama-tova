@@ -72,7 +72,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4.5rem; /* 72px */
+  gap: 3.25rem; /* 52px - matches login page */
   width: 100%;
   max-width: 19.875rem; /* 318px */
 }
@@ -86,26 +86,25 @@
   width: 100%;
 }
 
-/* Headline */
+/* Headline - matches login page h1 */
 .headline {
   width: 100%;
   font-family: var(--font-primary); /* Arfilit */
   font-weight: var(--font-weight-normal);
-  font-size: 2rem; /* 32px */
-  line-height: 2.125rem; /* 34px */
+  font-size: 2.25rem; /* 36px - matches login page */
+  line-height: 1.875rem; /* 30px - matches login page */
   text-align: center;
-  letter-spacing: 0.02em;
   color: var(--color-text-secondary); /* #F9F9F9 */
   margin: 0;
 }
 
-/* Subtitle */
+/* Subtitle - matches login page p */
 .subtitle {
   width: 100%;
   font-family: var(--font-secondary);
-  font-weight: 700;
-  font-size: 1rem; /* 16px */
-  line-height: 1.25rem; /* 20px */
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl); /* 20px - matches login page */
+  line-height: 1.375rem; /* 22px - matches login page */
   text-align: center;
   color: var(--color-text-secondary); /* #F9F9F9 */
   margin: 0;
@@ -128,39 +127,6 @@
   width: 100%;
 }
 
-/* Proceed button - Purple style */
-.proceedButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 11.8125rem; /* 189px */
-  height: 2.75rem; /* 44px */
-  padding: 0.75rem 2rem; /* 12px 32px */
-  gap: 0.5rem; /* 8px */
-
-  background: #B37EB3; /* purple */
-  border-radius: 0.3125rem; /* 5px */
-  border: none;
-
-  font-family: var(--font-secondary);
-  font-weight: 700;
-  font-size: 1rem; /* 16px */
-  line-height: 1.25rem; /* 20px */
-  color: var(--color-text-secondary); /* #F9F9F9 */
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.proceedButton:hover {
-  opacity: 0.9;
-}
-
-.proceedButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 /* ============================================
    RESPONSIVE - Small height screens

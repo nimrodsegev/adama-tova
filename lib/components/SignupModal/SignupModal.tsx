@@ -7,6 +7,7 @@ import { useUser } from "@/app/contexts/UserContext";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import CutInput from "@/lib/components/UI/CutInput";
+import Button from "@/lib/components/UI/Button";
 import styles from "./SignupModal.module.css";
 
 interface SignupModalProps {
@@ -193,7 +194,6 @@ export default function SignupModal({
                     setEmail(e.target.value);
                     setEmailError("");
                   }}
-                  placeholder="adama_tova@gmail.com"
                   error={emailError}
                   dir="ltr"
                   textAlign="right"
@@ -216,13 +216,13 @@ export default function SignupModal({
               </div>
 
               {/* Proceed Button */}
-              <button
-                className={styles.proceedButton}
+              <Button
+                variant="primary"
                 onClick={handleProceed}
                 disabled={loading}
               >
                 {loading ? "בודק..." : "המשך למילוי פרטים"}
-              </button>
+              </Button>
             </div>
           </div>
         )}

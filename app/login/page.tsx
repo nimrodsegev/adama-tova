@@ -10,6 +10,7 @@ import SignupModal from "@/lib/components/SignupModal/SignupModal";
 import SignupWizard from "@/app/ApplicationForm/SignupWizard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
+import Button from "@/lib/components/UI/Button";
 import { useState, useEffect } from "react";
 
 type Mode = "choice" | "signup";
@@ -210,7 +211,6 @@ export default function LoginPage() {
                   setEmail(e.target.value);
                   setEmailError("");
                 }}
-                placeholder="adama_tova@gmail.com"
                 error={emailError}
                 dir="ltr"
                 textAlign="right"
@@ -262,22 +262,27 @@ export default function LoginPage() {
                 </button>
 
                 {/* 5. שכחתי סיסמה (Forgot Password) - with arrow */}
-                <button
-                  className={styles.forgotPassword}
-                  onClick={() => setShowForgotPassword(true)}
-                  type="button"
-                >
-                  שכחתי סיסמה
-                  <span className={styles.forgotPasswordArrow}></span>
-                </button>
+                <div className={styles.forgotPasswordWrapper}>
+                  <Button
+                    variant="tertiary"
+                    colorType="white"
+                    tertiarySize="base"
+                    tertiaryWeight="normal"
+                    onClick={() => setShowForgotPassword(true)}
+                  >
+                    שכחתי סיסמה
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
 
           {/* About Link - "מי אנחנו?" */}
-          <a href="/login/about" className={styles.aboutLink}>
-            מי אנחנו?
-          </a>
+          <div className={styles.aboutLinkWrapper}>
+            <Button variant="primary" href="/login/about">
+              מי אנחנו?
+            </Button>
+          </div>
         </div>
 
         {showForgotPassword && (
