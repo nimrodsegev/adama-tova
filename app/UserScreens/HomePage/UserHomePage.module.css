@@ -2,6 +2,7 @@
 
 /* Page Container - SCROLLABLE (Matches Admin Structure) */
 .pageContainer {
+  z-index: var(--z-index-page);
   position: relative;
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem);
@@ -41,7 +42,7 @@
 .openHoursWrapper {
   width: 100%;
   padding-top: 3.5rem;
-  z-index: 10;
+
   display: flex;
   justify-content: center;
 }
@@ -100,7 +101,6 @@
 .filterContainer {
   width: 100%;
   margin-bottom: 1rem;
-  z-index: 40;
 }
 
 /* ============================================

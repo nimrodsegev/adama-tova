@@ -10,7 +10,7 @@
   border-top: 0.1rem solid var(--color-white-pure);
   border-top-left-radius: var(--radius-md);
   border-top-right-radius: var(--radius-md);
-  z-index: 100000;
+  z-index: var(--z-index-navbar);
   /* 2. CONTROLS: Adjust these numbers to move elements */
   /* Space between the Border Line and the Icons */
   padding-top: 0.6rem;

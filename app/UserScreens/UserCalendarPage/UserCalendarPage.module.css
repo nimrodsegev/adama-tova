@@ -3,10 +3,10 @@
 .pageContainer {
   width: 100%;
   max-width: var(--container-max-width);
-
   /* --- CHANGED: Scroll logic moved here --- */
   /* Fix height to viewport minus Bottom Nav (4.5rem) */
   height: calc(100dvh - 4.5rem);
+  z-index: var(--z-index-page);
 
   /* Enable scrolling on the page itself */
   overflow-y: auto;
@@ -14,7 +14,6 @@
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 
   margin: 0 auto;
-  background: var(--color-background);
   position: relative;
   direction: rtl;
 
@@ -70,7 +69,6 @@
   margin-bottom: var(--spacing-md);
   overflow-x: hidden;
   flex-shrink: 0;
-  z-index: 20;
   pointer-events: auto;
 }
 
@@ -113,7 +111,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;

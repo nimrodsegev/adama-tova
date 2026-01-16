@@ -3,7 +3,7 @@
 .pageContainer {
   width: 100%;
   max-width: var(--container-max-width);
-
+  z-index: var(--z-index-page);
   /* --- COPIED FROM ADMIN SETTINGS --- */
   /* Fix height to viewport minus nav bar, and scroll internally */
   height: calc(100dvh - 4.5rem);
