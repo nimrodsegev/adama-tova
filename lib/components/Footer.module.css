@@ -54,8 +54,8 @@
 .iconBox {
   position: relative;
   /* Fixed dimensions for stability */
-  width: 2rem; /* 32px */
-  height: 2rem; /* 32px */
+  width: auto; /* 32px */
+  height: auto; /* 32px */
 }
 
 .iconImage {

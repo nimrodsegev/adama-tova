@@ -100,8 +100,8 @@ export default function Footer() {
                     key={`${item.label}-${isActive}`}
                     src={isActive ? item.activeIcon : item.defaultIcon}
                     alt={item.label}
-                    width={32}
-                    height={32}
+                    width={24}
+                    height={24}
                     className={styles.iconImage}
                   />
                 </div>

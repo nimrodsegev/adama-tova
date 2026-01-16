@@ -479,7 +479,7 @@
   }
 
   .greetingTitle {
-    font-size: 1.75rem; /* 28px */
+    font-size: var(--font-size-3xl); /* 28px */
     line-height: 2rem;
   }
 
