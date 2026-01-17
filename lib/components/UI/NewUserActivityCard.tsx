@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiRegistrations, apiActivities } from "@/app/services/db_api";
@@ -206,8 +205,26 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     return "להרשמה";
   };
 
+  // ⭐ Updated Clock Logic
   const shouldShowClockIcon = () => {
-    return (regStatus === "none" && isFull) || regStatus === "waitlist";
+    // 0. Base case: User is personally on the waitlist
+    if (regStatus === "waitlist") return true;
+
+    const hasWaitlist = (waitlistCount || 0) > 0;
+
+    // 1 & 3. User is Unregistered
+    if (regStatus === "none") {
+      // Show if Full OR if it's a Group
+      return isFull || isGroup;
+    }
+
+    // 2 & 4. User is Registered
+    if (regStatus === "confirmed") {
+      // Show if there is a waitlist (others are waiting)
+      return hasWaitlist;
+    }
+
+    return false;
   };
 
   const getParticipantsStatus = () => {

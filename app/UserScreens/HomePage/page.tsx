@@ -189,9 +189,7 @@ export default function NewUserHomePage() {
 
   const firstName = userProfile?.full_name?.split(" ")[0] || "משתמש";
   const displayedActivities =
-    activeFilter === "yours"
-      ? registeredActivities
-      : suggestedActivities.slice(0, 4);
+    activeFilter === "yours" ? registeredActivities : suggestedActivities;
 
   return (
     <SmoothPageWrapper

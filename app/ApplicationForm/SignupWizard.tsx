@@ -39,12 +39,7 @@ const CIRCLE_OPTIONS = [
   "אחר",
 ];
 
-const INTEREST_OPTIONS = [
-  'מיינדפולנס',
-  'גוף ותנועה',
-  'מוזיקה',
-  'יצירה וחומר',
-];
+const INTEREST_OPTIONS = ["מיינדפולנס", "גוף ותנועה", "מוזיקה", "יצירה וחומר"];
 
 const BRANCH_OPTIONS = [
   { value: "nahalal", label: "נהלל" },
@@ -116,7 +111,7 @@ export default function SignupWizard({
   useEffect(() => {
     const updateCircleParams = () => {
       const height = window.innerHeight;
-      const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+      const isPWA = window.matchMedia("(display-mode: standalone)").matches;
 
       // PWA mode has larger viewport - adjust position to be more centered
       if (isPWA) {
@@ -128,7 +123,7 @@ export default function SignupWizard({
         setCirclePosition({ x: 0.22, y: 0.12 });
       } else {
         // Larger screens
-        setCircleRadius(0.10);
+        setCircleRadius(0.1);
         setCirclePosition({ x: 0.32, y: 0.12 }); // More to the right
       }
     };
@@ -168,12 +163,16 @@ export default function SignupWizard({
     if (gender) {
       layers++;
     }
+    if (branches.length > 0) {
+      layers++;
+    }
+    console.log(branches);
 
     // Update the layer count state (max 4 layers)
-    setLayerCount(Math.min(layers, 4));
+    setLayerCount(Math.min(layers, 5));
 
     console.log("Step 0 - Layer count updated to:", Math.min(layers, 4));
-  }, [fullName, phone, gender]);
+  }, [fullName, phone, gender, branches]);
 
   // STEP 2+ (Interests & Circle): CALCULATE ALL PARAMS using calculator (lines 127-148)
   useEffect(() => {
@@ -454,405 +453,440 @@ export default function SignupWizard({
 
   // Arrow SVG component (horizontal arrow pointing left)
   const NextArrow = () => (
-    <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M1 8.99609L18.9998 8.98543" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
-      <path d="M7.225 2L1 8.975" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
-      <path d="M0.99961 9L7.22461 15.975" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
+    <svg
+      width="20"
+      height="18"
+      viewBox="0 0 20 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M1 8.99609L18.9998 8.98543"
+        stroke="white"
+        strokeWidth="2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+      />
+      <path
+        d="M7.225 2L1 8.975"
+        stroke="white"
+        strokeWidth="2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+      />
+      <path
+        d="M0.99961 9L7.22461 15.975"
+        stroke="white"
+        strokeWidth="2"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+      />
     </svg>
   );
 
-  // Determine which params to use based on current step
-  const activeCircleParams = useMemo(() => {
-    if (currentStep <= 1) {
-      // Steps 0-1: Use layerCount with default params
-      return {
-        layers: layerCount,
-        smoothness: defaultParams.smoothness,
-        complexity: defaultParams.complexity,
-        elongation: defaultParams.elongation,
-        opacity: 0.8,
-        strokeWidth: 1,
-      };
-    } else {
-      // Steps 2-4: Use calculated params
-      return calculatedParams;
-    }
-  }, [currentStep, layerCount, defaultParams, calculatedParams]);
+  const activeCircleParams =
+    currentStep <= 1
+      ? {
+          layers: layerCount,
+          smoothness: defaultParams.smoothness,
+          complexity: defaultParams.complexity,
+          elongation: defaultParams.elongation,
+          opacity: 0.8,
+          strokeWidth: 1,
+        }
+      : calculatedParams;
 
   return (
     <SmoothPageWrapper isLoading={loading}>
       <div className={styles.wizardContainer}>
         {/* Fixed Background Circles - stays in place during swipe */}
         <div className={styles.backgroundCircles}>
-          <OrganicCircles
-            key={`background-circles-${activeCircleParams.layers}-${activeCircleParams.complexity}-${activeCircleParams.opacity}-${activeCircleParams.smoothness}-${activeCircleParams.strokeWidth}-${activeCircleParams.elongation}`}
-            mode="static"
-            radius={circleRadius}
-            layers={activeCircleParams.layers}
-            smoothness={activeCircleParams.smoothness}
-            complexity={activeCircleParams.complexity}
-            elongation={activeCircleParams.elongation}
-            opacity={activeCircleParams.opacity}
-            strokeWidth={activeCircleParams.strokeWidth}
-            position={circlePosition}
-            baseColor="#FFFFFF"
-          />
+          <div className={styles.backgroundCircles}>
+            <OrganicCircles
+              key={`background-circles-step${currentStep}-layers${activeCircleParams.layers}-${activeCircleParams.complexity}-${activeCircleParams.opacity}-${activeCircleParams.smoothness}-${activeCircleParams.strokeWidth}-${activeCircleParams.elongation}`}
+              mode="static"
+              radius={circleRadius}
+              layers={activeCircleParams.layers}
+              smoothness={activeCircleParams.smoothness}
+              complexity={activeCircleParams.complexity}
+              elongation={activeCircleParams.elongation}
+              opacity={activeCircleParams.opacity}
+              strokeWidth={activeCircleParams.strokeWidth}
+              position={circlePosition}
+              baseColor="#FFFFFF"
+            />
+          </div>
         </div>
 
         {/* Scroll Snap Container - locked until step 0 is valid */}
-      <div
-        ref={scrollContainerRef}
-        className={`${styles.scrollSnapContainer} ${
-          !isStep0Valid ? styles.scrollLocked : ""
-        }`}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Step 0: Personal Details - Uses layerCount only */}
-        <div className={styles.scrollSnapSlide}>
-          {/* Arrow for Step 0 - with swipe hint animation */}
-          {currentStep === 0 && (
-            <button
-              className={`${styles.nextArrow} ${arrowVisible ? styles.nextArrowSwipeHint : styles.nextArrowHidden}`}
-              type="button"
-              aria-label="המשך"
-            >
-              <NextArrow />
-            </button>
-          )}
-          <div className={styles.content}>
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
+        <div
+          ref={scrollContainerRef}
+          className={`${styles.scrollSnapContainer} ${
+            !isStep0Valid ? styles.scrollLocked : ""
+          }`}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Step 0: Personal Details - Uses layerCount only */}
+          <div className={styles.scrollSnapSlide}>
+            {/* Arrow for Step 0 - with swipe hint animation */}
+            {currentStep === 0 && (
+              <button
+                className={`${styles.nextArrow} ${
+                  arrowVisible
+                    ? styles.nextArrowSwipeHint
+                    : styles.nextArrowHidden
+                }`}
+                type="button"
+                aria-label="המשך"
+              >
+                <NextArrow />
+              </button>
+            )}
+            <div className={styles.content}>
+              {/* Spacer for fixed circles */}
+              <div className={styles.circleSpacer} />
 
-            <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>{t("השלם/י פרטים אישיים")}</h2>
-              <p className={styles.optionalSubtitle}>&nbsp;</p>
-            </div>
+              <div className={styles.headerSection}>
+                <h2 className={styles.stepTitle}>{t("השלם/י פרטים אישיים")}</h2>
+                <p className={styles.optionalSubtitle}>&nbsp;</p>
+              </div>
 
-            <div className={styles.stepContainer}>
-              <div className={styles.inputsContainer}>
-                <CutInput
-                  label="שם מלא"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => {
-                    setFullName(e.target.value);
-                    setNameError("");
-                  }}
-                  error={nameError}
-                  dir="rtl"
-                  textAlign="right"
-                />
+              <div className={styles.stepContainer}>
+                <div className={styles.inputsContainer}>
+                  <CutInput
+                    label="שם מלא"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      setNameError("");
+                    }}
+                    error={nameError}
+                    dir="rtl"
+                    textAlign="right"
+                  />
 
-                <CutInput
-                  label="מספר טלפון"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    setPhoneError("");
-                  }}
-                  error={phoneError}
-                  dir="rtl"
-                  textAlign="right"
-                />
+                  <CutInput
+                    label="מספר טלפון"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      setPhoneError("");
+                    }}
+                    error={phoneError}
+                    dir="rtl"
+                    textAlign="right"
+                  />
 
-                <div className={styles.genderSelector}>
-                  <div className={styles.genderWrapper}>
-                    {/* SVG Border with gap for label */}
-                    <svg
-                      className={styles.genderBorder}
-                      viewBox="0 0 315 61"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M286 0.5H306C308.5 0.5 314 2 314.5 8.5C314.5 15.3 314.5 39.3333 314.5 50.5C314.5 53.3333 312.8 59.1 306 59.5C299.2 59.9 105.5 59.6667 9.5 59.5C7 59.5 1 58.5 0.5 52C0.5 45.2 0.5 20.1667 0.5 8.5C0.5 6 2 1 8 0.5C14.8 0.5 172.333 0.5 254 0.5"
-                        className={styles.genderBorderPath}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span className={styles.genderLabel}>מין</span>
-                    <button
-                      type="button"
-                      onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
-                      className={`${styles.genderToggle} ${
-                        genderDropdownOpen ? styles.open : ""
-                      }`}
-                    >
-                      <span
-                        className={!gender ? styles.accordionPlaceholder : ""}
+                  <div className={styles.genderSelector}>
+                    <div className={styles.genderWrapper}>
+                      {/* SVG Border with gap for label */}
+                      <svg
+                        className={styles.genderBorder}
+                        viewBox="0 0 315 61"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        preserveAspectRatio="none"
                       >
-                        {gender
-                          ? GENDER_OPTIONS.find((g) => g.value === gender)
-                              ?.label
-                          : t("בחר/י")}
-                      </span>
-                      <span
-                        className={`${styles.genderToggleArrow} ${
+                        <path
+                          d="M286 0.5H306C308.5 0.5 314 2 314.5 8.5C314.5 15.3 314.5 39.3333 314.5 50.5C314.5 53.3333 312.8 59.1 306 59.5C299.2 59.9 105.5 59.6667 9.5 59.5C7 59.5 1 58.5 0.5 52C0.5 45.2 0.5 20.1667 0.5 8.5C0.5 6 2 1 8 0.5C14.8 0.5 172.333 0.5 254 0.5"
+                          className={styles.genderBorderPath}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className={styles.genderLabel}>מין</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setGenderDropdownOpen(!genderDropdownOpen)
+                        }
+                        className={`${styles.genderToggle} ${
                           genderDropdownOpen ? styles.open : ""
                         }`}
                       >
-                        ▼
-                      </span>
-                    </button>
-                  </div>
-                  {genderDropdownOpen && (
-                    <div className={styles.genderDropdown}>
-                      {GENDER_OPTIONS.map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => {
-                            setGender(option.value);
-                            setIvritaGender(option.value);
-                            setGenderDropdownOpen(false);
-                          }}
-                          className={`${styles.genderOption} ${
-                            gender === option.value ? styles.selected : ""
+                        <span
+                          className={!gender ? styles.accordionPlaceholder : ""}
+                        >
+                          {gender
+                            ? GENDER_OPTIONS.find((g) => g.value === gender)
+                                ?.label
+                            : t("בחר/י")}
+                        </span>
+                        <span
+                          className={`${styles.genderToggleArrow} ${
+                            genderDropdownOpen ? styles.open : ""
                           }`}
                         >
-                          {option.label}
-                        </button>
-                      ))}
+                          ▼
+                        </span>
+                      </button>
                     </div>
-                  )}
+                    {genderDropdownOpen && (
+                      <div className={styles.genderDropdown}>
+                        {GENDER_OPTIONS.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              setGender(option.value);
+                              setIvritaGender(option.value);
+                              setGenderDropdownOpen(false);
+                            }}
+                            className={`${styles.genderOption} ${
+                              gender === option.value ? styles.selected : ""
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Step 1: Branch Selection - Uses layerCount only (no calculator) */}
-        <div className={styles.scrollSnapSlide}>
-          {/* Arrow for Step 1 */}
-          {currentStep === 1 && (
-            <button
-              className={`${styles.nextArrow} ${arrowVisible ? styles.nextArrowVisible : styles.nextArrowHidden}`}
-              type="button"
-              aria-label="המשך"
-            >
-              <NextArrow />
-            </button>
-          )}
-          <div className={styles.content}>
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
+          {/* Step 1: Branch Selection - Uses layerCount only (no calculator) */}
+          <div className={styles.scrollSnapSlide}>
+            {/* Arrow for Step 1 */}
+            {currentStep === 1 && (
+              <button
+                className={`${styles.nextArrow} ${
+                  arrowVisible
+                    ? styles.nextArrowVisible
+                    : styles.nextArrowHidden
+                }`}
+                type="button"
+                aria-label="המשך"
+              >
+                <NextArrow />
+              </button>
+            )}
+            <div className={styles.content}>
+              {/* Spacer for fixed circles */}
+              <div className={styles.circleSpacer} />
 
-            <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>
-                הסניף הקרוב אליך
-              </h2>
-              <p className={styles.optionalSubtitle}>*לא חובה</p>
-            </div>
-
-            <div className={styles.stepContainerLower}>
-              <div className={styles.optionsContainer}>
-                {BRANCH_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => toggleBranch(option.value)}
-                    className={`${styles.optionButton} ${
-                      branches.includes(option.value) ? styles.selected : ""
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+              <div className={styles.headerSection}>
+                <h2 className={styles.stepTitle}>הסניף הקרוב אליך</h2>
+                <p className={styles.optionalSubtitle}>*לא חובה</p>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Step 2: Interests - Uses CALCULATED PARAMS */}
-        <div className={styles.scrollSnapSlide}>
-          {/* Arrow for Step 2 */}
-          {currentStep === 2 && (
-            <button
-              className={`${styles.nextArrow} ${arrowVisible ? styles.nextArrowVisible : styles.nextArrowHidden}`}
-              type="button"
-              aria-label="המשך"
-            >
-              <NextArrow />
-            </button>
-          )}
-          <div className={styles.content}>
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
-
-            <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>{t("מה מעניין אותך?")}</h2>
-              <p className={styles.optionalSubtitle}>*לא חובה</p>
-            </div>
-
-            <div className={styles.stepContainerLower}>
-              <div className={styles.optionsContainer}>
-                {INTEREST_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => toggleInterest(option)}
-                    className={`${styles.optionButton} ${
-                      interests.includes(option) ? styles.selected : ""
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Step 3: Circle Selection - Uses CALCULATED PARAMS */}
-        <div className={styles.scrollSnapSlide}>
-          {/* Arrow for Step 3 */}
-          {currentStep === 3 && (
-            <button
-              className={`${styles.nextArrow} ${arrowVisible ? styles.nextArrowVisible : styles.nextArrowHidden}`}
-              type="button"
-              aria-label="המשך"
-            >
-              <NextArrow />
-            </button>
-          )}
-          <div className={styles.content}>
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
-
-            <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>
-                {t("מאיזה מקום אישי את/ה מגיע/ה אלינו?")}
-              </h2>
-              <p className={styles.optionalSubtitle}>*לא חובה</p>
-            </div>
-
-            <div className={styles.stepContainerLower}>
-              <div className={styles.inputsContainer}>
-                <div className={styles.accordionContainer}>
-                  <div className={styles.inputWrapper}>
+              <div className={styles.stepContainerLower}>
+                <div className={styles.optionsContainer}>
+                  {BRANCH_OPTIONS.map((option) => (
                     <button
-                      type="button"
-                      onClick={() => setCircleDropdownOpen(!circleDropdownOpen)}
-                      className={`${styles.accordionHeader} ${
-                        circleDropdownOpen ? styles.open : ""
+                      key={option.value}
+                      onClick={() => toggleBranch(option.value)}
+                      className={`${styles.optionButton} ${
+                        branches.includes(option.value) ? styles.selected : ""
                       }`}
                     >
-                      <span
-                        className={!circle ? styles.accordionPlaceholder : ""}
-                      >
-                        {circle || "בחר"}
-                      </span>
-                      <span
-                        className={`${styles.accordionArrow} ${
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 2: Interests - Uses CALCULATED PARAMS */}
+          <div className={styles.scrollSnapSlide}>
+            {/* Arrow for Step 2 */}
+            {currentStep === 2 && (
+              <button
+                className={`${styles.nextArrow} ${
+                  arrowVisible
+                    ? styles.nextArrowVisible
+                    : styles.nextArrowHidden
+                }`}
+                type="button"
+                aria-label="המשך"
+              >
+                <NextArrow />
+              </button>
+            )}
+            <div className={styles.content}>
+              {/* Spacer for fixed circles */}
+              <div className={styles.circleSpacer} />
+
+              <div className={styles.headerSection}>
+                <h2 className={styles.stepTitle}>{t("מה מעניין אותך?")}</h2>
+                <p className={styles.optionalSubtitle}>*לא חובה</p>
+              </div>
+
+              <div className={styles.stepContainerLower}>
+                <div className={styles.optionsContainer}>
+                  {INTEREST_OPTIONS.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => toggleInterest(option)}
+                      className={`${styles.optionButton} ${
+                        interests.includes(option) ? styles.selected : ""
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 3: Circle Selection - Uses CALCULATED PARAMS */}
+          <div className={styles.scrollSnapSlide}>
+            {/* Arrow for Step 3 */}
+            {currentStep === 3 && (
+              <button
+                className={`${styles.nextArrow} ${
+                  arrowVisible
+                    ? styles.nextArrowVisible
+                    : styles.nextArrowHidden
+                }`}
+                type="button"
+                aria-label="המשך"
+              >
+                <NextArrow />
+              </button>
+            )}
+            <div className={styles.content}>
+              {/* Spacer for fixed circles */}
+              <div className={styles.circleSpacer} />
+
+              <div className={styles.headerSection}>
+                <h2 className={styles.stepTitle}>
+                  {t("מאיזה מקום אישי את/ה מגיע/ה אלינו?")}
+                </h2>
+                <p className={styles.optionalSubtitle}>*לא חובה</p>
+              </div>
+
+              <div className={styles.stepContainerLower}>
+                <div className={styles.inputsContainer}>
+                  <div className={styles.accordionContainer}>
+                    <div className={styles.inputWrapper}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCircleDropdownOpen(!circleDropdownOpen)
+                        }
+                        className={`${styles.accordionHeader} ${
                           circleDropdownOpen ? styles.open : ""
                         }`}
-                      ></span>
-                    </button>
-                  </div>
-                  {circleDropdownOpen && (
-                    <div className={styles.accordionDropdown}>
-                      {CIRCLE_OPTIONS.map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => {
-                            setCircle((prev) =>
-                              prev === option ? "" : option
-                            );
-                            setCircleDropdownOpen(false);
-                          }}
-                          className={`${styles.accordionOption} ${
-                            circle === option ? styles.selected : ""
-                          }`}
+                      >
+                        <span
+                          className={!circle ? styles.accordionPlaceholder : ""}
                         >
-                          {option}
-                        </button>
-                      ))}
+                          {circle || "בחר"}
+                        </span>
+                        <span
+                          className={`${styles.accordionArrow} ${
+                            circleDropdownOpen ? styles.open : ""
+                          }`}
+                        ></span>
+                      </button>
                     </div>
+                    {circleDropdownOpen && (
+                      <div className={styles.accordionDropdown}>
+                        {CIRCLE_OPTIONS.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => {
+                              setCircle((prev) =>
+                                prev === option ? "" : option
+                              );
+                              setCircleDropdownOpen(false);
+                            }}
+                            className={`${styles.accordionOption} ${
+                              circle === option ? styles.selected : ""
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {!circleDropdownOpen && circle === "אחר" && (
+                    <CutInput
+                      label="אחר"
+                      type="text"
+                      value={proximity}
+                      onChange={(e) => setProximity(e.target.value)}
+                      placeholder="אם מתאים לך, אפשר לפרט כאן (לא חובה)"
+                      dir="rtl"
+                      textAlign="right"
+                      placeholderAlign="center"
+                      tall
+                    />
                   )}
                 </div>
-
-                {!circleDropdownOpen && circle === "אחר" && (
-                  <CutInput
-                    label="אחר"
-                    type="text"
-                    value={proximity}
-                    onChange={(e) => setProximity(e.target.value)}
-                    placeholder="אם מתאים לך, אפשר לפרט כאן (לא חובה)"
-                    dir="rtl"
-                    textAlign="right"
-                    placeholderAlign="center"
-                    tall
-                  />
-                )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Step 4: Free Text - Uses CALCULATED PARAMS */}
-        <div className={styles.scrollSnapSlide}>
-          <div className={styles.content}>
-            <div className={styles.headerSection}>
-              <h2 className={styles.stepTitle}>&nbsp;</h2>
-              <p className={styles.optionalSubtitle}>&nbsp;</p>
-            </div>
+          {/* Step 4: Free Text - Uses CALCULATED PARAMS */}
+          <div className={styles.scrollSnapSlide}>
+            <div className={styles.content}>
+              <div className={styles.headerSection}>
+                <h2 className={styles.stepTitle}>&nbsp;</h2>
+                <p className={styles.optionalSubtitle}>&nbsp;</p>
+              </div>
 
-            {/* Spacer for fixed circles */}
-            <div className={styles.circleSpacer} />
+              {/* Spacer for fixed circles */}
+              <div className={styles.circleSpacer} />
 
-            <div className={styles.stepContainerLower}>
-              <div className={styles.inputsContainer}>
-                <h2 className={styles.step4Title}>
-                  {t("*כל דבר אחר שתרצה/י שנדע:")}
-                </h2>
+              <div className={styles.stepContainerLower}>
+                <div className={styles.inputsContainer}>
+                  <h2 className={styles.step4Title}>
+                    {t("*כל דבר אחר שתרצה/י שנדע:")}
+                  </h2>
 
-                <div className={styles.inputWrapper}>
-                  <span className={styles.inputLabel}>אחר</span>
-                  <textarea
-                    value={freeText}
-                    onChange={(e) => setFreeText(e.target.value)}
-                    className={styles.textarea}
-                    rows={1}
-                    dir="rtl"
-                  />
+                  <div className={styles.inputWrapper}>
+                    <span className={styles.inputLabel}>אחר</span>
+                    <textarea
+                      value={freeText}
+                      onChange={(e) => setFreeText(e.target.value)}
+                      className={styles.textarea}
+                      rows={1}
+                      dir="rtl"
+                    />
+                  </div>
+
+                  <Button
+                    variant="approve"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    customBgColor="#b37eb3"
+                    style={{ alignSelf: "center" }}
+                  >
+                    {loading ? "..." : "סיום"}
+                  </Button>
                 </div>
-
-                <Button
-                  variant="approve"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  customBgColor="#b37eb3"
-                  style={{ alignSelf: 'center' }}
-                >
-                  {loading ? "..." : "סיום"}
-                </Button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {error && <p className={styles.error}>{error}</p>}
+        {error && <p className={styles.error}>{error}</p>}
 
-      {/* Progress Circles - Fixed at bottom */}
-      <div className={styles.navigation}>
-        <div className={styles.progressDots}>
-          {[0, 1, 2, 3, 4].map((step) => (
-            <div
-              key={step}
-              className={styles.progressCircle}
-            >
-              <img
-                src={getProgressCircleIcon(step, step === currentStep)}
-                alt=""
-                className={styles.progressCircleIcon}
-              />
-            </div>
-          ))}
+        {/* Progress Circles - Fixed at bottom */}
+        <div className={styles.navigation}>
+          <div className={styles.progressDots}>
+            {[0, 1, 2, 3, 4].map((step) => (
+              <div key={step} className={styles.progressCircle}>
+                <img
+                  src={getProgressCircleIcon(step, step === currentStep)}
+                  alt=""
+                  className={styles.progressCircleIcon}
+                />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
       </div>
     </SmoothPageWrapper>
   );
