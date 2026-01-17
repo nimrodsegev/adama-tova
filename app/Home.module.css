@@ -2,8 +2,6 @@
 
 .pageContainer {
   min-height: 100dvh;
-  padding-top: env(safe-area-inset-top, 0);
-  padding-bottom: env(safe-area-inset-bottom, 0);
   background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
   display: flex;
   align-items: center;
@@ -56,6 +54,6 @@
 /* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
 @media (min-height: 865px) and (max-height: 885px) {
   .splashTitle {
-    top: 51%; /* Push down 2% from center */
+    top: 50%; /* Push down 2% from center */
   }
 }
