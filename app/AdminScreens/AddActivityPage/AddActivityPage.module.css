@@ -323,6 +323,7 @@
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-md); 
   transform: rotate(-90deg);
+  stroke-width: 3px;
   filter: brightness(0) invert(1);
 }
 

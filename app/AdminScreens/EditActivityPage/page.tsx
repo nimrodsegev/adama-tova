@@ -34,9 +34,29 @@ const getSvgPath = (label: string) => {
   return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
 };
 
+// --- CUSTOM SVG ARROW ---
+const CustomArrowIcon = ({ className, rotation = 0 }: { className?: string; rotation?: number }) => (
+  <svg 
+    width="24" 
+    height="14" 
+    viewBox="0 0 24 14" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    style={{ transform: `rotate(${rotation}deg)` }}
+  >
+    <path 
+      d="M2 2L12 12L22 2" 
+      stroke="white" 
+      strokeWidth="1" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 // --- Custom Time Picker Component ---
 const TimePicker = ({ value, onChange }: { value: string, onChange: (val: string) => void }) => {
-  // Default to 12:00 if empty
   const [hourStr, minStr] = value ? value.split(':') : ["12", "00"];
   const hour = parseInt(hourStr || "12");
   const minute = parseInt(minStr || "00");
@@ -55,49 +75,22 @@ const TimePicker = ({ value, onChange }: { value: string, onChange: (val: string
 
   return (
     <div className={styles.timePickerContainer}>
-      {/* Hours Column */}
       <div className={styles.timeColumn}>
         <button type="button" onClick={incrementHour} className={styles.timeButton}>
-           <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Up" 
-             width={24} 
-             height={24} 
-             className={styles.arrowUp} 
-           />
+          <CustomArrowIcon rotation={180} />
         </button>
         <span className={styles.timeValue}>{hour.toString().padStart(2, '0')}</span>
         <button type="button" onClick={decrementHour} className={styles.timeButton}>
-           <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Down" 
-             width={24} 
-             height={24} 
-             className={styles.arrowDown} 
-           />
+          <CustomArrowIcon rotation={0} />
         </button>
       </div>
-
-      {/* Minutes Column */}
       <div className={styles.timeColumn}>
         <button type="button" onClick={incrementMinute} className={styles.timeButton}>
-          <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Up" 
-             width={24} 
-             height={24} 
-             className={styles.arrowUp} 
-           />
+          <CustomArrowIcon rotation={180} />
         </button>
         <span className={styles.timeValue}>{minute.toString().padStart(2, '0')}</span>
         <button type="button" onClick={decrementMinute} className={styles.timeButton}>
-          <Image 
-             src="/icons/tertiary_arrow_left.svg" 
-             alt="Down" 
-             width={24} 
-             height={24} 
-             className={styles.arrowDown} 
-           />
+          <CustomArrowIcon rotation={0} />
         </button>
       </div>
     </div>
