@@ -305,6 +305,23 @@ export default function ProfilePage() {
                 הוספת מנהל
               </Button>
             )}
+            {isAdmin && (
+              <button
+                style={{
+                  marginTop: "40px",
+                  padding: "6px 12px",
+                  fontSize: "10px",
+                  background: "#444",
+                  color: "#888",
+                  border: "none",
+                  borderRadius: "4px",
+                  opacity: 0.6,
+                }}
+                onClick={() => router.push("/debug-viewport")}
+              >
+                debug
+              </button>
+            )}
           </div>
 
           {/* POPUPS WRAPPED IN CENTERED CONTAINER */}

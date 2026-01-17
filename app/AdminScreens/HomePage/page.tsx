@@ -162,7 +162,7 @@ export default function AdminHomePage() {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      let newConfig = { radius: 0.09, x: 0.47, y: 0.1 };
+      let newConfig = { radius: 0.09, x: 0.45, y: 0.1 };
 
       if (width < 380) {
         newConfig.radius = 0.06;

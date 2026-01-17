@@ -843,7 +843,7 @@
 
   width: 100%;
   position: fixed;
-  bottom: 3rem;
+  bottom: 2rem;
   left: 0;
   right: 0;
   z-index: 100;
@@ -1499,6 +1499,18 @@
 
   .circleSpacer {
     height: min(52vw, 13rem);
+    margin-bottom: 1rem;
+  }
+}
+
+/* iPhone 16/16 Pro PWA viewport (~824px height) */
+@media (min-height: 815px) and (max-height: 840px) {
+  .nextArrow {
+    bottom: 7.5rem; /* below gender toggle */
+  }
+
+  .circleSpacer {
+    height: min(53vw, 13.25rem);
     margin-bottom: 1rem;
   }
 }

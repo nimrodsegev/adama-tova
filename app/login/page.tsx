@@ -196,6 +196,7 @@ export default function LoginPage() {
       <SmoothPageWrapper
         isLoading={!initialCheckDone || loadingAction !== null}
         disableCircleLoader={true}
+        transitionDelay="0s"
       >
         <div className={styles.loginContainer}>
           <div className={styles.content}>

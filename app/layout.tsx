@@ -40,13 +40,13 @@ export default async function RootLayout({
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/icons/icon-180.png"
+          href="/icons/logo-iphone.png"
         />
         <link
           rel="icon"
           type="image/png"
           sizes="192x192"
-          href="/icons/icon-192.png"
+          href="/icons/logo-android.png"
         />
         <link rel="manifest" href="/manifest.json" />
         <script src="https://accounts.google.com/gsi/client" async defer />
