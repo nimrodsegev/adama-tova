@@ -46,8 +46,8 @@
   position: absolute;
   width: 2.5625rem; /* ⚠️ NO VARIABLE */
   height: 2.5rem; /* ⚠️ NO VARIABLE */
-  right: var(--spacing-xl);
-  top: 3.1875rem; /* ⚠️ NO VARIABLE - 51px */
+  right: var(--spacing-2xl); /* 24px */
+  top: var(--spacing-4xl); /* 48px */
   border: none;
   background: transparent;
   display: flex;
