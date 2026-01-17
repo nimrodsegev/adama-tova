@@ -1,6 +1,6 @@
 /* RegistrationSuccessModal.module.css */
 
-/* Overlay backdrop - Transparent */
+/* Overlay backdrop */
 .overlay {
   position: fixed;
   top: 0;
@@ -13,132 +13,18 @@
   z-index: 1999;
 }
 
-/* Modal container - FULL SCREEN COVERING NAVBAR */
-.modalContainer {
+/* Background Circles Container */
+.circlesContainer {
   position: fixed;
   top: 0;
-  bottom: 0; /* Changed from 6.8125rem to 0 */
   left: 0;
-  right: 0;
-
-  width: 100%;
-  max-width: 100vw;
-  height: 100dvh; /* Explicit full height */
-
-  background: var(--color-background);
-  z-index: 2000; /* High z-index covers everything */
-
-  overflow-y: auto;
-  overflow-x: hidden;
-  direction: rtl;
-  margin: 0 auto;
-}
-
-/* ... Rest of the file remains exactly the same ... */
-
-/* Close button (top right) */
-.closeButton {
-  position: absolute;
-  width: auto;
-  height: auto;
-  right: 1.5rem;
-  top: 3rem;
-  border: none;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  z-index: 1201;
-  padding: var(--spacing-xs);
-  transition: transform var(--transition-normal);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.closeButton:hover {
-  transform: scale(1.1);
-}
-
-.closeButton:active {
-  transform: scale(0.95);
-}
-
-/* Content Frame - centered vertically and horizontally */
-.contentFrame {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1.5rem;
-  gap: 1rem;
-  position: absolute;
-  width: 100%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Icon container */
-.iconContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 5.53625rem;
-  height: 4.7125rem;
-}
-
-/* Success icon (IMG tag) */
-.successIcon {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  pointer-events: none;
+  z-index: 3001;
 }
 
-/* Message text - centered symmetrically with TWO LINES */
-.messageText {
-  width: 100%;
-  max-width: 18rem;
-  font-family: var(--font-primary); /* Arfilit - matches pending approval */
-  font-style: normal;
-  font-weight: var(--font-weight-normal); /* 400 */
-  font-size: 1rem; /* 16px */
-  line-height: 1.5rem;
-  text-align: center;
-  color: #ffffff;
-  margin: 0;
-  direction: rtl;
-}
-
-/* Sub-message (smaller text for waitlist) */
-.subMessage {
-  font-size: var(--font-size-sm);
-  opacity: 0.8;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-/* ============================================
-   GROUP REGISTRATION SUCCESS MODAL STYLES
-   ============================================ */
-
-/* Group modal container with gradient background */
+/* Main Modal Container */
 .groupModalContainer {
   position: fixed;
   top: 0;
@@ -148,7 +34,7 @@
   width: 100%;
   max-width: 100vw;
   height: 100dvh;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
   z-index: 2000;
   overflow-y: auto;
   overflow-x: hidden;
@@ -156,7 +42,7 @@
   margin: 0 auto;
 }
 
-/* Group modal close button */
+/* Close Button (X) */
 .groupCloseButton {
   position: absolute;
   width: 2.5625rem;
@@ -183,22 +69,24 @@
   transform: scale(0.95);
 }
 
-/* Group content frame */
+/* Anchor Frame (Zero Height Center) */
 .groupContentFrame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 1.5rem;
-  gap: 1rem;
-  position: absolute;
-  width: 100%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  overflow: visible;
 }
 
-/* Checkmark circle container */
+/* =========================================================
+   ARROW CONTROL
+   ========================================================= */
 .checkmarkContainer {
   display: flex;
   justify-content: center;
@@ -206,16 +94,11 @@
   width: 7.635rem;
   height: 7.75rem;
   position: relative;
+  z-index: 3002;
+  /* Control Arrow Vertical Position */
+  transform: translateY(0.5rem);
 }
 
-/* Checkmark circle icon */
-.checkmarkCircle {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* Checkmark icon (the V) */
 .checkmarkIcon {
   position: absolute;
   top: 50%;
@@ -225,22 +108,66 @@
   height: 2.98rem;
 }
 
-/* Group message text */
-.groupMessageText {
+/* =========================================================
+   TEXT CONTROL
+   ========================================================= */
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 18rem;
+  max-width: 24rem; /* Wide enough for long titles */
+
+  /* Control Text Vertical Position */
+  transform: translateY(10rem);
+}
+
+/* ⭐ 1. "REGISTERED SUCCESSFULLY" TITLE */
+.successTitle {
   font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: var(--font-weight-bold);
-  font-size: 1rem;
-  line-height: 1.25rem;
+
+  /* 👇 CHANGE FONT SIZE/WEIGHT HERE */
+  font-weight: var(--font-weight-semibold); /* Bold */
+  font-size: var(--font-size-xl); /* Bigger size */
+
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
+
+  direction: rtl;
+}
+
+/* ⭐ 2. ACTIVITY DETAILS (Name, Date, Time) */
+.successDetails {
+  font-family: var(--font-secondary);
+  font-style: normal;
+
+  /* 👇 CHANGE FONT SIZE/WEIGHT HERE */
+  font-weight: var(--font-weight-semibold); /* Regular */
+  font-size: var(--font-size-xl); /* Standard size */
+
+  line-height: 1.5rem;
+  text-align: center;
+  color: #ffffff;
   margin: 0;
   direction: rtl;
 }
 
-/* "נעדכן אותך בקרוב" text - lighter weight */
+/* Waitlist Text (Fallback style) */
+.groupMessageText {
+  width: 100%;
+  font-family: var(--font-secondary);
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  text-align: center;
+  color: #ffffff;
+  margin: 0;
+  direction: rtl;
+}
+
 .groupMessageTextLight {
   font-weight: var(--font-weight-normal);
 }

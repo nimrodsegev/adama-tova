@@ -21,8 +21,8 @@ interface SmoothPageWrapperProps {
   radiusScale?: number;
   baseColor?: string;
   disableCircleLoader?: boolean;
-  // --- NEW PROP ---
   coverNavigation?: boolean;
+  customPosition?: { x: number; y: number };
 }
 
 export default function SmoothPageWrapper({
@@ -33,13 +33,13 @@ export default function SmoothPageWrapper({
   radiusScale = 1.0,
   baseColor = "#FFFFFF",
   disableCircleLoader = false,
-  // Default is false: So usually the Nav Bar (z-index 100) stays visible
   coverNavigation = false,
+  customPosition,
 }: SmoothPageWrapperProps) {
   const { userProfile } = useUser();
   const [minTimeElapsed, setMinTimeElapsed] = useState(true);
 
-  // Responsive Config
+  // Default Responsive Config
   const [circleConfig, setCircleConfig] = useState({
     radius: 0.35,
     x: 0.5,
@@ -107,12 +107,7 @@ export default function SmoothPageWrapper({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-
-            // --- LOGIC HERE ---
-            // If coverNavigation is true -> 9999 (Covers everything)
-            // If false -> 90 (Sits below Nav Bar which is 100)
             zIndex: coverNavigation ? 9999 : 90,
-
             opacity: showLoader ? 1 : 0,
             pointerEvents: showLoader ? "all" : "none",
             transition: "opacity 0.6s ease-in-out",
@@ -121,8 +116,10 @@ export default function SmoothPageWrapper({
         >
           <OrganicCircles
             mode={mode}
+            position={
+              customPosition || { x: circleConfig.x, y: circleConfig.y }
+            }
             radius={circleConfig.radius * radiusScale}
-            position={{ x: circleConfig.x, y: circleConfig.y }}
             baseColor={baseColor}
             {...shapeParams}
           />
@@ -132,8 +129,9 @@ export default function SmoothPageWrapper({
       <div
         style={{
           opacity: showLoader ? 0 : 1,
-          transform: showLoader ? "translateY(20px)" : "translateY(0)",
-          transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+          // ⭐ CHANGE: Removed the 'transform' property (translateY)
+          // ⭐ CHANGE: Removed 'transform' from the transition property
+          transition: "opacity 0.8s ease-out",
           transitionDelay: "0.2s",
           width: "100%",
           minHeight: "100vh",

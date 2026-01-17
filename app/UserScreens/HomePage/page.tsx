@@ -66,15 +66,13 @@ export default function NewUserHomePage() {
     "spouting"
   );
 
-  // ⭐ NEW: Control Z-Index for smooth nav vs. registration coverage
+  // This state stays true during the fade-out, so we use it to keep the circle size stable
   const [coverNav, setCoverNav] = useState(false);
 
-  // Note: We keep the circle config state even if we simplify positioning
-  // to maintain the logic, but the CSS now controls the container position.
   const [bgCircleConfig, setBgCircleConfig] = useState({
-    radius: 0.07, // Increased default radius for the new layout
+    radius: 0.07,
     x: 0.47,
-    y: 0.1, // Centered in the new container
+    y: 0.1,
   });
 
   const mountedRef = useRef(false);
@@ -169,19 +167,19 @@ export default function NewUserHomePage() {
     skipFetch?: boolean
   ) => {
     if (state === "start") {
-      // ⭐ Action Start: Raise Z-Index to cover NavBar
       setCoverNav(true);
-
-      setMotionMode("breathing");
+      setMotionMode("spouting");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
       if (!skipFetch) {
         await fetchData();
       }
+
+      // 1. Start fading out (by stopping processing state)
       setIsProcessing(false);
 
-      // ⭐ Action End: Reset Z-Index after animation delay
+      // 2. Wait for fade out to finish before resetting position/mode
       setTimeout(() => {
         setCoverNav(false);
         setMotionMode("spouting");
@@ -194,18 +192,19 @@ export default function NewUserHomePage() {
     activeFilter === "yours"
       ? registeredActivities
       : suggestedActivities.slice(0, 4);
-  console.log("shapeParams:", shapeParams);
 
   return (
     <SmoothPageWrapper
       isLoading={loading || isProcessing}
       mode={motionMode}
-      // ⭐ Pass the prop to control Z-Index
       coverNavigation={coverNav}
+      // ⭐ FIX: Use 'coverNav' instead of 'isProcessing'.
+      // This keeps the circle BIG (1.5) while it fades out, preventing the shrink/jump.
+      radiusScale={coverNav ? 1.5 : 1.0}
+      // ⭐ FIX: Keep it centered during the fade out too.
+      customPosition={coverNav ? { x: 0.5, y: 0.45 } : undefined}
     >
-      {/* Flattened Structure matching Admin Page */}
       <div className={styles.pageContainer} dir="rtl">
-        {/* 1. Open Hours */}
         <div className={styles.openHoursWrapper}>
           {todayHours ? (
             <OpenHours
@@ -218,7 +217,6 @@ export default function NewUserHomePage() {
           )}
         </div>
 
-        {/* 2. Circles (Static Position in flow) */}
         <div className={styles.circlesContainer}>
           <OrganicCircles
             mode="breathing"
@@ -230,13 +228,11 @@ export default function NewUserHomePage() {
           />
         </div>
 
-        {/* 3. Greeting */}
         <div className={styles.greetingSection}>
           <h1 className={styles.greetingTitle}>היי {firstName},</h1>
           <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
         </div>
 
-        {/* 4. Filter */}
         <div className={styles.filterContainer}>
           <HomeFilter
             options={[
@@ -258,7 +254,6 @@ export default function NewUserHomePage() {
           />
         </div>
 
-        {/* 5. Cards List */}
         <div className={styles.cardsContainer}>
           {displayedActivities.length > 0 ? (
             displayedActivities.map((activity) => (

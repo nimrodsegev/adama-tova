@@ -369,10 +369,9 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
             path.setAttribute("opacity", op.toString());
             path.setAttribute("stroke", this.config.baseColor);
             path.setAttribute("fill", "none");
-            path.setAttribute(
-              "stroke-width",
-              this.config.strokeWidth.toString()
-            );
+            const activeStrokeWidth =
+              this.currentMode === "splash" ? 3 : this.config.strokeWidth;
+            path.setAttribute("stroke-width", activeStrokeWidth.toString());
           });
         }
 
