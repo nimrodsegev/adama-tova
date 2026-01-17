@@ -100,3 +100,12 @@
   overflow: visible;
   transition: none;
 }
+.emptyText {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: 1.25rem;
+  text-align: center;
+  color: var(--color-text-primary);
+  margin-top: var(--spacing-3xl);
+}

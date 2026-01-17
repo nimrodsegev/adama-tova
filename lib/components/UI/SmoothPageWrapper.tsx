@@ -5,7 +5,6 @@ import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import { useUser } from "@/app/contexts/UserContext";
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
-// Define the exact types allowed by your OrganicCircles component
 type AllowedModes =
   | "static"
   | "spouting"
@@ -21,8 +20,9 @@ interface SmoothPageWrapperProps {
   minDuration?: number;
   radiusScale?: number;
   baseColor?: string;
-  // --- NEW PARAMETER ---
   disableCircleLoader?: boolean;
+  // --- NEW PROP ---
+  coverNavigation?: boolean;
 }
 
 export default function SmoothPageWrapper({
@@ -32,12 +32,11 @@ export default function SmoothPageWrapper({
   minDuration = 10,
   radiusScale = 1.0,
   baseColor = "#FFFFFF",
-  // Default is false so it behaves normally unless specified
   disableCircleLoader = false,
+  // Default is false: So usually the Nav Bar (z-index 100) stays visible
+  coverNavigation = false,
 }: SmoothPageWrapperProps) {
   const { userProfile } = useUser();
-
-  // 1. Initialize as TRUE so we don't block initially unless loading starts
   const [minTimeElapsed, setMinTimeElapsed] = useState(true);
 
   // Responsive Config
@@ -51,7 +50,6 @@ export default function SmoothPageWrapper({
     return calculateShapeParams(userProfile);
   }, [userProfile]);
 
-  // --- TIMER LOGIC ---
   useEffect(() => {
     if (isLoading) {
       setMinTimeElapsed(false);
@@ -63,17 +61,14 @@ export default function SmoothPageWrapper({
       const timer = setTimeout(() => {
         setMinTimeElapsed(true);
       }, minDuration);
-
       return () => clearTimeout(timer);
     }
   }, [minTimeElapsed, minDuration]);
-  // -------------------
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-
       let newRadius = 0.35;
       let newY = 0.5;
 
@@ -85,14 +80,9 @@ export default function SmoothPageWrapper({
       } else {
         newRadius = 0.3;
       }
-
       if (height < 700) newRadius = 0.25;
 
-      setCircleConfig({
-        radius: newRadius,
-        x: 0.5,
-        y: newY,
-      });
+      setCircleConfig({ radius: newRadius, x: 0.5, y: newY });
     };
 
     handleResize();
@@ -100,14 +90,10 @@ export default function SmoothPageWrapper({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Show loader if Data is loading OR Timer is still running
   const showLoader = isLoading || !minTimeElapsed;
 
   return (
     <>
-      {/* ONLY render the circle overlay if disableCircleLoader is FALSE.
-         If it is true, this entire block is skipped.
-      */}
       {!disableCircleLoader && (
         <div
           style={{
@@ -121,7 +107,12 @@ export default function SmoothPageWrapper({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: "{var(--z-index-modal)}",
+
+            // --- LOGIC HERE ---
+            // If coverNavigation is true -> 9999 (Covers everything)
+            // If false -> 90 (Sits below Nav Bar which is 100)
+            zIndex: coverNavigation ? 9999 : 90,
+
             opacity: showLoader ? 1 : 0,
             pointerEvents: showLoader ? "all" : "none",
             transition: "opacity 0.6s ease-in-out",
@@ -138,10 +129,6 @@ export default function SmoothPageWrapper({
         </div>
       )}
 
-      {/* The content wrapper remains exactly the same. 
-         Even if the circles are disabled, this div will still fade in 
-         smoothly (opacity 0 -> 1) once loading is finished.
-      */}
       <div
         style={{
           opacity: showLoader ? 0 : 1,

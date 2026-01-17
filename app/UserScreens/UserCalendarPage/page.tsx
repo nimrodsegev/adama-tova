@@ -50,6 +50,9 @@ export default function NewUserCalendarPage() {
     "spouting"
   );
 
+  // ⭐ NEW: Control Z-Index for smooth nav vs. registration coverage
+  const [coverNav, setCoverNav] = useState(false);
+
   const mounted = useRef(false);
 
   const fetchData = async () => {
@@ -109,6 +112,9 @@ export default function NewUserCalendarPage() {
     skipFetch?: boolean
   ) => {
     if (state === "start") {
+      // ⭐ Action Start: Raise Z-Index to cover NavBar
+      setCoverNav(true);
+
       setMotionMode("breathing");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
@@ -117,7 +123,12 @@ export default function NewUserCalendarPage() {
         await fetchData();
       }
       setIsProcessing(false);
-      setTimeout(() => setMotionMode("spouting"), 1000);
+
+      // ⭐ Action End: Reset Z-Index after animation
+      setTimeout(() => {
+        setCoverNav(false);
+        setMotionMode("spouting");
+      }, 1000);
     }
   };
 
@@ -149,6 +160,8 @@ export default function NewUserCalendarPage() {
     <SmoothPageWrapper
       isLoading={isInitialLoad || isProcessing}
       mode={motionMode}
+      // ⭐ Pass the prop to control Z-Index
+      coverNavigation={coverNav}
     >
       <div className={styles.pageContainer}>
         {/* LOADING OVERLAY */}

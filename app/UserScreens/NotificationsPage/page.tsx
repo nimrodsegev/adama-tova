@@ -248,7 +248,9 @@ export default function NewUserNotificationPage() {
                     </div>
                   );
                 })
-              : !loading && <p className="text-empty">כל ההודעות שלך נקראו</p>}
+              : !loading && (
+                  <p className={styles.emptyText}>כל ההודעות שלך נקראו</p>
+                )}
           </div>
         </div>
 
