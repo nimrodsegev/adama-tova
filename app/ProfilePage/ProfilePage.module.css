@@ -186,9 +186,9 @@
   padding: 0.5rem 1rem;
 
   /* UNSELECTED STATE: Filled White Background */
-  background: rgba(249, 249, 249, 0.8);
-  border: 1px solid transparent;
-  border-radius: 0.5625rem; /* 9px */
+  background: rgba(249, 249, 249, 0.3);
+  border: 1px solid #f9f9f9;
+  color: #681f02;
 
   font-family: var(--font-secondary);
   font-weight: 400;
@@ -206,9 +206,9 @@
 
 .optionToggle.selected {
   /* SELECTED STATE: Semi-transparent Glass + Border */
-  background: rgba(249, 249, 249, 0.3);
-  border: 1px solid #f9f9f9;
-  color: #681f02;
+  background: rgba(249, 249, 249, 0.8);
+  border: 1px solid transparent;
+  border-radius: 0.5625rem; /* 9px */
 }
 
 /* ============================================
