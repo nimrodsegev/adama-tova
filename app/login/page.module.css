@@ -201,7 +201,7 @@
 
   background: var(--color-text-secondary); /* #F9F9F9 */
   border-radius: var(--radius-sm); /* 9px */
-  border: 1px solid #E74E1C;
+  border: none;
 
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
@@ -291,7 +291,7 @@
 
   background: var(--color-text-secondary); /* #F9F9F9 */
   border-radius: var(--radius-sm); /* 9px */
-  border: 1px solid #E74E1C;
+  border: none;
 
   cursor: pointer;
   transition: opacity var(--transition-normal);
