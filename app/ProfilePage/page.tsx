@@ -306,13 +306,21 @@ export default function ProfilePage() {
               </Button>
             )}
             {isAdmin && (
-              <Button
-                className={styles.AddAdminButton}
-                style={{ marginTop: "10px", background: "#333" }}
+              <button
+                style={{
+                  marginTop: "40px",
+                  padding: "6px 12px",
+                  fontSize: "10px",
+                  background: "#444",
+                  color: "#888",
+                  border: "none",
+                  borderRadius: "4px",
+                  opacity: 0.6,
+                }}
                 onClick={() => router.push("/debug-viewport")}
               >
-                Debug Viewport
-              </Button>
+                debug
+              </button>
             )}
           </div>
 

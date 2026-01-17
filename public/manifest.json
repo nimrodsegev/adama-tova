@@ -1,9 +1,9 @@
 {
-  "name": "Product Jam Kit",
-  "short_name": "Jam Kit",
+  "name": "המרחב",
+  "short_name": "המרחב",
   "icons": [
     {
-      "src": "/icons/logo-192.png",
+      "src": "/icons/logo-android.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
