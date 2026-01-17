@@ -771,7 +771,7 @@
   bottom: 9rem; /* below gender toggle - desktop */
   width: 2.5625rem; /* 41px */
   height: 2.5rem; /* 40px */
-  z-index: 150;
+  z-index: 50; /* below dropdowns so they cover it when open */
   cursor: pointer;
   background: transparent;
   border: none;
