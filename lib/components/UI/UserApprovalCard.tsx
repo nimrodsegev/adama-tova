@@ -65,11 +65,11 @@ const UserApprovalCard: React.FC<UserApprovalCardProps> = ({
           className={styles.buttonStack}
           onClick={(e) => e.stopPropagation()}
         >
-          <Button variant="approve" onClick={onApprove}>
-            {t("אשר/י")}
-          </Button>
           <Button variant="reject" onClick={onReject}>
             {t("סרב/י")}
+          </Button>
+          <Button variant="approve" onClick={onApprove}>
+            {t("אשר/י")}
           </Button>
         </div>
       </div>

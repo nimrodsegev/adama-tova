@@ -233,6 +233,7 @@
   padding: 0 1rem; /* 24px side padding */
   background: var(--button-text);
   color: var(--color-text-secondary);
+  border: 1px solid #F9F9F9;
   border-radius: var(--radius-xs);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
