@@ -1,22 +1,19 @@
 /* UserNotificationPage.module.css */
-
 .pageContainer {
   width: 100%;
   max-width: var(--container-max-width);
   z-index: var(--z-index-page);
   /* --- COPIED FROM ADMIN SETTINGS --- */
   /* Fix height to viewport minus nav bar, and scroll internally */
-  height: calc(100dvh - 4.5rem);
+  height: calc(100dvh - 4.5rem); /* ⚠️ 4.5rem repeated */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
   overflow-x: hidden;
   /* ---------------------------------- */
-
   margin: 0 auto;
   background: var(--color-background);
   position: relative;
   direction: rtl;
-
   padding: var(--spacing-xl);
   /* Add safe area logic to bottom padding */
   padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
@@ -37,7 +34,7 @@
   font-family: var(--font-primary);
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-normal);
-  line-height: 2.8125rem;
+  line-height: 2.8125rem; /* ⚠️ NO VARIABLE - repeated across files */
   color: var(--color-text-primary);
   margin: 0;
   text-align: center;
@@ -81,15 +78,11 @@
   flex-direction: column;
   gap: var(--spacing-md);
   width: 100%;
-
   /* REMOVED max-height and overflow-y */
   /* The scrolling is now done by .pageContainer */
-
   overflow: visible;
-
   /* Cushion for the bottom of the scroll */
-  padding: 0.5rem;
-
+  padding: var(--spacing-sm);
   padding-right: var(--spacing-xs);
 }
 
@@ -100,11 +93,12 @@
   overflow: visible;
   transition: none;
 }
+
 .emptyText {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-base);
-  line-height: 1.25rem;
+  line-height: 1.25rem; /* ⚠️ NO VARIABLE - repeated across files */
   text-align: center;
   color: var(--color-text-primary);
   margin-top: var(--spacing-3xl);
