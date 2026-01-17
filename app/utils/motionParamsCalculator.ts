@@ -33,6 +33,13 @@ export const DEFAULTS: ShapeParams = {
   strokeWidth: 1.0,
 };
 
+const HEBREW_TO_ENGLISH: Record<string, string> = {
+  מיינדפולנס: "mindfulness",
+  "גוף ותנועה": "body_motion",
+  מוזיקה: "music_sound",
+  "יצירה וחומר": "creation_material",
+};
+
 // 1. INTERESTS (Direct English Keys)
 const INTEREST_ADJUSTMENTS: Record<
   string,
@@ -92,7 +99,8 @@ export function calculateShapeParams(
 
   // 1. Process Interests (Direct lookup)
   (userProfile.quiz?.interests || []).forEach((interest) => {
-    const adj = INTEREST_ADJUSTMENTS[interest];
+    const englishKey = HEBREW_TO_ENGLISH[interest] || interest;
+    const adj = INTEREST_ADJUSTMENTS[englishKey];
     if (adj) {
       if (adj.smoothness !== undefined) vals.smoothness.push(adj.smoothness);
       if (adj.complexity !== undefined) vals.complexity.push(adj.complexity);

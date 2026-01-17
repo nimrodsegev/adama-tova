@@ -78,7 +78,10 @@ export default function NewUserHomePage() {
   });
 
   const mountedRef = useRef(false);
-  const shapeParams = userProfile ? calculateShapeParams(userProfile) : {};
+  const shapeParams =
+    userProfile?.role === "participant"
+      ? calculateShapeParams(userProfile)
+      : calculateShapeParams(null);
 
   const todayHours = (() => {
     const today = new Date().getDay();
@@ -191,6 +194,7 @@ export default function NewUserHomePage() {
     activeFilter === "yours"
       ? registeredActivities
       : suggestedActivities.slice(0, 4);
+  console.log("shapeParams:", shapeParams);
 
   return (
     <SmoothPageWrapper
