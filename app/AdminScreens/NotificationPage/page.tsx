@@ -259,7 +259,7 @@ export default function AdminNotificationsPage() {
                 <EmptyState
                   message="אין הודעות אחרונות"
                   buttonText="להוספת הודעה"
-                  buttonHref="/UserScreens/UserCalendarPage"
+                  buttonHref="/AdminScreens/addNotification"
                 />
               </div>
             )
