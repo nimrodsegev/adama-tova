@@ -1506,7 +1506,7 @@
 /* iPhone 16/16 Pro PWA viewport (~824px height) */
 @media (min-height: 815px) and (max-height: 840px) {
   .nextArrow {
-    bottom: 7.5rem; /* below gender toggle */
+    bottom: 5.5rem; /* below gender toggle */
   }
 
   .circleSpacer {
