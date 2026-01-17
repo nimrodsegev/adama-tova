@@ -2,6 +2,9 @@
 import { createPortal } from "react-dom";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useUser } from "@/app/contexts/UserContext";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./RegistrationSuccessModal.module.css";
 
 type RegistrationSuccessModalProps = {
@@ -13,6 +16,8 @@ type RegistrationSuccessModalProps = {
   isGroup?: boolean;
   isWaitlist?: boolean;
   waitlistPosition?: number | null;
+  circleRadius?: number;
+  circlePosition?: { x: number; y: number };
 };
 
 export default function RegistrationSuccessModal({
@@ -24,8 +29,16 @@ export default function RegistrationSuccessModal({
   isGroup = false,
   isWaitlist = false,
   waitlistPosition = null,
+  circleRadius = 0.35 * 0.4,
+  circlePosition = { x: 0.5, y: 0.45 },
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { userProfile } = useUser();
+
+  const shapeParams =
+    userProfile?.role === "participant"
+      ? calculateShapeParams(userProfile)
+      : calculateShapeParams(null);
 
   useEffect(() => {
     setMounted(true);
@@ -50,6 +63,18 @@ export default function RegistrationSuccessModal({
       {/* Overlay backdrop */}
       <div className={styles.overlay} onClick={onClose} />
 
+      {/* Organic Circles Background */}
+      <div className={styles.circlesContainer}>
+        <OrganicCircles
+          mode="breathing"
+          radius={circleRadius}
+          position={circlePosition}
+          // @ts-ignore
+          {...shapeParams}
+          baseColor="#FFFFFF"
+        />
+      </div>
+
       {/* Modal container with gradient background */}
       <div className={styles.groupModalContainer}>
         {/* Close button */}
@@ -70,13 +95,6 @@ export default function RegistrationSuccessModal({
         <div className={styles.groupContentFrame}>
           {/* Checkmark circle with V icon */}
           <div className={styles.checkmarkContainer}>
-            <Image
-              src="/icons/checkmark_circle.svg"
-              alt=""
-              width={122}
-              height={124}
-              className={styles.checkmarkCircle}
-            />
             {/* Checkmark V icon */}
             <svg
               className={styles.checkmarkIcon}

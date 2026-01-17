@@ -34,6 +34,16 @@
   margin: 0 auto;
 }
 
+.circlesContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3001; /* Between overlay and modal */
+}
+
 /* ... Rest of the file remains exactly the same ... */
 
 /* Close button (top right) */
@@ -148,7 +158,7 @@
   width: 100%;
   max-width: 100vw;
   height: 100dvh;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
   z-index: 2000;
   overflow-y: auto;
   overflow-x: hidden;
@@ -235,7 +245,7 @@
   font-size: 1rem;
   line-height: 1.25rem;
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
   direction: rtl;
 }
