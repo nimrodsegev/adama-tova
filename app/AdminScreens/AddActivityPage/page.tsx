@@ -65,6 +65,20 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
+// --- SVG Path Generator (For Image Upload) ---
+const getSvgPath = (label: string) => {
+  const charWidth = 10; 
+  const padding = 20; 
+  const labelWidth = (label.length * charWidth) + padding;
+  
+  const totalWidth = 315;
+  const radius = 9; 
+  const rightGapStart = 315 - 32; 
+  const gapEnd = rightGapStart - labelWidth;
+
+  return `M${gapEnd} 0.5 H${radius} C0.5 0.5 0.5 4 0.5 8.5 V52 C0.5 56.5 4 59.5 ${radius} 59.5 H${totalWidth - radius} C${totalWidth - 4} 59.5 ${totalWidth - 0.5} 56.5 ${totalWidth - 0.5} 52 V8.5 C${totalWidth - 0.5} 4 ${totalWidth - 4} 0.5 ${totalWidth - radius} 0.5 H${rightGapStart}`;
+};
+
 // --- CUSTOM SVG ARROW ---
 const CustomArrowIcon = ({ className, rotation = 0 }: { className?: string; rotation?: number }) => (
   <svg 
@@ -215,6 +229,11 @@ export default function AddActivityPage() {
     }
   };
 
+  const handleClearImage = () => {
+    setImageFile(null);
+    setImagePreviewUrl(null);
+  };
+
   const handleScroll = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
@@ -336,18 +355,38 @@ export default function AddActivityPage() {
             <CutInput label="מנחה" value={formData.instructor} onChange={(e) => setFormValue('instructor', e.target.value)} className={styles.cutInput} type="text" dir="rtl" textAlign="right" />  
             <CutInput label="מספר משתתפים מקסימלי" value={formData.max_participants} onChange={(e) => setFormValue('max_participants', e.target.value)} className={styles.cutInput} type="number" dir="rtl" textAlign="right" />  
             
-            <div className={styles.uploadWrapper}>
+            {/* SVG BORDER IMAGE UPLOAD */}
+            <div className={styles.imageWrapperSVG}>
+              <svg className={styles.imageBorderSVG} viewBox="0 0 315 62" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d={getSvgPath("תמונה *לאה")} className={styles.imageBorderPath} strokeLinecap="round" />
+              </svg>
+              <span className={styles.imageLabelSVG}>תמונה *לא חובה</span>
+
               <input type="file" id="imageUpload" accept="image/*" onChange={handleImageChange} hidden />
-              <label htmlFor="imageUpload" className={styles.uploadBox}>
-                <div className={styles.paperclipWrapper}>
-                  <svg className={styles.paperclipIcon} width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14.8131 7.87167L7.92063 14.7642C7.07624 15.6086 5.93102 16.0829 4.73688 16.0829C3.54274 16.0829 2.39751 15.6086 1.55313 14.7642C0.708744 13.9198 0.234375 12.7746 0.234375 11.5804C0.234375 10.3863 0.708744 9.24105 1.55313 8.39667L8.44563 1.50417C9.00855 0.941246 9.77204 0.625 10.5681 0.625C11.3642 0.625 12.1277 0.941246 12.6906 1.50417C13.2536 2.06709 13.5698 2.83058 13.5698 3.62667C13.5698 4.42276 13.2536 5.18625 12.6906 5.74917L5.79063 12.6417C5.50917 12.9231 5.12742 13.0813 4.72938 13.0813C4.33133 13.0813 3.94959 12.9231 3.66813 12.6417C3.38667 12.3602 3.22854 11.9785 3.22854 11.5804C3.22854 11.1824 3.38667 10.8006 3.66813 10.5192L10.0356 4.15917" stroke="#F9F9F9" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+              
+              {imageFile ? (
+                <div className={styles.filePreviewBox}>
+                  <div style={{display:'flex', alignItems:'center', flex:1, overflow:'hidden'}}>
+                      <span className={styles.fileName}>{imageFile.name}</span>
+                  </div>
+                  <div style={{display:'flex', alignItems:'center'}}>
+                      <span style={{width:'3px', height:'3px', background:'#fff', borderRadius:'50%'}}></span>
+                      <span className={styles.previewLabel}>preview</span>
+                      <button onClick={handleClearImage} style={{background:'none', border:'none', cursor:'pointer', padding:'0 5px', color:'#fff', fontSize:'1.2rem', lineHeight: '1'}}>✕</button>
+                  </div>
                 </div>
-                <span className={styles.uploadText}>{imageFile ? imageFile.name : "לחץ/י כאן על מנת לבחור תמונה"}</span>
-                <span className={styles.uploadSubtext}>תמונה <span className={styles.optionalText}>*לא חובה</span></span>
-              </label>
+              ) : (
+                <label htmlFor="imageUpload" className={styles.uploadBox}>
+                  <span className={styles.uploadText}>לחץ/י כאן על מנת לבחור תמונה</span>
+                  <div className={styles.paperclipWrapper}>
+                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14.8131 7.87167L7.92063 14.7642C7.07624 15.6086 5.93102 16.0829 4.73688 16.0829C3.54274 16.0829 2.39751 15.6086 1.55313 14.7642C0.708744 13.9198 0.234375 12.7746 0.234375 11.5804C0.234375 10.3863 0.708744 9.24105 1.55313 8.39667L8.44563 1.50417C9.00855 0.941246 9.77204 0.625 10.5681 0.625C11.3642 0.625 12.1277 0.941246 12.6906 1.50417C13.2536 2.06709 13.5698 2.83058 13.5698 3.62667C13.5698 4.42276 13.2536 5.18625 12.6906 5.74917L5.79063 12.6417C5.50917 12.9231 5.12742 13.0813 4.72938 13.0813C4.33133 13.0813 3.94959 12.9231 3.66813 12.6417C3.38667 12.3602 3.22854 11.9785 3.22854 11.5804C3.22854 11.1824 3.38667 10.8006 3.66813 10.5192L10.0356 4.15917" stroke="#F9F9F9" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>                  
+                </label>
+              )}
             </div>
+
             <CutInput label="תיאור" value={formData.description} onChange={(e) => setFormValue('description', e.target.value)} className={styles.cutInput} type="text" dir="rtl" textAlign="right" />  
           </div>
         </div>
@@ -384,7 +423,6 @@ export default function AddActivityPage() {
 
         {/* STEP 3 - Unscrollable and Conditionally Rendered */}
         {isStep2Valid && (
-          // IMPORTANT: Added styles.noScroll class to lock this specific slide
           <div className={`${styles.scrollSnapSlide} ${styles.noScroll}`}>
             <div className={styles.slideContent}>
               <div className={styles.previewImageCard}>
