@@ -112,11 +112,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-lg); /* 16px */
+
   gap: var(--spacing-lg); /* 16px */
   width: 100%;
-  border: var(--border-width-thin) solid var(--color-text-secondary);
-  border-radius: 11px; /* ⚠️ NO VARIABLE - close to --radius-sm (9px) */
 }
 
 .emptyStateContent {
