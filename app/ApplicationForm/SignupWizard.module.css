@@ -477,9 +477,9 @@
   top: 3.25rem; /* Overlap slightly with wrapper to connect borders */
   left: 0;
   right: 0;
-  background: transparent;
+  background: #e26029; /* Solid orange like UnifiedDropdown */
   border: 0.0625rem solid #f9f9f9;
-  border-top: none;
+  border-top: 0.0625rem solid #f9f9f9; /* White border separating from toggle */
   border-radius: 0 0 0.5625rem 0.5625rem;
   padding-top: 0.5rem; /* Add padding to compensate for overlap */
   z-index: 100;
@@ -488,7 +488,7 @@
 .genderOption {
   width: 100%;
   padding: 0.875rem 1.875rem;
-  background: transparent;
+  background: #e26029; /* Solid orange */
   border: none;
   border-bottom: 0.0625rem solid #f9f9f9;
 
@@ -599,9 +599,9 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: transparent;
+  background: #e26029; /* Solid orange like UnifiedDropdown */
   border: 0.0625rem solid #f9f9f9;
-  border-top: none;
+  border-top: 0.0625rem solid #f9f9f9; /* White border separating from header */
   border-radius: 0 0 0.5625rem 0.5625rem;
   z-index: 100;
   max-height: min(11.5rem, 35vh); /* Shows exactly 4 options */
@@ -613,7 +613,7 @@
 .accordionOption {
   width: 100%;
   padding: 0.875rem 1.875rem;
-  background: transparent;
+  background: #e26029; /* Solid orange */
   border: none;
   border-bottom: 0.0625rem solid #f9f9f9;
 
@@ -670,15 +670,15 @@
   width: 19.6875rem; /* 315px */
   max-width: 100%;
   height: 2.9375rem; /* 47px */
-  background: #f9f9f9; /* White - unselected */
+  background: rgba(249, 249, 249, 0.3); /* Semi-transparent - unselected */
   border-radius: 0.5625rem; /* 9px */
-  border: none;
+  border: 1px solid #F9F9F9; /* White border */
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: 1rem; /* 16px */
   line-height: 1.1875rem; /* 19px */
   text-align: right;
-  color: #681f02; /* DarkTypo */
+  color: #F9F9F9; /* White text for unselected */
   cursor: pointer;
   transition: all 0.2s;
   -webkit-tap-highlight-color: transparent;
@@ -689,8 +689,9 @@
 }
 
 .optionButton.selected {
-  background: rgba(249, 249, 249, 0.3); /* Semi-transparent - selected */
-  border: 1px solid #F9F9F9; /* White border */
+  background: #f9f9f9; /* White - selected */
+  border: none;
+  color: #681f02; /* DarkTypo */
 }
 
 /* ============================================
@@ -765,7 +766,7 @@
 .nextArrow {
   position: absolute;
   left: 2.5rem; /* aligned with text box left edge */
-  bottom: 3rem; /* same level as dots */
+  bottom: 15rem; /* below gender toggle area */
   width: 2.5625rem; /* 41px */
   height: 2.5rem; /* 40px */
   z-index: 50;
