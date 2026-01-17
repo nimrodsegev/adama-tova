@@ -36,7 +36,7 @@
 .header {
   text-align: center;
   margin-top: 3.5rem; 
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   z-index: 10;
   flex-shrink: 0;
   transition: margin 0.3s ease;
@@ -71,7 +71,7 @@
   width: 100%;
   min-width: 100%;
   height: 100%;
-  margin-top: 1rem; 
+  margin-top: 2rem; 
   scroll-snap-align: start;
   scroll-snap-stop: always;
   overflow-y: auto;
