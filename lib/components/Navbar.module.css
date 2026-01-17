@@ -1,35 +1,36 @@
+/* Navbar.module.css */
 .navbar {
-    background: #2c3e50;
-    padding: 1rem 0;
-    color: white;
-  }
-  
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-    text-decoration: none;
-  }
-  
-  .links {
-    display: flex;
-    gap: 1.5rem;
-  }
-  
-  .links a {
-    color: white;
-    text-decoration: none;
-  }
-  
-  .links a:hover {
-    text-decoration: underline;
-  }
+  background: #2c3e50; /* ⚠️ NO VARIABLE - custom dark blue */
+  padding: var(--spacing-lg) 0; /* 16px vertical, 0 horizontal */
+  color: white;
+}
+
+.container {
+  max-width: 1200px; /* ⚠️ NO VARIABLE - desktop max-width */
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg); /* 0 vertical, 16px horizontal */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: var(--font-size-2xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  color: white;
+  text-decoration: none;
+}
+
+.links {
+  display: flex;
+  gap: var(--spacing-2xl); /* 24px */
+}
+
+.links a {
+  color: white;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
