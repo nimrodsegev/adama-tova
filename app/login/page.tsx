@@ -274,7 +274,13 @@ export default function LoginPage() {
                       colorType="white"
                       tertiarySize="base"
                       tertiaryWeight="normal"
-                      onClick={() => setShowForgotPassword(true)}
+                      onClick={() => {
+                        if (!email.trim()) {
+                          setEmailError("נא להזין אימייל");
+                          return;
+                        }
+                        setShowForgotPassword(true);
+                      }}
                     >
                       שכחתי סיסמה
                     </Button>

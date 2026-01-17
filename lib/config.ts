@@ -41,6 +41,8 @@ export const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || "";
 export const EMAIL_HOST = process.env.EMAIL_HOST || "";
 export const EMAIL_PORT = process.env.EMAIL_PORT || 587;
 
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://adama-tova.vercel.app";
+
 export const PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 export const PUBLIC_SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
