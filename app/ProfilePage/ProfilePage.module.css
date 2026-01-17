@@ -184,7 +184,7 @@
   align-items: flex-start;
   gap: 0.25rem;
   width: 100%;
-  max-width: 100%; /* Ensure fits within new padding */
+  max-width: 80%; /* Ensure fits within new padding */
 }
 
 .optionsGroup {
