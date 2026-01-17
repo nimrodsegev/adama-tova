@@ -43,7 +43,7 @@
   direction: rtl;
 }
 
-/* Content Frame - Centered */
+/* Content Frame - Centered now */
 .contentFrame {
   display: flex;
   flex-direction: column;
