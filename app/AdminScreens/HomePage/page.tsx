@@ -510,7 +510,7 @@ export default function AdminHomePage() {
                 ))}
               </>
             ) : (
-              <EmptyState message="אין ממתינים לאישור" showIcon={false} />
+              <EmptyState message="אין ממתינים לאישור" />
             )
           ) : upcomingActivities.length > 0 ? (
             upcomingActivities.map((activity) => (
@@ -528,7 +528,7 @@ export default function AdminHomePage() {
               />
             ))
           ) : (
-            <EmptyState message="אין מפגשים קרובים" showIcon={false} />
+            <EmptyState message="אין מפגשים קרובים" />
           )}
         </div>
 

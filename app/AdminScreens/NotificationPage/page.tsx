@@ -8,6 +8,7 @@ import { HomeFilter, FilterOption } from "@/lib/components/UI/HomeFilter";
 import Button from "@/lib/components/UI/Button";
 import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import EmptyState from "@/lib/components/UI/EmptyState";
 import styles from "./AdminNotificationsPage.module.css";
 
 type Notification = {
@@ -253,57 +254,13 @@ export default function AdminNotificationsPage() {
           ) : (
             !loading && (
               /* EMPTY STATE */
-              <div className={styles.emptyWrapper}>
-                <div className={styles.emptyStateContainer}>
-                  <div className={styles.emptyStateContent}>
-                    <div className={styles.emptyStateIcon}>
-                      <svg
-                        width="48"
-                        height="49"
-                        viewBox="0 0 48 49"
-                        fill="none"
-                      >
-                        <circle
-                          cx="24"
-                          cy="24.5"
-                          r="22.9"
-                          stroke="rgba(255, 255, 255, 0.5)"
-                          strokeWidth="2.2"
-                          strokeDasharray="4 4"
-                        />
-                        <circle
-                          cx="24"
-                          cy="24.5"
-                          r="11"
-                          stroke="rgba(255, 255, 255, 0.5)"
-                          strokeWidth="2.2"
-                          strokeDasharray="4 4"
-                        />
-                        <line
-                          x1="19.7"
-                          y1="24.5"
-                          x2="28.3"
-                          y2="24.5"
-                          stroke="rgba(255, 245, 245, 0.7)"
-                          strokeWidth="1"
-                        />
-                        <line
-                          x1="24"
-                          y1="19.2"
-                          x2="24"
-                          y2="29.8"
-                          stroke="rgba(255, 245, 245, 0.7)"
-                          strokeWidth="1"
-                        />
-                      </svg>
-                    </div>
-                    <p className={styles.emptyStateText}>אין הודעות אחרונות</p>
-                  </div>
-                  {/* Button inside empty state for better UX */}
-                  <Button size="L" href="/AdminScreens/addNotification">
-                    להוספת הודעה
-                  </Button>
-                </div>
+
+              <div className={styles.emptyStateContainer}>
+                <EmptyState
+                  message="אין הודעות אחרונות"
+                  buttonText="להוספת הודעה"
+                  buttonHref="/AdminScreens/addNotification"
+                />
               </div>
             )
           )}

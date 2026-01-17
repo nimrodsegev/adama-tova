@@ -137,13 +137,44 @@ export default function NewNotificationCard({
   const maxSwipeOffset = -120; // Match action box width (7.5rem ≈ 120px)
   const maxDeleteOffset = 120; // Positive for right swipe (delete)
 
+  // ---------------------------------------------------------
+  // Updated Helper: Smart Date Formatting
+  // ---------------------------------------------------------
   const formatTime = (dateInput: string | Date) => {
     const date = new Date(dateInput);
-    return date.toLocaleTimeString("he-IL", {
-      hour: "2-digit",
-      minute: "2-digit",
+    const now = new Date();
+
+    // Reset times to compare just the calendar days
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const inputDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+    const diffTime = today.getTime() - inputDay.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    // Case 1: Today -> Show Time (HH:MM)
+    if (diffDays === 0) {
+      return date.toLocaleTimeString("he-IL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    // Case 2: Yesterday -> Show "אתמול"
+    if (diffDays === 1) {
+      return "אתמול";
+    }
+
+    // Case 3: 2+ Days ago -> Show Date (DD.MM.YY)
+    return date.toLocaleDateString("he-IL", {
+      day: "2-digit",
+      month: "2-digit",
     });
   };
+  // ---------------------------------------------------------
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
