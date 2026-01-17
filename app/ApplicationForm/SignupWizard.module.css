@@ -1482,7 +1482,7 @@
 /* iPhone X/XS/11 Pro/12 mini PWA viewport (768px height) */
 @media (min-height: 760px) and (max-height: 780px) {
   .nextArrow {
-    bottom: 11rem; /* below gender toggle on smaller phones */
+    bottom: 7rem; /* below gender toggle on smaller phones */
   }
 
   .circleSpacer {
@@ -1494,7 +1494,7 @@
 /* iPhone 12/13/14 PWA viewport (797px height) */
 @media (min-height: 790px) and (max-height: 810px) {
   .nextArrow {
-    bottom: 12rem; /* below gender toggle */
+    bottom: 8rem; /* below gender toggle */
   }
 
   .circleSpacer {
@@ -1506,7 +1506,7 @@
 /* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
 @media (min-height: 865px) and (max-height: 885px) {
   .nextArrow {
-    bottom: 13rem; /* below gender toggle on larger phones */
+    bottom: 9rem; /* below gender toggle on larger phones */
   }
 
   .circleSpacer {
