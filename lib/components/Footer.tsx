@@ -18,6 +18,7 @@ export default function Footer() {
     "/ApplicationForm",
     "/AdminScreens/EditActivityPage",
     "/elements",
+    "/pending-approval",
   ];
 
   const safePathname = pathname || "";
