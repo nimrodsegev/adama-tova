@@ -141,8 +141,10 @@
    ============================================ */
 .bottomButton {
   position: fixed;
-  bottom: var(--spacing-6); /* 6rem / 96px */
-  right: var(--spacing-xl); /* 1.25rem / 20px */
+  bottom: calc(
+    var(--spacing-6) + env(safe-area-inset-bottom)
+  ); /* 96px + safe area */
+
   z-index: 50;
 }
 
