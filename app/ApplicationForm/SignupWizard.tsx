@@ -563,6 +563,7 @@ export default function SignupWizard({
                       setNameError("");
                     }}
                     error={nameError}
+                    onErrorExpire={() => setNameError("")}
                     dir="rtl"
                     textAlign="right"
                   />
@@ -576,6 +577,7 @@ export default function SignupWizard({
                       setPhoneError("");
                     }}
                     error={phoneError}
+                    onErrorExpire={() => setPhoneError("")}
                     dir="rtl"
                     textAlign="right"
                   />

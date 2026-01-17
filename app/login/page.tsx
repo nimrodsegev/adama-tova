@@ -218,6 +218,7 @@ export default function LoginPage() {
                     setEmailError("");
                   }}
                   error={emailError}
+                  onErrorExpire={() => setEmailError("")}
                   dir="ltr"
                   textAlign="right"
                 />
@@ -233,6 +234,7 @@ export default function LoginPage() {
                   }}
                   placeholder="6 תווים או יותר"
                   error={passwordError}
+                  onErrorExpire={() => setPasswordError("")}
                   dir="rtl"
                   textAlign="right"
                 />

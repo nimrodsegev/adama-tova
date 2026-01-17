@@ -211,6 +211,7 @@ export default function AddActivityPage() {
   // --- SWIPE VALIDATION STATE ---
   // New state variables for Step 1 errors
   const [titleError, setTitleError] = useState("");
+  const [branchError, setBranchError] = useState("");
   const [instructorError, setInstructorError] = useState("");
   const [dateError, setDateError] = useState("");
   const [maxParticipantsError, setMaxParticipantsError] = useState("");
@@ -285,9 +286,13 @@ export default function AddActivityPage() {
   // --- SWIPE VALIDATION LOGIC ---
   const validateStep1 = () => {
     let isValid = true;
-    
+
     if (!formData.title.trim()) {
       setTitleError("שדה חובה");
+      isValid = false;
+    }
+    if (!formData.branch) {
+      setBranchError("שדה חובה");
       isValid = false;
     }
     if (!formData.instructor.trim()) {
@@ -423,7 +428,7 @@ export default function AddActivityPage() {
         slide.removeEventListener("scroll", updateLabelBackgrounds)
       );
     };
-  }, [titleError, instructorError, maxParticipantsError]); // Added dependencies
+  }, [titleError, branchError, instructorError, maxParticipantsError]); // Added dependencies
 
   const handleSubmit = async () => {
     if (!isFormValid) return;
@@ -565,6 +570,7 @@ export default function AddActivityPage() {
                 dir="rtl"
                 textAlign="right"
                 error={titleError} // Pass error state
+                onErrorExpire={() => setTitleError("")}
               />
               
               {/* BRANCH DROPDOWN - WRAPPED FOR ERROR BORDER */}
@@ -578,9 +584,12 @@ export default function AddActivityPage() {
                     value={formData.branch}
                     onChange={(value) => {
                         setFormValue("branch", value);
+                        setBranchError(""); // Clear error
                     }}
                     isOpen={isBranchOpen}
                     onToggle={() => setIsBranchOpen(!isBranchOpen)}
+                    error={branchError}
+                    onErrorExpire={() => setBranchError("")}
                   />
               <CutInput
                 label="מיקום"
@@ -605,16 +614,22 @@ export default function AddActivityPage() {
                 dir="rtl"
                 textAlign="right"
                 error={instructorError} // Pass error state
+                onErrorExpire={() => setInstructorError("")}
               />
               
               <CutInput
                 label="מספר משתתפים"
                 value={formData.max_participants}
-                onChange={(e) => setFormValue("max_participants", e.target.value)}
+                onChange={(e) => {
+                  setFormValue("max_participants", e.target.value);
+                  setMaxParticipantsError(""); // Clear error
+                }}
                 className={styles.cutInput}
                 type="number"
                 dir="rtl"
                 textAlign="right"
+                error={maxParticipantsError}
+                onErrorExpire={() => setMaxParticipantsError("")}
               />
 
               <div className={styles.uploadWrapper}>

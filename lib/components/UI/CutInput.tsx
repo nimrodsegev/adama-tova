@@ -10,6 +10,7 @@ interface CutInputProps {
   type?: string;
   placeholder?: string;
   error?: string;
+  onErrorExpire?: () => void;
   dir?: "rtl" | "ltr";
   textAlign?: "right" | "left";
   placeholderAlign?: "right" | "left" | "center";
@@ -24,18 +25,35 @@ export default function CutInput({
   type = "text",
   placeholder,
   error,
+  onErrorExpire,
   dir = "rtl",
   textAlign = "right",
   placeholderAlign,
   className,
   tall = false,
 }: CutInputProps) {
-  const displayLabel = error || label;
-  const isError = !!error;
+  const [showError, setShowError] = useState(false);
   const labelRef = useRef<HTMLSpanElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [gapStart, setGapStart] = useState(231);
   const [gapEnd, setGapEnd] = useState(285.5);
+
+  // Auto-hide error after 6 seconds and return to original label
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setShowError(false);
+        onErrorExpire?.();
+      }, 6000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowError(false);
+    }
+  }, [error, onErrorExpire]);
+
+  const displayLabel = (showError && error) ? error : label;
+  const isError = showError && !!error;
 
   // Measure label and calculate gap positions
   useEffect(() => {

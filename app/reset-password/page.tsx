@@ -200,6 +200,7 @@ export default function ResetPasswordPage() {
                 setConfirmPasswordError('');
               }}
               error={passwordError}
+              onErrorExpire={() => setPasswordError('')}
               dir="rtl"
               textAlign="right"
               placeholder="6 תווים או יותר"
@@ -215,6 +216,7 @@ export default function ResetPasswordPage() {
                 setConfirmPasswordError('');
               }}
               error={confirmPasswordError}
+              onErrorExpire={() => setConfirmPasswordError('')}
               dir="rtl"
               textAlign="right"
               placeholder="6 תווים או יותר"
