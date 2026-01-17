@@ -305,6 +305,15 @@ export default function ProfilePage() {
                 הוספת מנהל
               </Button>
             )}
+            {isAdmin && (
+              <Button
+                className={styles.AddAdminButton}
+                style={{ marginTop: "10px", background: "#333" }}
+                onClick={() => router.push("/debug-viewport")}
+              >
+                Debug Viewport
+              </Button>
+            )}
           </div>
 
           {/* POPUPS */}
