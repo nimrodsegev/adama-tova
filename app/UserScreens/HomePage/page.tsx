@@ -65,10 +65,16 @@ export default function NewUserHomePage() {
   const [motionMode, setMotionMode] = useState<"spouting" | "breathing">(
     "spouting"
   );
+
+  // ⭐ NEW: Control Z-Index for smooth nav vs. registration coverage
+  const [coverNav, setCoverNav] = useState(false);
+
+  // Note: We keep the circle config state even if we simplify positioning
+  // to maintain the logic, but the CSS now controls the container position.
   const [bgCircleConfig, setBgCircleConfig] = useState({
-    radius: 0.07,
+    radius: 0.09, // Increased default radius for the new layout
     x: 0.47,
-    y: 0.25,
+    y: 0.1, // Centered in the new container
   });
 
   const mountedRef = useRef(false);
@@ -79,40 +85,6 @@ export default function NewUserHomePage() {
     // @ts-ignore
     return OPENING_HOURS[today] || null;
   })();
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      let newConfig = { radius: 0.07, x: 0.47, y: 0.2 };
-
-      if (width < 380) {
-        newConfig.radius = 0.06;
-        newConfig.x = 0.5;
-        newConfig.y = 0.25;
-      } else if (width > 600) {
-        newConfig.radius = 0.12;
-        newConfig.x = 0.5;
-        newConfig.y = 0.25;
-      }
-
-      if (height < 800) newConfig.y = 0.11;
-      if (height < 700) {
-        newConfig.radius = Math.min(newConfig.radius, 0.06);
-        newConfig.y = 0.25;
-      }
-      if (height < 600) {
-        newConfig.radius = Math.min(newConfig.radius, 0.05);
-        newConfig.y = 0.17;
-      }
-
-      setBgCircleConfig(newConfig);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     if (user && !mountedRef.current) {
@@ -194,6 +166,9 @@ export default function NewUserHomePage() {
     skipFetch?: boolean
   ) => {
     if (state === "start") {
+      // ⭐ Action Start: Raise Z-Index to cover NavBar
+      setCoverNav(true);
+
       setMotionMode("breathing");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
@@ -202,7 +177,12 @@ export default function NewUserHomePage() {
         await fetchData();
       }
       setIsProcessing(false);
-      setTimeout(() => setMotionMode("spouting"), 1000);
+
+      // ⭐ Action End: Reset Z-Index after animation delay
+      setTimeout(() => {
+        setCoverNav(false);
+        setMotionMode("spouting");
+      }, 1000);
     }
   };
 
@@ -213,22 +193,16 @@ export default function NewUserHomePage() {
       : suggestedActivities.slice(0, 4);
 
   return (
-    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
+    <SmoothPageWrapper
+      isLoading={loading || isProcessing}
+      mode={motionMode}
+      // ⭐ Pass the prop to control Z-Index
+      coverNavigation={coverNav}
+    >
+      {/* Flattened Structure matching Admin Page */}
       <div className={styles.pageContainer} dir="rtl">
-        {/* Decorative Background Circles */}
-        <div className={styles.backgroundCircles}>
-          <OrganicCircles
-            mode="breathing"
-            radius={bgCircleConfig.radius}
-            position={{ x: bgCircleConfig.x, y: bgCircleConfig.y }}
-            // @ts-ignore
-            {...shapeParams}
-            baseColor="#FFFFFF"
-          />
-        </div>
-
-        {/* CONTROLLABLE POSITION COMPONENT */}
-        <div className={styles.openHours}>
+        {/* 1. Open Hours */}
+        <div className={styles.openHoursWrapper}>
           {todayHours ? (
             <OpenHours
               startTime={todayHours.open}
@@ -240,61 +214,74 @@ export default function NewUserHomePage() {
           )}
         </div>
 
-        <div className={styles.mainContent}>
-          <div className={styles.greetingSection}>
-            <h1 className={styles.greetingTitle}>היי {firstName},</h1>
-            <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
-          </div>
+        {/* 2. Circles (Static Position in flow) */}
+        <div className={styles.circlesContainer}>
+          <OrganicCircles
+            mode="breathing"
+            radius={bgCircleConfig.radius}
+            position={{ x: bgCircleConfig.x, y: bgCircleConfig.y }}
+            // @ts-ignore
+            {...shapeParams}
+            baseColor="#FFFFFF"
+          />
+        </div>
 
-          <div className={styles.filterContainer}>
-            <HomeFilter
-              options={[
-                {
-                  id: "recommended",
-                  label: "חשבנו שיעניין אותך",
-                  count: suggestedActivities.length,
-                },
-                {
-                  id: "yours",
-                  label: "המפגשים שלך",
-                  count: registeredActivities.length,
-                },
-              ]}
-              activeOption={activeFilter}
-              onFilterChange={(id) =>
-                setActiveFilter(id as "recommended" | "yours")
-              }
+        {/* 3. Greeting */}
+        <div className={styles.greetingSection}>
+          <h1 className={styles.greetingTitle}>היי {firstName},</h1>
+          <p className={styles.greetingSubtitle}>המרחב כאן בשבילך</p>
+        </div>
+
+        {/* 4. Filter */}
+        <div className={styles.filterContainer}>
+          <HomeFilter
+            options={[
+              {
+                id: "recommended",
+                label: "חשבנו שיעניין אותך",
+                count: suggestedActivities.length,
+              },
+              {
+                id: "yours",
+                label: "המפגשים שלך",
+                count: registeredActivities.length,
+              },
+            ]}
+            activeOption={activeFilter}
+            onFilterChange={(id) =>
+              setActiveFilter(id as "recommended" | "yours")
+            }
+          />
+        </div>
+
+        {/* 5. Cards List */}
+        <div className={styles.cardsContainer}>
+          {displayedActivities.length > 0 ? (
+            displayedActivities.map((activity) => (
+              <NewUserActivityCard
+                key={activity.id}
+                id={activity.id}
+                title={activity.title}
+                instructor={activity.instructor || "מדריך"}
+                date={activity.date}
+                startTime={activity.start_time}
+                onMotionChange={handleMotionState}
+                isGroup={activity.is_group || !!activity.series_id}
+              />
+            ))
+          ) : activeFilter === "yours" ? (
+            <EmptyState
+              message="אין לך מפגשים קרובים"
+              buttonText="הוספת פעילות"
+              buttonHref="/UserScreens/UserCalendarPage"
             />
-          </div>
-
-          <div className={styles.cardsContainer}>
-            {displayedActivities.length > 0 ? (
-              displayedActivities.map((activity) => (
-                <NewUserActivityCard
-                  key={activity.id}
-                  id={activity.id}
-                  title={activity.title}
-                  instructor={activity.instructor || "מדריך"}
-                  date={activity.date}
-                  startTime={activity.start_time}
-                  onMotionChange={handleMotionState}
-                  isGroup={activity.is_group || !!activity.series_id}
-                />
-              ))
-            ) : activeFilter === "yours" ? (
-              <EmptyState
-                message="אין לך מפגשים קרובים"
-                buttonText="הוספת פעילות"
-                buttonHref="/UserScreens/UserCalendarPage"
-              />
-            ) : (
-              <EmptyState
-                message="אין פעילויות רלוונטיות עבורך"
-                buttonText="להוספת תחומי עניין"
-                buttonHref="/ProfilePage"
-              />
-            )}
-          </div>
+          ) : (
+            <EmptyState
+              message="אין פעילויות רלוונטיות עבורך"
+              buttonText="להוספת תחומי עניין"
+              buttonHref="/ProfilePage"
+            />
+          )}
         </div>
       </div>
     </SmoothPageWrapper>

@@ -5,22 +5,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  
-  position: fixed; 
-  inset: 0; 
+
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
-  
+
   /* Background Gradient */
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+
   padding: 3rem 0.2rem 1.5rem; /* 92px 24px 24px */
   gap: 0.5rem; /* 8px */
-  
+
   overflow: hidden;
   touch-action: none;
-  z-index: 1;
+  z-index: var(--z-index-page);
 }
 
 /* ============================================
@@ -34,7 +34,7 @@
   max-width: var(--container-max-width, 24.5625rem);
 }
 .userName {
-  font-family: 'Arfilit', sans-serif;
+  font-family: "Arfilit", sans-serif;
   font-weight: 400; /* Regular */
   font-size: 2rem; /* 32px */
   line-height: 2.125rem;
@@ -46,7 +46,7 @@
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 1rem;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-left: 0.5rem;
 }
 
@@ -57,7 +57,7 @@
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 1.25rem; /* xl */
-  color: #F9F9F9;
+  color: #f9f9f9;
   margin: 0;
   text-align: right;
 }
@@ -80,14 +80,16 @@
   max-width: var(--container-max-width, 24.5625rem);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 1.5rem 2rem 1.5rem; 
+  padding: 0 1.5rem 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.7rem; 
+  gap: 0.7rem;
 }
 
-.scrollContainer::-webkit-scrollbar { display: none; }
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
 
 /* ============================================
    PROFILE BOX (View Mode Container)
@@ -100,15 +102,15 @@
   align-items: flex-end; /* RTL layout */
   padding: 1rem;
   gap: 0.5rem;
-  
+
   /* White Border & Radius */
   border: 0.0625rem solid rgba(249, 249, 249, 0.84);
   border-radius: 0.625rem; /* 10px */
   background: transparent;
-  
+
   position: relative; /* For absolute positioning of Edit button */
   transition: all 0.3s ease;
-  direction: rtl; 
+  direction: rtl;
 }
 
 .boxHeader {
@@ -121,11 +123,10 @@
 /* View Mode Footer: Absolutely positioned */
 .profileBox .boxFooter {
   position: absolute;
-  bottom: 1rem; 
-  left: 1rem;   
+  bottom: 1rem;
+  left: 1rem;
   margin: 0;
   width: auto;
-  z-index: 2;
 }
 
 /* ============================================
@@ -183,17 +184,17 @@
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
-  
+
   /* UNSELECTED STATE: Filled White Background */
   background: rgba(249, 249, 249, 0.8);
-  border: 1px solid transparent; 
+  border: 1px solid transparent;
   border-radius: 0.5625rem; /* 9px */
-  
+
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 0.9rem;
-  color: #681F02; /* Dark Text */
-  
+  color: #681f02; /* Dark Text */
+
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -206,8 +207,8 @@
 .optionToggle.selected {
   /* SELECTED STATE: Semi-transparent Glass + Border */
   background: rgba(249, 249, 249, 0.3);
-  border: 1px solid #F9F9F9;
-  color: #681F02; 
+  border: 1px solid #f9f9f9;
+  color: #681f02;
 }
 
 /* ============================================
@@ -218,18 +219,18 @@
   gap: 8px;
   width: 72px;
   height: 44px;
-  background: #B37EB3;
+  background: #b37eb3;
   border-radius: 5px;
   min-width: auto !important;
   font-family: var(--font-secondary);
   cursor: pointer;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
-.saveButtonCustom{
+.saveButtonCustom {
   width: 75px;
   height: 46px;
-  color: #B37EB3;
+  color: #b37eb3;
   font-family: var(--font-secondary);
   font-weight: 700;
   background: rgba(247, 247, 247, 0.9);
@@ -237,14 +238,14 @@
   cursor: pointer;
 }
 
-.buttonsRow{
+.buttonsRow {
   width: 120%;
   align-self: right;
   box-sizing: border-box;
   display: flex;
-  align-items: flex-end; 
+  align-items: flex-end;
 }
-.logOutButton{
+.logOutButton {
   margin-right: 2.5rem;
   right: 2rem;
   width: 100%;
@@ -254,7 +255,7 @@
   margin-top: var(--spacing-xs);
   color: var(--color-red-alert);
 }
-.usersList{
+.usersList {
   margin-top: 1rem;
   margin-right: 4.4rem;
   width: 63px;
@@ -263,30 +264,29 @@
   border-radius: 5px;
   font-family: var(--font-secondary);
   font-weight: 400;
-  font-size: 0.875rem; 
+  font-size: 0.875rem;
   color: rgba(247, 247, 247, 0.9);
   text-align: right;
 }
-.AddAdminButton{
+.AddAdminButton {
   padding: 12px 32px 12px 32px;
   gap: 8px;
   /* purple */
-  background: #B37EB3;
+  background: #b37eb3;
   border-radius: 5px;
   min-width: auto !important;
   font-family: var(--font-secondary);
   cursor: pointer;
   align-self: bottom;
   margin-top: auto;
-  
 }
 .pressArrow {
   display: inline-block;
   width: 0.4375rem; /* 7px */
   height: 0.4375rem; /* 7px */
   margin-right: 0.5rem; /* 4px spacing from text */
-  border-left: 0.0625rem solid #F9F9F9; /* 1px */
-  border-bottom: 0.0625rem solid #F9F9F9; /* 1px */
+  border-left: 0.0625rem solid #f9f9f9; /* 1px */
+  border-bottom: 0.0625rem solid #f9f9f9; /* 1px */
   transform: rotate(45deg); /* Points left */
   margin-top: 0.125rem; /* 2px - slightly lower */
   margin-left: 1.25rem; /* 20px */
@@ -304,7 +304,15 @@
 }
 
 @media (max-height: 700px) {
-  .header { margin-top: 3rem; margin-bottom: 1.5rem; }
-  .profileBox { padding: 0.75rem; }
-  .profileBox .boxFooter { bottom: 0.75rem; left: 0.75rem; }
+  .header {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+  .profileBox {
+    padding: 0.75rem;
+  }
+  .profileBox .boxFooter {
+    bottom: 0.75rem;
+    left: 0.75rem;
+  }
 }

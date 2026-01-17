@@ -252,6 +252,10 @@ body {
   --container-min-height: 53.25rem;
 
   /* Z-index Scale */
+  --z-index-page: 10;
+  --z-index-navbar: 100;
+  --z-index-modal: 200;
+  --z-index-popup: 300;
   --z-background: -1;
   --z-base: 0;
   --z-dropdown: 100;

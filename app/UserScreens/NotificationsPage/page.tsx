@@ -188,8 +188,6 @@ export default function NewUserNotificationPage() {
   return (
     <SmoothPageWrapper isLoading={loading || !user}>
       <div className={styles.pageContainer}>
-        <div className="vector-background" />
-
         <div className={styles.titleContainer}>
           <h1 className={styles.title}>הודעות ועדכונים</h1>
         </div>
@@ -211,7 +209,9 @@ export default function NewUserNotificationPage() {
             customTextColor="var(--color-bg-light-opaque)"
             tertiaryArrowDirection="down"
             onClick={handleMarkAllAsRead}
-            disabled={loading || notifications.every((n) => n.isRead)}
+            disabled={loading || unreadCount === 0}
+            // This style hides the button but keeps the physical space (preventing layout jump)
+            style={{ visibility: unreadCount > 0 ? "visible" : "hidden" }}
           >
             סמן הכל כנקרא
           </Button>
@@ -246,7 +246,9 @@ export default function NewUserNotificationPage() {
                     </div>
                   );
                 })
-              : !loading && <p className="text-empty">כל ההודעות שלך נקראו</p>}
+              : !loading && (
+                  <p className={styles.emptyText}>כל ההודעות שלך נקראו</p>
+                )}
           </div>
         </div>
 
