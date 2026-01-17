@@ -415,7 +415,7 @@ export const apiActivities = {
 
                 await supabase.from('notifications').insert({
                   user_id: waitlistUser.user_id,
-                  title: "התפנה מקום בפעילות! 🎉",
+                  title: "התפנה מקום בפעילות!",
                   message: notificationMessage,
                   is_read: false,
                   created_at: new Date().toISOString(),
@@ -456,7 +456,7 @@ export const apiActivities = {
 
       const alerts = allRecipientIds.map(userId => ({
         user_id: userId,
-        title: "פרטי הפעילות שונו ✏️",
+        title: "פרטי הפעילות שונו ",
         message: `פרטי הפעילות "${activity.title}" עודכנו על ידי המנחה.`,
         is_read: false,
         created_at: new Date().toISOString(),
