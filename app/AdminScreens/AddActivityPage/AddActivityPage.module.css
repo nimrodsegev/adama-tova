@@ -72,16 +72,11 @@
   width: 100%;
   min-width: 100%;
   height: 100%;
-  
-  /* FIX: Remove margin-top so the box starts higher... */
   margin-top: 0; 
-  
-  /* ...and add PADDING-TOP inside so the labels (-0.6rem) aren't clipped */
-  padding-top: 2.5rem; 
-  padding-bottom: 4rem; /* Space for navigation dots */
   
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
@@ -89,6 +84,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  /* FIX 1: Padding-Top for floating labels */
+  padding-top: 2.5rem; 
+  
+  /* FIX 2: Massive Bottom Padding to clear the Dots/Navbar 
+     8rem + safe-area ensures the last button scrolls well ABOVE the dots */
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom)); 
+}
+
+/* FIX 3: Utility class to freeze scrolling on specific slides (Step 3) */
+.noScroll {
+  overflow-y: hidden !important;
+  /* Optional: Center content vertically if it's unscrollable */
+  justify-content: center; 
+  padding-bottom: 0; /* Remove padding if centering */
 }
 
 .slideContent {
@@ -96,7 +106,7 @@
   max-width: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem; /* Slightly more gap for breathing room */
+  gap: 1.2rem; 
   box-sizing: border-box; 
   transition: gap 0.3s ease;
   position: relative;
@@ -425,7 +435,9 @@
 .submitButton:disabled { opacity: 0.6; cursor: not-allowed; }
 .errorBanner { color: #ffcccc; font-size: 0.9rem; text-align: center; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; margin-top: 1rem; }
 
-/* NAVIGATION */
+/* ============================================
+   NAVIGATION
+   ============================================ */
 .navigation {
   display: flex;
   flex-direction: row;
@@ -434,11 +446,14 @@
   padding-top: 1rem;
   gap: 0.5rem; 
   width: 100%;
+  
+  /* Fixed at the bottom */
   position: fixed;
-  bottom: 3rem; 
+  bottom: calc(2rem + env(safe-area-inset-bottom)); /* Lifted up slightly for PWA home bar */
   left: 0;
   right: 0;
   z-index: 100;
+  
   background: transparent;
   pointer-events: none;
 }
