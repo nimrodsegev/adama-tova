@@ -32,10 +32,10 @@ export default function ProfilePage() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [mounting, setMounting] = useState(true);
-  
+
   // Popups State
   const [showBranchError, setShowBranchError] = useState(false);
-  const [showLogoutPopup, setShowLogoutPopup] = useState(false); 
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
   useEffect(() => {
     if (userProfile) {
@@ -327,10 +327,8 @@ export default function ProfilePage() {
           {/* POPUPS WRAPPED IN CENTERED CONTAINER */}
           {(showBranchError || showLogoutPopup) && (
             <div className={styles.popupWrapper}>
-              
               {showBranchError && (
                 <Popup
-                  title="חובה לבחור לפחות סניף אחד"
                   content="יש לבחור לפחות סניף אחד"
                   secondaryButtonText="סגור"
                   secondaryButtonAction={() => setShowBranchError(false)}
@@ -350,7 +348,6 @@ export default function ProfilePage() {
               )}
             </div>
           )}
-
         </main>
       </SmoothPageWrapper>
     </ProtectedRoute>
