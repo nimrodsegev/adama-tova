@@ -40,7 +40,9 @@ export default function ActivityDetailsModal({
   const { user, userProfile } = useUser();
   const { t } = useIvrita();
   const [activity, setActivity] = useState<any>(null);
+
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Registration State
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
@@ -141,7 +143,7 @@ export default function ActivityDetailsModal({
   };
 
   const handleRegistrationToggle = async () => {
-    if (!user || loading || isAdmin) return;
+    if (!user || loading || isSubmitting || isAdmin) return;
 
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
@@ -149,7 +151,7 @@ export default function ActivityDetailsModal({
     }
 
     onMotionChange?.("start");
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       const [res] = await apiRegistrations.registerUserToActivity(
@@ -176,16 +178,16 @@ export default function ActivityDetailsModal({
       console.error("Registration error:", error);
       onMotionChange?.("end");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleCancelConfirm = async () => {
-    if (!user || loading) return;
+    if (!user || loading || isSubmitting) return;
 
     setIsCancelModalOpen(false);
     onMotionChange?.("start");
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       const [_, error] = await apiRegistrations.cancelRegistration(
@@ -208,13 +210,12 @@ export default function ActivityDetailsModal({
       console.error("Unregistration error:", error);
       onMotionChange?.("end");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleSuccessModalClose = () => {
     onMotionChange?.("start");
-
     setTimeout(() => {
       setIsSuccessModalOpen(false);
       onClose();
@@ -247,9 +248,34 @@ export default function ActivityDetailsModal({
     }
   };
 
+  // ⭐ Helper: Dynamic Participant Text Logic
+  const getParticipantsText = () => {
+    const { confirmed, total, waitlist } = registrationCount;
+    const remaining = Math.max(0, total - confirmed);
+    const isFull = confirmed >= total;
+
+    // 1. User IS on the waitlist
+    if (regStatus === "waitlist" && waitlistPosition) {
+      return `(יש ${waitlist} ברשימת המתנה, מיקומך: ${waitlistPosition})`;
+    }
+
+    // 2. Activity is Full
+    if (isFull) {
+      if (waitlist > 0) {
+        // Full + Waiting list exists (User not on it, checked above)
+        return `(${waitlist} ברשימת המתנה)`;
+      } else {
+        // Full + No waiting list yet
+        return "(ניתן להירשם לרשימת המתנה)";
+      }
+    }
+
+    // 3. Open spots
+    return `(נותרו ${remaining} מקומות)`;
+  };
+
   if (!isOpen || !mounted) return null;
 
-  // Formatting
   const formattedTime = activity?.start_time?.slice(0, 5) || "";
   const dateObj = activity?.date ? new Date(activity.date) : null;
   const dayName = dateObj
@@ -268,11 +294,9 @@ export default function ActivityDetailsModal({
   const rawBranch = activity?.branch;
   const branch = BRANCH_MAPPING[rawBranch] || rawBranch || "המרכז";
   const description = activity?.description || "";
-  const remainingSpots = Math.max(
-    0,
-    registrationCount.total - registrationCount.confirmed
-  );
   const hasImage = !!activity?.image_url;
+
+  const participantsText = getParticipantsText();
 
   const modalContent = (
     <>
@@ -280,7 +304,6 @@ export default function ActivityDetailsModal({
         <>
           <div className={styles.overlay} onClick={handleCloseWithAnimation} />
           <div className={styles.modalContainer}>
-            {/* Close Button */}
             <button
               className={styles.closeButton}
               onClick={handleCloseWithAnimation}
@@ -294,9 +317,8 @@ export default function ActivityDetailsModal({
               />
             </button>
 
-            {/* Main Content Container */}
             <div className={styles.contentContainer}>
-              {loading || closing ? (
+              {loading ? (
                 <div className={styles.loadingContainer}>
                   <OrganicCircles
                     mode="loading"
@@ -306,7 +328,6 @@ export default function ActivityDetailsModal({
                 </div>
               ) : (
                 <>
-                  {/* Image */}
                   {hasImage && (
                     <div className={styles.imageContainer}>
                       <img
@@ -317,7 +338,6 @@ export default function ActivityDetailsModal({
                     </div>
                   )}
 
-                  {/* Title Section */}
                   <div className={styles.titleSection}>
                     <h2 className={styles.titleText}>
                       {isGroup ? "קבוצת " : "סדנת "}
@@ -325,7 +345,6 @@ export default function ActivityDetailsModal({
                     </h2>
                   </div>
 
-                  {/* Primary Info Section (Date & Time) */}
                   <div className={styles.primaryInfoSection}>
                     <div className={styles.dateTimeRow}>
                       <span className={styles.primaryInfoText}>
@@ -338,36 +357,26 @@ export default function ActivityDetailsModal({
                     </div>
                   </div>
 
-                  {/* Secondary Info Section (Location & Instructor) */}
                   <div className={styles.secondaryInfoSection}>
                     <p className={styles.secondaryInfoText}>
-                      בסניף {branch} ב{location}
+                      {`בסניף ${branch}${location ? ` ב${location}` : ""}`}
                     </p>
                     <p className={styles.secondaryInfoText}>
                       בהנחיית {instructor}
                     </p>
                   </div>
 
-                  {/* Participants Section */}
                   <div className={styles.participantsSection}>
                     <p className={styles.secondaryInfoText}>
                       משתתפים: {registrationCount.confirmed}/
-                      {registrationCount.total}{" "}
-                      {remainingSpots === 0
-                        ? "(לא נותרו מקומות)"
-                        : `(נותרו ${remainingSpots} מקומות)`}
-                      {regStatus === "waitlist" &&
-                        waitlistPosition &&
-                        ` (מיקומך: ${waitlistPosition})`}
+                      {registrationCount.total} {participantsText}
                     </p>
                   </div>
 
-                  {/* Description Section */}
                   <div className={styles.descriptionSection}>
                     <p className={styles.descriptionText}>{description}</p>
                   </div>
 
-                  {/* Admin: Participants Info & Registrations Button */}
                   {isAdmin && (
                     <div className={styles.adminControlsContainer}>
                       <p className={styles.adminParticipantsText}>
@@ -392,7 +401,6 @@ export default function ActivityDetailsModal({
               )}
             </div>
 
-            {/* Bottom Buttons Container */}
             {!loading && !closing && (
               <div className={styles.bottomButtonsContainer}>
                 {isAdmin ? (
@@ -401,7 +409,7 @@ export default function ActivityDetailsModal({
                       size="L"
                       variant="secondary"
                       onClick={handleDelete}
-                      disabled={loading}
+                      disabled={loading || isSubmitting}
                     >
                       {t("מחיקה")}
                     </Button>
@@ -409,7 +417,7 @@ export default function ActivityDetailsModal({
                       size="L"
                       variant="primary"
                       onClick={handleEdit}
-                      disabled={loading}
+                      disabled={loading || isSubmitting}
                     >
                       {t("עריכה")}
                     </Button>
@@ -419,7 +427,7 @@ export default function ActivityDetailsModal({
                     <Button
                       size="L"
                       onClick={handleRegistrationToggle}
-                      disabled={loading}
+                      disabled={loading || isSubmitting}
                     >
                       {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
                     </Button>
