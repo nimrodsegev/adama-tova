@@ -1,5 +1,6 @@
 import { getEmailTransport } from "@/lib/email";
 import { EMAIL_ADDRESS } from "@/lib/config";
+import { getRegistrationApprovalEmailHtml } from "@/lib/emailTemplates";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -13,19 +14,10 @@ export async function POST(request: NextRequest) {
     const transport = getEmailTransport();
 
     const message = {
-      from: `"אדמה טובה" <${EMAIL_ADDRESS}>`,
+      from: `"המרחב" <${EMAIL_ADDRESS}>`,
       to: email,
-      subject: "בקשתך אושרה - אדמה טובה",
-      html: `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2>שלום ${name || ""},</h2>
-          <p>יש לנו בשורות טובות!</p>
-          <p>בקשתך להצטרף ל<strong>"${activityTitle}"</strong> אושרה.</p>
-          <p>נתראה בפעילות!</p>
-          <br/>
-          <p>בברכה,<br/>צוות אדמה טובה</p>
-        </div>
-      `,
+      subject: "בקשתך אושרה - המרחב",
+      html: getRegistrationApprovalEmailHtml(name, activityTitle),
     };
 
     await transport.sendMail(message);

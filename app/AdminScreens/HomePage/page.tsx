@@ -26,6 +26,7 @@ import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 interface PendingUser {
   id: string;
   full_name: string;
+  email: string;
   created_at: string;
   circle?: string;
   quiz?: {
@@ -240,7 +241,18 @@ export default function AdminHomePage() {
   // --- Handlers ---
   const handleApproveUser = async (userId: string) => {
     const [, error] = await apiUser.approveUser(userId);
-    if (!error) fetchData();
+    if (!error) {
+      // Send approval email
+      const user = pendingUsers.find((u) => u.id === userId);
+      if (user?.email) {
+        fetch('/api/send-approval-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email, name: user.full_name }),
+        }).catch(err => console.error("Failed to send approval email:", err));
+      }
+      fetchData();
+    }
   };
   const handleRejectUser = async (userId: string) => {
     const [, error] = await apiUser.deleteUser(userId);
