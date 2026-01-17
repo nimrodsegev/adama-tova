@@ -1503,6 +1503,18 @@
   }
 }
 
+/* iPhone 16/16 Pro PWA viewport (~824px height) */
+@media (min-height: 815px) and (max-height: 840px) {
+  .nextArrow {
+    bottom: 7.5rem; /* below gender toggle */
+  }
+
+  .circleSpacer {
+    height: min(53vw, 13.25rem);
+    margin-bottom: 1rem;
+  }
+}
+
 /* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
 @media (min-height: 865px) and (max-height: 885px) {
   .nextArrow {
