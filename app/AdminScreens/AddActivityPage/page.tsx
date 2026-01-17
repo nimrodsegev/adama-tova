@@ -201,11 +201,6 @@ export default function AddActivityPage() {
   }, [formData]);
 
   const isFormValid = isStep1Valid && isStep2Valid;
-
-  // --- UPDATED LOGIC: ---
-  // Only lock scroll completely if we are on Step 1 (index 0) and it is INVALID.
-  // If we are on Step 2, we leave scroll UNLOCKED so user can swipe back to 1.
-  // We prevent forward movement from 2 to 3 by conditionally rendering Step 3 (see below).
   const isScrollLocked = currentStep === 0 && !isStep1Valid;
 
   const setFormValue = (key: string, value: any) => {
@@ -332,7 +327,7 @@ export default function AddActivityPage() {
 
       <div ref={scrollContainerRef} className={`${styles.scrollSnapContainer} ${isScrollLocked ? styles.scrollLocked : ''}`} onScroll={handleScroll}>
         
-        {/* STEP 1 - Always Visible */}
+        {/* STEP 1 */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             <CutInput label="שם הפעילות" value={formData.title} onChange={(e) => setFormValue('title', e.target.value)} className={styles.cutInput} type="text" dir="rtl" textAlign="right" />  
@@ -357,7 +352,7 @@ export default function AddActivityPage() {
           </div>
         </div>
 
-        {/* STEP 2 - Visible when user swipes to it. Access to Step 3 is controlled below. */}
+        {/* STEP 2 */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             <UnifiedDropdown label="סוג פעילות" placeholder="בחר/י" options={TYPE_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))} value={formData.type} onChange={(value) => setFormValue('type', value)} isOpen={isTypeOpen} onToggle={() => setIsTypeOpen(!isTypeOpen)} />
@@ -382,18 +377,15 @@ export default function AddActivityPage() {
 
             <div className={styles.fieldGroup}>
               <div className={styles.dateLabel}>שעה</div>
-              {/* CUSTOM TIME PICKER */}
               <TimePicker value={formData.startTime} onChange={(val) => setFormValue('startTime', val)} />
             </div>
           </div>
         </div>
 
-        {/* STEP 3 - CONDITIONALLY RENDERED 
-            This slide only physically exists if Step 2 is valid.
-            If Step 2 is invalid, this div disappears, preventing forward scrolling
-            while allowing backward scrolling to Step 1. */}
+        {/* STEP 3 - Unscrollable and Conditionally Rendered */}
         {isStep2Valid && (
-          <div className={styles.scrollSnapSlide}>
+          // IMPORTANT: Added styles.noScroll class to lock this specific slide
+          <div className={`${styles.scrollSnapSlide} ${styles.noScroll}`}>
             <div className={styles.slideContent}>
               <div className={styles.previewImageCard}>
                 {imagePreviewUrl ? <img src={imagePreviewUrl} alt="Preview" className={styles.previewImage} /> : <div className={styles.previewImagePlaceholder}>אין תמונה</div>}
