@@ -3,7 +3,7 @@
   "short_name": "Jam Kit",
   "icons": [
     {
-      "src": "/icons/logo-192.png",
+      "src": "/icons/logo-android.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
