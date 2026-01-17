@@ -26,8 +26,8 @@
   position: absolute;
   width: auto;
   height: auto;
-  right: 1.3rem; /* ⚠️ NO VARIABLE - 20.8px */
-  top: var(--spacing-3xl); /* 32px */
+  right: var(--spacing-2xl); /* 24px */
+  top: var(--spacing-4xl); /* 48px */
   border: none;
   outline: none;
   box-shadow: none;

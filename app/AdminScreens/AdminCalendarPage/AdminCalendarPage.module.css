@@ -131,7 +131,7 @@
   bottom: calc(
     var(--spacing-6) + env(safe-area-inset-bottom)
   ); /* 96px + safe area */
-  right: var(--spacing-xl); /* 20px */
+  right: var(--spacing-2xl);
   z-index: 50;
 }
 

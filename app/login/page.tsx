@@ -203,7 +203,7 @@ export default function LoginPage() {
             <div className={styles.mainSection}>
               {/* Greeting section */}
               <div className={styles.greeting}>
-                <h1>ברוכה הבאה</h1>
+                <h1>ברוכים הבאים</h1>
                 <p>להתחברות הכניסו פרטים</p>
               </div>
 

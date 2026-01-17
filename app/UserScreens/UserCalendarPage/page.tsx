@@ -11,6 +11,9 @@ import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
+// Import the calculator
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+
 import styles from "./UserCalendarPage.module.css";
 
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -50,10 +53,14 @@ export default function NewUserCalendarPage() {
     "spouting"
   );
 
-  // ⭐ NEW: Control Z-Index for smooth nav vs. registration coverage
   const [coverNav, setCoverNav] = useState(false);
-
   const mounted = useRef(false);
+
+  // Calculate Shape Params based on user profile
+  const shapeParams =
+    userProfile?.role === "participant"
+      ? calculateShapeParams(userProfile)
+      : calculateShapeParams(null);
 
   const fetchData = async () => {
     // If switching dates, show Overlay Loader and clear list
@@ -112,10 +119,9 @@ export default function NewUserCalendarPage() {
     skipFetch?: boolean
   ) => {
     if (state === "start") {
-      // ⭐ Action Start: Raise Z-Index to cover NavBar
       setCoverNav(true);
-
-      setMotionMode("breathing");
+      // ⭐ UPDATED: Use "spouting" to match Home Page registration effect
+      setMotionMode("spouting");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
@@ -124,7 +130,6 @@ export default function NewUserCalendarPage() {
       }
       setIsProcessing(false);
 
-      // ⭐ Action End: Reset Z-Index after animation
       setTimeout(() => {
         setCoverNav(false);
         setMotionMode("spouting");
@@ -160,14 +165,22 @@ export default function NewUserCalendarPage() {
     <SmoothPageWrapper
       isLoading={isInitialLoad || isProcessing}
       mode={motionMode}
-      // ⭐ Pass the prop to control Z-Index
       coverNavigation={coverNav}
+      // ⭐ UPDATED: Added radiusScale and customPosition to match Home Page logic
+      radiusScale={coverNav ? 1.5 : 1.0}
+      customPosition={coverNav ? { x: 0.5, y: 0.45 } : undefined}
     >
       <div className={styles.pageContainer}>
         {/* LOADING OVERLAY */}
         {isListLoading && (
           <div className={styles.loadingOverlay}>
-            <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
+            <OrganicCircles
+              mode="loading"
+              radius={0.08}
+              baseColor="#FFFFFF"
+              // @ts-ignore
+              {...shapeParams}
+            />
           </div>
         )}
 
