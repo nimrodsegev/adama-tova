@@ -35,7 +35,7 @@ export default function ProfilePage() {
   
   // Popups State
   const [showBranchError, setShowBranchError] = useState(false);
-  const [showLogoutPopup, setShowLogoutPopup] = useState(false); // NEW: Logout Popup State
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false); 
 
   useEffect(() => {
     if (userProfile) {
@@ -324,30 +324,33 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* POPUPS */}
-          
-          {/* Branch Error Popup */}
-          {showBranchError && (
-            <Popup
-              title="חובה לבחור לפחות סניף אחד"
-              content="יש לבחור לפחות סניף אחד"
-              secondaryButtonText="סגור"
-              secondaryButtonAction={() => setShowBranchError(false)}
-              onClose={() => setShowBranchError(false)}
-            />
+          {/* POPUPS WRAPPED IN CENTERED CONTAINER */}
+          {(showBranchError || showLogoutPopup) && (
+            <div className={styles.popupWrapper}>
+              
+              {showBranchError && (
+                <Popup
+                  title="חובה לבחור לפחות סניף אחד"
+                  content="יש לבחור לפחות סניף אחד"
+                  secondaryButtonText="סגור"
+                  secondaryButtonAction={() => setShowBranchError(false)}
+                  onClose={() => setShowBranchError(false)}
+                />
+              )}
+
+              {showLogoutPopup && (
+                <Popup
+                  content="האם אתה בטוח שאתה רוצה להתנתק?"
+                  primaryButtonText="כן אני בטוח"
+                  primaryButtonAction={confirmLogout}
+                  secondaryButtonText="ביטול"
+                  secondaryButtonAction={() => setShowLogoutPopup(false)}
+                  onClose={() => setShowLogoutPopup(false)}
+                />
+              )}
+            </div>
           )}
 
-          {/* Logout Confirmation Popup */}
-          {showLogoutPopup && (
-            <Popup
-              content="האם אתה בטוח שאתה רוצה להתנתק?"
-              primaryButtonText="כן אני בטוח"
-              primaryButtonAction={confirmLogout}
-              secondaryButtonText="ביטול"
-              secondaryButtonAction={() => setShowLogoutPopup(false)}
-              onClose={() => setShowLogoutPopup(false)}
-            />
-          )}
         </main>
       </SmoothPageWrapper>
     </ProtectedRoute>

@@ -65,7 +65,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 3 }, (_, i) => (CURRENT_YEAR + i).toString());
 
-// --- CUSTOM SVG ARROW (For TimePicker) ---
+// --- CUSTOM SVG ARROW ---
 const CustomArrowIcon = ({ className, rotation = 0 }: { className?: string; rotation?: number }) => (
   <svg 
     width="24" 
@@ -131,7 +131,6 @@ const TimePicker = ({ value, onChange }: { value: string, onChange: (val: string
 // --- Helper for Progress Icons ---
 const getProgressCircleIcon = (stepIndex: number, isCurrent: boolean) => {
   const suffix = isCurrent ? "_filled" : "";
-  // Ensure these files exist in public/icons/
   return `/icons/progress_circle_${stepIndex + 1}${suffix}.svg`;
 };
 
@@ -202,7 +201,12 @@ export default function AddActivityPage() {
   }, [formData]);
 
   const isFormValid = isStep1Valid && isStep2Valid;
-  const isScrollLocked = (currentStep === 0 && !isStep1Valid) || (currentStep === 1 && !isStep2Valid);
+
+  // --- UPDATED LOGIC: ---
+  // Only lock scroll completely if we are on Step 1 (index 0) and it is INVALID.
+  // If we are on Step 2, we leave scroll UNLOCKED so user can swipe back to 1.
+  // We prevent forward movement from 2 to 3 by conditionally rendering Step 3 (see below).
+  const isScrollLocked = currentStep === 0 && !isStep1Valid;
 
   const setFormValue = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -328,7 +332,7 @@ export default function AddActivityPage() {
 
       <div ref={scrollContainerRef} className={`${styles.scrollSnapContainer} ${isScrollLocked ? styles.scrollLocked : ''}`} onScroll={handleScroll}>
         
-        {/* STEP 1 */}
+        {/* STEP 1 - Always Visible */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             <CutInput label="שם הפעילות" value={formData.title} onChange={(e) => setFormValue('title', e.target.value)} className={styles.cutInput} type="text" dir="rtl" textAlign="right" />  
@@ -353,7 +357,7 @@ export default function AddActivityPage() {
           </div>
         </div>
 
-        {/* STEP 2 */}
+        {/* STEP 2 - Visible when user swipes to it. Access to Step 3 is controlled below. */}
         <div className={styles.scrollSnapSlide}>
           <div className={styles.slideContent}>
             <UnifiedDropdown label="סוג פעילות" placeholder="בחר/י" options={TYPE_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))} value={formData.type} onChange={(value) => setFormValue('type', value)} isOpen={isTypeOpen} onToggle={() => setIsTypeOpen(!isTypeOpen)} />
@@ -378,36 +382,41 @@ export default function AddActivityPage() {
 
             <div className={styles.fieldGroup}>
               <div className={styles.dateLabel}>שעה</div>
+              {/* CUSTOM TIME PICKER */}
               <TimePicker value={formData.startTime} onChange={(val) => setFormValue('startTime', val)} />
             </div>
           </div>
         </div>
 
-        {/* STEP 3 */}
-        <div className={styles.scrollSnapSlide}>
-          <div className={styles.slideContent}>
-            <div className={styles.previewImageCard}>
-              {imagePreviewUrl ? <img src={imagePreviewUrl} alt="Preview" className={styles.previewImage} /> : <div className={styles.previewImagePlaceholder}>אין תמונה</div>}
+        {/* STEP 3 - CONDITIONALLY RENDERED 
+            This slide only physically exists if Step 2 is valid.
+            If Step 2 is invalid, this div disappears, preventing forward scrolling
+            while allowing backward scrolling to Step 1. */}
+        {isStep2Valid && (
+          <div className={styles.scrollSnapSlide}>
+            <div className={styles.slideContent}>
+              <div className={styles.previewImageCard}>
+                {imagePreviewUrl ? <img src={imagePreviewUrl} alt="Preview" className={styles.previewImage} /> : <div className={styles.previewImagePlaceholder}>אין תמונה</div>}
+              </div>
+              <h2 className={styles.previewTitle}>{formData.title || "שם הפעילות"}</h2>
+              <div className={styles.previewInfoBlock}>
+                <div className={styles.previewDetailsText}>{`יום ${formData.day ? `${formData.day}.${formData.month}.${formData.year}` : '...'} בשעה ${formData.startTime || '...'}`}</div>
+                <div className={styles.previewDetailsText}>{`בסניף ${formData.branch === 'nahalal' ? 'נהלל' : 'סתריה'}${formData.location ? ` • ${formData.location}` : ''}`}</div>
+                <div className={styles.previewDetailsText}>{`בהנחיית ${formData.instructor || '...'}`}</div>
+                <div className={styles.previewDetailsText}>{formData.max_participants ? `משתתפים: 0/${formData.max_participants}` : 'ללא הגבלת משתתפים'}</div>
+              </div>
+              <div className={styles.previewDescription}>{formData.description || "תיאור הפעילות יופיע כאן..."}</div>
+              <div className={styles.submitButtonContainer}>
+                <button type="button" onClick={handleSubmit} disabled={uploading || submitStatus === 'success' || !isFormValid} className={styles.submitButton} style={{ opacity: !isFormValid ? 0.5 : 1 }}>
+                  {uploading ? "שומר..." : submitStatus === 'success' ? "פורסם!" : "פרסם פעילות"}
+                </button>
+              </div>
+              {submitStatus === "error" && <div className={styles.errorBanner}>{errorMessage}</div>}
             </div>
-            <h2 className={styles.previewTitle}>{formData.title || "שם הפעילות"}</h2>
-            <div className={styles.previewInfoBlock}>
-              <div className={styles.previewDetailsText}>{`יום ${formData.day ? `${formData.day}.${formData.month}.${formData.year}` : '...'} בשעה ${formData.startTime || '...'}`}</div>
-              <div className={styles.previewDetailsText}>{`בסניף ${formData.branch === 'nahalal' ? 'נהלל' : 'סתריה'}${formData.location ? ` • ${formData.location}` : ''}`}</div>
-              <div className={styles.previewDetailsText}>{`בהנחיית ${formData.instructor || '...'}`}</div>
-              <div className={styles.previewDetailsText}>{formData.max_participants ? `משתתפים: 0/${formData.max_participants}` : 'ללא הגבלת משתתפים'}</div>
-            </div>
-            <div className={styles.previewDescription}>{formData.description || "תיאור הפעילות יופיע כאן..."}</div>
-            <div className={styles.submitButtonContainer}>
-              <button type="button" onClick={handleSubmit} disabled={uploading || submitStatus === 'success' || !isFormValid} className={styles.submitButton} style={{ opacity: !isFormValid ? 0.5 : 1 }}>
-                {uploading ? "שומר..." : submitStatus === 'success' ? "פורסם!" : "פרסם פעילות"}
-              </button>
-            </div>
-            {submitStatus === "error" && <div className={styles.errorBanner}>{errorMessage}</div>}
           </div>
-        </div>
+        )}
       </div>
 
-      {/* NAVIGATION DOTS */}
       <div className={styles.navigation}>
         <div className={styles.progressDots}>
           {[0, 1, 2].map((step) => (
