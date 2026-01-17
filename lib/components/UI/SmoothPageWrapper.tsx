@@ -22,7 +22,6 @@ interface SmoothPageWrapperProps {
   baseColor?: string;
   disableCircleLoader?: boolean;
   coverNavigation?: boolean;
-  // ⭐ NEW: Allow overriding position externally
   customPosition?: { x: number; y: number };
 }
 
@@ -35,12 +34,12 @@ export default function SmoothPageWrapper({
   baseColor = "#FFFFFF",
   disableCircleLoader = false,
   coverNavigation = false,
-  customPosition, // ⭐ Destructure the new prop
+  customPosition,
 }: SmoothPageWrapperProps) {
   const { userProfile } = useUser();
   const [minTimeElapsed, setMinTimeElapsed] = useState(true);
 
-  // Default Responsive Config (Used if customPosition is NOT provided)
+  // Default Responsive Config
   const [circleConfig, setCircleConfig] = useState({
     radius: 0.35,
     x: 0.5,
@@ -117,7 +116,6 @@ export default function SmoothPageWrapper({
         >
           <OrganicCircles
             mode={mode}
-            // ⭐ LOGIC: If customPosition exists, use it. Otherwise use calculated center.
             position={
               customPosition || { x: circleConfig.x, y: circleConfig.y }
             }
@@ -131,8 +129,9 @@ export default function SmoothPageWrapper({
       <div
         style={{
           opacity: showLoader ? 0 : 1,
-          transform: showLoader ? "translateY(20px)" : "translateY(0)",
-          transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+          // ⭐ CHANGE: Removed the 'transform' property (translateY)
+          // ⭐ CHANGE: Removed 'transform' from the transition property
+          transition: "opacity 0.8s ease-out",
           transitionDelay: "0.2s",
           width: "100%",
           minHeight: "100vh",

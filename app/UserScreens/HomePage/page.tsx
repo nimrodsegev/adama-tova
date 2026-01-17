@@ -168,7 +168,7 @@ export default function NewUserHomePage() {
   ) => {
     if (state === "start") {
       setCoverNav(true);
-      setMotionMode("breathing");
+      setMotionMode("spouting");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
@@ -200,7 +200,7 @@ export default function NewUserHomePage() {
       coverNavigation={coverNav}
       // ⭐ FIX: Use 'coverNav' instead of 'isProcessing'.
       // This keeps the circle BIG (1.5) while it fades out, preventing the shrink/jump.
-      radiusScale={coverNav ? 0.4 : 1.0}
+      radiusScale={coverNav ? 1.5 : 1.0}
       // ⭐ FIX: Keep it centered during the fade out too.
       customPosition={coverNav ? { x: 0.5, y: 0.45 } : undefined}
     >

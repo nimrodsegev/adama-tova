@@ -29,7 +29,7 @@ export default function RegistrationSuccessModal({
   isGroup = false,
   isWaitlist = false,
   waitlistPosition = null,
-  circleRadius = 0.35 * 0.4,
+  circleRadius = 0.14,
   circlePosition = { x: 0.5, y: 0.45 },
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -60,10 +60,8 @@ export default function RegistrationSuccessModal({
 
   const modalContent = (
     <>
-      {/* Overlay backdrop */}
       <div className={styles.overlay} onClick={onClose} />
 
-      {/* Organic Circles Background */}
       <div className={styles.circlesContainer}>
         <OrganicCircles
           mode="breathing"
@@ -75,9 +73,7 @@ export default function RegistrationSuccessModal({
         />
       </div>
 
-      {/* Modal container with gradient background */}
       <div className={styles.groupModalContainer}>
-        {/* Close button */}
         <button
           className={styles.groupCloseButton}
           onClick={onClose}
@@ -91,11 +87,9 @@ export default function RegistrationSuccessModal({
           />
         </button>
 
-        {/* Content Frame */}
         <div className={styles.groupContentFrame}>
-          {/* Checkmark circle with V icon */}
+          {/* Arrow Container */}
           <div className={styles.checkmarkContainer}>
-            {/* Checkmark V icon */}
             <svg
               className={styles.checkmarkIcon}
               viewBox="0 0 60 48"
@@ -119,10 +113,10 @@ export default function RegistrationSuccessModal({
             </svg>
           </div>
 
-          {/* Message text */}
-          <p className={styles.groupMessageText}>
+          {/* Text Container */}
+          <div className={styles.textWrapper}>
             {isWaitlist ? (
-              <>
+              <p className={styles.groupMessageText}>
                 הפעילות מלאה - נרשמת לרשימת ההמתנה
                 <br />
                 מקום #{waitlistPosition} {isGroup ? `לקבוצת` : `לפעילות`}{" "}
@@ -134,17 +128,21 @@ export default function RegistrationSuccessModal({
                     ? "כשיתפנה מקום, בקשתך תועבר לאישור המנהל"
                     : "נעדכן אותך כשיתפנה מקום"}
                 </span>
-              </>
+              </p>
             ) : (
               <>
-                נרשמת בהצלחה לסדנת
-                <br />
-                {activityTitle}
-                <br />
-                בתאריך {activityDate} בשעה {activityTime}
+                {/* ⭐ 1. Main Title ("Registered Successfully") */}
+                <h2 className={styles.successTitle}>נרשמת בהצלחה</h2>
+
+                {/* ⭐ 2. Details (Activity Name & Time) */}
+                <p className={styles.successDetails}>
+                  לסדנת {activityTitle}
+                  <br />
+                  בתאריך {activityDate} בשעה {activityTime}
+                </p>
               </>
             )}
-          </p>
+          </div>
         </div>
       </div>
     </>
