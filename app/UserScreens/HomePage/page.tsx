@@ -66,6 +66,9 @@ export default function NewUserHomePage() {
     "spouting"
   );
 
+  // ⭐ NEW: Control Z-Index for smooth nav vs. registration coverage
+  const [coverNav, setCoverNav] = useState(false);
+
   // Note: We keep the circle config state even if we simplify positioning
   // to maintain the logic, but the CSS now controls the container position.
   const [bgCircleConfig, setBgCircleConfig] = useState({
@@ -163,6 +166,9 @@ export default function NewUserHomePage() {
     skipFetch?: boolean
   ) => {
     if (state === "start") {
+      // ⭐ Action Start: Raise Z-Index to cover NavBar
+      setCoverNav(true);
+
       setMotionMode("breathing");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
@@ -171,7 +177,12 @@ export default function NewUserHomePage() {
         await fetchData();
       }
       setIsProcessing(false);
-      setTimeout(() => setMotionMode("spouting"), 1000);
+
+      // ⭐ Action End: Reset Z-Index after animation delay
+      setTimeout(() => {
+        setCoverNav(false);
+        setMotionMode("spouting");
+      }, 1000);
     }
   };
 
@@ -182,7 +193,12 @@ export default function NewUserHomePage() {
       : suggestedActivities.slice(0, 4);
 
   return (
-    <SmoothPageWrapper isLoading={loading || isProcessing} mode={motionMode}>
+    <SmoothPageWrapper
+      isLoading={loading || isProcessing}
+      mode={motionMode}
+      // ⭐ Pass the prop to control Z-Index
+      coverNavigation={coverNav}
+    >
       {/* Flattened Structure matching Admin Page */}
       <div className={styles.pageContainer} dir="rtl">
         {/* 1. Open Hours */}

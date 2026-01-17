@@ -188,8 +188,6 @@ export default function NewUserNotificationPage() {
   return (
     <SmoothPageWrapper isLoading={loading || !user}>
       <div className={styles.pageContainer}>
-        <div className="vector-background" />
-
         <div className={styles.titleContainer}>
           <h1 className={styles.title}>הודעות ועדכונים</h1>
         </div>
