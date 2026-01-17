@@ -340,7 +340,7 @@ export default function EditActivityPage() {
         />  
         {/* Instructor */}
         <CutInput
-            label="מנחה/ה"
+            label="מנחה"
             value={formData.instructor}
             onChange={(e) => setFormValue('instructor', e.target.value)}
             className={styles.cutInput}
@@ -351,7 +351,7 @@ export default function EditActivityPage() {
 
         {/* Max Participants */}
         <CutInput
-            label="מספר משתתפים מקסימלי"
+            label="מספר משתתפים"
             value={formData.maxParticipants}
             onChange={(e) => setFormValue('maxParticipants', e.target.value)}
             className={styles.cutInput}

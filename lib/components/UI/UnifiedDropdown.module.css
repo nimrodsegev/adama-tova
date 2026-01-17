@@ -228,6 +228,9 @@
   right: -0.06rem;
   width: 102%;
 }
+.dropdownContainer.miniDropdown .dropdownToggle {
+  top: 4px;
+}
 .dropdownContainer.miniDropdown .dropdownOption {
   padding: 0.5rem;
   font-size: var(--font-size-md);
