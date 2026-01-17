@@ -53,7 +53,7 @@
 .circlesContainer {
   position: relative;
   width: 100%;
-  height: 10rem; /* Fixed height for the graphic area */
+  height: 11rem; /* Fixed height for the graphic area */
   pointer-events: none;
   flex-shrink: 0;
   margin-bottom: 0.5rem;

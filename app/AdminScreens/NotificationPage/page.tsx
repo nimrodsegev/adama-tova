@@ -200,7 +200,7 @@ export default function AdminNotificationsPage() {
           />
         </div>
 
-        {/* Actions Container */}
+        {/* Actions Container - UPDATED WITH VISIBILITY LOGIC */}
         <div className={styles.actionsContainer}>
           <Button
             variant="tertiary"
@@ -210,7 +210,9 @@ export default function AdminNotificationsPage() {
             customTextColor="#F9F9F9"
             tertiaryArrowDirection="down"
             onClick={handleMarkAllAsRead}
-            disabled={loading || notifications.every((n) => n.isRead)}
+            disabled={loading || unreadCount === 0}
+            // Logic to hide button but keep layout spacing
+            style={{ visibility: unreadCount > 0 ? "visible" : "hidden" }}
           >
             סמן הכל כנקרא
           </Button>
