@@ -72,7 +72,7 @@ export default function NewUserHomePage() {
   // Note: We keep the circle config state even if we simplify positioning
   // to maintain the logic, but the CSS now controls the container position.
   const [bgCircleConfig, setBgCircleConfig] = useState({
-    radius: 0.09, // Increased default radius for the new layout
+    radius: 0.07, // Increased default radius for the new layout
     x: 0.47,
     y: 0.1, // Centered in the new container
   });
