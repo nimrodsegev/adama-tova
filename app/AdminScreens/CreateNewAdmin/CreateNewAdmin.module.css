@@ -1,3 +1,4 @@
+/* EditActivityModal.module.css */
 /* ============================================
    PAGE LAYOUT & BACKGROUND
    ============================================ */
@@ -5,17 +6,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed; 
-  inset: 0; 
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
-  max-width: none !important; 
+  max-width: none !important;
   overflow: hidden;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  padding: 2rem 0.2rem 1.5rem; /* 48px 4px 24px */
-  gap: 0.5rem; /* 8px */
-  z-index: 1;
+  background: var(--color-background);
+  padding: var(--spacing-3xl) 0.2rem var(--spacing-2xl); /* 32px 3.2px 24px - ⚠️ 0.2rem = NO VARIABLE */
+  gap: var(--spacing-sm); /* 8px */
+  z-index: 1000;
 }
 
 /* ============================================
@@ -25,8 +26,8 @@
   position: absolute;
   width: auto;
   height: auto;
-  right: 1.3rem; /* 20px */
-  top: 2rem; /* 32px */
+  right: 1.3rem; /* ⚠️ NO VARIABLE - 20.8px */
+  top: var(--spacing-3xl); /* 32px */
   border: none;
   outline: none;
   box-shadow: none;
@@ -35,7 +36,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 1201;
+  z-index: 1201; /* ⚠️ NO VARIABLE */
   padding: var(--spacing-xs); /* 4px */
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
@@ -52,20 +53,20 @@
 /* Header */
 .header {
   text-align: center;
-  margin-top: 4.5rem; 
-  margin-bottom: 2rem;
+  margin-top: 4.5rem; /* ⚠️ NO VARIABLE - 72px, equals --nav-height-bottom */
+  margin-bottom: var(--spacing-3xl); /* 32px */
   z-index: 10;
   flex-shrink: 0;
   width: 100%;
-  max-width: var(--container-max-width, 24.5625rem); 
+  max-width: var(--container-max-width);
 }
 
 .headerTitle {
-  font-family: 'Arfilit', sans-serif;
-  font-weight: 400;
-  font-size: 2rem;
-  line-height: 2.125rem;
-  color: #FFFFFF;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-3xl); /* 2.25rem / 36px */
+  line-height: 2.125rem; /* ⚠️ NO VARIABLE - 34px */
+  color: var(--color-text-primary);
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -78,15 +79,18 @@
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-  max-width: var(--container-max-width, 24.5625rem); 
-  padding: 0 1.3rem 1.5rem 1.5rem; 
+  max-width: var(--container-max-width);
+  padding: 0 1.3rem var(--spacing-2xl) var(--spacing-2xl); /* 0 20.8px 24px 24px - ⚠️ 1.3rem = NO VARIABLE */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  overflow: visible; 
+  gap: var(--spacing-2xl); /* 24px */
+  overflow: visible;
 }
-.scrollContainer::-webkit-scrollbar { display: none; }
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
 
 /* ============================================
    DROPDOWN WRAPPERS
@@ -99,7 +103,7 @@
 
 /* Lifts the wrapper above siblings when menu is open */
 .activeDropdownWrapper {
-  z-index: 1000 !important; 
+  z-index: 1000 !important;
 }
 
 /* ============================================
@@ -107,7 +111,7 @@
    ============================================ */
 .cutInput {
   width: 100%;
-  height: 3.75rem !important; /* 60px */
+  height: 3.75rem !important; /* ⚠️ NO VARIABLE - 60px */
 }
 
 /* ============================================
@@ -117,28 +121,43 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: var(--spacing-lg); /* 16px */
 }
 
 .submitButton {
-  background: #B37EB3; 
-  color: rgba(247, 247, 247, 0.9);
-  border: none; 
-  border-radius: 0.3125rem; 
-  padding: 0.5rem 1rem;
-  width: auto; 
-  min-width: 8rem;
-  height: 2.75rem;
-  font-family: var(--font-secondary); 
-  font-size: 1.125rem; 
-  cursor: pointer; 
-  transition: opacity 0.2s;
+  background: var(--color-purple-bg); /* #B37EB3 */
+  color: var(--color-bg-light-opaque); /* rgba(247, 247, 247, 0.9) */
+  border: none;
+  border-radius: var(--radius-xs); /* 5px */
+  padding: var(--spacing-sm) var(--spacing-lg); /* 8px 16px */
+  width: auto;
+  min-width: 8rem; /* ⚠️ NO VARIABLE - 128px */
+  height: var(--button-size-s); /* 2.75rem / 44px */
+  font-family: var(--font-secondary);
+  font-size: var(--font-size-lg); /* 18px */
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
 }
-.submitButton:hover { opacity: 0.9; }
-.submitButton:disabled { opacity: 0.6; cursor: not-allowed; background: #B37EB3; }
+
+.submitButton:hover {
+  opacity: 0.9;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--color-purple-bg); /* #B37EB3 */
+}
 
 @media (max-height: 700px) {
-  .header { margin-top: 3.5rem; margin-bottom: 1.5rem; }
-  .scrollContainer { gap: 1rem; }
-  .closeButton { top: 2rem; }
+  .header {
+    margin-top: var(--spacing-3-5xl); /* 3.5rem / 56px */
+    margin-bottom: var(--spacing-2xl); /* 24px */
+  }
+  .scrollContainer {
+    gap: var(--spacing-lg); /* 16px */
+  }
+  .closeButton {
+    top: var(--spacing-3xl); /* 32px */
+  }
 }
