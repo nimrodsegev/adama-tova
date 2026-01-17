@@ -869,3 +869,46 @@
 @media (min-height: 811px) {
   .nextArrow { bottom: 8rem; }
 }
+/* ============================================
+   ERROR STYLING (Validation)
+   ============================================ */
+
+/* Red Border for invalid inputs */
+.inputError {
+  border: 0.125rem solid #A70000 !important;
+}
+
+/* Red Label replacing the standard label */
+.fieldError {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.0625rem 0.5rem;
+  gap: 0.5rem;
+  position: absolute;
+  height: 0.875rem;
+  
+  /* Positioning matches your existing .inputLabel */
+  top: -0.6rem; 
+  right: 1.5rem; 
+
+  /* Dynamic Gradient Background (matches page) */
+  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-repeat: no-repeat;
+  background-size: 100vw var(--vh, 100dvh); 
+  background-position: center var(--bg-y, 0px);
+
+  font-family: var(--font-secondary);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #A70000; /* Dark Red */
+  
+  pointer-events: none;
+  z-index: 3;
+  white-space: nowrap;
+}
+
+/* Helper to apply red border to UnifiedDropdown wrapper */
+.dropdownErrorWrapper .dropdownToggle {
+  border: 0.125rem solid #A70000 !important;
+}
