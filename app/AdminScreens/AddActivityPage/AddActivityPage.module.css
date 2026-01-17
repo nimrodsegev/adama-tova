@@ -42,7 +42,6 @@
   flex-shrink: 0;
   transition: margin 0.3s ease;
   
-  /* Constrain header width here instead of parent */
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem); 
 }
@@ -58,7 +57,7 @@
   height: 100%; 
   flex: 1;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: hidden; /* Prevent vertical scroll on the container itself */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
@@ -72,16 +71,12 @@
   width: 100%;
   min-width: 100%;
   height: 100%;
-  
-  /* FIX: Remove margin-top so the box starts higher... */
   margin-top: 0; 
-  
-  /* ...and add PADDING-TOP inside so the labels (-0.6rem) aren't clipped */
-  padding-top: 2.5rem; 
-  padding-bottom: 4rem; /* Space for navigation dots */
   
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  
+  /* Default behavior for Step 1 & 2: Allow scrolling */
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
@@ -89,6 +84,30 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  padding-top: 2.5rem; 
+  padding-bottom: 4rem; 
+}
+
+/* FIX: LOCKED LAST STEP (Stricter Rules) */
+.noScroll {
+  /* 1. Force kill scroll */
+  overflow: hidden !important; 
+  overflow-y: hidden !important;
+  overscroll-behavior: none !important; /* Stop "rubber banding" bounce */
+  touch-action: pan-x; /* Allow horizontal swipe (for back), block vertical */
+  
+  /* 2. Positioning strategy */
+  justify-content: center; /* Center content vertically */
+  
+  /* 3. Reset Top Padding */
+  padding-top: 0 !important;
+  
+  /* 4. Massive Bottom Padding 
+     This reduces the "available vertical space" for the flex centering,
+     effectively pushing the visual center upwards by ~100-120px. 
+     This ensures the button is always above the dots. */
+  padding-bottom: calc(14rem + env(safe-area-inset-bottom)) !important; 
 }
 
 .slideContent {
@@ -96,7 +115,7 @@
   max-width: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem; /* Slightly more gap for breathing room */
+  gap: 1.2rem; 
   box-sizing: border-box; 
   transition: gap 0.3s ease;
   position: relative;
@@ -371,7 +390,7 @@
 .step3Container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 21.625rem; gap: 2rem; }
 .previewImageCard {
   box-sizing: border-box; width: 100%; height: 13.0625rem;
-  background: #AB4016; border: 0.0625rem solid #F9F9F9; border-radius: 0.75rem;
+  background: #AB4016; margin-top:120px ; border: 0.0625rem solid #F9F9F9; border-radius: 0.75rem;
   overflow: hidden; position: relative; margin-bottom: 2rem;
 }
 .previewImage { width: 100%; height: 100%; object-fit: cover; }
@@ -425,35 +444,40 @@
 .submitButton:disabled { opacity: 0.6; cursor: not-allowed; }
 .errorBanner { color: #ffcccc; font-size: 0.9rem; text-align: center; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; margin-top: 1rem; }
 
-/* NAVIGATION */
+/* NAVIGATION (Updated Positioning)
+   Lifts dots above the bottom safe area
+*/
 .navigation {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding-top: 1rem;
-  gap: 0.5rem; 
+  
   width: 100%;
   position: fixed;
-  bottom: 3rem; 
+  bottom: calc(2rem + env(safe-area-inset-bottom)); /* Lifted up for PWA bar */
   left: 0;
   right: 0;
   z-index: 100;
+  
   background: transparent;
   pointer-events: none;
 }
+
 .progressDots {
   display: flex;
-  flex-direction: row;
+  flex-direction: row; /* In RTL this goes Right to Left */
   justify-content: center;
   align-items: center;
   padding: 0;
-  gap: 0.5rem; 
-  pointer-events: auto; 
+  gap: 0.5rem; /* 8px */
+  pointer-events: auto; /* Re-enable clicks on the dots themselves */
 }
+
+/* Progress circle container */
 .progressCircle {
-  width: 1.0625rem; 
-  height: 1.0625rem; 
+  width: 1.0625rem; /* ~17px */
+  height: 1.0625rem; /* ~17px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -461,7 +485,13 @@
   flex-grow: 0;
   transition: all 0.3s;
 }
-.progressCircleIcon { width: 100%; height: 100%; object-fit: contain; }
+
+/* Progress circle icon (SVG) */
+.progressCircleIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 /* ============================================
    RESPONSIVE DESIGN
@@ -471,23 +501,23 @@
 }
 
 @media (max-height: 700px) {
-  /* Fix header position and ensure scrolling content has padding */
-  .header { margin-top: 1rem; margin-bottom: 1rem; }
-  .scrollSnapSlide { padding-top: 2rem; } /* Ensure padding inside scroll area */
+  .header { margin-top: 2rem; margin-bottom: 1.5rem; }
+  .scrollSnapSlide { padding-top: 1rem; }
   .pageOverride :global(.input-field), .dropdownToggle, .uploadBox { height: 3rem; }
   .slideContent { gap: 0.75rem; }
-  .navigation { bottom: 2rem; }
+  /* Adjust navigation for small screens */
+  .navigation { bottom: calc(1rem + env(safe-area-inset-bottom)); }
 }
 
 @media (max-height: 600px) {
-  .header { margin-top: 1rem; margin-bottom: 1rem; }
+  .header { margin-top: 2.5rem; margin-bottom: 1rem; }
   .pageOverride :global(.input-field), .dropdownToggle, .uploadBox { height: 2.5rem; }
   .slideContent { gap: 0.5rem; }
 }
 
 @media (min-height: 800px) {
-  .header { margin-top: 1.5rem; }
-  .scrollSnapSlide { padding-top: 2.5rem; }
+  .header { margin-top: 3.5rem; }
+  .scrollSnapSlide { padding-top: 1rem; }
   .slideContent { gap: 1.25rem; }
 }
 
@@ -496,6 +526,5 @@
 }
 
 @media (display-mode: standalone) {
-  .pageOverride { padding-top: calc(4rem + env(safe-area-inset-top)) !important; }
-  .navigation { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+  .pageOverride { padding-top: calc(2vh + env(safe-area-inset-top)) !important; }
 }
