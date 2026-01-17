@@ -1,3 +1,4 @@
+/* EmptyState.module.css */
 .emptyStateContainer {
   box-sizing: border-box;
   display: flex;
@@ -6,37 +7,37 @@
   justify-content: center;
   /* Reduced padding and gap */
   padding: var(--spacing-sm) var(--spacing-md);
-  gap: var(--spacing-sm); /* 0.5rem / 8px - Can be overridden via style prop */
+  gap: var(--spacing-sm); /* Can be overridden via style prop */
   width: 100%;
-  max-width: 22.0625rem;
-  min-height: 10rem; /* Slightly lower height */
+  max-width: 22.0625rem; /* ⚠️ NO VARIABLE - 353px, close to --content-width-standard (345px) */
+  min-height: 10rem; /* ⚠️ NO VARIABLE - 160px, equals --spacing-10 */
   /* Transparent background with white stroke */
   background: transparent;
-  border: 0.0625rem solid var(--color-text-secondary); /* #F9F9F9 */
+  border: var(--border-width-thin) solid var(--color-text-secondary);
   border-radius: var(--radius-md);
   margin: 0 auto;
 }
 
 .iconContainer {
-  width: 3.5rem; /* Default - Can be overridden via style prop */
-  height: 3.5rem; /* Default - Can be overridden via style prop */
+  width: 3.5rem; /* ⚠️ NO VARIABLE - 56px, equals --spacing-3-5xl */
+  height: 3.5rem; /* ⚠️ NO VARIABLE - 56px */
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: var(--spacing-lg);
 }
 
 .messageText {
   width: 100%;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xl); /* 1.125rem / 18px */
-  line-height: 1.2;
+  font-size: var(--font-size-xl);
+  line-height: 1.2; /* ⚠️ NO VARIABLE - close to --line-height-snug (1.15) */
   text-align: center;
   color: var(--color-text-secondary);
   margin: 0;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .buttonContainer {
@@ -44,6 +45,6 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
+  margin-top: -0.5rem; /* ⚠️ NO VARIABLE - negative spacing */
+  margin-bottom: var(--spacing-lg);
 }

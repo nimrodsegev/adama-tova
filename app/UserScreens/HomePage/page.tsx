@@ -71,7 +71,7 @@ export default function NewUserHomePage() {
 
   const [bgCircleConfig, setBgCircleConfig] = useState({
     radius: 0.07,
-    x: 0.47,
+    x: 0.45,
     y: 0.1,
   });
 

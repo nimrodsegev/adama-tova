@@ -1,3 +1,4 @@
+/* WeekSlider.module.css */
 .weekContainer {
   display: flex;
   flex-direction: row;
@@ -5,8 +6,8 @@
   justify-content: space-between;
   padding: var(--spacing-md);
   width: 100%;
-  max-width: 24.5625rem; /* var(--container-max-width) equivalent */
-  height: 6.1875rem;
+  max-width: var(--container-max-width);
+  height: 6.1875rem; /* ⚠️ NO VARIABLE - close to --layout-slider-height (3.6875rem) but different */
   direction: rtl;
   position: relative;
 }
@@ -27,8 +28,8 @@
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-xs);
   gap: var(--spacing-xs);
-  min-width: 2.75rem;
-  height: 3.6875rem;
+  min-width: var(--button-size-s);
+  height: var(--layout-slider-height);
   transition: all var(--transition-fast);
   position: relative;
 }
@@ -76,8 +77,8 @@
 .todayDot {
   position: absolute;
   bottom: 0;
-  width: 0.3125rem;
-  height: 0.3125rem;
+  width: 0.3125rem; /* ⚠️ NO VARIABLE - 5px */
+  height: 0.3125rem; /* ⚠️ NO VARIABLE - 5px */
   background: var(--color-text-primary);
   border-radius: var(--radius-full);
 }
@@ -85,8 +86,8 @@
 .navButton {
   background: transparent;
   border: none;
-  width: 1.875rem;
-  height: 2.75rem;
+  width: 1.875rem; /* ⚠️ NO VARIABLE - 30px */
+  height: var(--button-size-s);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,10 +104,10 @@
 
 .arrowIcon {
   box-sizing: border-box;
-  width: 0.625rem;
-  height: 0.625rem;
-  border-top: 0.125rem solid var(--color-text-secondary);
-  border-right: 0.125rem solid var(--color-text-secondary);
+  width: 0.625rem; /* ⚠️ NO VARIABLE - 10px */
+  height: 0.625rem; /* ⚠️ NO VARIABLE - 10px */
+  border-top: 0.125rem solid var(--color-text-secondary); /* ⚠️ 2px - NO VARIABLE */
+  border-right: 0.125rem solid var(--color-text-secondary); /* ⚠️ 2px - NO VARIABLE */
 }
 
 .nextButton .arrowIcon {
