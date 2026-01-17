@@ -1,5 +1,6 @@
 import { getEmailTransport } from "@/lib/email";
 import { EMAIL_ADDRESS } from "@/lib/config";
+import { getApprovalEmailHtml } from "@/lib/emailTemplates";
 import { type NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -13,19 +14,10 @@ export async function POST(request: NextRequest) {
     const transport = getEmailTransport();
 
     const message = {
-      from: `"אדמה טובה" <${EMAIL_ADDRESS}>`,
+      from: `"המרחב" <${EMAIL_ADDRESS}>`,
       to: email,
-      subject: "הבקשה שלך אושרה - אדמה טובה",
-      html: `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2>שלום ${name || ""},</h2>
-          <p>אנחנו שמחים לבשר לך שהבקשה שלך להצטרף לאדמה טובה <strong>אושרה!</strong></p>
-          <p>כעת תוכל/י להיכנס לאתר ולהירשם לפעילויות.</p>
-          <p><a href="https://adama-tova.vercel.app/login">לחצ/י כאן להתחברות</a></p>
-          <br/>
-          <p>בברכה,<br/>צוות אדמה טובה</p>
-        </div>
-      `,
+      subject: "הבקשה שלך אושרה - המרחב",
+      html: getApprovalEmailHtml(name),
     };
 
     await transport.sendMail(message);
