@@ -11,7 +11,7 @@ import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
-// 1. Import the calculator
+// Import the calculator
 import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
 
 import styles from "./UserCalendarPage.module.css";
@@ -56,7 +56,7 @@ export default function NewUserCalendarPage() {
   const [coverNav, setCoverNav] = useState(false);
   const mounted = useRef(false);
 
-  // 2. Calculate Shape Params based on user profile
+  // Calculate Shape Params based on user profile
   const shapeParams =
     userProfile?.role === "participant"
       ? calculateShapeParams(userProfile)
@@ -120,7 +120,8 @@ export default function NewUserCalendarPage() {
   ) => {
     if (state === "start") {
       setCoverNav(true);
-      setMotionMode("breathing");
+      // ⭐ UPDATED: Use "spouting" to match Home Page registration effect
+      setMotionMode("spouting");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
     } else {
@@ -165,6 +166,9 @@ export default function NewUserCalendarPage() {
       isLoading={isInitialLoad || isProcessing}
       mode={motionMode}
       coverNavigation={coverNav}
+      // ⭐ UPDATED: Added radiusScale and customPosition to match Home Page logic
+      radiusScale={coverNav ? 1.5 : 1.0}
+      customPosition={coverNav ? { x: 0.5, y: 0.45 } : undefined}
     >
       <div className={styles.pageContainer}>
         {/* LOADING OVERLAY */}
@@ -174,7 +178,6 @@ export default function NewUserCalendarPage() {
               mode="loading"
               radius={0.08}
               baseColor="#FFFFFF"
-              // 3. Pass the calculated params to the loader
               // @ts-ignore
               {...shapeParams}
             />
