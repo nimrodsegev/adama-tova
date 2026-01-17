@@ -109,7 +109,7 @@
 .imageContainer {
   width: 100%;
   height: 12rem; /* 192px */
-  margin-bottom: var(--spacing-md); /* 12px */
+  margin-top: var(--spacing-xl); /* 12px */
   border-radius: var(--radius-md); /* 14px */
   overflow: hidden;
   border: 0.0625rem solid var(--color-text-secondary); /* 1px */
@@ -130,7 +130,6 @@
 
 .titleSection {
   width: 100%;
-  margin-bottom: var(--spacing-sm); /* 8px */
 }
 
 .titleText {
@@ -207,7 +206,6 @@
 
 .participantsSection {
   width: 100%;
-  margin-bottom: var(--spacing-sm); /* 8px */
 }
 
 /* Uses .secondaryInfoText class for styling */
@@ -219,7 +217,6 @@
 .descriptionSection {
   width: 100%;
 
-  margin-bottom: var(--spacing-lg); /* 16px */
   max-height: 12rem; /* 192px */
   overflow-y: auto;
   padding-right: var(--spacing-xs); /* 4px for scrollbar */
@@ -240,10 +237,14 @@
    ADMIN: PARTICIPANTS INFO & BUTTON
    ============================================ */
 
-.adminParticipantsSection {
+.adminControlsContainer {
   width: 100%;
-  margin-top: var(--spacing-md); /* 12px */
-  margin-bottom: var(--spacing-sm); /* 8px */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns content to the right in RTL */
+
+  /* 👇 CONTROL THE GAP HERE */
+  gap: var(--spacing-sm);
 }
 
 .adminParticipantsText {
@@ -256,12 +257,9 @@
   text-align: right;
 }
 
-.adminRegistrationsButtonSection {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: var(--spacing-lg); /* 16px */
-  margin-top: var(--spacing-xs);
+/* Optional: if you need specific tweaks for the button itself */
+.adminRegistrationsButton {
+  padding-right: 0 !important; /* Ensures button text aligns perfectly with text above */
 }
 
 /* ============================================

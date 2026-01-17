@@ -369,26 +369,24 @@ export default function ActivityDetailsModal({
 
                   {/* Admin: Participants Info & Registrations Button */}
                   {isAdmin && (
-                    <>
-                      <div className={styles.adminParticipantsSection}>
-                        <p className={styles.adminParticipantsText}>
-                          {registrationCount.confirmed}/
-                          {registrationCount.total} נרשמים
-                          {registrationCount.waitlist > 0 &&
-                            ` (${registrationCount.waitlist} ברשימת המתנה)`}
-                        </p>
-                      </div>
-                      <div className={styles.adminRegistrationsButtonSection}>
-                        <Button
-                          variant="tertiary"
-                          tertiarySize="medium"
-                          tertiaryWeight="semibold"
-                          onClick={() => setIsRegistrationsModalOpen(true)}
-                        >
-                          לכל הנרשמים
-                        </Button>
-                      </div>
-                    </>
+                    <div className={styles.adminControlsContainer}>
+                      <p className={styles.adminParticipantsText}>
+                        {registrationCount.confirmed}/{registrationCount.total}{" "}
+                        נרשמים
+                        {registrationCount.waitlist > 0 &&
+                          ` (${registrationCount.waitlist} ברשימת המתנה)`}
+                      </p>
+
+                      <Button
+                        variant="tertiary"
+                        tertiarySize="medium"
+                        tertiaryWeight="semibold"
+                        onClick={() => setIsRegistrationsModalOpen(true)}
+                        className={styles.adminRegistrationsButton}
+                      >
+                        לכל הנרשמים
+                      </Button>
+                    </div>
                   )}
                 </>
               )}
@@ -401,19 +399,19 @@ export default function ActivityDetailsModal({
                   <>
                     <Button
                       size="L"
-                      variant="primary"
-                      onClick={handleEdit}
-                      disabled={loading}
-                    >
-                      {t("[ערוך|ערכי]")}
-                    </Button>
-                    <Button
-                      size="L"
                       variant="secondary"
                       onClick={handleDelete}
                       disabled={loading}
                     >
-                      {t("מחק/י")}
+                      {t("מחיקה")}
+                    </Button>
+                    <Button
+                      size="L"
+                      variant="primary"
+                      onClick={handleEdit}
+                      disabled={loading}
+                    >
+                      {t("עריכה")}
                     </Button>
                   </>
                 ) : (
