@@ -79,7 +79,7 @@ const CustomArrowIcon = ({ className, rotation = 0 }: { className?: string; rota
     <path 
       d="M2 2L12 12L22 2" 
       stroke="white" 
-      strokeWidth="3" 
+      strokeWidth="1" 
       strokeLinecap="round" 
       strokeLinejoin="round"
     />
