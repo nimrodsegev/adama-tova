@@ -48,11 +48,6 @@ export default function AboutPage() {
               פעולות האיבה והמלחמה מה-7/10/23, ומעגלי התמיכה שלהם, ואף נפתח מרחב
               נוסף בצפון, בנהלל.
             </p>
-            <p className={styles.sectionText}>
-              האפליקציה מאפשרת מרחב נגישות עבור משתתפים בקהילה, ומציעה דרך נוחה
-              לראות את פעילויות העמותה, להירשם אליהם ולהיות במעקב אחרי אירועים
-              שקורים בעמותה.
-            </p>
           </section>
 
           {/* Treatment Plan Section */}
@@ -64,6 +59,17 @@ export default function AboutPage() {
             </p>
             <p className={styles.sectionText}>מוזמנים ומוזמנות פשוט להגיע!</p>
           </section>
+
+          {/* Video Section */}
+          <div className={styles.videoContainer}>
+            <iframe
+              src="https://www.youtube.com/embed/A_cPHriFA-Y"
+              title="אדמה טובה"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className={styles.video}
+            />
+          </div>
         </div>
       </div>
 
