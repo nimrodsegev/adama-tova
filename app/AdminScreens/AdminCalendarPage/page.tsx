@@ -10,6 +10,7 @@ import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/Activity
 import Button from "@/lib/components/UI/Button";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import styles from "./AdminCalendarPage.module.css";
+import { DEFAULTS } from "@/app/utils/motionParamsCalculator";
 
 export default function AdminCalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -84,7 +85,17 @@ export default function AdminCalendarPage() {
         {/* LOADING OVERLAY */}
         {loading && (
           <div className={styles.loadingOverlay}>
-            <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
+            <OrganicCircles
+              mode="loading"
+              radius={0.08}
+              layers={DEFAULTS.layers}
+              smoothness={DEFAULTS.smoothness}
+              complexity={DEFAULTS.complexity}
+              elongation={DEFAULTS.elongation}
+              opacity={DEFAULTS.opacity}
+              strokeWidth={DEFAULTS.strokeWidth}
+              baseColor="#FFFFFF"
+            />
           </div>
         )}
 
