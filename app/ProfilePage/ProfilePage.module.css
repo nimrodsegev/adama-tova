@@ -5,23 +5,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  
-  position: fixed; 
-  inset: 0; 
+
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
-  
+
   /* Background Gradient */
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  
-  padding: 0 !important; 
-  padding-top: env(safe-area-inset-top) !important;
-  padding-bottom: env(safe-area-inset-bottom) !important;
-  
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+
+  padding: 3rem 0.2rem 1.5rem; /* 92px 24px 24px */
+  gap: 0.5rem; /* 8px */
+
   overflow: hidden;
   touch-action: none;
-  z-index: 1;
+  z-index: var(--z-index-page);
 }
 
 /* ============================================
@@ -29,105 +28,68 @@
    ============================================ */
 .header {
   text-align: center;
-  margin-top: 5rem; 
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   flex-shrink: 0;
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem);
 }
 .userName {
-  font-family: 'Arfilit', sans-serif;
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-3xl);
+  font-family: "Arfilit", sans-serif;
+  font-weight: 400; /* Regular */
+  font-size: 2rem; /* 32px */
   line-height: 2.125rem;
   color: rgba(249, 249, 249, 0.84);
-  margin: 0;
+  margin-bottom: 0.5rem;
   letter-spacing: 0.02em;
-  
 }
 .adminLabel {
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-light);
-  font-size: var(--font-size-md);
-  color: #FFFFFF;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #ffffff;
   margin-left: 0.5rem;
 }
-.storyContainer {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end; /* In RTL, flex-end is the LEFT side */
-  padding-left: 1.5rem; /* Match scroll container padding */
-}
 
-/* "Our Story" Button */
-.storyButton {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  height: auto !important;
-  min-width: 0 !important;
-  box-shadow: none !important;
-  cursor: pointer;
-}
-
-/* Inner content wrapper for perfect alignment */
-.storyContent {
-  display: flex;
-  flex-direction: row;
-  align-items: center; /* Vertically centers text and icon */
-  gap: 0.5rem;
-  direction: rtl; /* Ensures Text is Right, Arrow is Left */
-  padding-top: 1.5rem;
+/* ============================================
+   TYPOGRAPHY HELPERS
+   ============================================ */
+.bodyL {
   font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 1rem;
-  line-height: 1; /* Reset line height for centering */
-  color: #F9F9F9;
-}
-
-.storyArrow {
-  width: 0.75rem; 
-  height: 0.75rem;
-  stroke: #F9F9F9;
-  display: block; /* Removes any inline spacing */
-}
-
-
-.bodyL{
-  font-family: var(--font-secondary);
-  font-weight: 700;
-  font-style: bold;
-  font-size: 1rem; 
-  color: #F9F9F9;
+  font-weight: 400;
+  font-size: 1.25rem; /* xl */
+  color: #f9f9f9;
   margin: 0;
   text-align: right;
 }
-.bodyS{
+.bodyS {
   font-family: var(--font-secondary);
   font-weight: 400;
-  font-size: 0.875rem; 
+  font-size: 1rem; /* md */
   color: rgba(247, 247, 247, 0.9);
   margin: 0;
   text-align: right;
 }
+
 /* ============================================
    SCROLLABLE CONTENT
-   ============================================ */
+  ============================================ */
 .scrollContainer {
   flex: 1;
   width: 100%;
-  max-height: 60%;
+  max-height: 72%;
   max-width: var(--container-max-width, 24.5625rem);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 1.5rem 2rem 1.5rem; 
+  padding: 0 1.5rem 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem; 
+  gap: 0.7rem;
 }
 
-.scrollContainer::-webkit-scrollbar { display: none; }
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
 
 /* ============================================
    PROFILE BOX (View Mode Container)
@@ -139,22 +101,36 @@
   flex-direction: column;
   align-items: flex-end; /* RTL layout */
   padding: 1rem;
-  
-  
   gap: 0.5rem;
-  
+
   /* White Border & Radius */
   border: 0.0625rem solid rgba(249, 249, 249, 0.84);
   border-radius: 0.625rem; /* 10px */
   background: transparent;
-  
+
   position: relative; /* For absolute positioning of Edit button */
   transition: all 0.3s ease;
-  direction: rtl; 
+  direction: rtl;
+}
+
+.boxHeader {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start; /* Right in RTL */
+  align-items: center;
+}
+
+/* View Mode Footer: Absolutely positioned */
+.profileBox .boxFooter {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  margin: 0;
+  width: auto;
 }
 
 /* ============================================
-   EDIT MODE CONTAINER (No White Box)
+   EDIT MODE CONTAINER
    ============================================ */
 .editModeContainer {
   width: 100%;
@@ -163,52 +139,8 @@
   gap: 1rem;
   padding-bottom: 0.5rem;
   direction: rtl;
-  /* No border, no background */
 }
 
-/* ============================================
-   HEADERS & TITLES
-   ============================================ */
-.boxHeader {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start; /* Right in RTL */
-  align-items: center;
-}
-
-.boxTitle {
-  font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 1rem; 
-  color: #FFFFFF;
-  margin: 0;
-}
-
-.sectionTitle {
-  font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 1rem; 
-  color: #FFFFFF;
-  margin: 0;
-  text-align: right;
-  padding-right: 0.5rem;
-}
-
-/* ============================================
-   FOOTER (Buttons)
-   ============================================ */
-
-/* 1. View Mode Footer: Absolutely positioned to align with last row */
-.profileBox .boxFooter {
-  position: absolute;
-  bottom: 1rem; /* Aligns with bottom padding */
-  left: 1rem;   /* Aligns with left padding */
-  margin: 0;
-  width: auto;
-  z-index: 2;
-}
-
-/* 2. Edit Mode Footer: Normal flow below inputs */
 .editModeContainer .boxFooter {
   width: 100%;
   display: flex;
@@ -233,124 +165,97 @@
   align-items: flex-start;
   gap: 0.25rem;
   width: 100%;
-}
-
-.detailLabel {
-  font-family: var(--font-secondary);
-  font-size: 0.875rem; 
-  color: rgba(247, 247, 247, 0.9);
-}
-
-.detailValue {
-  font-family: var(--font-secondary);
-  font-size: 1rem; 
-  color: rgba(249, 249, 249, 0.84);
-  font-weight: 400;
-  width: 100%;
-  text-align: right; 
   max-width: 80%;
 }
 
 /* ============================================
-   EDIT INPUTS
+   OPTION TOGGLE BUTTONS (The New Design)
    ============================================ */
-.editGrid {
-  width: 100%;
+.optionsGroup {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 0.5rem;
 }
 
-.inputWrapper {
-  position: relative;
-  width: 100%;
-}
+.optionToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
 
-.profileInput {
-  box-sizing: border-box;
-  width: 100%;
-  height: 3.75rem; 
-  padding: 0 1.5rem;
-  background: transparent;
-  border: 0.0625rem solid rgba(249, 249, 249, 0.84);
-  border-radius: 0.5625rem; 
+  /* UNSELECTED STATE: Filled White Background */
+  background: rgba(249, 249, 249, 0.8);
+  border: 1px solid transparent;
+  border-radius: 0.5625rem; /* 9px */
+
   font-family: var(--font-secondary);
-  font-weight: 300;
-  font-size: 1rem;
-  text-align: right;
-  color: rgba(249, 249, 249, 0.84);
-  outline: none;
-}
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #681f02; /* Dark Text */
 
-.profileInputLTR {
-  direction: ltr;
-  text-align: right;
-}
-
-.floatingLabel {
-  position: absolute;
-  top: -0.6rem;
-  right: 1.5rem;
-  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-size: 100vw var(--vh, 100dvh); 
-  background-position: center var(--bg-y, 0px);
-  padding: 0 0.5rem;
-  font-family: var(--font-secondary);
-  font-size: 0.875rem;
-  color: rgba(249, 249, 249, 0.84);
-  pointer-events: none;
-  z-index: 2;
+  cursor: pointer;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
+.optionToggle:hover {
+  opacity: 0.9;
+}
+
+.optionToggle.selected {
+  /* SELECTED STATE: Semi-transparent Glass + Border */
+  background: rgba(249, 249, 249, 0.3);
+  border: 1px solid #f9f9f9;
+  color: #681f02;
+}
+
 /* ============================================
-   BUTTON STYLES
+   INPUTS & BUTTONS
    ============================================ */
 .editButtonCustom {
   padding: 12px 32px;
   gap: 8px;
   width: 72px;
   height: 44px;
-  /* purple */
-  background: #B37EB3;
+  background: #b37eb3;
   border-radius: 5px;
   min-width: auto !important;
   font-family: var(--font-secondary);
   cursor: pointer;
+  color: #ffffff;
 }
-.saveButtonCustom{
+
+.saveButtonCustom {
   width: 75px;
   height: 46px;
-  left: 16px;
-  top: 240px;
-  color:#B37EB3;
-  font-size: var(--font-);
-  /* box */
+  color: #b37eb3;
+  font-family: var(--font-secondary);
+  font-weight: 700;
   background: rgba(247, 247, 247, 0.9);
   border-radius: 5px;
-
+  cursor: pointer;
 }
-.buttonsRow{
+
+.buttonsRow {
   width: 120%;
   align-self: right;
   box-sizing: border-box;
   display: flex;
-  align-items: flex-end; 
+  align-items: flex-end;
 }
-.logOutButton{
-  width: 63px;
+.logOutButton {
   margin-right: 2.5rem;
-  height: 18px;
-  background: transparent;
-  border-radius: 5px;
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 0.875rem; 
+  right: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: var(--spacing-lg); /* 16px */
+  margin-top: var(--spacing-xs);
   color: var(--color-red-alert);
 }
-.usersList{
+.usersList {
   margin-top: 1rem;
   margin-right: 4.4rem;
   width: 63px;
@@ -359,29 +264,29 @@
   border-radius: 5px;
   font-family: var(--font-secondary);
   font-weight: 400;
-  font-size: 0.875rem; 
+  font-size: 0.875rem;
   color: rgba(247, 247, 247, 0.9);
   text-align: right;
 }
-.AddAdminButton{
+.AddAdminButton {
   padding: 12px 32px 12px 32px;
   gap: 8px;
   /* purple */
-  background: #B37EB3;
+  background: #b37eb3;
   border-radius: 5px;
   min-width: auto !important;
   font-family: var(--font-secondary);
   cursor: pointer;
-  align-self: center;
-  
+  align-self: bottom;
+  margin-top: auto;
 }
 .pressArrow {
   display: inline-block;
   width: 0.4375rem; /* 7px */
   height: 0.4375rem; /* 7px */
   margin-right: 0.5rem; /* 4px spacing from text */
-  border-left: 0.0625rem solid #F9F9F9; /* 1px */
-  border-bottom: 0.0625rem solid #F9F9F9; /* 1px */
+  border-left: 0.0625rem solid #f9f9f9; /* 1px */
+  border-bottom: 0.0625rem solid #f9f9f9; /* 1px */
   transform: rotate(45deg); /* Points left */
   margin-top: 0.125rem; /* 2px - slightly lower */
   margin-left: 1.25rem; /* 20px */
@@ -398,42 +303,16 @@
   margin-left: 1.25rem; /* 20px */
 }
 
-/* ============================================
-   NAVIGATION
-   ============================================ */
-.navBar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 4.5rem;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid rgba(249, 249, 249, 0.84);
-  border-radius: 9px 9px 0px 0px;
-  background: linear-gradient(180deg, #E79267 0%, #E79267 100%);
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 20;
-}
-
-.navIcon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #FFF;
-  font-size: 1.5rem;
-  opacity: 0.6;
-  cursor: pointer;
-}
-
-.navIcon.active { opacity: 1; }
-
 @media (max-height: 700px) {
-  .header { margin-top: 3rem; margin-bottom: 1.5rem; }
-  .profileBox { padding: 0.75rem; padding-bottom: 0.75rem; }
-  /* Adjust absolute button for smaller padding if needed */
-  .profileBox .boxFooter { bottom: 0.75rem; left: 0.75rem; }
-  .profileInput { height: 3rem; }
+  .header {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+  }
+  .profileBox {
+    padding: 0.75rem;
+  }
+  .profileBox .boxFooter {
+    bottom: 0.75rem;
+    left: 0.75rem;
+  }
 }

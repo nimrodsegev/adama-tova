@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./AboutPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import Button from "@/lib/components/UI/Button";
 
 export default function AboutPage() {
   // Mounting state to ensure smooth entry animation
@@ -18,9 +20,13 @@ export default function AboutPage() {
     <SmoothPageWrapper isLoading={mounting}>
       <div className={styles.aboutContainer}>
       {/* Close Button - Top Right */}
-      <Link href="/login" className="close-button">
-        <span className="close-button-inner"></span>
-        <span className="close-icon"></span>
+      <Link href="/login" className={styles.closeButton} aria-label="סגור">
+        <Image
+          src="/icons/close.svg"
+          alt="Close icon"
+          width={40}
+          height={40}
+        />
       </Link>
 
       {/* Content Frame */}
@@ -63,22 +69,21 @@ export default function AboutPage() {
 
       {/* Bottom Buttons */}
       <div className={styles.bottomButtons}>
-        <a
-          href="https://maps.google.com/?q=סתריה"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.navigationButton}
+        <Button
+          variant="secondary"
+          size="L-short"
+          icon="/icons/google_maps.svg"
+          onClick={() => window.open("https://maps.google.com/?q=סתריה", "_blank")}
         >
           ניווט למרחב
-        </a>
-        <a
-          href="https://www.adamatova.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.websiteButton}
+        </Button>
+        <Button
+          variant="primary"
+          size="L-short"
+          onClick={() => window.open("https://www.adamatova.org/", "_blank")}
         >
           לאתר
-        </a>
+        </Button>
       </div>
       </div>
     </SmoothPageWrapper>

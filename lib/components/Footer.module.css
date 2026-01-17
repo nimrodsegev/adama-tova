@@ -7,10 +7,10 @@
   /* 1. Remove fixed height so padding dictates the size */
   height: 4.5rem;
   background-color: transparent;
-  border-top: 0.0625rem solid var(--color-white-pure);
-  border-top-left-radius: var(--radius-sm);
-  border-top-right-radius: var(--radius-sm);
-  z-index: 100000;
+  border-top: 0.1rem solid var(--color-white-pure);
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  z-index: var(--z-index-navbar);
   /* 2. CONTROLS: Adjust these numbers to move elements */
   /* Space between the Border Line and the Icons */
   padding-top: 0.6rem;

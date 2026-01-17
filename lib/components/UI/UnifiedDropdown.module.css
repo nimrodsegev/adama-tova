@@ -98,10 +98,10 @@
   background: transparent;
   border: none;
   border-radius: 0.5625rem;
-  
+
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: 1rem; 
+  font-size: var(--font-size-md); 
   color: #FFFFFF;
   text-align: right;
   
@@ -193,7 +193,6 @@
   height: 1.75rem;
   border: 0.0625rem solid #F9F9F9;
   border-radius: 0.21875rem; 
-  
 }
 
 .dropdownContainer.miniDropdown.active {
@@ -201,23 +200,36 @@
   border-bottom-color: transparent;
 }
 
+/* --- UPDATED: CENTER TEXT IN MINI DROPDOWN --- */
 .dropdownContainer.miniDropdown .dropdownToggle {
-  padding: 0 0.5625rem;
-  font-size: var(--font-size-base);
+  padding: 0 0.5rem;
+  font-size: var(--font-size-md);
   
+  /* Force Center Alignment */
+  justify-content: center; 
+  text-align: center;
+  gap: 0.3rem; /* Prevent text and arrow from touching */
+}
+
+/* Ensure placeholder is also centered if present */
+.dropdownContainer.miniDropdown .placeholder {
+  width: auto;
+    transform: translateY(0.1rem);
+}
+.dropdownContainer.miniDropdown .arrowIcon {
+  transform: translateY(0.15rem);
 }
 
 .dropdownContainer.miniDropdown .dropdownMenu {
   top: 100%;
   border-radius: 0 0 0.21875rem 0.21875rem;
   right: -0.075rem;
-  width: 102.5%;
+  width: 100%;
 }
-
 .dropdownContainer.miniDropdown .dropdownOption {
   padding: 0.5rem;
   font-size: var(--font-size-md);
-  width: 102%;
+  width: 100%;
   text-align: center;
   border-bottom: 0.0625rem solid rgba(249, 249, 249, 0.2);
 }

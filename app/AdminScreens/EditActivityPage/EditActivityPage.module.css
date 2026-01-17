@@ -15,17 +15,16 @@
   /* Gradient Background */
   background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
   
-  padding: 0 !important; 
-  padding-top: env(safe-area-inset-top) !important;
-  padding-bottom: env(safe-area-inset-bottom) !important;
+  padding: 2rem 0.2rem 1.5rem; /* 48px 4px 24px */
+  gap: 0.5rem; /* 8px */
   z-index: 1;
 }
 
 /* Header */
 .header {
   text-align: center;
-  margin-top: 7rem; 
-  margin-bottom: 2rem;
+  margin-top: 3rem; 
+  margin-bottom: 1.5rem;
   z-index: 10;
   flex-shrink: 0;
   width: 100%;
@@ -375,6 +374,72 @@
 .fileName { color: #fff; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; }
 .previewLabel { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin: 0 5px; }
 .optionalText { font-size: 0.8rem; opacity: 0.8; margin-right: 4px; }
+/* ============================================
+   CUSTOM TIME PICKER
+   ============================================ */
+.timePickerContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 6rem; /* Large gap */
+  width: 100%;
+  height: 9rem; 
+  border: 0.0625rem solid #F9F9F9;
+  border-radius: 0.5625rem; 
+  background: transparent;
+  direction: ltr; 
+}
+
+.timeColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem; 
+}
+
+.timeButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  transition: transform 0.1s;
+}
+
+.timeButton:active {
+  transform: scale(0.9);
+}
+
+/* If tertiary_arrow_left.svg points LEFT:
+  Rotate 90deg to point UP
+  Rotate -90deg (or 270deg) to point DOWN
+*/
+.arrowUp {
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); 
+  transform: rotate(90deg);
+  filter: brightness(0) invert(1);
+}
+
+.arrowDown {
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); 
+  transform: rotate(-90deg);
+  filter: brightness(0) invert(1);
+}
+
+.timeValue {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md); 
+  color: #FFFFFF;
+  min-width: 1rem;
+  text-align: center;
+}
 
 /* ============================================
    CLOSE BUTTON 
@@ -383,8 +448,8 @@
   position: absolute;
   width: auto;
   height: auto;
-  right: 2.5rem; /* 24px */
-  top: var(--spacing-3xl); /* 32px */
+  right: 1.3rem; /* 20px */
+  top: 2rem; /* 32px */
   border: none;
   outline: none;
   box-shadow: none;

@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect } from "react";
-import Image from "next/image"; // Added for icon
+import Image from "next/image"; 
 import { apiUser } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./CreateNewAdmin.module.css";
-import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; // Added wrapper
+import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; 
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
+import Popup from "@/lib/components/UI/Popup"; // 1. Import Popup
 
 // --- Constants ---
 const GENDER_OPTIONS = [
@@ -34,6 +35,17 @@ export default function CreateNewAdmin() {
   
   // Animation State
   const [closing, setClosing] = useState(false);
+
+  // 2. Popup State
+  const [popupConfig, setPopupConfig] = useState<{
+    isOpen: boolean;
+    title?: string;
+    content: string;
+    isSuccess?: boolean; // To trigger navigation on close
+  }>({
+    isOpen: false,
+    content: "",
+  });
 
   // --- FLOATING LABEL BACKGROUND FIX ---
   useLayoutEffect(() => {
@@ -68,9 +80,23 @@ export default function CreateNewAdmin() {
     }, 400);
   };
 
+  const handlePopupClose = () => {
+    const isSuccess = popupConfig.isSuccess;
+    setPopupConfig((prev) => ({ ...prev, isOpen: false }));
+    
+    if (isSuccess) {
+      handleCloseWithAnimation();
+    }
+  };
+
   const handleSubmit = async () => {
     if (!fullName || !email || !password || !phone || !gender) {
-      alert("נא למלא את כל השדות");
+      // Alert replaced with Popup
+      setPopupConfig({
+        isOpen: true,
+        title: "שגיאה",
+        content: "נא למלא את כל השדות",
+      });
       return;
     }
 
@@ -84,17 +110,28 @@ export default function CreateNewAdmin() {
         phone,
         gender
       );
-    
-      alert("מנהל נוסף בהצלחה!");
-      handleCloseWithAnimation(); // Reuse close logic to exit
+      
+      // Success Popup
+      setPopupConfig({
+        isOpen: true,
+        title: "הצלחה",
+        content: "מנהל נוסף בהצלחה!",
+        isSuccess: true, // Will trigger navigation on close
+      });
+
     } catch (error: any) {
       console.error("Error creating admin:", error);
-      alert("שגיאה ביצירת המנהל: " + (error.message || "אירעה תקלה"));
+      // Error Popup
+      setPopupConfig({
+        isOpen: true,
+        title: "שגיאה",
+        content: "שגיאה ביצירת המנהל: " + (error.message || "אירעה תקלה"),
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-
+ 
   return (
     <SmoothPageWrapper isLoading={closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
@@ -187,8 +224,19 @@ export default function CreateNewAdmin() {
                 {isSubmitting ? "יוצר..." : "צור מנהל"}
             </button>
         </div>
-
       </div>
+
+      {/* 3. Render Popup */}
+      {popupConfig.isOpen && (
+        <Popup
+          title={popupConfig.title}
+          content={popupConfig.content}
+          secondaryButtonText="אישור"
+          secondaryButtonAction={handlePopupClose}
+          onClose={handlePopupClose}
+        />
+      )}
+
     </main>
     </SmoothPageWrapper>
   );

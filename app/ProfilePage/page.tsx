@@ -8,6 +8,7 @@ import { apiUser } from "@/app/services/db_api";
 import styles from "./ProfilePage.module.css";
 import Button from "@/lib/components/UI/Button";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
+import Popup from "@/lib/components/UI/Popup";
 
 const AVAILABLE_INTERESTS = [
   "מיינדפולנס",
@@ -21,7 +22,6 @@ export default function ProfilePage() {
   const { t } = useIvrita();
   const router = useRouter();
 
-
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // --- STATE ---
@@ -31,14 +31,13 @@ export default function ProfilePage() {
   const [isEditingExtras, setIsEditingExtras] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
-
-  // 1. Force a "mounting" state to ensure the Wrapper sees "Loading=true"
-  // on the very first render. This forces the orange screen to appear
-  // before fading out.
   const [mounting, setMounting] = useState(true);
+  
+  // Popups State
+  const [showBranchError, setShowBranchError] = useState(false);
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false); // NEW: Logout Popup State
 
   useEffect(() => {
-    // Determine branches/phone/interests from profile
     if (userProfile) {
       if (userProfile.branches && userProfile.branches.length > 0) {
         setBranches(userProfile.branches);
@@ -51,10 +50,9 @@ export default function ProfilePage() {
       }
     }
 
-    // 2. Turn off mounting after a tiny delay to trigger the animation
     const timer = setTimeout(() => {
       setMounting(false);
-    }, 50); // 50ms is enough to let React paint the "loading" state first
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [userProfile]);
@@ -88,7 +86,13 @@ export default function ProfilePage() {
     };
   }, [isEditingPersonal, isEditingExtras]);
 
-  const handleLogout = async () => {
+  // --- LOGOUT HANDLERS ---
+  const handleLogoutClick = () => {
+    setShowLogoutPopup(true);
+  };
+
+  const confirmLogout = async () => {
+    setShowLogoutPopup(false);
     await signOut();
     router.replace("/login");
     router.refresh();
@@ -114,7 +118,10 @@ export default function ProfilePage() {
 
   const toggleBranch = (branch: string) => {
     if (branches.includes(branch)) {
-      if (branches.length === 1) return alert("חובה לבחור סניף אחד לפחות");
+      if (branches.length === 1) {
+        setShowBranchError(true);
+        return;
+      }
       setBranches(branches.filter((b) => b !== branch));
     } else {
       setBranches([...branches, branch]);
@@ -137,21 +144,16 @@ export default function ProfilePage() {
   };
 
   const handleToUserList = () => {
-    console.log("Navigating to user list");
+    router.push("/AdminScreens/UserManagement");
   };
   const handleToAddAdmin = () => {
     router.push("/AdminScreens/CreateNewAdmin");
-  }
+  };
 
   const isAdmin = userProfile?.role === "admin";
 
   return (
     <ProtectedRoute>
-      {/* 3. Pass (loading || mounting). 
-         Even if `loading` is false, `mounting` keeps it true for 50ms.
-         This forces SmoothPageWrapper to initialize in "Locked" state.
-         When mounting flips to false, the wrapper transitions out nicely.
-      */}
       <SmoothPageWrapper isLoading={loading || mounting}>
         <main className={styles.pageContainer}>
           <div className={styles.header}>
@@ -163,25 +165,25 @@ export default function ProfilePage() {
 
           <div className={styles.scrollContainer} ref={scrollContainerRef}>
             {/* --- SECTION 1: PERSONAL DETAILS --- */}
-              <div className={styles.profileBox}>
-                <div className={styles.boxHeader}>
-                  <span className={styles.bodyL}>פרטים אישיים</span>
+            <div className={styles.profileBox}>
+              <div className={styles.boxHeader}>
+                <span className={styles.bodyL}>פרטים אישיים</span>
+              </div>
+              <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                  <span className={styles.bodyS}>טלפון</span>
+                  <span className={styles.bodyS} dir="ltr">
+                    {userProfile?.phone || "לא צוין"}
+                  </span>
                 </div>
-                <div className={styles.detailsGrid}>
-                  <div className={styles.detailItem}>
-                    <span className={styles.bodyS}>טלפון</span>
-                    <span className={styles.detailValue} dir="ltr">
-                      {userProfile?.phone || "לא צוין"}
-                    </span>
-                  </div>
-                  <div className={styles.detailItem}>
-                    <span className={styles.bodyS}>אימייל</span>
-                    <span className={styles.detailValue}>
-                      {userProfile?.email || user?.email}
-                    </span>
-                  </div>
+                <div className={styles.detailItem}>
+                  <span className={styles.bodyS}>אימייל</span>
+                  <span className={styles.bodyS} dir="ltr">
+                    {userProfile?.email || user?.email}
+                  </span>
                 </div>
               </div>
+            </div>
 
             {/* --- SECTION 2: ADDITIONAL DETAILS --- */}
             {!isAdmin &&
@@ -189,37 +191,19 @@ export default function ProfilePage() {
                 <div className={styles.editModeContainer}>
                   <h2 className={styles.bodyL}>פרטים נוספים</h2>
 
-                  <div
-                    className={styles.detailItem}
-                    style={{ alignItems: "flex-start", width: "100%" }}
-                  >
-                    <span
-                      className={styles.bodyS}
-                      style={{ color: "#fff" }}
-                    >
+                  <div className={styles.detailItem}>
+                    <span className={styles.bodyS} style={{ color: "#fff" }}>
                       הסניף הקרוב אליי
                     </span>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        marginTop: "0.5rem",
-                      }}
-                    >
+                    {/* BRANCHES BUTTONS */}
+                    <div className={styles.optionsGroup}>
                       {["nahalal", "satria"].map((b) => (
                         <button
                           key={b}
                           onClick={() => toggleBranch(b)}
-                          style={{
-                            background: branches.includes(b)
-                              ? "rgba(255,255,255,0.2)"
-                              : "transparent",
-                            border: "1px solid #fff",
-                            color: "white",
-                            borderRadius: "4px",
-                            padding: "6px 12px",
-                            cursor: "pointer",
-                          }}
+                          className={`${styles.optionToggle} ${
+                            branches.includes(b) ? styles.selected : ""
+                          }`}
                         >
                           {b === "nahalal" ? "נהלל" : "סתריה"}
                         </button>
@@ -227,40 +211,21 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div
-                    className={styles.detailItem}
-                    style={{ alignItems: "flex-start", width: "100%" }}
-                  >
-                    <span
-                      className={styles.bodyS}
-                      style={{ color: "#fff" }}
-                    >
+                  <div className={styles.detailItem}>
+                    <span className={styles.bodyS} style={{ color: "#fff" }}>
                       תחומי עניין
                     </span>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        flexWrap: "wrap",
-                        justifyContent: "flex-start",
-                        marginTop: "0.5rem",
-                      }}
-                    >
+                    {/* INTERESTS BUTTONS */}
+                    <div className={styles.optionsGroup}>
                       {AVAILABLE_INTERESTS.map((int) => (
                         <button
                           key={int}
                           onClick={() => toggleInterest(int)}
-                          style={{
-                            background: selectedInterests.includes(int)
-                              ? "rgba(255,255,255,0.2)"
-                              : "transparent",
-                            border: "1px solid #fff",
-                            color: "white",
-                            borderRadius: "4px",
-                            padding: "6px 12px",
-                            cursor: "pointer",
-                            fontSize: "0.8rem",
-                          }}
+                          className={`${styles.optionToggle} ${
+                            selectedInterests.includes(int)
+                              ? styles.selected
+                              : ""
+                          }`}
                         >
                           {int}
                         </button>
@@ -285,24 +250,22 @@ export default function ProfilePage() {
                   </div>
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>
-                        הסניף הקרוב אליי
-                      </span>
-                      <span className={styles.detailValue}>
+                      <span className={styles.bodyS}>הסניף הקרוב אליי</span>
+                      <span className={styles.bodyS} dir="ltr">
                         {branches
                           .map((b) => (b === "nahalal" ? "נהלל" : "סתריה"))
                           .join(", ")}
                       </span>
                     </div>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>המעגל שלי</span>
-                      <span className={styles.detailValue}>
+                      <span className={styles.bodyS}>המעגל שלי</span>
+                      <span className={styles.bodyS} dir="ltr">
                         {userProfile?.quiz?.circle || "לא צוין"}
                       </span>
                     </div>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>תחומי עניין</span>
-                      <span className={styles.detailValue}>
+                      <span className={styles.bodyS}>תחומי עניין</span>
+                      <span className={styles.bodyS} dir="ltr">
                         {selectedInterests.length > 0
                           ? selectedInterests.join(", ")
                           : "לא נבחרו"}
@@ -319,24 +282,55 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ))}
-              {isAdmin && (
+
+            {/* --- LOGOUT BUTTON --- */}
             <div className={styles.buttonsRow}>
-                <Button className={styles.usersList} onClick={handleToUserList}>
-                  רשימת משתמשים
-                  <span className={styles.pressArrow}></span>
-                </Button>
-            </div>)}
-            <div className={styles.buttonsRow}>
-                <Button className={styles.logOutButton} onClick={handleLogout}>
+              <div className={styles.logOutButton}>
+                <Button
+                  variant="tertiary"
+                  tertiarySize="medium"
+                  tertiaryWeight="semibold"
+                  colorType="delete"
+                  onClick={handleLogoutClick}
+                >
                   התנתק
-                  <span className={styles.redPressArrow}></span>
                 </Button>
+              </div>
             </div>
+            {isAdmin && (
+              <Button
+                className={styles.AddAdminButton}
+                onClick={handleToAddAdmin}
+              >
+                הוספת מנהל
+              </Button>
+            )}
           </div>
-          {isAdmin && (
-                <Button className={styles.AddAdminButton} onClick={handleToAddAdmin}>
-                  הוספת מנהל
-                </Button>)}
+
+          {/* POPUPS */}
+          
+          {/* Branch Error Popup */}
+          {showBranchError && (
+            <Popup
+              title="חובה לבחור לפחות סניף אחד"
+              content="יש לבחור לפחות סניף אחד"
+              secondaryButtonText="סגור"
+              secondaryButtonAction={() => setShowBranchError(false)}
+              onClose={() => setShowBranchError(false)}
+            />
+          )}
+
+          {/* Logout Confirmation Popup */}
+          {showLogoutPopup && (
+            <Popup
+              content="האם אתה בטוח שאתה רוצה להתנתק?"
+              primaryButtonText="כן אני בטוח"
+              primaryButtonAction={confirmLogout}
+              secondaryButtonText="ביטול"
+              secondaryButtonAction={() => setShowLogoutPopup(false)}
+              onClose={() => setShowLogoutPopup(false)}
+            />
+          )}
         </main>
       </SmoothPageWrapper>
     </ProtectedRoute>

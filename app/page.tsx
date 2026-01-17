@@ -23,7 +23,7 @@ export default function Home() {
       // Small delay before navigation
       setTimeout(() => {
         router.replace(destination);
-      }, 100);
+      }, 90);
     }
   }, [animationFinished, loading, user, router, isExiting]);
 

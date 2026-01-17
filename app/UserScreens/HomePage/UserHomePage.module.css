@@ -1,95 +1,65 @@
-/* ============================================
-   NEW USER HOME PAGE
-   Based on Figma design - iPhone 16 (393x852)
-   ============================================ */
+/* UserHomePage.module.css */
 
-/* Loading State */
-.loadingContainer {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #efefef;
-  font-family: var(--font-secondary);
-  font-size: 1.25rem;
-}
-
-/* Page Container - Must be relative for absolute children to work */
+/* Page Container - SCROLLABLE (Matches Admin Structure) */
 .pageContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding: 5.75rem 1.5rem 1.5rem;
-  isolation: isolate;
-
-  position: relative; /* This is key */
+  z-index: var(--z-index-page);
+  position: relative;
   width: 100%;
-  max-width: 24.5625rem;
-  min-height: 100dvh;
+  max-width: var(--container-max-width, 24.5625rem);
+
+  /* Fixed height forces internal scrolling */
+  height: calc(100dvh - 4.5rem);
   margin: 0 auto;
 
-  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  /* Scroll behavior */
+  overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+
+  /* Background */
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* Padding: Top for status bar, Bottom for safe scroll */
+  padding: 0 1.5rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+
+  /* Hide scrollbar */
+  scrollbar-width: none;
+}
+
+.pageContainer::-webkit-scrollbar {
+  display: none;
 }
 
 /* ============================================
-   OPEN HOURS POSITION CONTROL
-   Change 'top' and 'right' to move it anywhere 
-   inside the pageContainer.
+   OPEN HOURS
    ============================================ */
-.openHours {
-  position: relative;
-
-  /* POSITION CONTROLS - Adjust these */
-  bottom: 2rem; /* Distance from top edge */
-
+.openHoursWrapper {
   width: 100%;
+  padding-top: 3.5rem;
 
-  z-index: 10; /* Keeps it above the circles */
+  display: flex;
+  justify-content: center;
+}
+
+/* ============================================
+   CIRCLES CONTAINER (Static Flow)
+   ============================================ */
+.circlesContainer {
+  position: relative;
+  width: 100%;
+  height: 11rem; /* Fixed height for the graphic area */
+  pointer-events: none;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* Background circles container */
-.backgroundCircles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none; /* Let clicks pass through to content */
-}
-
-/* Main Content Layout */
-.mainContent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
-  gap: 0.75rem;
-
-  width: 100%;
-  margin-top: 6.5rem; /* Pushes content down to make room for top elements */
-  z-index: 5;
-  position: relative;
-}
-
-/* ============================================
-   MAIN CONTENT
-   ============================================ */
-.mainContent {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
-  gap: 0.75rem;
-
-  width: 100%; /* Changed to 100% for better scaling */
-  margin-top: 6.5rem;
-  z-index: 5; /* Above backgroundLayer */
 }
 
 /* ============================================
@@ -98,469 +68,63 @@
 .greetingSection {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding: 0;
-  gap: 0.125rem; /* 8px */
-
   width: 100%;
-  margin-top: var(--spacing-4xl);
+  padding-bottom: 1.5rem;
 }
 
 .greetingTitle {
-  width: 100%;
-
-  font-family: var(--font-primary); /* Arfilit */
-  font-style: normal;
-  font-weight: var(--weight-normal);
-  font-size: var(--font-size-3xl); /* 32px */
-  line-height: 2.5rem; /* 40px */
-  text-align: center;
-  letter-spacing: 0.02em;
-
+  font-family: var(--font-primary);
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 2.5rem;
   color: #ffffff;
+  text-align: center;
   margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .greetingSubtitle {
-  width: 100%;
-
-  font-family: var(--font-secondary); /* Ezer Shemesh */
-  font-style: normal;
-  font-weight: var(--weight-semibold);
-  font-size: var(--font-size-xl); /* 32px */
-  line-height: 2rem; /* 32px */
-  text-align: center;
-  letter-spacing: 0.02em;
-
-  color: var(--color-white-pure);
-  margin: 0;
-  margin-bottom: var(--spacing-md);
-}
-
-/* ============================================
-   CLOSED MESSAGE (when space is closed)
-   ============================================ */
-.closedMessage {
-  width: 100%;
-  padding: 0.5rem 0;
-  text-align: center;
-}
-
-.closedText {
   font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.5rem; /* 24px */
-
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
-
-/* ============================================
-   FILTER CONTAINER
-   ============================================ */
-.filterContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  gap: 0.625rem; /* 10px */
-
-  width: 100%;
-  margin-top: 0.5rem; /* 8px */
-}
-
-/* ============================================
-   SECTION TITLE
-   ============================================ */
-.sectionTitle {
-  width: 100%;
-
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 700;
-  font-size: 1.25rem; /* 20px */
-  line-height: 1.75rem; /* 28px */
-  text-align: right;
-
+  font-weight: 600;
+  font-size: 1.25rem;
   color: #ffffff;
-  margin: 0.5rem 0 0 0; /* 16px top margin */
-}
-
-/* ============================================
-   CARDS CONTAINER (Placeholder)
-   ============================================ */
-.cardsContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
-  gap: 0.75rem; /* 8px */
-
-  width: 100%;
-  max-height: 21.6875rem; /* 379px */
-  overflow-y: auto;
-
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.cardsContainer > * {
-  flex-shrink: 0; /* CRITICAL: Prevent cards from shrinking */
-  width: 100%;
-}
-
-.cardsContainer::-webkit-scrollbar {
-  width: 0.375rem;
-}
-
-.cardsContainer::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.cardsContainer::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 0.5625rem;
-}
-
-/* ============================================
-   EMPTY STATE
-   ============================================ */
-.emptyState {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 10rem; /* 160px */
-  padding: 2rem;
-}
-
-.emptyText {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 300;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.5rem; /* 24px */
+  margin: 0;
   text-align: center;
-
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
-
-/* ============================================
-   PLACEHOLDER CARD (To be replaced)
-   ============================================ */
-.placeholderCard {
-  box-sizing: border-box;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 1rem; /* 16px */
-  gap: 0.75rem; /* 12px */
-
-  width: 100%;
-
-  background: rgba(247, 247, 247, 0.9);
-  border-radius: 0.5625rem; /* 9px */
-}
-
-.cardHeader {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-
-  width: 100%;
-}
-
-.activityTitle {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 700;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.5rem; /* 24px */
-  text-align: right;
-
-  color: #681f02;
-}
-
-.activityIcon {
-  font-size: 1.5rem; /* 24px */
-}
-
-.cardBody {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-
-  width: 100%;
-}
-
-.activityInfo {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 0.875rem; /* 14px */
-  line-height: 1.25rem; /* 20px */
-  text-align: right;
-
-  color: #681f02;
-  margin: 0;
-}
-
-.activityDescription {
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 300;
-  font-size: 1rem; /* 16px */
-  line-height: 1.375rem; /* 22px */
-  text-align: right;
-
-  color: #681f02;
-  margin: 0;
-}
-
-/* ============================================
-   BOTTOM BUTTONS
-   ============================================ */
-.bottomButtons {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  gap: 1rem; /* 16px */
-
-  width: 100%;
-  margin-top: auto; /* Push to bottom */
-  padding-top: 1rem;
-}
-
-.purpleButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0.5rem 1rem; /* 8px 16px */
-  gap: 0.5rem; /* 8px */
-
-  flex: 1;
-  min-width: 8rem; /* 128px */
-  height: 2.25rem; /* 36px */
-
-  background: #b37eb3;
-  border: none;
-  border-radius: 0.3125rem; /* 5px */
-
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.25rem; /* 20px */
-
-  color: #f9f9f9;
-
-  cursor: pointer;
-  transition: opacity var(--transition-normal);
-}
-
-.purpleButton:hover {
+  margin-top: 0.25rem;
   opacity: 0.9;
 }
 
 /* ============================================
-   RESPONSIVE ADAPTATIONS
+   FILTER
    ============================================ */
-
-/* Screens smaller than design width (below 393px) */
-/* Adjusts margins to prevent content touching edges */
-@media (max-width: 24.5rem) {
-  .pageContainer {
-    padding: 5.75rem 1rem 1.5rem;
-  }
-
-  .mainContent {
-    /* Ensure content doesn't overflow horizontally */
-    width: calc(100% - 0.5rem);
-  }
-
-  .emptyState {
-    width: 100%;
-    padding: 1.5rem 1rem;
-  }
-}
-
-/* Small screens (below 360px) - e.g., Small Androids, older iPhones */
-@media (max-width: 22.5rem) {
-  .pageContainer {
-    padding: 4rem 0.75rem 1.5rem;
-  }
-
-  .mainContent {
-    margin-top: 5rem;
-  }
-
-  .greetingTitle {
-    font-size: 1.75rem; /* 28px */
-    line-height: 2.25rem;
-  }
-
-  .greetingSubtitle {
-    font-size: 1.125rem; /* 18px */
-  }
-
-  .sectionTitle {
-    font-size: 1.125rem; /* 18px */
-  }
-
-  .closedText {
-    font-size: 0.875rem; /* 14px */
-  }
-}
-
-/* Very small screens (below 320px) - e.g., Galaxy Fold outer screen */
-@media (max-width: 20rem) {
-  .pageContainer {
-    padding: 3rem 0.5rem 1rem;
-  }
-
-  .mainContent {
-    margin-top: 4rem;
-    gap: 0.75rem;
-  }
-
-  .greetingTitle {
-    font-size: 1.5rem; /* 24px */
-    line-height: 2rem;
-  }
-
-  .greetingSubtitle {
-    font-size: 1rem; /* 16px */
-  }
-
-  .sectionTitle {
-    font-size: 1rem; /* 16px */
-  }
-
-  .emptyText {
-    font-size: 1rem;
-  }
-
-  /* Stack buttons vertically if they exist */
-  .bottomButtons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+.filterContainer {
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 /* ============================================
-   HEIGHT-BASED RESPONSIVENESS
-   Crucial for phones like iPhone SE where vertical space is limited
+   CARDS CONTAINER
    ============================================ */
-
-/* Medium-Tall screens (below 900px / 56.25rem) 
-   Base design is ~852px, so this catches standard modern phones 
-   with browser bars visible.
-*/
-@media (max-height: 56.25rem) {
-  .pageContainer {
-    padding-top: 5rem; /* Slight reduction from 5.75rem */
-  }
-
-  .mainContent {
-    margin-top: 5.5rem; /* Pull content slightly closer */
-  }
-
-  .cardsContainer {
-    max-height: 24rem; /* Ensure list uses available space */
-  }
+.cardsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-/* Medium-Short screens (below 800px / 50rem) 
-   e.g., Standard Androids, iPhone 14/15 with heavy browser chrome
-*/
-@media (max-height: 50rem) {
-  .pageContainer {
-    padding-top: 4.5rem;
-  }
-
-  .mainContent {
-    margin-top: 5rem;
-    gap: 0.625rem; /* Reduce gap slightly (10px) */
-  }
-
-  .greetingTitle {
-    font-size: 1.875rem; /* 30px - slightly smaller */
-    line-height: 2.25rem;
-  }
-
-  .cardsContainer {
-    max-height: 23.5rem; /* Shrink scroll area to fit viewport */
-  }
+.cardsContainer > * {
+  width: 100%;
+  flex-shrink: 0;
 }
 
-/* Short screens (below 700px / 43.75rem) 
-   e.g., iPhone SE, Small Androids 
-*/
-@media (max-height: 43.75rem) {
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 24.5rem) {
   .pageContainer {
-    padding-top: 4rem;
-  }
-
-  .mainContent {
-    margin-top: 4.5rem; /* Significant reduction */
-  }
-
-  .greetingSection {
-    gap: 0.25rem;
-  }
-
-  .greetingTitle {
-    font-size: var(--font-size-3xl); /* 28px */
-    line-height: 2rem;
-  }
-
-  .greetingSubtitle {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-
-  /* Reduce height of scrollable area so bottom content isn't cut off */
-  .cardsContainer {
-    max-height: 13rem;
-  }
-}
-
-/* Very short screens (below 600px / 37.5rem) */
-@media (max-height: 37.5rem) {
-  .pageContainer {
-    padding-top: 2.5rem;
-  }
-
-  .mainContent {
-    margin-top: 2.5rem;
-    gap: 0.5rem;
-  }
-
-  .greetingTitle {
-    font-size: 1.5rem;
-    line-height: 1.75rem;
-  }
-
-  .greetingSubtitle {
-    display: none; /* Hide subtitle to save space */
-  }
-
-  .cardsContainer {
-    max-height: 10rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

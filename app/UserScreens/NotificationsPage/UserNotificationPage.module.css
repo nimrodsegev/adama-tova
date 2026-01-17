@@ -3,14 +3,23 @@
 .pageContainer {
   width: 100%;
   max-width: var(--container-max-width);
-  min-height: var(--container-min-height);
+  z-index: var(--z-index-page);
+  /* --- COPIED FROM ADMIN SETTINGS --- */
+  /* Fix height to viewport minus nav bar, and scroll internally */
+  height: calc(100dvh - 4.5rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  overflow-x: hidden;
+  /* ---------------------------------- */
+
   margin: 0 auto;
   background: var(--color-background);
   position: relative;
-  overflow: hidden; /* Prevent the whole page from scrolling */
   direction: rtl;
+
   padding: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
+  /* Add safe area logic to bottom padding */
+  padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
 }
 
 /* Centered Title Container */
@@ -61,52 +70,42 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Ensure only the list inside scrolls */
+  /* Removed overflow: hidden so padding works correctly */
+  overflow: visible;
+  align-items: center;
 }
 
-/* Notifications List - SCROLLABLE AREA */
+/* Notifications List - GROWS NATURALLY */
 .notificationsList {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  width: 100%;
 
-  /* Height Calculation:
-     We want the list to end about 20rem from the bottom.
-     We use 100dvh (dynamic viewport height) and subtract the top elements + bottom space.
-     Adjust '25rem' if the top elements are larger/smaller.
-  */
-  max-height: calc(100dvh - 20.5rem);
+  /* REMOVED max-height and overflow-y */
+  /* The scrolling is now done by .pageContainer */
 
-  overflow-y: auto; /* Enable vertical scroll */
-  overflow-x: visible; /* Allow shadows to spill over */
+  overflow: visible;
 
-  /* Add padding to container so cards/shadows aren't cut off */
+  /* Cushion for the bottom of the scroll */
   padding: 0.5rem;
-  padding-right: var(--spacing-xs); /* Slight adjustment for RTL scrollbar */
 
-  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border-glass) transparent;
-}
-
-.notificationsList::-webkit-scrollbar {
-  width: 0.375rem;
-}
-
-.notificationsList::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.notificationsList::-webkit-scrollbar-thumb {
-  background: var(--color-border-glass);
-  border-radius: var(--radius-sm);
+  padding-right: var(--spacing-xs);
 }
 
 /* Individual Notification Item */
 .notificationItem {
   width: 100%;
-  flex-shrink: 0; /* Prevent items from shrinking */
-  /* REMOVED overflow:hidden to stop cards from being cut off */
+  flex-shrink: 0;
   overflow: visible;
   transition: none;
+}
+.emptyText {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: 1.25rem;
+  text-align: center;
+  color: var(--color-text-primary);
+  margin-top: var(--spacing-3xl);
 }
