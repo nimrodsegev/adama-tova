@@ -8,6 +8,7 @@ import styles from "./AddActivityPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
+import Popup from "@/lib/components/UI/Popup"; // IMPORT POPUP
 
 // --- Types ---
 type ActivityStatus = "open" | "closed" | "cancelled";
@@ -191,6 +192,10 @@ export default function AddActivityPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  // --- POPUP STATE ---
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupConfig, setPopupConfig] = useState({ title: "", content: "" });
+
   // Dropdown States
   const [isBranchOpen, setIsBranchOpen] = useState(false);
   const [isTypeOpen, setIsTypeOpen] = useState(false);
@@ -319,6 +324,40 @@ export default function AddActivityPage() {
     setErrorMessage("");
     setUploading(true);
 
+    // --- VALIDATION WITH POPUP ---
+    const maxPart = parseInt(formData.max_participants);
+
+    if (isNaN(maxPart) || maxPart < 1) {
+      setPopupConfig({
+        title: "מספר משתתפים לא תקין",
+        content: "מספר המשתתפים חייב להיות לפחות 1",
+      });
+      setShowPopup(true);
+      setUploading(false);
+      return;
+    }
+
+    const activityDate = new Date(
+      parseInt(formData.year),
+      parseInt(formData.month) - 1,
+      parseInt(formData.day),
+      parseInt(formData.startTime.split(":")[0]),
+      parseInt(formData.startTime.split(":")[1])
+    );
+
+    const now = new Date();
+
+    if (activityDate <= now) {
+      setPopupConfig({
+        title: "תאריך לא תקין",
+        content: "לא ניתן ליצור פעילות בתאריך או שעה שכבר עברו",
+      });
+      setShowPopup(true);
+      setUploading(false);
+      return;
+    }
+    // ----------------------------------
+
     const fullDate = `${formData.year}-${formData.month}-${formData.day}`;
     let endTime = "";
     if (formData.startTime) {
@@ -347,9 +386,7 @@ export default function AddActivityPage() {
       branch: formData.branch,
       location: formData.location || "לא צוין",
       instructor: formData.instructor,
-      max_participants: formData.max_participants
-        ? parseInt(formData.max_participants)
-        : 0,
+      max_participants: maxPart,
       image_url: imageUrl,
       date: fullDate,
       start_time: formData.startTime,
@@ -679,6 +716,19 @@ export default function AddActivityPage() {
             </div>
           )}
         </div>
+
+        {/* 4. RENDER POPUP */}
+        {showPopup && (
+          <div className={styles.popupWrapper}>
+            <Popup
+              title={popupConfig.title}
+              content={popupConfig.content}
+              secondaryButtonText="סגור"
+              secondaryButtonAction={() => setShowPopup(false)}
+              onClose={() => setShowPopup(false)}
+            />
+          </div>
+        )}
 
         <div className={styles.navigation}>
           <div className={styles.progressDots}>
