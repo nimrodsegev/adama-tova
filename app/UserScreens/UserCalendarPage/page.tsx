@@ -11,6 +11,9 @@ import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
+// 1. Import the calculator
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+
 import styles from "./UserCalendarPage.module.css";
 
 const INTRESTS_MAPPING: Record<string, string> = {
@@ -50,10 +53,14 @@ export default function NewUserCalendarPage() {
     "spouting"
   );
 
-  // ⭐ NEW: Control Z-Index for smooth nav vs. registration coverage
   const [coverNav, setCoverNav] = useState(false);
-
   const mounted = useRef(false);
+
+  // 2. Calculate Shape Params based on user profile
+  const shapeParams =
+    userProfile?.role === "participant"
+      ? calculateShapeParams(userProfile)
+      : calculateShapeParams(null);
 
   const fetchData = async () => {
     // If switching dates, show Overlay Loader and clear list
@@ -112,9 +119,7 @@ export default function NewUserCalendarPage() {
     skipFetch?: boolean
   ) => {
     if (state === "start") {
-      // ⭐ Action Start: Raise Z-Index to cover NavBar
       setCoverNav(true);
-
       setMotionMode("breathing");
       setIsProcessing(true);
       setTimeout(() => setIsProcessing(false), 5000);
@@ -124,7 +129,6 @@ export default function NewUserCalendarPage() {
       }
       setIsProcessing(false);
 
-      // ⭐ Action End: Reset Z-Index after animation
       setTimeout(() => {
         setCoverNav(false);
         setMotionMode("spouting");
@@ -160,14 +164,20 @@ export default function NewUserCalendarPage() {
     <SmoothPageWrapper
       isLoading={isInitialLoad || isProcessing}
       mode={motionMode}
-      // ⭐ Pass the prop to control Z-Index
       coverNavigation={coverNav}
     >
       <div className={styles.pageContainer}>
         {/* LOADING OVERLAY */}
         {isListLoading && (
           <div className={styles.loadingOverlay}>
-            <OrganicCircles mode="loading" radius={0.08} baseColor="#FFFFFF" />
+            <OrganicCircles
+              mode="loading"
+              radius={0.08}
+              baseColor="#FFFFFF"
+              // 3. Pass the calculated params to the loader
+              // @ts-ignore
+              {...shapeParams}
+            />
           </div>
         )}
 
