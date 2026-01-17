@@ -202,6 +202,7 @@ export default function SignupModal({
                     setEmailError("");
                   }}
                   error={emailError}
+                  onErrorExpire={() => setEmailError("")}
                   dir="ltr"
                   textAlign="right"
                 />
@@ -217,6 +218,7 @@ export default function SignupModal({
                   }}
                   placeholder="6 תווים או יותר"
                   error={passwordError}
+                  onErrorExpire={() => setPasswordError("")}
                   dir="rtl"
                   textAlign="right"
                 />

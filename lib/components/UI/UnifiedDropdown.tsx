@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './UnifiedDropdown.module.css';
 
 interface DropdownOption {
@@ -16,6 +16,8 @@ interface UnifiedDropdownProps {
   onToggle: () => void;
   className?: string;
   isMini?: boolean;
+  error?: string;
+  onErrorExpire?: () => void;
 }
 
 export default function UnifiedDropdown({
@@ -28,37 +30,58 @@ export default function UnifiedDropdown({
   onToggle,
   className = '',
   isMini = false,
+  error,
+  onErrorExpire,
 }: UnifiedDropdownProps) {
+  const [showError, setShowError] = useState(false);
+
+  // Auto-hide error after 6 seconds and return to original label
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setShowError(false);
+        onErrorExpire?.();
+      }, 6000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowError(false);
+    }
+  }, [error, onErrorExpire]);
+
+  const displayLabel = (showError && error) ? error : label;
+  const isError = showError && !!error;
   const selectedOption = options.find(opt => opt.value === value);
 
   return (
-    <div 
+    <div
       className={`
-        ${styles.dropdownContainer} 
-        ${isOpen ? styles.active : ''} 
-        ${isMini ? styles.miniDropdown : ''} 
+        ${styles.dropdownContainer}
+        ${isOpen ? styles.active : ''}
+        ${isMini ? styles.miniDropdown : ''}
+        ${isError ? styles.hasError : ''}
         ${className}
       `}
     >
-      {/* FIELDSET BORDER STRATEGY (Standard Only) 
+      {/* FIELDSET BORDER STRATEGY (Standard Only)
           This creates the border gap naturally using HTML flow.
       */}
       {!isMini && (
-        <fieldset 
-          aria-hidden="true" 
-          className={styles.borderFieldset}
+        <fieldset
+          aria-hidden="true"
+          className={`${styles.borderFieldset} ${isError ? styles.borderError : ''}`}
         >
           <legend className={styles.borderLegend}>
             {/* Span adds breathing room for the cut */}
-            <span>{label}</span>
+            <span>{displayLabel}</span>
           </legend>
         </fieldset>
       )}
 
       {/* VISIBLE LABEL (Positioned over the gap) */}
       {!isMini && (
-        <span className={styles.dropdownLabel}>
-          {label}
+        <span className={`${styles.dropdownLabel} ${isError ? styles.labelError : ''}`}>
+          {displayLabel}
         </span>
       )}
 

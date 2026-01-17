@@ -1,7 +1,7 @@
 /* UserApprovalModal.module.css - Modal for user approval details */
 /* Updated to match ProfilePage design with profile boxes and stat cards */
 
-/* Overlay backdrop - TRANSPARENT */
+/* Overlay backdrop - Semi-transparent */
 .overlay {
   position: fixed;
   top: 0;
@@ -10,22 +10,23 @@
   bottom: 0;
   width: 100vw;
   height: 100vh;
-  background-color: transparent;
-  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
 }
 
-/* Modal container - FULL SCREEN FROM TOP TO NAVBAR */
+/* Modal container - FULL SCREEN */
 .modalContainer {
   position: fixed;
   top: 0;
-  bottom: 3.8125rem; /* 61px for navbar - ends above navbar */
+  bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
+  height: 100dvh;
   max-width: 100vw;
   /* Orange gradient background like ProfilePage */
   background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  z-index: 1000;
+  z-index: 2000;
   overflow: hidden;
   direction: rtl;
   margin: 0 auto;

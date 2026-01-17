@@ -388,6 +388,7 @@ export default function ActivityDetailsModal({
 
                       <Button
                         variant="tertiary"
+                        colorType="white"
                         tertiarySize="medium"
                         tertiaryWeight="semibold"
                         onClick={() => setIsRegistrationsModalOpen(true)}

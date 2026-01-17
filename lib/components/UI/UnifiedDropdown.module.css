@@ -243,3 +243,20 @@
   .dropdownContainer { height: 3rem; }
   .dropdownMenu { top: 2.95rem; }
 }
+
+/* ============================================
+   ERROR STATES
+   ============================================ */
+.borderError {
+  border-color: #A70000 !important;
+  border-width: 0.125rem !important;
+}
+
+.labelError {
+  color: #A70000 !important;
+}
+
+.hasError .borderFieldset {
+  border-color: #A70000;
+  border-width: 0.125rem;
+}
