@@ -3,26 +3,23 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/contexts/UserContext";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
+import styles from "./Home.module.css"; // Import the CSS file
 
 export default function Home() {
   const router = useRouter();
   const { user, loading } = useUser();
   const [animationFinished, setAnimationFinished] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
-
-  // 1. State to control text visibility
   const [showText, setShowText] = useState(false);
 
   const handleSplashComplete = () => {
     setAnimationFinished(true);
   };
 
-  // 2. Effect to trigger the text fade-in
   useEffect(() => {
-    // ⭐ CONTROL DELAY HERE (in milliseconds)
     const timer = setTimeout(() => {
       setShowText(true);
-    }, 2600); // 1000ms = 1 second delay
+    }, 2600);
 
     return () => clearTimeout(timer);
   }, []);
@@ -38,35 +35,16 @@ export default function Home() {
   }, [animationFinished, loading, user, router, isExiting]);
 
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        paddingTop: "env(safe-area-inset-top, 0)",
-        paddingBottom: "env(safe-area-inset-bottom, 0)",
-        background:
-          "linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
+    <div className={styles.pageContainer}>
       <h1
+        className={styles.splashTitle}
         style={{
-          position: "absolute",
-          zIndex: 10,
-          color: "#FFFFFF",
-          fontSize: "var(--font-size-xl)",
-          fontWeight: "var(--font-weight-semibold)",
-          fontFamily: "var(--font-primary, sans-serif)",
-          margin: 0,
-          pointerEvents: "none",
-
-          // 3. Animation Styles
-          opacity: showText ? 1 : 0, // Starts invisible, becomes visible
-          transition: "opacity 1.5s ease-out", // Smooth fade-in (adjust 1.5s to make it faster/slower)
-          transform: showText ? "translateY(0)" : "translateY(10px)", // Optional: slight slide up
+          // Control visibility and slight motion via inline styles
+          // Note: We combine the translateY(-50%) from CSS with the animation offset
+          opacity: showText ? 1 : 0,
+          transform: showText
+            ? "translateY(-50%)" // End state: Exact center defined in CSS
+            : "translateY(-40%)", // Start state: Slightly lower/higher for effect
         }}
       >
         המרחב

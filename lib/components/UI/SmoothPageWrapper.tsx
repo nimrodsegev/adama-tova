@@ -23,6 +23,7 @@ interface SmoothPageWrapperProps {
   disableCircleLoader?: boolean;
   coverNavigation?: boolean;
   customPosition?: { x: number; y: number };
+  transitionDelay?: string;
 }
 
 export default function SmoothPageWrapper({
@@ -35,6 +36,7 @@ export default function SmoothPageWrapper({
   disableCircleLoader = false,
   coverNavigation = false,
   customPosition,
+  transitionDelay = "0.2s",
 }: SmoothPageWrapperProps) {
   const { userProfile } = useUser();
   const [minTimeElapsed, setMinTimeElapsed] = useState(true);
@@ -132,7 +134,8 @@ export default function SmoothPageWrapper({
           // ⭐ CHANGE: Removed the 'transform' property (translateY)
           // ⭐ CHANGE: Removed 'transform' from the transition property
           transition: "opacity 0.8s ease-out",
-          transitionDelay: "0.2s",
+          transitionDelay: transitionDelay,
+
           width: "100%",
           minHeight: "100vh",
         }}
