@@ -40,7 +40,10 @@ export default function ActivityDetailsModal({
   const { user, userProfile } = useUser();
   const { t } = useIvrita();
   const [activity, setActivity] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+
+  // 1. Separate Loading States
+  const [loading, setLoading] = useState(true); // For fetching data
+  const [isSubmitting, setIsSubmitting] = useState(false); // For actions (register/cancel)
 
   // Registration State
   const [regStatus, setRegStatus] = useState<"none" | "confirmed" | "waitlist">(
@@ -141,15 +144,19 @@ export default function ActivityDetailsModal({
   };
 
   const handleRegistrationToggle = async () => {
-    if (!user || loading || isAdmin) return;
+    // Check isSubmitting instead of loading
+    if (!user || loading || isSubmitting || isAdmin) return;
 
     if (regStatus !== "none") {
       setIsCancelModalOpen(true);
       return;
     }
 
+    // Trigger parent animation
     onMotionChange?.("start");
-    setLoading(true);
+
+    // 2. Set submitting true, but NOT loading (prevents spinner)
+    setIsSubmitting(true);
 
     try {
       const [res] = await apiRegistrations.registerUserToActivity(
@@ -176,16 +183,18 @@ export default function ActivityDetailsModal({
       console.error("Registration error:", error);
       onMotionChange?.("end");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleCancelConfirm = async () => {
-    if (!user || loading) return;
+    if (!user || loading || isSubmitting) return;
 
     setIsCancelModalOpen(false);
     onMotionChange?.("start");
-    setLoading(true);
+
+    // 3. Set submitting true, but NOT loading
+    setIsSubmitting(true);
 
     try {
       const [_, error] = await apiRegistrations.cancelRegistration(
@@ -208,7 +217,7 @@ export default function ActivityDetailsModal({
       console.error("Unregistration error:", error);
       onMotionChange?.("end");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -233,7 +242,7 @@ export default function ActivityDetailsModal({
   };
 
   const handleDeleteConfirm = async () => {
-    setLoading(true);
+    setLoading(true); // Delete is internal, so we CAN use loading here if we want
     const [_, error] = await apiActivities.delete(activityId);
     if (error) {
       alert("שגיאה במחיקה: " + error);
@@ -296,7 +305,8 @@ export default function ActivityDetailsModal({
 
             {/* Main Content Container */}
             <div className={styles.contentContainer}>
-              {loading || closing ? (
+              {/* 4. Only show spinner on initial load, NOT on submitting/closing */}
+              {loading ? (
                 <div className={styles.loadingContainer}>
                   <OrganicCircles
                     mode="loading"
@@ -401,7 +411,7 @@ export default function ActivityDetailsModal({
                       size="L"
                       variant="secondary"
                       onClick={handleDelete}
-                      disabled={loading}
+                      disabled={loading || isSubmitting}
                     >
                       {t("מחיקה")}
                     </Button>
@@ -409,7 +419,7 @@ export default function ActivityDetailsModal({
                       size="L"
                       variant="primary"
                       onClick={handleEdit}
-                      disabled={loading}
+                      disabled={loading || isSubmitting}
                     >
                       {t("עריכה")}
                     </Button>
@@ -419,7 +429,7 @@ export default function ActivityDetailsModal({
                     <Button
                       size="L"
                       onClick={handleRegistrationToggle}
-                      disabled={loading}
+                      disabled={loading || isSubmitting}
                     >
                       {regStatus === "none" ? "הרשמה" : "ביטול רישום"}
                     </Button>
