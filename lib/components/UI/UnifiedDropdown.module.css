@@ -223,8 +223,8 @@
 .dropdownContainer.miniDropdown .dropdownMenu {
   top: 100%;
   border-radius: 0 0 0.21875rem 0.21875rem;
-  right: -0.075rem;
-  width: 100%;
+  right: -0.06rem;
+  width: 102%;
 }
 .dropdownContainer.miniDropdown .dropdownOption {
   padding: 0.5rem;

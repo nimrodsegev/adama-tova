@@ -1,47 +1,59 @@
 /* ============================================
-   PAGE LAYOUT
+   PAGE LAYOUT (Matched to ADMIN HOME PAGE Logic)
    ============================================ */
 .pageContainer {
+  /* Positioning & Size */
+  position: fixed; /* Fixed to cover screen */
+  inset: 0;
+  width: 100%;
+  max-width: 24.5625rem; /* 393px - Match reference */
+  height: 100dvh; 
+  margin: 0 auto; /* Center on larger screens */
+
+  /* Background */
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+
+  /* Flex Layout */
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100dvh;
-  min-height: 0 !important;
-
-  /* Background Gradient */
-  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
-
-  padding: 3rem 0.2rem 1.5rem; /* 92px 24px 24px */
-  gap: 0.5rem; /* 8px */
-
+  
+  /* Reset padding here, handled by children to match reference flow */
+  padding: 0;
+  
   overflow: hidden;
   touch-action: none;
-  z-index: var(--z-index-page);
+  z-index: 1;
 }
 
 /* ============================================
    HEADER
    ============================================ */
 .header {
-  text-align: center;
-  margin-bottom: 1rem;
-  flex-shrink: 0;
   width: 100%;
-  max-width: var(--container-max-width, 24.5625rem);
+  text-align: center;
+  
+  /* Match reference spacing logic */
+  padding-top: 3.5rem; 
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  margin-bottom: 1rem;
+  
+  flex-shrink: 0;
+  box-sizing: border-box;
+  z-index: 10;
 }
+
 .userName {
   font-family: "Arfilit", sans-serif;
-  font-weight: 400; /* Regular */
-  font-size: 2rem; /* 32px */
-  line-height: 2.125rem;
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 2.5rem;
   color: rgba(249, 249, 249, 0.84);
-  margin-bottom: 0.5rem;
+  margin: 0;
   letter-spacing: 0.02em;
 }
+
 .adminLabel {
   font-family: var(--font-secondary);
   font-weight: 400;
@@ -51,40 +63,28 @@
 }
 
 /* ============================================
-   TYPOGRAPHY HELPERS
-   ============================================ */
-.bodyL {
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1.25rem; /* xl */
-  color: #f9f9f9;
-  margin: 0;
-  text-align: right;
-}
-.bodyS {
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1rem; /* md */
-  color: rgba(247, 247, 247, 0.9);
-  margin: 0;
-  text-align: right;
-}
-
-/* ============================================
    SCROLLABLE CONTENT
-  ============================================ */
+   ============================================ */
 .scrollContainer {
-  flex: 1;
   width: 100%;
-  max-height: 72%;
-  max-width: var(--container-max-width, 24.5625rem);
+  flex: 1; /* Take remaining height */
+  
+  /* Scroll behavior */
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 1.5rem 2rem 1.5rem;
+  scrollbar-width: none; /* Hide scrollbar */
+  
+  /* Layout */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.7rem;
+  
+  /* Padding Logic from Reference (1.5rem sides) + Bottom space */
+  padding: 0 1.5rem 6rem; 
+  gap: 0.75rem; /* Match reference cards gap */
+  
+  position: relative;
+  z-index: 10;
 }
 
 .scrollContainer::-webkit-scrollbar {
@@ -92,23 +92,42 @@
 }
 
 /* ============================================
-   PROFILE BOX (View Mode Container)
+   TYPOGRAPHY HELPERS
+   ============================================ */
+.bodyL {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: #f9f9f9;
+  margin: 0;
+  text-align: right;
+}
+.bodyS {
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem;
+  color: rgba(247, 247, 247, 0.9);
+  margin: 0;
+  text-align: right;
+}
+
+/* ============================================
+   PROFILE BOX (View Mode)
    ============================================ */
 .profileBox {
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* RTL layout */
+  align-items: flex-end;
   padding: 1rem;
   gap: 0.5rem;
 
-  /* White Border & Radius */
   border: 0.0625rem solid rgba(249, 249, 249, 0.84);
-  border-radius: 0.625rem; /* 10px */
+  border-radius: 0.625rem;
   background: transparent;
 
-  position: relative; /* For absolute positioning of Edit button */
+  position: relative;
   transition: all 0.3s ease;
   direction: rtl;
 }
@@ -116,17 +135,17 @@
 .boxHeader {
   width: 100%;
   display: flex;
-  justify-content: flex-start; /* Right in RTL */
+  justify-content: flex-start;
   align-items: center;
 }
 
-/* View Mode Footer: Absolutely positioned */
 .profileBox .boxFooter {
   position: absolute;
   bottom: 1rem;
   left: 1rem;
   margin: 0;
   width: auto;
+  z-index: 2;
 }
 
 /* ============================================
@@ -144,13 +163,13 @@
 .editModeContainer .boxFooter {
   width: 100%;
   display: flex;
-  justify-content: flex-end; /* Aligns to Left in RTL */
+  justify-content: flex-end;
   align-items: center;
   margin-top: 0.5rem;
 }
 
 /* ============================================
-   DETAILS GRID
+   DETAILS & TOGGLES
    ============================================ */
 .detailsGrid {
   width: 100%;
@@ -165,12 +184,9 @@
   align-items: flex-start;
   gap: 0.25rem;
   width: 100%;
-  max-width: 80%;
+  max-width: 100%; /* Ensure fits within new padding */
 }
 
-/* ============================================
-   OPTION TOGGLE BUTTONS (The New Design)
-   ============================================ */
 .optionsGroup {
   display: flex;
   gap: 0.5rem;
@@ -184,35 +200,27 @@
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
-
-  /* UNSELECTED STATE: Filled White Background */
   background: rgba(249, 249, 249, 0.3);
   border: 1px solid #f9f9f9;
   color: #681f02;
-
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 0.9rem;
-  color: #681f02; /* Dark Text */
-
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  border-radius: 0.5625rem;
 }
 
-.optionToggle:hover {
-  opacity: 0.9;
-}
+.optionToggle:hover { opacity: 0.9; }
 
 .optionToggle.selected {
-  /* SELECTED STATE: Semi-transparent Glass + Border */
   background: rgba(249, 249, 249, 0.8);
   border: 1px solid transparent;
-  border-radius: 0.5625rem; /* 9px */
 }
 
 /* ============================================
-   INPUTS & BUTTONS
+   BUTTONS
    ============================================ */
 .editButtonCustom {
   padding: 12px 32px;
@@ -239,74 +247,88 @@
 }
 
 .buttonsRow {
-  width: 120%;
-  align-self: right;
+  width: 100%;
   box-sizing: border-box;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column; /* Stack vertically for alignment */
+  align-items: flex-end; /* Right align in RTL */
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
+
 .logOutButton {
-  margin-right: 2.5rem;
-  right: 2rem;
   width: 100%;
   display: flex;
-  justify-content: flex-start;
-  margin-bottom: var(--spacing-lg); /* 16px */
-  margin-top: var(--spacing-xs);
+  justify-content: flex-start; /* Left side */
   color: var(--color-red-alert);
+  margin-bottom: 1rem;
 }
+
 .usersList {
-  margin-top: 1rem;
-  margin-right: 4.4rem;
-  width: 63px;
-  height: 18px;
+  width: auto;
+  height: auto;
   background: transparent;
-  border-radius: 5px;
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 0.875rem;
   color: rgba(247, 247, 247, 0.9);
   text-align: right;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
 }
+
 .AddAdminButton {
-  padding: 12px 32px 12px 32px;
+  padding: 12px 32px;
   gap: 8px;
-  /* purple */
   background: #b37eb3;
   border-radius: 5px;
   min-width: auto !important;
   font-family: var(--font-secondary);
   cursor: pointer;
-  align-self: bottom;
+  align-self: center;
+  color: #FFF;
   margin-top: auto;
 }
+
 .pressArrow {
   display: inline-block;
-  width: 0.4375rem; /* 7px */
-  height: 0.4375rem; /* 7px */
-  margin-right: 0.5rem; /* 4px spacing from text */
-  border-left: 0.0625rem solid #f9f9f9; /* 1px */
-  border-bottom: 0.0625rem solid #f9f9f9; /* 1px */
-  transform: rotate(45deg); /* Points left */
-  margin-top: 0.125rem; /* 2px - slightly lower */
-  margin-left: 1.25rem; /* 20px */
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-right: 0.5rem;
+  border-left: 0.0625rem solid #f9f9f9;
+  border-bottom: 0.0625rem solid #f9f9f9;
+  transform: rotate(45deg);
+  margin-left: 0.5rem;
 }
+
 .redPressArrow {
   display: inline-block;
-  width: 0.4375rem; /* 7px */
-  height: 0.4375rem; /* 7px */
-  margin-right: 0.2rem; /* 4px spacing from text */
-  border-left: 0.0625rem solid var(--color-red-alert); /* 1px */
-  border-bottom: 0.0625rem solid var(--color-red-alert); /* 1px */
-  transform: rotate(45deg); /* Points left */
-  margin-top: 0.125rem; /* 2px - slightly lower */
-  margin-left: 1.25rem; /* 20px */
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-right: 0.2rem;
+  border-left: 0.0625rem solid var(--color-red-alert);
+  border-bottom: 0.0625rem solid var(--color-red-alert);
+  transform: rotate(45deg);
+  margin-left: 0.5rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 24.5rem) {
+  .header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .scrollContainer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 @media (max-height: 700px) {
   .header {
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
+    padding-top: 3rem;
   }
   .profileBox {
     padding: 0.75rem;

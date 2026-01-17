@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image"; // Added for the close icon
+import Image from "next/image"; 
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import styles from "./addNotification.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from '@/lib/components/UI/CutInput';
 import UnifiedDropdown from '@/lib/components/UI/UnifiedDropdown';
+import Popup from "@/lib/components/UI/Popup"; // IMPORT POPUP
 
 // ... (Constants TARGET_OPTIONS, CIRCLE_OPTIONS, DAYS, MONTHS, YEARS remain unchanged) ...
 const TARGET_OPTIONS = [
@@ -50,7 +51,7 @@ export default function AddNotificationPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const [mounting, setMounting] = useState(true);
-  const [closing, setClosing] = useState(false); // New closing state
+  const [closing, setClosing] = useState(false);
 
   // Form State
   const [targetType, setTargetType] = useState<"" | "activity" | "date" | "circle">("");
@@ -67,6 +68,14 @@ export default function AddNotificationPage() {
   // UI State
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Popup State
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupConfig, setPopupConfig] = useState({
+    title: "",
+    content: "",
+    isSuccess: false,
+  });
+
   // Data State
   const [allActivities, setAllActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(false);
@@ -77,7 +86,6 @@ export default function AddNotificationPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Close Animation Handler
   const handleCloseWithAnimation = () => {
     setClosing(true);
     setTimeout(() => {
@@ -113,22 +121,42 @@ export default function AddNotificationPage() {
     setIsSubmitting(true);
     try {
       if (targetType === "activity") {
-        if (!selectedActivityId) throw new Error("Please select an activity");
+        if (!selectedActivityId) throw new Error("יש לבחור סדנא");
         await apiActivities.notifyParticipants(selectedActivityId, title, message);
       } else if (targetType === "date") {
-        if (!day || !month || !year) throw new Error("Please select a full date");
+        if (!day || !month || !year) throw new Error("יש לבחור תאריך מלא");
         await apiActivities.notifyByDate(`${year}-${month}-${day}`, title, message);
       } else if (targetType === "circle") {
-        if (!selectedCircle) throw new Error("Please select a circle");
+        if (!selectedCircle) throw new Error("יש לבחור מעגל");
         await apiActivities.notifyByCircle(selectedCircle, title, message);
       }
-      alert("ההודעה נשלחה בהצלחה!");
-      router.push("/AdminScreens/HomePage");
+      
+      // Success Popup
+      setPopupConfig({
+        title: "הודעה נשלחה",
+        content: "ההודעה נשלחה בהצלחה לקהל היעד שנבחר.",
+        isSuccess: true,
+      });
+      setShowPopup(true);
+
     } catch (error: any) {
       console.error("Error sending notification:", error);
-      alert("שגיאה בשליחת ההודעה");
+      // Error Popup
+      setPopupConfig({
+        title: "שגיאה",
+        content: error.message || "אירעה שגיאה בשליחת ההודעה",
+        isSuccess: false,
+      });
+      setShowPopup(true);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePopupClose = () => {
+    setShowPopup(false);
+    if (popupConfig.isSuccess) {
+      router.push("/AdminScreens/HomePage");
     }
   };
 
@@ -144,7 +172,6 @@ export default function AddNotificationPage() {
   return (
     <SmoothPageWrapper isLoading={mounting || closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
-      {/* Updated Close Button */}
       <button
         className={styles.closeButton}
         onClick={handleCloseWithAnimation}
@@ -302,6 +329,20 @@ export default function AddNotificationPage() {
         </div>
 
       </div>
+
+      {/* --- POPUP COMPONENT --- */}
+      {showPopup && (
+        <div className={styles.popupWrapper}>
+          <Popup
+            title={popupConfig.title}
+            content={popupConfig.content}
+            secondaryButtonText={popupConfig.isSuccess ? "חזרה לדף הבית" : "סגור"}
+            secondaryButtonAction={handlePopupClose}
+            onClose={handlePopupClose}
+          />
+        </div>
+      )}
+
     </main>
     </SmoothPageWrapper>
   );
