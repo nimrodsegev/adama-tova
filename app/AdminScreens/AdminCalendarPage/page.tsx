@@ -6,7 +6,6 @@ import DaySlider from "@/lib/components/UI/DaySlider";
 import { HomeFilter } from "@/lib/components/UI/HomeFilter";
 import NewUserActivityCard from "@/lib/components/UI/NewUserActivityCard";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
-import ActivityDetailsModal from "@/lib/components/ActivityDetailsModal/ActivityDetailsModal";
 import Button from "@/lib/components/UI/Button";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import styles from "./AdminCalendarPage.module.css";
@@ -18,12 +17,6 @@ export default function AdminCalendarPage() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [mounting, setMounting] = useState(true);
-
-  // Modal State
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
-    null
-  );
-  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
 
   const fetchData = async () => {
     setActivities([]);
@@ -68,16 +61,6 @@ export default function AdminCalendarPage() {
   const availableCount = activities.filter(
     (a: any) => (a.current_participants || 0) < (a.max_participants || 0)
   ).length;
-
-  const handleActivityModalClose = () => {
-    setIsActivityModalOpen(false);
-    setSelectedActivityId(null);
-  };
-
-  const handleCardClick = (id: string) => {
-    setSelectedActivityId(id);
-    setIsActivityModalOpen(true);
-  };
 
   return (
     <SmoothPageWrapper isLoading={mounting}>
@@ -133,7 +116,6 @@ export default function AdminCalendarPage() {
                   <div
                     key={activity.id}
                     className={styles.activityItem}
-                    onClick={() => handleCardClick(activity.id)}
                   >
                     <NewUserActivityCard
                       id={activity.id}
@@ -145,6 +127,7 @@ export default function AdminCalendarPage() {
                       maxParticipants={activity.max_participants || 0}
                       waitlistCount={activity.waitlist_count || 0}
                       isGroup={activity.is_group || !!activity.series_id}
+                      onMotionChange={() => fetchData()}
                     />
                   </div>
                 ))
@@ -153,16 +136,6 @@ export default function AdminCalendarPage() {
                 )}
           </div>
         </div>
-
-        {/* Admin Specific: Modal */}
-        {selectedActivityId && (
-          <ActivityDetailsModal
-            activityId={selectedActivityId}
-            isOpen={isActivityModalOpen}
-            onClose={handleActivityModalClose}
-            onRegistrationChange={fetchData}
-          />
-        )}
 
         {/* Admin Specific: Sticky Button (UPDATED) */}
         <div className={styles.bottomButton}>
