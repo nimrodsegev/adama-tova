@@ -96,10 +96,18 @@ const CustomArrowIcon = ({
     <path
       d="M2 2L12 12L22 2"
       stroke="white"
-      strokeWidth="3"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  </svg>
+);
+// The Horizontal Arrow for the "Swipe Hint"
+const NextArrow = () => (
+  <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 8.99609L18.9998 8.98543" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
+    <path d="M7.225 2L1 8.975" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
+    <path d="M0.99961 9L7.22461 15.975" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
   </svg>
 );
 
@@ -196,6 +204,10 @@ export default function AddActivityPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupConfig, setPopupConfig] = useState({ title: "", content: "" });
 
+  // Arrow State
+  const [arrowVisible, setArrowVisible] = useState(false);
+  const arrowTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Dropdown States
   const [isBranchOpen, setIsBranchOpen] = useState(false);
   const [isTypeOpen, setIsTypeOpen] = useState(false);
@@ -266,6 +278,10 @@ export default function AddActivityPage() {
       setImagePreviewUrl(URL.createObjectURL(file));
     }
   };
+  const handleClearImage = () => {
+    setImageFile(null);
+    setImagePreviewUrl(null);
+  };
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -278,6 +294,32 @@ export default function AddActivityPage() {
       }
     }
   };
+
+  // --- ARROW LOGIC ---
+  useEffect(() => {
+    // Clear existing timer
+    if (arrowTimerRef.current) clearTimeout(arrowTimerRef.current);
+    
+    // Hide initially
+    setArrowVisible(false);
+
+    // Logic: Determine if current step is valid to show arrow
+    let isCurrentStepValid = false;
+    if (currentStep === 0) isCurrentStepValid = isStep1Valid;
+    else if (currentStep === 1) isCurrentStepValid = isStep2Valid;
+    else return; // No arrow on step 2 (final step)
+
+    if (isCurrentStepValid) {
+      // Small delay for smooth animation after validation
+      arrowTimerRef.current = setTimeout(() => {
+        setArrowVisible(true);
+      }, 200);
+    }
+
+    return () => {
+      if (arrowTimerRef.current) clearTimeout(arrowTimerRef.current);
+    };
+  }, [currentStep, isStep1Valid, isStep2Valid]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -446,6 +488,14 @@ export default function AddActivityPage() {
         >
           {/* STEP 1 */}
           <div className={styles.scrollSnapSlide}>
+            {/* Arrow for Step 1 - Shows when form is valid */}
+            <button
+              className={`${styles.nextArrow} ${arrowVisible && currentStep === 0 ? styles.nextArrowSwipeHint : styles.nextArrowHidden}`}
+              type="button"
+              aria-label="המשך"
+            >
+              <NextArrow />
+            </button>
             <div className={styles.slideContent}>
               <CutInput
                 label="שם הפעילות"
@@ -487,7 +537,7 @@ export default function AddActivityPage() {
                 textAlign="right"
               />
               <CutInput
-                label="מספר משתתפים מקסימלי"
+                label="מספר משתתפים"
                 value={formData.max_participants}
                 onChange={(e) =>
                   setFormValue("max_participants", e.target.value)
@@ -549,6 +599,14 @@ export default function AddActivityPage() {
 
           {/* STEP 2 */}
           <div className={styles.scrollSnapSlide}>
+            {/* Arrow for Step 2 - Shows when valid */}
+            <button
+              className={`${styles.nextArrow} ${arrowVisible && currentStep === 1 ? styles.nextArrowSwipeHint : styles.nextArrowHidden}`}
+              type="button"
+              aria-label="המשך"
+            >
+              <NextArrow />
+            </button>
             <div className={styles.slideContent}>
               <UnifiedDropdown
                 label="סוג פעילות"
