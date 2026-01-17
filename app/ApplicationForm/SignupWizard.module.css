@@ -526,7 +526,7 @@
 .accordionContainer {
   width: 100%;
   position: relative;
-  z-index: 20;
+  z-index: 60; /* above arrow (50) so dropdown covers it */
 }
 
 .accordionHeader {
