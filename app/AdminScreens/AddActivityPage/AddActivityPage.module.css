@@ -1,47 +1,34 @@
+/* ... (Keep existing styles for Page, Header, ScrollSnap, Dropdowns) ... */
+
 /* ============================================
    PAGE LAYOUT LOCK & RESPONSIVENESS
    ============================================ */
 .pageOverride {
   display: flex;
   flex-direction: column;
-  
-  /* Center inner content (header/slider) horizontally */
   align-items: center;
-  
-  /* Lock to viewport edges explicitly */
   position: fixed; 
   inset: 0; 
-  
-  /* Force full width/height for background coverage */
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
   max-width: none !important; 
-  
-  /* Prevent background scroll */
   overflow: hidden;
   overscroll-behavior: none; 
-  
   background: var(--color-background);
-  
-  /* FIX: Use Safe Area Env + ample padding */
   padding: calc(2rem + env(safe-area-inset-top)) 1.2rem 1.5rem; 
-  gap: 0.5rem; /* 8px */
-  
-  /* Desktop shadow */
+  gap: 0.5rem; 
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
   z-index: 1;
 }
 
-/* Header */
 .header {
   text-align: center;
-  margin-top: 2rem; 
+  margin-top: 3rem; 
   margin-bottom: 0.5rem;
   z-index: 10;
   flex-shrink: 0;
   transition: margin 0.3s ease;
-  
   width: 100%;
   max-width: var(--container-max-width, 24.5625rem); 
 }
@@ -57,7 +44,7 @@
   height: 100%; 
   flex: 1;
   overflow-x: auto;
-  overflow-y: hidden; /* Prevent vertical scroll on the container itself */
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
@@ -72,41 +59,23 @@
   min-width: 100%;
   height: 100%;
   margin-top: 0; 
-  
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  
-  /* Default behavior for Step 1 & 2: Allow scrolling */
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior-y: contain;
-  
   display: flex;
   flex-direction: column;
   align-items: center;
-  
   padding-top: 2.5rem; 
   padding-bottom: 4rem; 
 }
 
-/* FIX: LOCKED LAST STEP (Stricter Rules) */
 .noScroll {
-  /* 1. Force kill scroll */
   overflow: hidden !important; 
-  overflow-y: hidden !important;
-  overscroll-behavior: none !important; /* Stop "rubber banding" bounce */
-  touch-action: pan-x; /* Allow horizontal swipe (for back), block vertical */
-  
-  /* 2. Positioning strategy */
-  justify-content: center; /* Center content vertically */
-  
-  /* 3. Reset Top Padding */
+  touch-action: none;
+  justify-content: center;
   padding-top: 0 !important;
-  
-  /* 4. Massive Bottom Padding 
-     This reduces the "available vertical space" for the flex centering,
-     effectively pushing the visual center upwards by ~100-120px. 
-     This ensures the button is always above the dots. */
   padding-bottom: calc(14rem + env(safe-area-inset-bottom)) !important; 
 }
 
@@ -122,7 +91,7 @@
 }
 
 /* ============================================
-   FLOATING LABELS (SignupWizard Style)
+   FLOATING LABELS
    ============================================ */
 .inputLabel {
   display: flex;
@@ -134,24 +103,21 @@
   height: 0.875rem;
   top: -0.6rem;
   right: 1.5rem;
-  
   background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
   background-repeat: no-repeat;
   background-size: 100vw var(--vh, 100dvh); 
   background-position: center var(--bg-y, 0px);
-  
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 0.9rem;
   color: #F9F9F9;
-  
   pointer-events: none;
   z-index: 2;
   white-space: nowrap;
 }
 
 /* ============================================
-   CUSTOM DROPDOWN
+   DROPDOWNS
    ============================================ */
 .dropdownContainer {
   position: relative;
@@ -160,10 +126,7 @@
   z-index: 1; 
   transition: z-index 0.1s; 
 }
-
-.activeDropdownContainer {
-  z-index: 100 !important;
-}
+.activeDropdownContainer { z-index: 100 !important; }
 
 .dropdownToggle {
   box-sizing: border-box;
@@ -184,12 +147,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
-.dropdownToggle.open {
-  border-radius: 0.5625rem 0.5625rem 0 0;
-  border-bottom: none;
-}
-
+.dropdownToggle.open { border-radius: 0.5625rem 0.5625rem 0 0; border-bottom: none; }
 .dropdownPlaceholder { color: rgba(247, 247, 247, 0.7); }
 
 .dropdownMenu {
@@ -205,7 +163,6 @@
   overflow-y: auto;
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
-
 .dropdownOption {
   width: 100%;
   padding: 0.875rem 1.625rem;
@@ -222,10 +179,9 @@
 }
 .dropdownOption:last-child { border-bottom: none; }
 .dropdownOption:hover { background: rgba(255, 255, 255, 0.1); }
-.dropdownOption.selected { background: rgba(255, 255, 255, 0.15); font-weight: 400; }
 
 /* ============================================
-   MINI DROPDOWN (Date)
+   MINI DROPDOWN
    ============================================ */
 .miniDropdownContainer {
   position: relative;
@@ -233,10 +189,7 @@
   height: 1.75rem;
   z-index: 1;
 }
-
-.activeMiniDropdown {
-  z-index: 100 !important;
-}
+.activeMiniDropdown { z-index: 100 !important; }
 
 .miniDropdownToggle {
   width: 100%; height: 100%;
@@ -269,14 +222,14 @@
 }
 
 /* ============================================
-   CUSTOM TIME PICKER
+   TIME PICKER
    ============================================ */
 .timePickerContainer {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 6rem; /* Large gap */
+  gap: 6rem; 
   width: 100%;
   height: 9rem; 
   border: 0.0625rem solid #F9F9F9;
@@ -284,7 +237,6 @@
   background: transparent;
   direction: ltr; 
 }
-
 .timeColumn {
   display: flex;
   flex-direction: column;
@@ -292,7 +244,6 @@
   justify-content: center;
   gap: 0.75rem; 
 }
-
 .timeButton {
   background: transparent;
   border: none;
@@ -303,29 +254,7 @@
   padding: 0.5rem;
   transition: transform 0.1s;
 }
-
-.timeButton:active {
-  transform: scale(0.9);
-}
-
-/* If tertiary_arrow_left.svg points LEFT:
-  Rotate 90deg to point UP
-  Rotate -90deg (or 270deg) to point DOWN
-*/
-.arrowUp {
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); 
-  transform: rotate(90deg);
-  filter: brightness(0) invert(1);
-}
-
-.arrowDown {
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); 
-  transform: rotate(-90deg);
-  filter: brightness(0) invert(1);
-}
-
+.timeButton:active { transform: scale(0.9); }
 .timeValue {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
@@ -335,13 +264,11 @@
   text-align: center;
 }
 
-
 /* ============================================
    ICONS & HELPERS
    ============================================ */
 .arrowIconWrapper {
   display: flex; align-items: center; justify-content: center;
-  
   pointer-events: none; transition: transform 0.2s ease;
 }
 .dropdownToggle.open .arrowIconWrapper, .miniDropdownToggle.open .arrowIconWrapper { transform: rotate(180deg); }
@@ -351,46 +278,88 @@
 .dateRow { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0; gap: 0.5rem; width: 100%; direction: rtl; }
 
 /* ============================================
-   IMAGE UPLOAD
+   IMAGE UPLOAD (SVG BORDER)
    ============================================ */
-.uploadWrapper { position: relative; width: 100%; }
+.imageWrapperSVG {
+  position: relative;
+  width: 100%;
+  height: 3.75rem; /* 60px */
+  z-index: 1;
+}
+
+/* The SVG Border */
+.imageBorderSVG {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.imageBorderPath {
+  stroke: #F9F9F9;
+  stroke-width: 1;
+}
+
+/* The Label sitting in the gap */
+.imageLabelSVG {
+  position: absolute;
+  top: -0.5rem;
+  right: 3rem;
+  font-family: var(--font-secondary);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.1875rem;
+  color: #F9F9F9;
+  padding: 0 0.25rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* The Clickable Area (No CSS Border) */
 .uploadBox {
   display: flex; align-items: center; justify-content: space-between;
-  width: 100%; height: 3.75rem; padding: 0.6875rem 1.875rem;
-  background: transparent; border: 0.0625rem solid var(--color-text-secondary);
-  border-radius: var(--radius-sm); cursor: pointer; transition: height 0.2s ease;
+  width: 100%; 
+  height: 100%; /* Fill wrapper */
+  padding: 0.6875rem 1.875rem;
+  background: transparent;
+  border: none; /* SVG handles border */
+  border-radius: 0.5625rem;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
 }
-.paperclipWrapper {
-  position: absolute; width: 1.125rem; height: 1.125rem;
-  top: 50%; transform: translateY(-50%); left: 1.5rem; 
-  display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 1;
-}
-.paperclipIcon { width: 100%; height: 100%; }
+
+.paperclipWrapper { width: 1.125rem; height: 1.125rem; display: flex; align-items: center; justify-content: center;}
 .uploadText {
-  flex: 1; text-align: right; color: var(--color-text-tertiary);
+  flex: 1; text-align: right; color: rgba(247, 247, 247, 0.7);
   font-family: var(--font-secondary); font-size: 1rem; font-weight: 300;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl;
+  margin-right: 1rem;
 }
-.uploadSubtext {
-  position: absolute; right: 1.95rem; top: -0.6rem;
-  font-size: 0.875rem; color: var(--color-text-secondary);
-  
-  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  background-repeat: no-repeat;
-  background-size: 100vw var(--vh, 100dvh); 
-  background-position: center var(--bg-y, 0px);
-  
-  padding: 0 4px;
+
+/* Preview Box (No CSS Border) */
+.filePreviewBox {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; 
+  height: 100%; /* Fill wrapper */
+  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.1); 
+  border: none; /* SVG handles border */
+  border-radius: 0.5625rem;
+  position: relative;
+  z-index: 5;
 }
-.optionalText { font-family: var(--font-secondary); font-weight: 300; color: #FFFFFF; padding-right: 0.25rem; }
+.fileName { color: #fff; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; }
+.previewLabel { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin: 0 5px; }
 
 /* ============================================
    PREVIEW CARD (Step 3)
    ============================================ */
-.step3Container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 21.625rem; gap: 2rem; }
 .previewImageCard {
   box-sizing: border-box; width: 100%; height: 13.0625rem;
-  background: #AB4016; margin-top:120px ; border: 0.0625rem solid #F9F9F9; border-radius: 0.75rem;
+  background: #AB4016; border: 0.0625rem solid #F9F9F9; border-radius: 0.75rem;
   overflow: hidden; position: relative; margin-bottom: 2rem;
 }
 .previewImage { width: 100%; height: 100%; object-fit: cover; }
@@ -401,39 +370,19 @@
 .previewDescription { width: 100%; font-family: var(--font-secondary); font-weight: 400; font-size: 1rem; line-height: 1.1875rem; text-align: right; color: #F9F9F9; white-space: pre-wrap; min-height: 2.375rem; }
 
 /* ============================================
-   CLOSE BUTTON 
+   BUTTONS
    ============================================ */
 .closeButton {
-  position: absolute;
-  width: auto;
-  height: auto;
-  right: 1.3rem; /* 20px */
-  top: 2rem; /* 32px */
-  border: none;
-  outline: none;
-  box-shadow: none;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  z-index: 1201;
-  padding: var(--spacing-xs); /* 4px */
-  transition: transform var(--transition-normal);
-  -webkit-tap-highlight-color: transparent;
+  position: absolute; width: auto; height: auto;
+  right: 1rem; top: 2rem;
+  border: none; outline: none; background: transparent;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer; z-index: 1201;
+  padding: 4px; transition: transform 0.2s;
 }
+.closeButton:hover { transform: scale(1.1); }
+.closeButton:active { transform: scale(0.95); }
 
-.closeButton:hover {
-  transform: scale(1.1);
-}
-
-.closeButton:active {
-  transform: scale(0.95);
-}
-
-/* ============================================
-   BUTTONS & FOOTER
-   ============================================ */
 .submitButtonContainer { display: flex; justify-content: center; align-items: center; margin-top: 1rem; width: 100%; }
 .submitButton {
   display: flex; flex-direction: row; justify-content: center; align-items: center;
@@ -444,87 +393,29 @@
 .submitButton:disabled { opacity: 0.6; cursor: not-allowed; }
 .errorBanner { color: #ffcccc; font-size: 0.9rem; text-align: center; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; margin-top: 1rem; }
 
-/* NAVIGATION (Updated Positioning)
-   Lifts dots above the bottom safe area
-*/
-.navigation {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  
-  width: 100%;
-  position: fixed;
-  bottom: calc(2rem + env(safe-area-inset-bottom)); /* Lifted up for PWA bar */
-  left: 0;
-  right: 0;
-  z-index: 100;
-  
-  background: transparent;
-  pointer-events: none;
-}
-
-.progressDots {
-  display: flex;
-  flex-direction: row; /* In RTL this goes Right to Left */
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  gap: 0.5rem; /* 8px */
-  pointer-events: auto; /* Re-enable clicks on the dots themselves */
-}
-
-/* Progress circle container */
-.progressCircle {
-  width: 1.0625rem; /* ~17px */
-  height: 1.0625rem; /* ~17px */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  flex-grow: 0;
-  transition: all 0.3s;
-}
-
-/* Progress circle icon (SVG) */
-.progressCircleIcon {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
 /* ============================================
-   RESPONSIVE DESIGN
+   NAVIGATION
    ============================================ */
-.pageOverride :global(.input-field) {
-  transition: height 0.2s ease;
+.navigation {
+  display: flex; flex-direction: row; justify-content: center; align-items: center;
+  width: 100%; position: fixed; bottom: calc(2rem + env(safe-area-inset-bottom));
+  left: 0; right: 0; z-index: 100;
+  background: transparent; pointer-events: none;
 }
+.progressDots {
+  display: flex; flex-direction: row; justify-content: center; align-items: center;
+  padding: 0; gap: 0.5rem; pointer-events: auto; 
+}
+.progressCircle {
+  width: 1.0625rem; height: 1.0625rem; display: flex; align-items: center; justify-content: center;
+  flex: none; flex-grow: 0; transition: all 0.3s;
+}
+.progressCircleIcon { width: 100%; height: 100%; object-fit: contain; }
 
 @media (max-height: 700px) {
-  .header { margin-top: 2rem; margin-bottom: 1.5rem; }
+  .header { margin-top: 3rem; margin-bottom: 1.5rem; }
   .scrollSnapSlide { padding-top: 1rem; }
   .pageOverride :global(.input-field), .dropdownToggle, .uploadBox { height: 3rem; }
   .slideContent { gap: 0.75rem; }
-  /* Adjust navigation for small screens */
   .navigation { bottom: calc(1rem + env(safe-area-inset-bottom)); }
-}
-
-@media (max-height: 600px) {
-  .header { margin-top: 2.5rem; margin-bottom: 1rem; }
-  .pageOverride :global(.input-field), .dropdownToggle, .uploadBox { height: 2.5rem; }
-  .slideContent { gap: 0.5rem; }
-}
-
-@media (min-height: 800px) {
-  .header { margin-top: 3.5rem; }
-  .scrollSnapSlide { padding-top: 1rem; }
-  .slideContent { gap: 1.25rem; }
-}
-
-@media (min-width: 48rem) {
-  .slideContent { max-width: 24rem; }
-}
-
-@media (display-mode: standalone) {
-  .pageOverride { padding-top: calc(2vh + env(safe-area-inset-top)) !important; }
 }

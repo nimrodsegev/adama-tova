@@ -1,5 +1,4 @@
 /* RegistrationSuccessModal.module.css */
-
 /* Overlay backdrop */
 .overlay {
   position: fixed;
@@ -10,7 +9,7 @@
   width: 100vw;
   height: 100vh;
   background-color: transparent;
-  z-index: 1999;
+  z-index: 1999; /* ⚠️ NO VARIABLE - custom z-index */
 }
 
 /* Background Circles Container */
@@ -21,7 +20,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 3001;
+  z-index: 3001; /* ⚠️ NO VARIABLE - custom z-index */
 }
 
 /* Main Modal Container */
@@ -34,8 +33,8 @@
   width: 100%;
   max-width: 100vw;
   height: 100dvh;
-  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
-  z-index: 2000;
+  background: var(--color-background);
+  z-index: 2000; /* ⚠️ NO VARIABLE - custom z-index */
   overflow-y: auto;
   overflow-x: hidden;
   direction: rtl;
@@ -45,17 +44,17 @@
 /* Close Button (X) */
 .groupCloseButton {
   position: absolute;
-  width: 2.5625rem;
-  height: 2.5rem;
-  right: 1.25rem;
-  top: 3.1875rem;
+  width: 2.5625rem; /* ⚠️ NO VARIABLE */
+  height: 2.5rem; /* ⚠️ NO VARIABLE */
+  right: var(--spacing-xl);
+  top: 3.1875rem; /* ⚠️ NO VARIABLE - 51px */
   border: none;
   background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 10;
+  z-index: 10; /* ⚠️ NO VARIABLE */
   padding: 0;
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
@@ -91,12 +90,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 7.635rem;
-  height: 7.75rem;
+  width: 7.635rem; /* ⚠️ NO VARIABLE */
+  height: 7.75rem; /* ⚠️ NO VARIABLE */
   position: relative;
-  z-index: 3002;
+  z-index: 3002; /* ⚠️ NO VARIABLE */
   /* Control Arrow Vertical Position */
-  transform: translateY(0.5rem);
+  transform: translateY(var(--spacing-sm));
 }
 
 .checkmarkIcon {
@@ -104,8 +103,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 3.74rem;
-  height: 2.98rem;
+  width: 3.74rem; /* ⚠️ NO VARIABLE */
+  height: 2.98rem; /* ⚠️ NO VARIABLE */
 }
 
 /* =========================================================
@@ -117,24 +116,19 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 24rem; /* Wide enough for long titles */
-
+  max-width: 24rem; /* ⚠️ NO VARIABLE - wide enough for long titles */
   /* Control Text Vertical Position */
-  transform: translateY(10rem);
+  transform: translateY(10rem); /* ⚠️ NO VARIABLE */
 }
 
 /* ⭐ 1. "REGISTERED SUCCESSFULLY" TITLE */
 .successTitle {
   font-family: var(--font-secondary);
   font-style: normal;
-
-  /* 👇 CHANGE FONT SIZE/WEIGHT HERE */
   font-weight: var(--font-weight-semibold); /* Bold */
   font-size: var(--font-size-xl); /* Bigger size */
-
   text-align: center;
-  color: #ffffff;
-
+  color: var(--color-text-primary);
   direction: rtl;
 }
 
@@ -142,14 +136,11 @@
 .successDetails {
   font-family: var(--font-secondary);
   font-style: normal;
-
-  /* 👇 CHANGE FONT SIZE/WEIGHT HERE */
   font-weight: var(--font-weight-semibold); /* Regular */
   font-size: var(--font-size-xl); /* Standard size */
-
-  line-height: 1.5rem;
+  line-height: var(--spacing-2xl);
   text-align: center;
-  color: #ffffff;
+  color: var(--color-text-primary);
   margin: 0;
   direction: rtl;
 }
@@ -160,10 +151,10 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-bold);
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font-size: var(--font-size-base);
+  line-height: var(--spacing-2xl);
   text-align: center;
-  color: #ffffff;
+  color: var(--color-text-primary);
   margin: 0;
   direction: rtl;
 }

@@ -219,6 +219,7 @@
 }
 .dropdownContainer.miniDropdown .arrowIcon {
   transform: translateY(0.15rem);
+  margin-right: 1.5rem;
 }
 
 .dropdownContainer.miniDropdown .dropdownMenu {

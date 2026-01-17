@@ -1,3 +1,4 @@
+/* ActivityCard.module.css */
 .cardContainer {
   box-sizing: border-box;
   display: flex;
@@ -5,8 +6,8 @@
   align-items: flex-start;
   padding: var(--spacing-lg);
   width: 100%;
-  max-width: 21.5625rem;
-  min-height: 6rem;
+  max-width: var(--content-width-standard);
+  min-height: 6rem; /* ⚠️ NO VARIABLE - 96px */
   height: auto;
   background: var(--button-bg-light);
   border-radius: var(--radius-sm);
@@ -37,7 +38,7 @@
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xl);
-  line-height: 1.25rem;
+  line-height: var(--line-height-compact);
   color: var(--color-bordo);
   margin: 0;
   text-align: right;
@@ -48,7 +49,7 @@
 .detailsGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-xs);
   width: 100%;
 }
 
@@ -57,7 +58,7 @@
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-md);
-  line-height: 1.125rem;
+  line-height: 1.125rem; /* ⚠️ NO VARIABLE - 18px */
   color: var(--color-bordo);
   margin: 0;
   text-align: right;
@@ -70,7 +71,7 @@
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-md);
-  line-height: 1.125rem;
+  line-height: 1.125rem; /* ⚠️ NO VARIABLE - 18px */
   color: var(--color-bordo);
   margin: 0;
   text-align: right;
@@ -91,7 +92,7 @@
   justify-content: flex-start;
   margin-top: auto;
   flex-shrink: 0;
-  top: 0.1rem;
+  top: 0.1rem; /* ⚠️ NO VARIABLE */
   width: auto;
 }
 
@@ -105,7 +106,7 @@
   flex-shrink: 0;
   /* ⭐ Adjust these values to control admin button position */
   top: var(--spacing-xs); /* Remove the 0.1rem offset */
-  margin-bottom: 0.25rem; /* Add some bottom margin if needed */
+  margin-bottom: var(--spacing-xs); /* Add some bottom margin if needed */
   width: auto;
   left: var(--spacing-2xl);
 }
@@ -116,25 +117,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
   flex-shrink: 0;
   z-index: 1;
 }
 
 .clockIconRegister {
-  left: 5.5rem;
+  left: 5.5rem; /* ⚠️ NO VARIABLE - 88px */
   bottom: 0;
-  margin-bottom: -0.5rem;
+  margin-bottom: -0.5rem; /* ⚠️ NO VARIABLE - negative spacing */
 }
 
 .clockIconCancel {
-  left: 4.5rem;
+  left: 4.5rem; /* ⚠️ NO VARIABLE - 72px */
   bottom: 0;
-  margin-bottom: -0.5rem;
+  margin-bottom: -0.5rem; /* ⚠️ NO VARIABLE - negative spacing */
 }
 
 .clockIcon {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
 }

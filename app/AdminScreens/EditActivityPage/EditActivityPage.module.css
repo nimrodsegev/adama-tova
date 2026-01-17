@@ -374,6 +374,7 @@
 .fileName { color: #fff; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; }
 .previewLabel { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin: 0 5px; }
 .optionalText { font-size: 0.8rem; opacity: 0.8; margin-right: 4px; }
+
 /* ============================================
    CUSTOM TIME PICKER
    ============================================ */
@@ -429,6 +430,7 @@
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-md); 
   transform: rotate(-90deg);
+  stroke-width: 3px;
   filter: brightness(0) invert(1);
 }
 
@@ -437,7 +439,7 @@
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-md); 
   color: #FFFFFF;
-  min-width: 1rem;
+  min-width: 2.5rem;
   text-align: center;
 }
 

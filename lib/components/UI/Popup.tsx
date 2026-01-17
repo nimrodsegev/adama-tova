@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom"; // Import createPortal
 import Button from "./Button";
 import styles from "./Popup.module.css";
 
@@ -36,6 +37,19 @@ export default function Popup({
   onClose,
   preview = false,
 }: PopupProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Optional: Prevent background scrolling when popup is open
+    if (!preview) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [preview]);
+
   const handlePrimaryClick = () => {
     if (primaryButtonAction) {
       primaryButtonAction();
@@ -60,99 +74,64 @@ export default function Popup({
     }
   };
 
-  // Preview mode - just the modal without overlay
-  if (preview) {
-    return (
-      <div className={styles.modal}>
-        <div className={styles.modalContent}>
-          {title && <h2 className={styles.title}>{title}</h2>}
+  // 1. Content Logic (Same as before)
+  const modalContent = (
+    <div className={styles.modalContent}>
+      {title && <h2 className={styles.title}>{title}</h2>}
 
-          <div className={styles.messageContainer}>
-            {userName && <p className={styles.userName}>{userName}</p>}
+      <div className={styles.messageContainer}>
+        {userName && <p className={styles.userName}>{userName}</p>}
 
-            {typeof content === "string" ? (
-              <p className={styles.message}>{content}</p>
-            ) : (
-              content
-            )}
+        {typeof content === "string" ? (
+          <p className={styles.message}>{content}</p>
+        ) : (
+          content
+        )}
 
-            {email && <p className={styles.email}>{email}</p>}
+        {email && <p className={styles.email}>{email}</p>}
 
-            {recommendation && (
-              <p className={styles.recommendation}>{recommendation}</p>
-            )}
-          </div>
+        {recommendation && (
+          <p className={styles.recommendation}>{recommendation}</p>
+        )}
+      </div>
 
-          {(primaryButtonText || secondaryButtonText) && (
-            <div className={styles.buttons}>
-              {secondaryButtonText && (
-                <Button variant="reject" onClick={handleSecondaryClick}>
-                  {secondaryButtonText}
-                </Button>
-              )}
+      {(primaryButtonText || secondaryButtonText) && (
+        <div className={styles.buttons}>
+          {secondaryButtonText && (
+            <Button variant="reject" onClick={handleSecondaryClick}>
+              {secondaryButtonText}
+            </Button>
+          )}
 
-              {primaryButtonText && (
-                <Button
-                  variant="approve"
-                  onClick={handlePrimaryClick}
-                  disabled={loading}
-                  customBorderColor={"var(--color-white-pure)"}
-                >
-                  {loading ? "טוען..." : primaryButtonText}
-                </Button>
-              )}
-            </div>
+          {primaryButtonText && (
+            <Button
+              variant="approve"
+              onClick={handlePrimaryClick}
+              disabled={loading}
+              customBorderColor={"var(--color-white-pure)"}
+            >
+              {loading ? "טוען..." : primaryButtonText}
+            </Button>
           )}
         </div>
-      </div>
-    );
+      )}
+    </div>
+  );
+
+  // 2. Preview Mode (Returns normal JSX, no portal needed)
+  if (preview) {
+    return <div className={styles.modal}>{modalContent}</div>;
   }
 
-  // Full mode - with overlay
-  return (
+  // 3. Client-side Check
+  if (!mounted) return null;
+
+  // 4. Portal Logic - Render directly into document.body
+  // This breaks the popup out of SmoothPageWrapper and puts it above the Footer
+  return createPortal(
     <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={styles.modal}>
-        <div className={styles.modalContent}>
-          {title && <h2 className={styles.title}>{title}</h2>}
-
-          <div className={styles.messageContainer}>
-            {userName && <p className={styles.userName}>{userName}</p>}
-
-            {typeof content === "string" ? (
-              <p className={styles.message}>{content}</p>
-            ) : (
-              content
-            )}
-
-            {email && <p className={styles.email}>{email}</p>}
-
-            {recommendation && (
-              <p className={styles.recommendation}>{recommendation}</p>
-            )}
-          </div>
-
-          {(primaryButtonText || secondaryButtonText) && (
-            <div className={styles.buttons}>
-              {secondaryButtonText && (
-                <Button variant="reject" onClick={handleSecondaryClick}>
-                  {secondaryButtonText}
-                </Button>
-              )}
-
-              {primaryButtonText && (
-                <Button
-                  variant="approve"
-                  onClick={handlePrimaryClick}
-                  disabled={loading}
-                  customBorderColor={"var(--color-white-pure)"}
-                >
-                  {loading ? "טוען..." : primaryButtonText}
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+      <div className={styles.modal}>{modalContent}</div>
+    </div>,
+    document.body
   );
 }
