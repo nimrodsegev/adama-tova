@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useUser } from "@/app/contexts/UserContext";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { apiActivities, apiRegistrations } from "@/app/services/db_api";
@@ -13,7 +14,6 @@ import GroupRegistrationSuccessModal from "@/lib/components/RegistrationSuccessM
 import ActivityRegistrationsModal from "@/lib/components/ActivityRegistrationsModal/ActivityRegistrationsModal";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./ActivityDetailsModal.module.css";
-import Image from "next/image";
 
 type ActivityDetailsModalProps = {
   activityId: string;
@@ -248,29 +248,23 @@ export default function ActivityDetailsModal({
     }
   };
 
-  // ⭐ Helper: Dynamic Participant Text Logic
   const getParticipantsText = () => {
     const { confirmed, total, waitlist } = registrationCount;
     const remaining = Math.max(0, total - confirmed);
     const isFull = confirmed >= total;
 
-    // 1. User IS on the waitlist
     if (regStatus === "waitlist" && waitlistPosition) {
       return `(יש ${waitlist} ברשימת המתנה, מיקומך: ${waitlistPosition})`;
     }
 
-    // 2. Activity is Full
     if (isFull) {
       if (waitlist > 0) {
-        // Full + Waiting list exists (User not on it, checked above)
         return `(${waitlist} ברשימת המתנה)`;
       } else {
-        // Full + No waiting list yet
         return "(ניתן להירשם לרשימת המתנה)";
       }
     }
 
-    // 3. Open spots
     return `(נותרו ${remaining} מקומות)`;
   };
 
@@ -303,7 +297,9 @@ export default function ActivityDetailsModal({
       {!hideDetailsModal && (
         <>
           <div className={styles.overlay} onClick={handleCloseWithAnimation} />
+
           <div className={styles.modalContainer}>
+            {/* 1. CLOSE BUTTON (Flex Item - Aligned Start/Right) */}
             <button
               className={styles.closeButton}
               onClick={handleCloseWithAnimation}
@@ -317,6 +313,7 @@ export default function ActivityDetailsModal({
               />
             </button>
 
+            {/* 2. SCROLLABLE CONTENT */}
             <div className={styles.contentContainer}>
               {loading ? (
                 <div className={styles.loadingContainer}>
@@ -338,7 +335,11 @@ export default function ActivityDetailsModal({
                     </div>
                   )}
 
-                  <div className={styles.titleSection}>
+                  <div
+                    className={`${styles.titleSection} ${
+                      !hasImage ? styles.noImageSpacing : ""
+                    }`}
+                  >
                     <h2 className={styles.titleText}>
                       {isGroup ? "קבוצת " : "סדנת "}
                       {activity?.title || ""}
@@ -402,6 +403,7 @@ export default function ActivityDetailsModal({
               )}
             </div>
 
+            {/* 3. FIXED BOTTOM BUTTONS */}
             {!loading && !closing && (
               <div className={styles.bottomButtonsContainer}>
                 {isAdmin ? (
