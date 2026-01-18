@@ -3,35 +3,35 @@
 import React, { useEffect, useState } from "react";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
-const TEXT_APPEAR_DELAY = 2600; // Time before text fades in (ms)
-const EXTRA_HOLD_TIME = 1000; // ⭐️ NEW: How long to wait AFTER animation finishes before closing (ms)
+// ⏱️ CONTROL SETTINGS
+const TEXT_APPEAR_DELAY = 2600;
+const EXTRA_HOLD_TIME = 1000;
 
 export default function GlobalSplash() {
   const [shouldShow, setShouldShow] = useState(true);
   const [showText, setShowText] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const hasSeenSplash = sessionStorage.getItem("has_seen_splash");
+    // 1. Check for mobile to optimize animation later if needed
+    setIsMobile(window.innerWidth < 768);
 
+    const hasSeenSplash = sessionStorage.getItem("has_seen_splash");
     if (hasSeenSplash) {
       setShouldShow(false);
     } else {
       const timer = setTimeout(() => {
         setShowText(true);
       }, TEXT_APPEAR_DELAY);
-
       return () => clearTimeout(timer);
     }
   }, []);
 
   const handleSplashComplete = () => {
-    // ⭐️ CHANGE: We now wait for EXTRA_HOLD_TIME before starting the fade out
     setTimeout(() => {
       sessionStorage.setItem("has_seen_splash", "true");
       setIsFadingOut(true);
-
-      // Remove from DOM after the fade-out transition (0.5s) is done
       setTimeout(() => {
         setShouldShow(false);
       }, 500);
@@ -47,17 +47,26 @@ export default function GlobalSplash() {
         top: 0,
         left: 0,
         width: "100vw",
-        height: "100vh",
 
-        // ✅ Using CSS Variable for easy changes
+        // 📱 FIX 1: Use dvh (Dynamic Viewport Height)
+        // This ensures it fits perfectly between mobile address bars/notches
+        height: "100dvh",
+        maxHeight: "-webkit-fill-available", // Safari fallback
+
         background: "var(--color-background)",
-
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 99999,
+
+        // 🚀 FIX 2: Performance Optimizations
         opacity: isFadingOut ? 0 : 1,
         transition: "opacity 0.5s ease-out",
+        willChange: "opacity", // Tells mobile GPU to get ready
+
+        // Prevent scrolling/pull-to-refresh on the splash screen
+        overscrollBehavior: "none",
+        touchAction: "none",
         pointerEvents: isFadingOut ? "none" : "all",
       }}
       dir="rtl"
@@ -67,32 +76,40 @@ export default function GlobalSplash() {
           position: "absolute",
           top: "50%",
           left: "50%",
+          // 🚀 FIX 3: Use translate3d to force GPU acceleration
           transform: showText
-            ? "translate(-50%, -50%)"
-            : "translate(-50%, -40%)",
+            ? "translate3d(-50%, -50%, 0)"
+            : "translate3d(-50%, -40%, 0)",
 
-          // ✅ Using CSS Variables for text and font
           color: "var(--color-text-primary)",
           fontFamily: "var(--font-primary)",
 
+          // Responsive font size: slightly smaller on mobile to feel "cleaner"
           fontSize: "var(--font-size-xl)",
-          fontWeight: "var(--font-weight-semibold)",
+          fontWeight: "var(iifont-weight-semibold)",
+
           opacity: showText ? 1 : 0,
           transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+          willChange: "opacity, transform", // Hint to browser
+
           zIndex: 10000,
           margin: 0,
           whiteSpace: "nowrap",
+
+          // Ensure text doesn't get cut off by notches in landscape
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
         }}
       >
         המרחב
       </h1>
 
+      {/* If OrganicCircles is very heavy, you might consider 
+         passing a simpler configuration for mobile if isMobile is true.
+      */}
       <OrganicCircles
         mode="splash"
         radius={0.15}
-        // ✅ We pass the variable string.
-        // Note: If OrganicCircles uses canvas context.fillStyle, you might need a hex code here.
-        // But if it uses SVG/CSS, this variable works perfectly.
         baseColor="var(--color-text-primary)"
         position={{ x: 0.5, y: 0.5 }}
         onModeComplete={handleSplashComplete}
