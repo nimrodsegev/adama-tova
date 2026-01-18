@@ -1686,12 +1686,13 @@ export const apiUser = {
   /**
    * 📊 GET USER ACTIVITY STATS
    * Returns count of groups and workshops the user is registered for
+   * Groups with multiple sessions (same series_id) are counted as one group
    */
   async getUserActivityStats(userId) {
-    // Get all registrations for this user with activity details
+    // Get all registrations for this user with activity details including series_id
     const { data: registrations, error } = await supabase
       .from("registrations")
-      .select("activity_id, activities!inner(id, is_group)")
+      .select("activity_id, activities!inner(id, is_group, series_id)")
       .eq("user_id", userId)
       .eq("if_confirmed", true);
 
@@ -1705,17 +1706,20 @@ export const apiUser = {
     }
 
     // Count groups vs workshops
-    let groupCount = 0;
+    // For groups, use Set to count unique series_ids (avoid counting multiple sessions as separate groups)
+    const uniqueGroupSeriesIds = new Set();
     let workshopCount = 0;
 
     registrations.forEach((reg) => {
       if (reg.activities?.is_group) {
-        groupCount++;
+        // Use series_id if available, otherwise use activity_id as fallback
+        const groupId = reg.activities.series_id || reg.activities.id;
+        uniqueGroupSeriesIds.add(groupId);
       } else {
         workshopCount++;
       }
     });
 
-    return [{ groups: groupCount, workshops: workshopCount }, null];
+    return [{ groups: uniqueGroupSeriesIds.size, workshops: workshopCount }, null];
   },
 };

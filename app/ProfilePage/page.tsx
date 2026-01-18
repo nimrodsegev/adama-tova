@@ -156,14 +156,13 @@ export default function ProfilePage() {
     <ProtectedRoute>
       <SmoothPageWrapper isLoading={loading || mounting}>
         <main className={styles.pageContainer}>
-          <div className={styles.header}>
+          <div className={styles.scrollContainer} ref={scrollContainerRef}>
+            <div className={styles.header}>
             <h1 className={styles.userName}>
               {userProfile?.full_name || "אורח"}
             </h1>
             {isAdmin && <span className={styles.adminLabel}>מנהלת</span>}
           </div>
-
-          <div className={styles.scrollContainer} ref={scrollContainerRef}>
             {/* --- SECTION 1: PERSONAL DETAILS --- */}
             <div className={styles.profileBox}>
               <div className={styles.boxHeader}>

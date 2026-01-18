@@ -38,14 +38,14 @@ export default function CutInput({
   const [gapStart, setGapStart] = useState(231);
   const [gapEnd, setGapEnd] = useState(285.5);
 
-  // Auto-hide error after 6 seconds and return to original label
+  // Auto-hide error after 5 seconds and return to original label
   useEffect(() => {
     if (error) {
       setShowError(true);
       const timer = setTimeout(() => {
         setShowError(false);
         onErrorExpire?.();
-      }, 6000);
+      }, 4000);
       return () => clearTimeout(timer);
     } else {
       setShowError(false);
