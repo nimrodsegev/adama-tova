@@ -3,35 +3,39 @@
 import React, { useEffect, useState } from "react";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
+const TEXT_APPEAR_DELAY = 2600; // Time before text fades in (ms)
+const EXTRA_HOLD_TIME = 1000; // ⭐️ NEW: How long to wait AFTER animation finishes before closing (ms)
+
 export default function GlobalSplash() {
   const [shouldShow, setShouldShow] = useState(true);
   const [showText, setShowText] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Check if the user has already seen the splash in this session
     const hasSeenSplash = sessionStorage.getItem("has_seen_splash");
 
     if (hasSeenSplash) {
       setShouldShow(false);
     } else {
-      // If not seen, start animation sequence
-      // 2.6s delay syncs with the OrganicCircles opening animation
       const timer = setTimeout(() => {
         setShowText(true);
-      }, 2600);
+      }, TEXT_APPEAR_DELAY);
 
       return () => clearTimeout(timer);
     }
   }, []);
 
   const handleSplashComplete = () => {
-    sessionStorage.setItem("has_seen_splash", "true");
-    setIsFadingOut(true);
-
+    // ⭐️ CHANGE: We now wait for EXTRA_HOLD_TIME before starting the fade out
     setTimeout(() => {
-      setShouldShow(false);
-    }, 500);
+      sessionStorage.setItem("has_seen_splash", "true");
+      setIsFadingOut(true);
+
+      // Remove from DOM after the fade-out transition (0.5s) is done
+      setTimeout(() => {
+        setShouldShow(false);
+      }, 500);
+    }, EXTRA_HOLD_TIME);
   };
 
   if (!shouldShow) return null;
