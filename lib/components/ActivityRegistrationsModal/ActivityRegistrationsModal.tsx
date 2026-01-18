@@ -37,11 +37,11 @@ interface ActivityRegistrationsModalProps {
 
 // Map English circle values to Hebrew
 const CIRCLE_TO_HEBREW: Record<string, string> = {
-  "Nova Survivor": "שורדי ושורדות המסיבות",
+  "Nova Survivor": "שורדי מסיבות",
   "October 7 victim": "נפגעי טראומה 7.10 ומלחמת חרבות ברזל",
   "Shkulim parents": "הורים שכולים",
   "Shkulim Siblings": "אחים.ות שכולים",
-  "Family of october 7 victim": "משפחות וקרובים של פצועים טראומה בגופם ובנפשם",
+  "Family of october 7 victim": "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם",
   "Rescue forces": "כוחות הצלה וחילוץ",
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",
