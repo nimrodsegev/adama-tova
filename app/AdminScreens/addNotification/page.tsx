@@ -9,9 +9,9 @@ import styles from "./addNotification.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
-import Popup from "@/lib/components/UI/Popup"; // IMPORT POPUP
+import Popup from "@/lib/components/UI/Popup";
 
-// ... (Constants TARGET_OPTIONS, CIRCLE_OPTIONS, DAYS, MONTHS, YEARS remain unchanged) ...
+// --- Constants ---
 const TARGET_OPTIONS = [
   { label: "לפי פעילות", value: "activity" },
   { label: "לפי תאריך", value: "date" },
@@ -109,12 +109,32 @@ export default function AddNotificationPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // --- UPDATED EFFECT: Filter for Future Activities ---
   useEffect(() => {
     if (targetType === "activity" && allActivities.length === 0) {
       const fetchActivities = async () => {
         setLoadingActivities(true);
         const [data, error] = await apiActivities.getAll();
-        if (!error && data) setAllActivities(data);
+        
+        if (!error && data) {
+          // 1. Get Today's date at 00:00:00 to compare
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // 2. Filter: Keep only activities where date >= today
+          const futureActivities = data.filter((act: any) => {
+            if (!act.date) return false;
+            const actDate = new Date(act.date);
+            return actDate >= today; 
+          });
+
+          // 3. Sort them by date (closest first)
+          futureActivities.sort((a: any, b: any) => 
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+
+          setAllActivities(futureActivities);
+        }
         setLoadingActivities(false);
       };
       fetchActivities();
@@ -129,7 +149,6 @@ export default function AddNotificationPage() {
 
       if (targetType === "activity") {
         if (!selectedActivityId) throw new Error("יש לבחור סדנא");
-        // Capture the response
         [res, err] = await apiActivities.notifyParticipants(
           selectedActivityId,
           title,
@@ -137,7 +156,6 @@ export default function AddNotificationPage() {
         );
       } else if (targetType === "date") {
         if (!day || !month || !year) throw new Error("יש לבחור תאריך מלא");
-        // Capture the response
         [res, err] = await apiActivities.notifyByDate(
           `${year}-${month}-${day}`,
           title,
@@ -145,7 +163,6 @@ export default function AddNotificationPage() {
         );
       } else if (targetType === "circle") {
         if (!selectedCircle) throw new Error("יש לבחור מעגל");
-        // Capture the response
         [res, err] = await apiActivities.notifyByCircle(
           selectedCircle,
           title,
@@ -153,38 +170,61 @@ export default function AddNotificationPage() {
         );
       }
 
-      // Check for API errors first
       if (err) throw err;
 
-      // Calculate how many users were actually notified
       const recipientCount = res ? res.length : 0;
 
       if (recipientCount === 0) {
-        // CASE: No users found - Show info popup, stay on page
+        let emptyMsg = "לא נמצאו נמענים לשליחת ההודעה.";
+        if (targetType === "date") {
+            emptyMsg = "לא נמצאו פעילויות (או נרשמים) בתאריך שנבחר.";
+        } else if (targetType === "activity") {
+            emptyMsg = "לא נמצאו נרשמים לפעילות זו.";
+        }
+
         setPopupConfig({
           title: "לא נמצאו נמענים",
-          content: "לא נמצאו משתמשים התואמים את קהל היעד שנבחר. ההודעה לא נשלחה.",
+          content:
+            "לא נמצאו משתמשים התואמים את קהל היעד שנבחר. ההודעה לא נשלחה.",
           isSuccess: false,
         });
       } else {
-        // CASE: Success - Show count and prepare to redirect
         setPopupConfig({
           title: "הודעה נשלחה",
-          content: `ההודעה נשלחה בהצלחה ל-${recipientCount} משתמשים.`,
-          isSuccess: true,
+          content: `ההודעה נשלחה בהצלחה.`,
+          isSuccess: true, 
         });
       }
-      
-      setShowPopup(true);
 
+      setShowPopup(true);
     } catch (error: any) {
       console.error("Error sending notification:", error);
-      // Error Popup
       setPopupConfig({
         title: "שגיאה",
         content: error.message || "אירעה שגיאה בשליחת ההודעה",
         isSuccess: false,
       });
+      
+      const errMsg = typeof error === 'string' ? error : (error.message || "Unknown error");
+
+      if (
+        errMsg.includes("No activities found") || 
+        errMsg.includes("No participants found") || 
+        errMsg.includes("No users")
+      ) {
+        setPopupConfig({
+          title: "לא נמצאו נמענים",
+          content: "לא נמצאו נרשמים/פעילויות התואמים את הבחירה, ולכן ההודעה לא נשלחה.",
+          isSuccess: false, 
+        });
+      } else {
+        setPopupConfig({
+          title: "שגיאה",
+          content: errMsg,
+          isSuccess: false,
+        });
+      }
+      
       setShowPopup(true);
     } finally {
       setIsSubmitting(false);
@@ -208,8 +248,9 @@ export default function AddNotificationPage() {
   }));
 
   return (
-    <SmoothPageWrapper isLoading={mounting || closing}>
+    <SmoothPageWrapper isLoading={mounting}>
       <main className={`mobile-container ${styles.pageOverride}`}>
+        {/* 1. CLOSE BUTTON (Flex Item, Aligned End) */}
         <button
           className={styles.closeButton}
           onClick={handleCloseWithAnimation}
@@ -223,10 +264,12 @@ export default function AddNotificationPage() {
           />
         </button>
 
+        {/* 2. HEADER (Spacing via margin-top) */}
         <div className={styles.header}>
           <h1 className={styles.headerTitle}>יצירת הודעה חדשה</h1>
         </div>
 
+        {/* 3. CONTENT */}
         <div className={styles.scrollContainer} ref={scrollContainerRef}>
           {/* --- TARGET AUDIENCE --- */}
           <div

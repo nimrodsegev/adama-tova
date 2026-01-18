@@ -80,19 +80,26 @@
    ============================================ */
 .header {
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: var(--container-max-width, 24.5625rem);
   text-align: center;
 
-  /* --- SPACING CONTROL --- */
-  /* Space between Close Button and Title */
+  /* Spacing between Close Button and Title */
   margin-top: var(--spacing-3xl);
 
   /* Space between Title and Items */
-  margin-bottom: var(--spacing-sm);
 
   z-index: 10;
   flex-shrink: 0;
-  transition: margin var(--transition-slow);
+}
+
+.headerTitle {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-3xl);
+  line-height: 2.125rem;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.02em;
 }
 
 /* ============================================

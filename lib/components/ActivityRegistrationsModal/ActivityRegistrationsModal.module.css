@@ -1,7 +1,7 @@
 /* ActivityRegistrationsModal.module.css */
+
 /* ============================================
    ACTIVITY REGISTRATIONS MODAL
-   Based on Figma design - using rem units
    ============================================ */
 
 /* Overlay backdrop */
@@ -16,31 +16,42 @@
   background-color: transparent;
 }
 
-/* Modal container - full page with gradient */
+/* Modal container */
 .modalContainer {
+  /* Lock Layout */
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   width: 100%;
   max-width: 100vw;
   height: 100dvh;
   background: var(--color-background);
   z-index: var(--z-index-modal);
+
+  /* Flex Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* Scrolling */
   overflow-y: auto;
   overflow-x: hidden;
   direction: rtl;
-  margin: 0 auto;
+
+  /* Padding Structure */
+  padding-top: calc(var(--spacing-4xl) + env(safe-area-inset-top));
+  padding-right: var(--spacing-2xl);
+  padding-bottom: 0;
+  padding-left: var(--spacing-2xl);
 }
 
 /* Close button */
 .closeButton {
-  position: absolute;
+  /* Flex positioning: RTL + flex-start = Right */
+  align-self: flex-start;
+  position: relative;
+
   width: auto;
   height: auto;
-  right: var(--spacing-2xl);
-  top: var(--spacing-4xl);
   border: none;
   background: transparent;
   display: flex;
@@ -48,6 +59,7 @@
   align-items: center;
   cursor: pointer;
   padding: var(--spacing-xs);
+  margin: 0;
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
 }
@@ -65,12 +77,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 5.75rem var(--spacing-2xl) 6.875rem; /* ⚠️ 92px top, 110px bottom - NO VARIABLES */
-  gap: var(--spacing-3xl); /* 32px */
   width: 100%;
   max-width: var(--container-max-width);
-  margin: 0 auto;
-  min-height: 100%;
+  gap: var(--spacing-3xl);
+
+  /* Reset padding (handled by container) */
+  padding: 0;
+  /* Add bottom spacing for safe scrolling */
+  padding-bottom: 6rem;
 }
 
 .loadingContainer {
@@ -86,16 +100,20 @@
    ============================================ */
 
 .titleText {
-  width: 21.5625rem; /* ⚠️ NO VARIABLE - 345px */
+  width: 100%;
+  max-width: 21.5625rem;
   font-family: var(--font-primary);
   font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-2xl); /* 24px */
-  line-height: 1.75rem; /* ⚠️ NO VARIABLE - 28px */
+  font-size: var(--font-size-3xl);
+  line-height: 1.75rem;
   text-align: center;
   letter-spacing: 0.02em;
   color: var(--color-text-primary);
-  margin: 0;
+
+  /* Spacing between Close Button and Title */
+  margin-top: var(--spacing-3xl);
+  margin-bottom: 0;
 }
 
 /* ============================================
@@ -116,21 +134,15 @@
 .registrationsList {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center; /* Centered in the frame */
   padding: 0;
-  gap: var(--spacing-lg); /* 16px */
-  width: 21.5625rem; /* ⚠️ NO VARIABLE - 345px */
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.registrationsList::-webkit-scrollbar {
-  display: none;
+  gap: var(--spacing-lg);
+  width: 100%;
+  max-width: 21.5625rem;
 }
 
 /* ============================================
-   USER CARD - Confirmed (Border style)
+   USER CARD
    ============================================ */
 
 .userCard {
@@ -139,18 +151,13 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  padding: var(--spacing-lg); /* 16px */
-  gap: 0.625rem; /* ⚠️ NO VARIABLE - 10px */
-  width: 21.5625rem; /* ⚠️ NO VARIABLE - 345px */
-  min-height: 6.125rem; /* ⚠️ NO VARIABLE - 98px */
-  border: 0.0625rem solid var(--color-bg-light-opaque); /* ⚠️ 1px - NO BORDER WIDTH VARIABLE */
+  padding: var(--spacing-lg);
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 6.125rem;
+  border: 0.0625rem solid var(--color-bg-light-opaque);
   border-radius: var(--radius-sm);
   background: transparent;
-}
-
-/* User Card - Waitlist (Same transparent style) */
-.userCardWaitlist {
-  /* Same as confirmed - transparent with border */
 }
 
 /* ============================================
@@ -161,101 +168,39 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-end;
-  padding: 0;
-  gap: var(--spacing-xs); /* 4px */
-  width: 11.25rem; /* ⚠️ NO VARIABLE - 180px */
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  flex: 1; /* Take remaining space */
 }
 
 .userName {
-  width: 100%;
   font-family: var(--font-secondary);
-  font-style: normal;
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-xl); /* 20px */
+  font-size: var(--font-size-xl);
   line-height: var(--line-height-snug);
   text-align: right;
   color: var(--color-bg-light-opaque);
   margin: 0;
-}
-
-.userNameWaitlist {
-  /* Same as confirmed - white text on transparent */
 }
 
 .userDetail {
-  width: 100%;
   font-family: var(--font-secondary);
-  font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); /* 17px */
+  font-size: var(--font-size-md);
   line-height: var(--line-height-snug);
   text-align: right;
   color: var(--color-bg-light-opaque);
   margin: 0;
 }
 
-.userDetailWaitlist {
-  /* Same as confirmed - white text on transparent */
-}
-
-/* Pending approval status */
 .pendingStatus {
-  width: 100%;
   font-family: var(--font-secondary);
-  font-style: normal;
   font-weight: var(--font-weight-normal);
-  font-size: 0.9375rem; /* ⚠️ NO VARIABLE - 15px */
-  line-height: 1.1875rem; /* ⚠️ NO VARIABLE - 19px */
+  font-size: 0.9375rem;
+  line-height: 1.1875rem;
   text-align: right;
   color: var(--color-bg-light-opaque);
   margin: 0;
-}
-
-/* ============================================
-   PROFILE LINK
-   ============================================ */
-
-.profileLink {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  align-self: flex-end;
-  gap: var(--spacing-sm); /* 8px */
-  padding: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-secondary);
-  font-style: normal;
-  font-weight: var(--font-weight-bold);
-  font-size: 0.9375rem; /* ⚠️ NO VARIABLE - 15px */
-  line-height: 1.1875rem; /* ⚠️ NO VARIABLE - 19px */
-  color: var(--color-text-secondary);
-  transition: opacity var(--transition-normal);
-}
-
-.profileLink:hover {
-  opacity: 0.8;
-}
-
-.profileLinkWaitlist {
-  /* Same as confirmed - white text on transparent */
-}
-
-/* Arrow icon - Points left */
-.profileArrow {
-  display: inline-block;
-  width: var(--spacing-sm); /* 8px */
-  height: var(--spacing-sm); /* 8px */
-  border-left: 0.1rem solid var(--color-text-secondary); /* ⚠️ NO BORDER WIDTH VARIABLE */
-  border-bottom: 0.1rem solid var(--color-text-secondary); /* ⚠️ NO BORDER WIDTH VARIABLE */
-  transform: rotate(45deg);
-}
-
-.profileArrowWaitlist {
-  /* Same as confirmed - white arrow on transparent */
 }
 
 /* ============================================
@@ -264,33 +209,28 @@
 
 .emptyText {
   font-family: var(--font-secondary);
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-base);
-  line-height: 1.25rem; /* ⚠️ NO VARIABLE - repeated */
+  font-weight: var(--font-weight-md);
+  font-size: var(--font-size-semibold);
+  line-height: 1.25rem;
   text-align: center;
   color: var(--color-text-primary);
   width: 100%;
   margin-top: var(--spacing-3xl);
 }
 
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.clockIconWrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  flex-shrink: 0;
+  z-index: 1;
+  left: 10.5rem;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+.clockIcon {
+  width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
 }
