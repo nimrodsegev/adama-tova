@@ -124,32 +124,59 @@ export default function AddNotificationPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      let res: any[] | null = null;
+      let err = null;
+
       if (targetType === "activity") {
         if (!selectedActivityId) throw new Error("יש לבחור סדנא");
-        await apiActivities.notifyParticipants(
+        // Capture the response
+        [res, err] = await apiActivities.notifyParticipants(
           selectedActivityId,
           title,
           message
         );
       } else if (targetType === "date") {
         if (!day || !month || !year) throw new Error("יש לבחור תאריך מלא");
-        await apiActivities.notifyByDate(
+        // Capture the response
+        [res, err] = await apiActivities.notifyByDate(
           `${year}-${month}-${day}`,
           title,
           message
         );
       } else if (targetType === "circle") {
         if (!selectedCircle) throw new Error("יש לבחור מעגל");
-        await apiActivities.notifyByCircle(selectedCircle, title, message);
+        // Capture the response
+        [res, err] = await apiActivities.notifyByCircle(
+          selectedCircle,
+          title,
+          message
+        );
       }
 
-      // Success Popup
-      setPopupConfig({
-        title: "הודעה נשלחה",
-        content: "ההודעה נשלחה בהצלחה לקהל היעד שנבחר",
-        isSuccess: true,
-      });
+      // Check for API errors first
+      if (err) throw err;
+
+      // Calculate how many users were actually notified
+      const recipientCount = res ? res.length : 0;
+
+      if (recipientCount === 0) {
+        // CASE: No users found - Show info popup, stay on page
+        setPopupConfig({
+          title: "לא נמצאו נמענים",
+          content: "לא נמצאו משתמשים התואמים את קהל היעד שנבחר. ההודעה לא נשלחה.",
+          isSuccess: false,
+        });
+      } else {
+        // CASE: Success - Show count and prepare to redirect
+        setPopupConfig({
+          title: "הודעה נשלחה",
+          content: `ההודעה נשלחה בהצלחה ל-${recipientCount} משתמשים.`,
+          isSuccess: true,
+        });
+      }
+      
       setShowPopup(true);
+
     } catch (error: any) {
       console.error("Error sending notification:", error);
       // Error Popup
