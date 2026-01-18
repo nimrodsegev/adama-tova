@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1200; /* ⚠️ NO VARIABLE - custom z-index */
+  z-index: 2000; /* ⚠️ NO VARIABLE - custom z-index */
 }
 
 /* Modal container - #E74E1C background, 14px radius */
