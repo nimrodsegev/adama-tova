@@ -42,7 +42,6 @@ export default function UserProfileModal({
     };
   }, [isOpen, userId]);
 
-  // Handle close with animation
   const handleCloseWithAnimation = () => {
     setClosing(true);
     setTimeout(() => {
@@ -66,8 +65,9 @@ export default function UserProfileModal({
   const modalContent = (
     <>
       <div className={styles.overlay} onClick={handleCloseWithAnimation} />
+
       <div className={styles.modalContainer}>
-        {/* Close Button */}
+        {/* 1. CLOSE BUTTON (Flex Item - Aligned Start/Right) */}
         <button
           className={styles.closeButton}
           onClick={handleCloseWithAnimation}
@@ -82,20 +82,24 @@ export default function UserProfileModal({
         </button>
 
         <div className={styles.contentFrame}>
-          {(loading || closing) ? (
+          {loading || closing ? (
             <div className={styles.loadingContainer}>
-              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+              <OrganicCircles
+                mode="loading"
+                radius={0.15}
+                baseColor="#FFFFFF"
+              />
             </div>
           ) : !user ? (
             <p className={styles.errorText}>משתמש לא נמצא</p>
           ) : (
             <>
-              {/* Header with User Name */}
+              {/* 2. HEADER (Spacing via margin-top) */}
               <div className={styles.header}>
                 <h1 className={styles.userName}>{user.full_name}</h1>
               </div>
 
-              {/* Scrollable Content */}
+              {/* 3. SCROLLABLE CONTENT */}
               <div className={styles.scrollContainer}>
                 {/* Personal Details Box */}
                 <div className={styles.profileBox}>
@@ -123,10 +127,16 @@ export default function UserProfileModal({
                   </div>
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>הסניף הקרוב אליי</span>
+                      <span className={styles.detailLabel}>
+                        הסניף הקרוב אליי
+                      </span>
                       <span className={styles.detailValue}>
                         {branches.length > 0
-                          ? branches.map((b: string) => b === "nahalal" ? "נהלל" : "סתריה").join(", ")
+                          ? branches
+                              .map((b: string) =>
+                                b === "nahalal" ? "נהלל" : "סתריה"
+                              )
+                              .join(", ")
                           : "לא צוין"}
                       </span>
                     </div>
@@ -147,7 +157,9 @@ export default function UserProfileModal({
                     {quiz.free_text && (
                       <div className={styles.detailItem}>
                         <span className={styles.detailLabel}>הערות</span>
-                        <span className={styles.detailValue}>{quiz.free_text}</span>
+                        <span className={styles.detailValue}>
+                          {quiz.free_text}
+                        </span>
                       </div>
                     )}
                   </div>
