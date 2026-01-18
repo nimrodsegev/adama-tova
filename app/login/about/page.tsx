@@ -75,21 +75,33 @@ export default function AboutPage() {
 
       {/* Bottom Buttons */}
       <div className={styles.bottomButtons}>
-        <Button
-          variant="secondary"
-          size="L-short"
-          icon="/icons/google_maps.svg"
-          onClick={() => window.open("https://maps.google.com/?q=סתריה", "_blank")}
+        <a
+          href="https://www.google.com/maps/place/Hahita+St+2,+Sitriya/@31.8959682,34.8382764,988m/data=!3m2!1e3!4b1!4m6!3m5!1s0x1502b635b4564bab:0xd4d8e784d7da8a09!8m2!3d31.8959637!4d34.8431473!16s%2Fg%2F11c2fw57jz"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
         >
-          ניווט למרחב
-        </Button>
-        <Button
-          variant="primary"
-          size="L-short"
-          onClick={() => window.open("https://www.adamatova.org/", "_blank")}
+          <Button
+            variant="secondary"
+            size="L-short"
+            icon="/icons/google_maps.svg"
+          >
+            ניווט למרחב
+          </Button>
+        </a>
+        <a
+          href="https://www.adamatova.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
         >
-          לאתר
-        </Button>
+          <Button
+            variant="primary"
+            size="L-short"
+          >
+            לאתר
+          </Button>
+        </a>
       </div>
       </div>
     </SmoothPageWrapper>
