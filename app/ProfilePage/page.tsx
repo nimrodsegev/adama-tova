@@ -19,10 +19,9 @@ const AVAILABLE_INTERESTS = [
 
 export default function ProfilePage() {
   const { user, userProfile, loading, signOut } = useUser();
-  const { t } = useIvrita();
+  const { t } = useIvrita(); // ✅ Using Ivrita for gender-aware text
   const router = useRouter();
 
-  // Ref is now attached to the main container which handles scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // --- STATE ---
@@ -156,17 +155,18 @@ export default function ProfilePage() {
   return (
     <ProtectedRoute>
       <SmoothPageWrapper isLoading={loading || mounting}>
-        {/* Main scrollable container matches AdminNotificationsPage structure */}
         <main className={styles.pageContainer} ref={scrollContainerRef}>
           {/* Header / Title */}
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>
-              {userProfile?.full_name || "אורח"}
-              {isAdmin && <span className={styles.adminLabel}>מנהלת</span>}
+              {userProfile?.full_name || t("אורח/ת")}
             </h1>
+            {/* ✅ Admin Label is now on a new line below */}
+            {isAdmin && (
+              <span className={styles.adminLabel}>{t("מנהל/ת")}</span>
+            )}
           </div>
 
-          {/* Content Wrapper for Padding/Alignment */}
           <div className={styles.contentContainer}>
             {/* --- SECTION 1: PERSONAL DETAILS --- */}
             <div className={styles.profileBox}>
@@ -199,7 +199,6 @@ export default function ProfilePage() {
                     <span className={styles.bodyS} style={{ color: "#fff" }}>
                       הסניף הקרוב אליי
                     </span>
-                    {/* BRANCHES BUTTONS */}
                     <div className={styles.optionsGroup}>
                       {["nahalal", "satria"].map((b) => (
                         <button
@@ -219,7 +218,6 @@ export default function ProfilePage() {
                     <span className={styles.bodyS} style={{ color: "#fff" }}>
                       תחומי עניין
                     </span>
-                    {/* INTERESTS BUTTONS */}
                     <div className={styles.optionsGroup}>
                       {AVAILABLE_INTERESTS.map((int) => (
                         <button
@@ -321,7 +319,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Sticky Add Admin Button (Outside content flow, fixed position) */}
+          {/* Sticky Add Admin Button - CENTERED */}
           {isAdmin && (
             <div className={styles.bottomButton}>
               <Button size="L" onClick={handleToAddAdmin}>

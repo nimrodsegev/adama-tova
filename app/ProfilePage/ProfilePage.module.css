@@ -1,34 +1,15 @@
 /* ============================================
-   PAGE LAYOUT (Matched to ADMIN NOTIFICATIONS)
-   ============================================ */
-.pageContainer {
-  width: 100%;
-  max-width: var(--container-max-width);
-  /* Use scroll lock logic from reference */
-  height: calc(100dvh - var(--nav-height-bottom));
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  margin: 0 auto;
-
-  /* Gradient Background */
-  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
-
-  position: relative;
-  direction: rtl;
-  /* Use standard spacing variable */
-  padding: var(--spacing-2xl); /* 24px */
-}
-
-/* ============================================
-   TITLE
+   TITLE CONTAINER
    ============================================ */
 .titleContainer {
   display: flex;
+  flex-direction: column; /* ✅ Stacks elements vertically */
   justify-content: center;
   align-items: center;
-  margin-bottom: var(--spacing-3xl); /* 32px */
-  margin-top: var(--spacing-4xl); /* 48px */
+  gap: 0.25rem; /* Space between name and admin label */
+
+  margin-bottom: var(--spacing-3xl);
+  margin-top: var(--spacing-4xl);
   width: 100%;
   flex-shrink: 0;
 }
@@ -42,9 +23,6 @@
   text-align: center;
   margin: 0;
   letter-spacing: 0.02em;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .adminLabel {
@@ -52,24 +30,56 @@
   font-weight: 400;
   font-size: 1rem;
   color: #ffffff;
+  /* Removed margin-left/right since it's on its own line now */
+}
+
+/* ... (keep other CSS the same until .bottomButton) ... */
+
+/* ============================================
+   STICKY BOTTOM BUTTON
+   ============================================ */
+.bottomButton {
+  position: fixed;
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
+
+  /* ✅ Center Logic */
+  left: 50%;
+  transform: translateX(-50%);
+  right: auto; /* Reset right property */
+
+  z-index: 50;
+  display: flex;
+  justify-content: center;
 }
 
 /* ============================================
-   CONTENT
+   REST OF THE FILE
    ============================================ */
+/* Ensure you keep the rest of your CSS file (.pageContainer, .contentContainer, etc.) */
+
+.pageContainer {
+  width: 100%;
+  max-width: var(--container-max-width);
+  height: calc(100dvh - var(--nav-height-bottom));
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  position: relative;
+  direction: rtl;
+  padding: var(--spacing-2xl);
+}
+
 .contentContainer {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem; /* Gap between cards */
-  /* Cushion for the sticky button */
+  gap: 0.75rem;
   padding-bottom: 5rem;
 }
 
-/* ============================================
-   PROFILE BOX STYLES
-   ============================================ */
 .profileBox {
   width: 100%;
   box-sizing: border-box;
@@ -78,11 +88,9 @@
   align-items: flex-end;
   padding: 1rem;
   gap: 0.5rem;
-
   border: 0.0625rem solid rgba(249, 249, 249, 0.84);
   border-radius: 0.625rem;
   background: transparent;
-
   position: relative;
   transition: all 0.3s ease;
   direction: rtl;
@@ -104,9 +112,6 @@
   z-index: 2;
 }
 
-/* ============================================
-   EDIT MODE
-   ============================================ */
 .editModeContainer {
   width: 100%;
   display: flex;
@@ -124,9 +129,6 @@
   margin-top: 0.5rem;
 }
 
-/* ============================================
-   DETAILS & TOGGLES
-   ============================================ */
 .detailsGrid {
   width: 100%;
   display: flex;
@@ -177,9 +179,6 @@
   border: 1px solid transparent;
 }
 
-/* ============================================
-   BUTTONS
-   ============================================ */
 .editButtonCustom {
   padding: 12px 32px;
   gap: 8px;
@@ -222,20 +221,6 @@
   margin-bottom: 1rem;
 }
 
-/* ============================================
-   STICKY BOTTOM BUTTON
-   ============================================ */
-.bottomButton {
-  position: fixed;
-  bottom: calc(6.5rem + env(safe-area-inset-bottom));
-  right: var(--spacing-xl);
-  z-index: 50;
-  align-items: center;
-}
-
-/* ============================================
-   TYPOGRAPHY
-   ============================================ */
 .bodyL {
   font-family: var(--font-secondary);
   font-weight: 400;
@@ -244,6 +229,7 @@
   margin: 0;
   text-align: right;
 }
+
 .bodyS {
   font-family: var(--font-secondary);
   font-weight: 400;
@@ -253,13 +239,10 @@
   text-align: right;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 @media (max-width: 24.5rem) {
   .pageContainer {
-    padding-left: var(--spacing-lg); /* 16px */
-    padding-right: var(--spacing-lg); /* 16px */
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
 }
 
