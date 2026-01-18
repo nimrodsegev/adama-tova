@@ -8,7 +8,7 @@ import styles from "./AddActivityPage.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
-import Popup from "@/lib/components/UI/Popup"; // IMPORT POPUP
+import Popup from "@/lib/components/UI/Popup";
 
 // --- Types ---
 type ActivityStatus = "open" | "closed" | "cancelled";
@@ -104,10 +104,34 @@ const CustomArrowIcon = ({
 );
 // The Horizontal Arrow for the "Swipe Hint"
 const NextArrow = () => (
-  <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M1 8.99609L18.9998 8.98543" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
-    <path d="M7.225 2L1 8.975" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
-    <path d="M0.99961 9L7.22461 15.975" stroke="white" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
+  <svg
+    width="20"
+    height="18"
+    viewBox="0 0 20 18"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M1 8.99609L18.9998 8.98543"
+      stroke="white"
+      strokeWidth="2"
+      strokeMiterlimit="10"
+      strokeLinecap="round"
+    />
+    <path
+      d="M7.225 2L1 8.975"
+      stroke="white"
+      strokeWidth="2"
+      strokeMiterlimit="10"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0.99961 9L7.22461 15.975"
+      stroke="white"
+      strokeWidth="2"
+      strokeMiterlimit="10"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
@@ -209,11 +233,9 @@ export default function AddActivityPage() {
   const arrowTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // --- SWIPE VALIDATION STATE ---
-  // New state variables for Step 1 errors
   const [titleError, setTitleError] = useState("");
   const [branchError, setBranchError] = useState("");
   const [instructorError, setInstructorError] = useState("");
-  const [dateError, setDateError] = useState("");
   const [maxParticipantsError, setMaxParticipantsError] = useState("");
 
   // Touch tracking refs
@@ -266,7 +288,12 @@ export default function AddActivityPage() {
       formData.instructor.trim() !== "" &&
       formData.max_participants.trim() !== ""
     );
-  }, [formData.title, formData.branch, formData.instructor, formData.max_participants]);
+  }, [
+    formData.title,
+    formData.branch,
+    formData.instructor,
+    formData.max_participants,
+  ]);
 
   const isStep2Valid = useMemo(() => {
     const baseDateValid =
@@ -283,6 +310,7 @@ export default function AddActivityPage() {
   const setFormValue = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
+
   // --- SWIPE VALIDATION LOGIC ---
   const validateStep1 = () => {
     let isValid = true;
@@ -325,17 +353,15 @@ export default function AddActivityPage() {
     const startStep = Math.round(touchStartScrollLeft.current / slideWidth);
 
     const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchEndX - touchStartX.current; 
-    
+    const diff = touchEndX - touchStartX.current;
+
     // Check for swipe "Next" (Right in RTL context means dragging left->right visually, diff > 0)
-    // If Step is 0 and user swipes to go to 1 (Next)
     if (startStep === 0) {
-        if (Math.abs(diff) > 50) { // Threshold
-             // If we are on step 0 and it is NOT valid, trigger validation errors
-             if (!isStep1Valid) {
-                 validateStep1();
-             }
+      if (Math.abs(diff) > 50) {
+        if (!isStep1Valid) {
+          validateStep1();
         }
+      }
     }
 
     touchStartX.current = null;
@@ -348,10 +374,6 @@ export default function AddActivityPage() {
       setImageFile(file);
       setImagePreviewUrl(URL.createObjectURL(file));
     }
-  };
-  const handleClearImage = () => {
-    setImageFile(null);
-    setImagePreviewUrl(null);
   };
 
   const handleScroll = () => {
@@ -368,20 +390,16 @@ export default function AddActivityPage() {
 
   // --- ARROW LOGIC ---
   useEffect(() => {
-    // Clear existing timer
     if (arrowTimerRef.current) clearTimeout(arrowTimerRef.current);
-    
-    // Hide initially
+
     setArrowVisible(false);
 
-    // Logic: Determine if current step is valid to show arrow
     let isCurrentStepValid = false;
     if (currentStep === 0) isCurrentStepValid = isStep1Valid;
     else if (currentStep === 1) isCurrentStepValid = isStep2Valid;
-    else return; // No arrow on step 2 (final step)
+    else return;
 
     if (isCurrentStepValid) {
-      // Small delay for smooth animation after validation
       arrowTimerRef.current = setTimeout(() => {
         setArrowVisible(true);
       }, 200);
@@ -403,7 +421,6 @@ export default function AddActivityPage() {
     const updateLabelBackgrounds = () => {
       const vh = window.innerHeight;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
-      // UPDATED SELECTOR to include .fieldError
       const labels = document.querySelectorAll(
         `.${styles.inputLabel}, .${styles.uploadSubtext}, .${styles.fieldError}`
       ) as NodeListOf<HTMLElement>;
@@ -418,7 +435,9 @@ export default function AddActivityPage() {
 
     const slides = document.querySelectorAll(`.${styles.scrollSnapSlide}`);
     slides.forEach((slide) =>
-      slide.addEventListener("scroll", updateLabelBackgrounds, { passive: true })
+      slide.addEventListener("scroll", updateLabelBackgrounds, {
+        passive: true,
+      })
     );
 
     return () => {
@@ -428,7 +447,7 @@ export default function AddActivityPage() {
         slide.removeEventListener("scroll", updateLabelBackgrounds)
       );
     };
-  }, [titleError, branchError, instructorError, maxParticipantsError]); // Added dependencies
+  }, [titleError, branchError, instructorError, maxParticipantsError]);
 
   const handleSubmit = async () => {
     if (!isFormValid) return;
@@ -436,7 +455,6 @@ export default function AddActivityPage() {
     setErrorMessage("");
     setUploading(true);
 
-    // --- VALIDATION WITH POPUP ---
     const maxPart = parseInt(formData.max_participants);
 
     if (isNaN(maxPart) || maxPart < 1) {
@@ -468,7 +486,6 @@ export default function AddActivityPage() {
       setUploading(false);
       return;
     }
-    // ----------------------------------
 
     const fullDate = `${formData.year}-${formData.month}-${formData.day}`;
     let endTime = "";
@@ -527,70 +544,84 @@ export default function AddActivityPage() {
   return (
     <SmoothPageWrapper isLoading={mounting || closing}>
       <main className={`mobile-container ${styles.pageOverride}`}>
-        <button className={styles.closeButton} onClick={handleCloseWithAnimation} aria-label="סגור">
-          <Image src="/icons/close.svg" alt="Close icon" width={40} height={40} />
+        {/* CLOSE BUTTON - Flex item aligned to end */}
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseWithAnimation}
+          aria-label="סגור"
+        >
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
+          />
         </button>
 
+        {/* HEADER - Margin top handles spacing */}
         <div className={styles.header}>
-          <h1 className="header-primary" style={{ color: "var(--color-text-primary)" }}>
+          <h1
+            className="header-primary"
+            style={{ color: "var(--color-text-primary)" }}
+          >
             הוספת פעילות
           </h1>
         </div>
 
         <div
           ref={scrollContainerRef}
-          className={`${styles.scrollSnapContainer} ${isScrollLocked ? styles.scrollLocked : ""}`}
+          className={`${styles.scrollSnapContainer} ${
+            isScrollLocked ? styles.scrollLocked : ""
+          }`}
           onScroll={handleScroll}
-          // ADDED TOUCH HANDLERS
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
           {/* STEP 1 */}
           <div className={styles.scrollSnapSlide}>
-            {/* Arrow for Step 1 - Shows when form is valid */}
             <button
-              className={`${styles.nextArrow} ${arrowVisible && currentStep === 0 ? styles.nextArrowSwipeHint : styles.nextArrowHidden}`}
+              className={`${styles.nextArrow} ${
+                arrowVisible && currentStep === 0
+                  ? styles.nextArrowSwipeHint
+                  : styles.nextArrowHidden
+              }`}
               type="button"
               aria-label="המשך"
             >
               <NextArrow />
             </button>
             <div className={styles.slideContent}>
-              
-              {/* TITLE INPUT - ADDED ERROR HANDLING */}
               <CutInput
                 label="שם הפעילות"
                 value={formData.title}
                 onChange={(e) => {
-                    setFormValue("title", e.target.value);
-                    setTitleError(""); // Clear error
+                  setFormValue("title", e.target.value);
+                  setTitleError("");
                 }}
                 className={styles.cutInput}
                 type="text"
                 dir="rtl"
                 textAlign="right"
-                error={titleError} // Pass error state
+                error={titleError}
                 onErrorExpire={() => setTitleError("")}
               />
-              
-              {/* BRANCH DROPDOWN - WRAPPED FOR ERROR BORDER */}
-                  <UnifiedDropdown
-                    label={"סניף"}
-                    placeholder="בחר/י סניף"
-                    options={BRANCH_OPTIONS.map((opt) => ({
-                      value: opt.value,
-                      label: opt.label,
-                    }))}
-                    value={formData.branch}
-                    onChange={(value) => {
-                        setFormValue("branch", value);
-                        setBranchError(""); // Clear error
-                    }}
-                    isOpen={isBranchOpen}
-                    onToggle={() => setIsBranchOpen(!isBranchOpen)}
-                    error={branchError}
-                    onErrorExpire={() => setBranchError("")}
-                  />
+              <UnifiedDropdown
+                label={"סניף"}
+                placeholder="בחר/י סניף"
+                options={BRANCH_OPTIONS.map((opt) => ({
+                  value: opt.value,
+                  label: opt.label,
+                }))}
+                value={formData.branch}
+                onChange={(value) => {
+                  setFormValue("branch", value);
+                  setBranchError("");
+                }}
+                isOpen={isBranchOpen}
+                onToggle={() => setIsBranchOpen(!isBranchOpen)}
+                error={branchError}
+                onErrorExpire={() => setBranchError("")}
+              />
               <CutInput
                 label="מיקום"
                 value={formData.location}
@@ -600,29 +631,26 @@ export default function AddActivityPage() {
                 dir="rtl"
                 textAlign="right"
               />
-              
-              {/* INSTRUCTOR INPUT - ADDED ERROR HANDLING */}
               <CutInput
                 label="מנחה"
                 value={formData.instructor}
                 onChange={(e) => {
-                    setFormValue("instructor", e.target.value);
-                    setInstructorError(""); // Clear error
+                  setFormValue("instructor", e.target.value);
+                  setInstructorError("");
                 }}
                 className={styles.cutInput}
                 type="text"
                 dir="rtl"
                 textAlign="right"
-                error={instructorError} // Pass error state
+                error={instructorError}
                 onErrorExpire={() => setInstructorError("")}
               />
-              
               <CutInput
                 label="מספר משתתפים"
                 value={formData.max_participants}
                 onChange={(e) => {
                   setFormValue("max_participants", e.target.value);
-                  setMaxParticipantsError(""); // Clear error
+                  setMaxParticipantsError("");
                 }}
                 className={styles.cutInput}
                 type="number"
@@ -633,90 +661,229 @@ export default function AddActivityPage() {
               />
 
               <div className={styles.uploadWrapper}>
-                <input type="file" id="imageUpload" accept="image/*" onChange={handleImageChange} hidden />
+                <input
+                  type="file"
+                  id="imageUpload"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  hidden
+                />
                 <label htmlFor="imageUpload" className={styles.uploadBox}>
                   <div className={styles.paperclipWrapper}>
-                    <svg className={styles.paperclipIcon} width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M14.8131 7.87167L7.92063 14.7642C7.07624 15.6086 5.93102 16.0829 4.73688 16.0829C3.54274 16.0829 2.39751 15.6086 1.55313 14.7642C0.708744 13.9198 0.234375 12.7746 0.234375 11.5804C0.234375 10.3863 0.708744 9.24105 1.55313 8.39667L8.44563 1.50417C9.00855 0.941246 9.77204 0.625 10.5681 0.625C11.3642 0.625 12.1277 0.941246 12.6906 1.50417C13.2536 2.06709 13.5698 2.83058 13.5698 3.62667C13.5698 4.42276 13.2536 5.18625 12.6906 5.74917L5.79063 12.6417C5.50917 12.9231 5.12742 13.0813 4.72938 13.0813C4.33133 13.0813 3.94959 12.9231 3.66813 12.6417C3.38667 12.3602 3.22854 11.9785 3.22854 11.5804C3.22854 11.1824 3.38667 10.8006 3.66813 10.5192L10.0356 4.15917" stroke="#F9F9F9" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg
+                      className={styles.paperclipIcon}
+                      width="16"
+                      height="17"
+                      viewBox="0 0 16 17"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M14.8131 7.87167L7.92063 14.7642C7.07624 15.6086 5.93102 16.0829 4.73688 16.0829C3.54274 16.0829 2.39751 15.6086 1.55313 14.7642C0.708744 13.9198 0.234375 12.7746 0.234375 11.5804C0.234375 10.3863 0.708744 9.24105 1.55313 8.39667L8.44563 1.50417C9.00855 0.941246 9.77204 0.625 10.5681 0.625C11.3642 0.625 12.1277 0.941246 12.6906 1.50417C13.2536 2.06709 13.5698 2.83058 13.5698 3.62667C13.5698 4.42276 13.2536 5.18625 12.6906 5.74917L5.79063 12.6417C5.50917 12.9231 5.12742 13.0813 4.72938 13.0813C4.33133 13.0813 3.94959 12.9231 3.66813 12.6417C3.38667 12.3602 3.22854 11.9785 3.22854 11.5804C3.22854 11.1824 3.38667 10.8006 3.66813 10.5192L10.0356 4.15917"
+                        stroke="#F9F9F9"
+                        strokeWidth="1.25"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </div>
-                  <span className={styles.uploadText}>{imageFile ? imageFile.name : "לחץ/י כאן על מנת לבחור תמונה"}</span>
-                  <span className={styles.uploadSubtext}>תמונה <span className={styles.optionalText}>*לא חובה</span></span>
+                  <span className={styles.uploadText}>
+                    {imageFile
+                      ? imageFile.name
+                      : "לחץ/י כאן על מנת לבחור תמונה"}
+                  </span>
+                  <span className={styles.uploadSubtext}>
+                    תמונה <span className={styles.optionalText}>*לא חובה</span>
+                  </span>
                 </label>
               </div>
-              <CutInput label="תיאור" value={formData.description} onChange={(e) => setFormValue("description", e.target.value)} className={styles.cutInput} type="text" dir="rtl" textAlign="right" />
+              <CutInput
+                label="תיאור"
+                value={formData.description}
+                onChange={(e) => setFormValue("description", e.target.value)}
+                className={styles.cutInput}
+                type="text"
+                dir="rtl"
+                textAlign="right"
+              />
             </div>
           </div>
 
           {/* STEP 2 */}
           <div className={styles.scrollSnapSlide}>
-            {/* Arrow for Step 2 - Shows when valid */}
             <button
-              className={`${styles.nextArrow} ${arrowVisible && currentStep === 1 ? styles.nextArrowSwipeHint : styles.nextArrowHidden}`}
+              className={`${styles.nextArrow} ${
+                arrowVisible && currentStep === 1
+                  ? styles.nextArrowSwipeHint
+                  : styles.nextArrowHidden
+              }`}
               type="button"
               aria-label="המשך"
             >
               <NextArrow />
             </button>
             <div className={styles.slideContent}>
-              <UnifiedDropdown label="סוג פעילות" placeholder="בחר/י" options={TYPE_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))} value={formData.type} onChange={(value) => setFormValue("type", value)} isOpen={isTypeOpen} onToggle={() => setIsTypeOpen(!isTypeOpen)} />
+              <UnifiedDropdown
+                label="סוג פעילות"
+                placeholder="בחר/י"
+                options={TYPE_OPTIONS.map((opt) => ({
+                  value: opt.value,
+                  label: opt.label,
+                }))}
+                value={formData.type}
+                onChange={(value) => setFormValue("type", value)}
+                isOpen={isTypeOpen}
+                onToggle={() => setIsTypeOpen(!isTypeOpen)}
+              />
               {formData.type === "workshop" && (
-                <UnifiedDropdown label="תחום עניין" placeholder="בחר/י" options={CATEGORY_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))} value={formData.category} onChange={(value) => setFormValue("category", value)} isOpen={isCategoryOpen} onToggle={() => setIsCategoryOpen(!isCategoryOpen)} />
+                <UnifiedDropdown
+                  label="תחום עניין"
+                  placeholder="בחר/י"
+                  options={CATEGORY_OPTIONS.map((opt) => ({
+                    value: opt.value,
+                    label: opt.label,
+                  }))}
+                  value={formData.category}
+                  onChange={(value) => setFormValue("category", value)}
+                  isOpen={isCategoryOpen}
+                  onToggle={() => setIsCategoryOpen(!isCategoryOpen)}
+                />
               )}
               {formData.type === "group" && (
                 <>
-                  <UnifiedDropdown label="קבוצת יעד" placeholder="בחר/י" options={CIRCLE_OPTIONS.map((opt) => ({ value: opt, label: CIRCLE_LABELS[opt] }))} value={formData.circle} onChange={(value) => setFormValue("circle", value)} isOpen={isCircleOpen} onToggle={() => setIsCircleOpen(!isCircleOpen)} />
-                  <CutInput label="מספר מפגשים" value={formData.weeks} onChange={(e) => setFormValue("weeks", e.target.value)} className={styles.cutInput} type="text" dir="rtl" textAlign="right" />
+                  <UnifiedDropdown
+                    label="קבוצת יעד"
+                    placeholder="בחר/י"
+                    options={CIRCLE_OPTIONS.map((opt) => ({
+                      value: opt,
+                      label: CIRCLE_LABELS[opt],
+                    }))}
+                    value={formData.circle}
+                    onChange={(value) => setFormValue("circle", value)}
+                    isOpen={isCircleOpen}
+                    onToggle={() => setIsCircleOpen(!isCircleOpen)}
+                  />
+                  <CutInput
+                    label="מספר מפגשים"
+                    value={formData.weeks}
+                    onChange={(e) => setFormValue("weeks", e.target.value)}
+                    className={styles.cutInput}
+                    type="text"
+                    dir="rtl"
+                    textAlign="right"
+                  />
                 </>
               )}
 
               <div className={styles.fieldGroup}>
-                <div className={styles.dateLabel}>{formData.type === "group" ? "תאריך התחלה" : "תאריך"}</div>
+                <div className={styles.dateLabel}>
+                  {formData.type === "group" ? "תאריך התחלה" : "תאריך"}
+                </div>
                 <div className={styles.dateRow}>
-                  <UnifiedDropdown label="שנה" placeholder="שנה" options={YEARS.map((y) => ({ value: y, label: y }))} value={formData.year} onChange={(value) => setFormValue("year", value)} isOpen={isYearOpen} onToggle={() => setIsYearOpen(!isYearOpen)} isMini={true} />
-                  <UnifiedDropdown label="חודש" placeholder="חודש" options={MONTHS.map((m) => ({ value: m, label: m }))} value={formData.month} onChange={(value) => setFormValue("month", value)} isOpen={isMonthOpen} onToggle={() => setIsMonthOpen(!isMonthOpen)} isMini={true} />
-                  <UnifiedDropdown label="יום" placeholder="יום" options={DAYS.map((d) => ({ value: d, label: d }))} value={formData.day} onChange={(value) => setFormValue("day", value)} isOpen={isDayOpen} onToggle={() => setIsDayOpen(!isDayOpen)} isMini={true} />
+                  <UnifiedDropdown
+                    label="שנה"
+                    placeholder="שנה"
+                    options={YEARS.map((y) => ({ value: y, label: y }))}
+                    value={formData.year}
+                    onChange={(value) => setFormValue("year", value)}
+                    isOpen={isYearOpen}
+                    onToggle={() => setIsYearOpen(!isYearOpen)}
+                    isMini={true}
+                  />
+                  <UnifiedDropdown
+                    label="חודש"
+                    placeholder="חודש"
+                    options={MONTHS.map((m) => ({ value: m, label: m }))}
+                    value={formData.month}
+                    onChange={(value) => setFormValue("month", value)}
+                    isOpen={isMonthOpen}
+                    onToggle={() => setIsMonthOpen(!isMonthOpen)}
+                    isMini={true}
+                  />
+                  <UnifiedDropdown
+                    label="יום"
+                    placeholder="יום"
+                    options={DAYS.map((d) => ({ value: d, label: d }))}
+                    value={formData.day}
+                    onChange={(value) => setFormValue("day", value)}
+                    isOpen={isDayOpen}
+                    onToggle={() => setIsDayOpen(!isDayOpen)}
+                    isMini={true}
+                  />
                 </div>
               </div>
 
               <div className={styles.fieldGroup}>
                 <div className={styles.dateLabel}>שעה</div>
-                <TimePicker value={formData.startTime} onChange={(val) => setFormValue("startTime", val)} />
+                <TimePicker
+                  value={formData.startTime}
+                  onChange={(val) => setFormValue("startTime", val)}
+                />
               </div>
             </div>
           </div>
 
-          {/* STEP 3 - Unscrollable and Conditionally Rendered */}
+          {/* STEP 3 */}
           {isStep2Valid && (
             <div className={`${styles.scrollSnapSlide} ${styles.noScroll}`}>
               <div className={styles.slideContent}>
                 <div className={styles.previewImageCard}>
                   {imagePreviewUrl ? (
-                    <img src={imagePreviewUrl} alt="Preview" className={styles.previewImage} />
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Preview"
+                      className={styles.previewImage}
+                    />
                   ) : (
-                    <div className={styles.previewImagePlaceholder}>אין תמונה</div>
+                    <div className={styles.previewImagePlaceholder}>
+                      אין תמונה
+                    </div>
                   )}
                 </div>
-                <h2 className={styles.previewTitle}>{formData.title || "שם הפעילות"}</h2>
+                <h2 className={styles.previewTitle}>
+                  {formData.title || "שם הפעילות"}
+                </h2>
                 <div className={styles.previewInfoBlock}>
-                  <div className={styles.previewDetailsText}>{`יום ${formData.day ? `${formData.day}.${formData.month}.${formData.year}` : "..."} בשעה ${formData.startTime || "..."}`}</div>
-                  <div className={styles.previewDetailsText}>{`בסניף ${formData.branch === "nahalal" ? "נהלל" : "סתריה"}${formData.location ? ` • ${formData.location}` : ""}`}</div>
-                  <div className={styles.previewDetailsText}>{`בהנחיית ${formData.instructor || "..."}`}</div>
-                  <div className={styles.previewDetailsText}>{formData.max_participants ? `משתתפים: 0/${formData.max_participants}` : "ללא הגבלת משתתפים"}</div>
+                  <div className={styles.previewDetailsText}>{`יום ${
+                    formData.day
+                      ? `${formData.day}.${formData.month}.${formData.year}`
+                      : "..."
+                  } בשעה ${formData.startTime || "..."}`}</div>
+                  <div className={styles.previewDetailsText}>{`בסניף ${
+                    formData.branch === "nahalal" ? "נהלל" : "סתריה"
+                  }${formData.location ? ` • ${formData.location}` : ""}`}</div>
+                  <div className={styles.previewDetailsText}>{`בהנחיית ${
+                    formData.instructor || "..."
+                  }`}</div>
+                  <div className={styles.previewDetailsText}>
+                    {formData.max_participants
+                      ? `משתתפים: 0/${formData.max_participants}`
+                      : "ללא הגבלת משתתפים"}
+                  </div>
                 </div>
-                <div className={styles.previewDescription}>{formData.description || "תיאור הפעילות יופיע כאן..."}</div>
+                <div className={styles.previewDescription}>
+                  {formData.description || "תיאור הפעילות יופיע כאן..."}
+                </div>
                 <div className={styles.submitButtonContainer}>
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={uploading || submitStatus === "success" || !isFormValid}
+                    disabled={
+                      uploading || submitStatus === "success" || !isFormValid
+                    }
                     className={styles.submitButton}
                     style={{ opacity: !isFormValid ? 0.5 : 1 }}
                   >
-                    {uploading ? "שומר..." : submitStatus === "success" ? "פורסם!" : "פרסם פעילות"}
+                    {uploading
+                      ? "שומר..."
+                      : submitStatus === "success"
+                      ? "פורסם!"
+                      : "פרסם פעילות"}
                   </button>
                 </div>
-                {submitStatus === "error" && <div className={styles.errorBanner}>{errorMessage}</div>}
+                {submitStatus === "error" && (
+                  <div className={styles.errorBanner}>{errorMessage}</div>
+                )}
               </div>
             </div>
           )}
