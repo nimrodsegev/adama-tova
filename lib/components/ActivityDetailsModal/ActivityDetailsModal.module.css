@@ -346,4 +346,7 @@
 
 /* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
 @media (min-height: 865px) and (max-height: 885px) {
+  .bottomButtonsContainer {
+    bottom: 2rem;
+  }
 }
