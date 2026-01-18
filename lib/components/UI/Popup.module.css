@@ -35,8 +35,8 @@
   align-items: center;
   gap: var(--spacing-lg); /* ⚠️ comment says 32px but --spacing-lg is 16px */
   width: 100%;
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+  margin-bottom: calc(var(--spacing-lg) + var(--spacing-sm));
 }
 
 /* Title - Arfilit 32px */
