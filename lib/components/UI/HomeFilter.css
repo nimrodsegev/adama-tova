@@ -96,32 +96,21 @@
 /* ============================================
    MOBILE RESPONSIVENESS
    ============================================ */
-/* Small screens (iPhone 12 mini, etc.) - 760-780px height */
+/* iPhone 11 Pro PWA (760-780px height) */
 @media (min-height: 760px) and (max-height: 780px) {
   .home-filter {
-    width: auto; /* Keep auto width */
-    gap: var(--spacing-xxs, 2px); /* Reduce gap from 4px to 2px */
-    padding: var(--spacing-xs); /* Reduce padding from 8px to 6px */
+    gap: 3px; /* Slightly reduced gap */
   }
 
   .home-filter__tab {
-    padding: var(--spacing-xs) var(--spacing-xs); /* Reduce padding: 6px instead of 8px */
+    padding: 6px 7px; /* Slightly smaller padding */
   }
 
   .home-filter__label {
-    font-size: var(--font-size-md); /* Shrink from lg to md */
+    font-size: var(--font-size-base); /* Between md and lg */
   }
 
   .home-filter__count {
-    margin-right: 2px; /* Reduce from 4px to 2px */
-  }
-}
-
-/* If still too long on very small screens with this height */
-@media (min-height: 760px) and (max-height: 780px) and (max-width: 380px) {
-  .home-filter__label {
-    font-size: var(
-      --font-size-sm
-    ); /* Further reduce to sm if screen is also narrow */
+    margin-right: 3px;
   }
 }
