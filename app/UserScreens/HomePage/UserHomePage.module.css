@@ -86,6 +86,7 @@
 .filterContainer {
   width: 100%;
   margin-bottom: var(--spacing-lg);
+  text-align: center;
 }
 /* ============================================
    CARDS CONTAINER

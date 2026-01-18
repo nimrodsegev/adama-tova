@@ -89,8 +89,9 @@
    ============================================ */
 .filterContainer {
   width: 100%;
-  margin-bottom: var(--spacing-md); /* 12px */
+  margin-bottom: var(--spacing-lg); /* 12px */
   z-index: 40;
+  text-align: center;
 }
 
 /* ============================================
