@@ -4,9 +4,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md);
+
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: 100%;
   height: 6.1875rem; /* ⚠️ NO VARIABLE - close to --layout-slider-height (3.6875rem) but different */
   direction: rtl;
   position: relative;
