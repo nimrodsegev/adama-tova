@@ -12,7 +12,7 @@
   /* Sizing */
   height: 3.25rem; /* ⚠️ NO VARIABLE - 52px */
   width: auto;
-  min-width: min-content;
+  max-width: 100%;
   /* SPACING (The "Margin" from container edge)
      We use equal padding and gap to ensure the active button
      is always equidistant from the edges and other buttons. */
