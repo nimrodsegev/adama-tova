@@ -717,8 +717,8 @@
 
 @media (max-height: 740px) {
   .header {
-    margin-top: var(--spacing-xl);
-    margin-bottom: 1rem;
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
   }
 
   .scrollSnapSlide {
