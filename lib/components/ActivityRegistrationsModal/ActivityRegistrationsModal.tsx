@@ -205,6 +205,9 @@ export default function ActivityRegistrationsModal({
                     const user = reg.users;
                     const circle = getCircleHebrew(user);
 
+                    // Logic: Show clock only if Pending or Waitlist
+                    const showClock = isPending || isWaitlist;
+
                     return (
                       <div
                         key={user?.id || index}
@@ -255,16 +258,21 @@ export default function ActivityRegistrationsModal({
                             style={{
                               display: "flex",
                               alignItems: "center",
-                              gap: "0",
+                              gap: "0.25rem", // Added gap between icon and text
                             }}
                           >
-                            <Image
-                              src="/icons/clock_icon.svg"
-                              alt=""
-                              width={40}
-                              height={40}
-                              style={{ filter: "brightness(0) invert(1)" }}
-                            />
+                            <div className={styles.clockIconWrapper}>
+                              {showClock && (
+                                <Image
+                                  src="/icons/clock_icon.svg"
+                                  alt="Pending"
+                                  width={16}
+                                  height={16}
+                                  className={styles.clockIcon}
+                                  style={{ filter: "brightness(0) invert(1)" }}
+                                />
+                              )}
+                            </div>
                             לצפייה בפרופיל
                           </span>
                         </Button>

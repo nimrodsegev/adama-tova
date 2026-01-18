@@ -160,10 +160,6 @@
   background: transparent;
 }
 
-.userCardWaitlist {
-  /* Inherits styles */
-}
-
 /* ============================================
    USER INFO
    ============================================ */
@@ -172,7 +168,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: var(--spacing-xs);
   flex: 1; /* Take remaining space */
 }
@@ -187,9 +183,6 @@
   margin: 0;
 }
 
-.userNameWaitlist {
-}
-
 .userDetail {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
@@ -198,9 +191,6 @@
   text-align: right;
   color: var(--color-bg-light-opaque);
   margin: 0;
-}
-
-.userDetailWaitlist {
 }
 
 .pendingStatus {
@@ -226,4 +216,21 @@
   color: var(--color-text-primary);
   width: 100%;
   margin-top: var(--spacing-3xl);
+}
+
+.clockIconWrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  flex-shrink: 0;
+  z-index: 1;
+  left: 10.5rem;
+}
+
+.clockIcon {
+  width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
+  height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
 }
