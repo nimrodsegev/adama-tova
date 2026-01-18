@@ -318,7 +318,7 @@ export default function ActivityDetailsModal({
               {loading ? (
                 <div className={styles.loadingContainer}>
                   <OrganicCircles
-                    mode="loading"
+                    mode="spouting"
                     radius={0.15}
                     baseColor="#FFFFFF"
                   />

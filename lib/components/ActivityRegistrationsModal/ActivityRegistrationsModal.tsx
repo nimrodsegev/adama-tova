@@ -165,8 +165,8 @@ export default function ActivityRegistrationsModal({
           {loading || closing ? (
             <div className={styles.loadingContainer}>
               <OrganicCircles
-                mode="loading"
-                radius={0.15}
+                mode="spouting"
+                radius={0.25}
                 baseColor="#FFFFFF"
               />
             </div>
