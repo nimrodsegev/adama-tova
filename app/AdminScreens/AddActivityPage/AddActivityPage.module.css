@@ -711,64 +711,87 @@
 
 @media (max-height: 700px) {
   .header {
-    margin-top: var(--spacing-3xl); /* 32px */
-    margin-bottom: var(--spacing-2xl); /* 24px */
+    margin-top: 2rem; 
+    margin-bottom: 1rem;
   }
+  
   .scrollSnapSlide {
-    padding-top: var(--spacing-lg); /* 16px */
+    padding-top: 1rem;
   }
+
+  /* 1. Shrink all inputs to 3rem (48px) */
   .pageOverride :global(.input-field),
   .dropdownToggle,
-  .uploadBox {
-    height: 3rem; /* ⚠️ NO VARIABLE */
+  .uploadBox,
+  .cutInput {
+    height: 3rem !important; 
+  }
+
+  /* 2. SPECIFIC FIX FOR IMAGE WRAPPER */
+  .imageWrapperSVG {
+    height: 3rem !important;       /* Match other inputs */
+    margin-top: 1.2rem !important; /* Add TOP MARGIN so the label isn't cut off */
+    margin-bottom: 0.5rem;         /* Add breathing room below */
+  }
+
+  /* 3. Adjust the floating label position for the smaller box */
+  .imageLabelSVG {
+    top: -0.7rem;        /* Move label up slightly */
+    right: 2.5rem;       /* Adjust right position if needed */
+    font-size: 0.85rem;  /* Slightly smaller font */
+  }
+
+  /* 4. Adjust internal padding so text centers nicely */
+  .uploadBox, .filePreviewBox {
+    padding: 0.5rem 1.5rem !important;
+  }
+  .previewImageCard {
+    height: 13.0625rem; /* ⚠️ NO VARIABLE - 161px */
+    margin-top: 165px;  /* ⚠️ NO VARIABLE */
   }
   .slideContent {
-    gap: var(--spacing-md); /* 12px */
+    gap: 0.75rem;
   }
-  /* Adjust navigation for small screens */
+  
   .navigation {
-    bottom: calc(
-      var(--spacing-lg) + env(safe-area-inset-bottom)
-    ); /* 16px + safe area */
+    bottom: calc(1rem + env(safe-area-inset-bottom));
   }
 }
 
 @media (max-height: 600px) {
   .header {
-    margin-top: 2.5rem; /* ⚠️ NO VARIABLE - 40px */
-    margin-bottom: var(--spacing-lg); /* 16px */
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
   }
+  
+  /* Inputs shrink to 2.5rem (40px) */
   .pageOverride :global(.input-field),
   .dropdownToggle,
-  .uploadBox {
-    height: 2.5rem; /* ⚠️ NO VARIABLE - 40px */
+  .uploadBox,
+  .cutInput {
+    height: 2.5rem !important; 
   }
-  .slideContent {
-    gap: var(--spacing-sm); /* 8px */
-  }
-}
 
-@media (min-height: 800px) {
-  .header {
-    margin-top: var(--spacing-3-5xl); /* 3.5rem / 56px */
+  /* Specific Fix for Image Wrapper on small screens */
+  .imageWrapperSVG {
+    height: 2.5rem !important;
+    margin-top: 0.75rem; /* Add margin on top so the label isn't cut off */
+    margin-bottom: 0.25rem; /* Balance spacing below */
   }
-  .scrollSnapSlide {
-    padding-top: var(--spacing-lg); /* 16px */
-  }
-  .slideContent {
-    gap: 1.25rem; /* ⚠️ NO VARIABLE - 20px */
-  }
-}
 
-@media (min-width: 48rem) {
-  .slideContent {
-    max-width: 24rem; /* ⚠️ NO VARIABLE - 384px */
+  /* Adjust the label position for the smaller wrapper */
+  .imageLabelSVG {
+    top: -0.75rem; /* Move label slightly higher relative to the smaller box */
+    font-size: 0.8rem; /* Slightly smaller text */
   }
-}
 
-@media (display-mode: standalone) {
-  .pageOverride {
-    padding-top: calc(2vh + env(safe-area-inset-top)) !important;
+  /* Adjust internal padding */
+  .uploadBox, .filePreviewBox {
+    padding: 0.4rem 1rem !important;
+  }
+  
+  .slideContent {
+    gap: 0.5rem;
   }
 }
 /* ============================================
