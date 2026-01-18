@@ -149,7 +149,7 @@ const OrganicCircles = forwardRef<OrganicCirclesRef, OrganicCirclesProps>(
           }
 
           if (c.layers !== undefined)
-            this.config.layerCount = Math.max(1, Math.min(10, c.layers));
+            this.config.layerCount = Math.max(0, Math.min(10, c.layers));
           if (c.baseColor !== undefined) this.config.baseColor = c.baseColor;
           if (c.strokeWidth !== undefined)
             this.config.strokeWidth = c.strokeWidth;

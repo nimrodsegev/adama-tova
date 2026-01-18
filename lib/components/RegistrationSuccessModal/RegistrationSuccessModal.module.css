@@ -102,7 +102,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -40%);
   width: 3.74rem; /* ⚠️ NO VARIABLE */
   height: 2.98rem; /* ⚠️ NO VARIABLE */
 }
@@ -126,7 +126,7 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-semibold); /* Bold */
-  font-size: var(--font-size-xl); /* Bigger size */
+  font-size: var(--font-size-3xl); /* Bigger size */
   text-align: center;
   color: var(--color-text-primary);
   direction: rtl;
@@ -137,7 +137,7 @@
   font-family: var(--font-secondary);
   font-style: normal;
   font-weight: var(--font-weight-semibold); /* Regular */
-  font-size: var(--font-size-xl); /* Standard size */
+  font-size: var(--font-size-2xl); /* Standard size */
   line-height: var(--spacing-2xl);
   text-align: center;
   color: var(--color-text-primary);
