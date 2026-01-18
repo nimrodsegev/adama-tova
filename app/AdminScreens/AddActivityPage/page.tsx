@@ -560,12 +560,7 @@ export default function AddActivityPage() {
 
         {/* HEADER - Margin top handles spacing */}
         <div className={styles.header}>
-          <h1
-            className="header-primary"
-            style={{ color: "var(--color-text-primary)" }}
-          >
-            הוספת פעילות
-          </h1>
+          <h1 className={styles.headerTitle}>הוספת פעילות</h1>
         </div>
 
         <div

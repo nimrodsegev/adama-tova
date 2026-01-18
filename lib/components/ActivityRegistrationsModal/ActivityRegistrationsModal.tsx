@@ -41,7 +41,8 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
   "October 7 victim": "נפגעי טראומה 7.10 ומלחמת חרבות ברזל",
   "Shkulim parents": "הורים שכולים",
   "Shkulim Siblings": "אחים.ות שכולים",
-  "Family of october 7 victim": "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם",
+  "Family of october 7 victim":
+    "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם",
   "Rescue forces": "כוחות הצלה וחילוץ",
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",
@@ -49,9 +50,7 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
 
 const getCircleHebrew = (user: Registration["users"]): string => {
   if (!user) return "";
-  // First try quiz.circle (already in Hebrew)
   if (user.quiz?.circle) return user.quiz.circle;
-  // Fall back to translating users.circle (English)
   if (user.circle) return CIRCLE_TO_HEBREW[user.circle] || user.circle;
   return "";
 };
@@ -92,7 +91,6 @@ export default function ActivityRegistrationsModal({
     };
   }, [isOpen, activityId]);
 
-  // Handle close with animation
   const handleCloseWithAnimation = () => {
     setClosing(true);
     setTimeout(() => {
@@ -104,7 +102,6 @@ export default function ActivityRegistrationsModal({
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch activity title if not provided
       if (!propTitle) {
         const [activityData] = await apiActivities.getById(activityId);
         if (activityData) {
@@ -112,7 +109,6 @@ export default function ActivityRegistrationsModal({
         }
       }
 
-      // Fetch registrations
       const [regsData, error] = await apiActivities.getParticipants(activityId);
       if (!error && regsData) {
         setRegistrations(regsData);
@@ -136,7 +132,6 @@ export default function ActivityRegistrationsModal({
 
   if (!isOpen || !mounted) return null;
 
-  // Filter registrations
   const confirmedRegs = registrations.filter((r) => r.if_confirmed === true);
   const waitlistRegs = registrations.filter((r) => r.if_confirmed === false);
 
@@ -152,7 +147,7 @@ export default function ActivityRegistrationsModal({
       <div className={styles.overlay} onClick={handleCloseWithAnimation} />
 
       <div className={styles.modalContainer}>
-        {/* Close Button */}
+        {/* Close Button (Flex Item - Aligned Start/Right) */}
         <button
           className={styles.closeButton}
           onClick={handleCloseWithAnimation}
@@ -167,9 +162,13 @@ export default function ActivityRegistrationsModal({
         </button>
 
         <div className={styles.contentFrame}>
-          {(loading || closing) ? (
+          {loading || closing ? (
             <div className={styles.loadingContainer}>
-              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+              <OrganicCircles
+                mode="loading"
+                radius={0.15}
+                baseColor="#FFFFFF"
+              />
             </div>
           ) : (
             <>
@@ -181,8 +180,16 @@ export default function ActivityRegistrationsModal({
                 <HomeFilter
                   options={[
                     { id: "all", label: "הכל", count: registrations.length },
-                    { id: "confirmed", label: "מאושרים", count: confirmedRegs.length },
-                    { id: "waitlist", label: "ממתינים", count: waitlistRegs.length },
+                    {
+                      id: "confirmed",
+                      label: "מאושרים",
+                      count: confirmedRegs.length,
+                    },
+                    {
+                      id: "waitlist",
+                      label: "ממתינים",
+                      count: waitlistRegs.length,
+                    },
                   ]}
                   activeOption={filter}
                   onFilterChange={(newId) => setFilter(newId)}
@@ -194,7 +201,7 @@ export default function ActivityRegistrationsModal({
                 {filteredRegistrations.length > 0 ? (
                   filteredRegistrations.map((reg, index) => {
                     const isWaitlist = !reg.if_confirmed;
-                    const isPending = reg.status === 'pending';
+                    const isPending = reg.status === "pending";
                     const user = reg.users;
                     const circle = getCircleHebrew(user);
 
@@ -207,17 +214,31 @@ export default function ActivityRegistrationsModal({
                       >
                         {/* User Info */}
                         <div className={styles.userInfo}>
-                          <p className={`${styles.userName} ${isWaitlist ? styles.userNameWaitlist : ""}`}>
+                          <p
+                            className={`${styles.userName} ${
+                              isWaitlist ? styles.userNameWaitlist : ""
+                            }`}
+                          >
                             {user?.full_name || "משתמש"}
                           </p>
-                          <p className={`${styles.userDetail} ${isWaitlist ? styles.userDetailWaitlist : ""}`}>
+                          <p
+                            className={`${styles.userDetail} ${
+                              isWaitlist ? styles.userDetailWaitlist : ""
+                            }`}
+                          >
                             {user?.phone || ""}
                           </p>
-                          <p className={`${styles.userDetail} ${isWaitlist ? styles.userDetailWaitlist : ""}`}>
+                          <p
+                            className={`${styles.userDetail} ${
+                              isWaitlist ? styles.userDetailWaitlist : ""
+                            }`}
+                          >
                             {circle}
                           </p>
                           {isPending && (
-                            <p className={styles.pendingStatus}>*מותנה באישור מנהל</p>
+                            <p className={styles.pendingStatus}>
+                              *מותנה באישור מנהל
+                            </p>
                           )}
                         </div>
 
@@ -228,15 +249,21 @@ export default function ActivityRegistrationsModal({
                           tertiarySize="base"
                           tertiaryWeight="semibold"
                           onClick={() => handleViewProfile(user?.id)}
-                          style={{ alignSelf: 'flex-end' }}
+                          style={{ alignSelf: "flex-end" }}
                         >
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+                          <span
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0",
+                            }}
+                          >
                             <Image
                               src="/icons/clock_icon.svg"
                               alt=""
                               width={40}
                               height={40}
-                              style={{ filter: 'brightness(0) invert(1)' }}
+                              style={{ filter: "brightness(0) invert(1)" }}
                             />
                             לצפייה בפרופיל
                           </span>
@@ -259,7 +286,6 @@ export default function ActivityRegistrationsModal({
     <>
       {createPortal(modalContent, document.body)}
 
-      {/* User Profile Modal */}
       {selectedUserId && (
         <UserProfileModal
           userId={selectedUserId}

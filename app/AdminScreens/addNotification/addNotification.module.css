@@ -91,7 +91,7 @@
 }
 
 .headerTitle {
-  font-family: "Arfilit", sans-serif;
+  font-family: var(--font-primary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-3xl);
   line-height: 2.125rem;
