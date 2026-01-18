@@ -13,7 +13,7 @@
   margin: 0 auto;
   position: relative;
   direction: rtl;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-2xl);
   /* Add safe area logic to bottom padding */
   padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
 }

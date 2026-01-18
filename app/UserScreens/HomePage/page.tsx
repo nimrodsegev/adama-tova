@@ -48,6 +48,14 @@ const isActivityInFuture = (activity: Activity) => {
   return activityDateTime >= new Date();
 };
 
+// Calculate radius based on layers
+const calculateRadius = (layers: number) => {
+  const baseRadius = 0.07;
+  if (layers <= 5) return baseRadius;
+  const reduction = (layers - 5) * 0.01;
+  return baseRadius - reduction;
+};
+
 export default function NewUserHomePage() {
   const { user, userProfile } = useUser();
   const [activeFilter, setActiveFilter] = useState<"recommended" | "yours">(
@@ -69,17 +77,19 @@ export default function NewUserHomePage() {
   // This state stays true during the fade-out, so we use it to keep the circle size stable
   const [coverNav, setCoverNav] = useState(false);
 
-  const [bgCircleConfig, setBgCircleConfig] = useState({
-    radius: 0.07,
-    x: 0.45,
-    y: 0.1,
-  });
-
   const mountedRef = useRef(false);
   const shapeParams =
     userProfile?.role === "participant"
       ? calculateShapeParams(userProfile)
       : calculateShapeParams(null);
+
+  const dynamicRadius = calculateRadius(shapeParams.layers);
+
+  const [bgCircleConfig, setBgCircleConfig] = useState({
+    radius: dynamicRadius,
+    x: 0.45,
+    y: 0.1,
+  });
 
   const todayHours = (() => {
     const today = new Date().getDay();
@@ -93,6 +103,15 @@ export default function NewUserHomePage() {
       fetchData();
     }
   }, [user]);
+
+  // Update radius when shapeParams change
+  useEffect(() => {
+    const newRadius = calculateRadius(shapeParams.layers);
+    setBgCircleConfig((prev) => ({
+      ...prev,
+      radius: newRadius,
+    }));
+  }, [shapeParams.layers]);
 
   const fetchData = async () => {
     try {

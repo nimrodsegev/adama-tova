@@ -13,7 +13,7 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   direction: rtl;
-  padding: var(--spacing-2xl) var(--spacing-lg); /* 24px */
+  padding: var(--spacing-2xl) var(--spacing-2xl); /* 24px */
 }
 
 /* Centered Title Container */
@@ -54,7 +54,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: var(--spacing-xs); /* 4px */
+  margin-bottom: var(--spacing-lg); /* 4px */
   overflow-x: hidden;
   flex-shrink: 0;
   z-index: 20;
