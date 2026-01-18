@@ -1,7 +1,7 @@
 /* AdminNotificationsPage.module.css */
 .pageContainer {
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: 100%;
   /* --- FIX: OVERRIDE GLOBAL SCROLL LOCK --- */
   /* instead of letting the div grow (min-height), we fix it to viewport height */
   height: calc(100dvh - var(--nav-height-bottom)); /* 100dvh - 72px */
