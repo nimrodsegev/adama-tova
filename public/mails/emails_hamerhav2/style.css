@@ -1,0 +1,296 @@
+/* --- Self Hosted Fonts --- */
+/* Arfilit */
+@font-face {
+    font-family: "Arfilit Black";
+    src: url("fonts/arfilit-black-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Arfilit Bold";
+    src: url("fonts/arfilit-bold-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Arfilit ExtraLight";
+    src: url("fonts/arfilit-extralight-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Arfilit Light";
+    src: url("fonts/arfilit-light-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+/* Ezer Shemesh */
+@font-face {
+    font-family: "Ezer Shemesh Black";
+    src: url("fonts/ezershemeshtrialonly-black-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Ezer Shemesh Bold";
+    src: url("fonts/ezershemeshtrialonly-bold-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Ezer Shemesh Light";
+    src: url("fonts/ezershemeshtrialonly-light-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Ezer Shemesh Regular";
+    src: url("fonts/ezershemeshtrialonly-regular-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Ezer Shemesh UltraLight";
+    src: url("fonts/ezershemeshtrialonly-ultralight-webfont.woff2") format("woff2");
+    font-style: normal;
+}
+
+/* --- CSS Reset --- */
+*, *:before, *:after { 
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    font-size: 1em;
+    overflow-wrap: break-word;
+}
+
+ul { 
+    padding: 0;
+    list-style: none;
+}
+
+a { 
+    color: inherit;
+    text-decoration: none;
+}
+
+
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #f6f6f6;
+    font-family: 'Ezer Shemesh Regular';
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    direction: rtl;
+    text-align: right;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse !important;
+    mso-table-lspace: 0pt;
+    mso-table-rspace: 0pt;
+}
+
+img {
+    border: 0;
+    line-height: 100%;
+    outline: none;
+    text-decoration: none;
+    -ms-interpolation-mode: bicubic;
+}
+
+.email-wrapper {
+    background-color: #f6f6f6;
+    width: 100%;
+    padding: 40px 10px;
+}
+
+.email-container {
+    background-color: #ffffff;
+    margin: 0 auto; /* מרכוז */
+    max-width: 600px;
+    width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.header {
+    padding: 40px 0 20px 0;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.header img {
+    margin: 0 auto; 
+}
+
+.content {
+    padding: 20px 50px; 
+    text-align: right;
+    color: #555555;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.footer-cell {
+    background-color: #f4f4f4;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #eeeeee;
+    font-size: 12px;
+    color: #999999;
+}
+
+/* --- רכיבים (Components) --- */
+h1 {
+    font-family: 'Arfilit Light';
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    color: #333333;
+    font-weight: bold;
+}
+
+p {
+    margin: 0 0 2px 0;
+}
+
+.btn-container {
+    text-align: right;
+    margin: 20px 0;
+}
+
+.btn-login {
+    background-color: #E74E1C;
+    border-radius: 6px;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 50px;
+    text-align: center;
+    text-decoration: none;
+    width: 200px;
+    -webkit-text-size-adjust: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease; 
+}
+
+.btn-login:active {
+    background-color: #fff2ee; 
+    color: #E74E1C; 
+    border: 1px solid #E74E1C; 
+}
+.unsubscribe-link {
+    color: #999999;
+    text-decoration: underline;
+    font-size: 12px;
+}
+
+/* --- רספונסיביות --- */
+
+/* Tablet and smaller desktops */
+@media screen and (max-width: 620px) {
+    .email-wrapper {
+        padding: 20px 10px !important;
+    }
+
+    .email-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .content {
+        padding: 20px 30px !important;
+    }
+
+    .header {
+        padding: 30px 0 15px 0 !important;
+    }
+
+    .btn-login {
+        width: 180px !important;
+    }
+}
+
+/* Mobile devices */
+@media screen and (max-width: 480px) {
+    .email-wrapper {
+        padding: 10px 5px !important;
+    }
+
+    .email-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+    }
+
+    .header {
+        padding: 25px 0 15px 0 !important;
+    }
+
+    .header img {
+        width: 100px !important;
+    }
+
+    .content {
+        padding: 15px 20px !important;
+        font-size: 15px !important;
+    }
+
+    h1 {
+        font-size: 20px !important;
+    }
+
+    .btn-container {
+        text-align: center !important;
+        margin: 15px 0 !important;
+    }
+
+    .btn-login {
+        width: 100% !important;
+        max-width: 250px !important;
+        font-size: 15px !important;
+        line-height: 45px !important;
+    }
+
+    .footer-cell {
+        padding: 15px 10px !important;
+        font-size: 11px !important;
+    }
+}
+
+/* Very small mobile devices */
+@media screen and (max-width: 360px) {
+    .content {
+        padding: 12px 15px !important;
+        font-size: 14px !important;
+    }
+
+    h1 {
+        font-size: 18px !important;
+    }
+
+    .header img {
+        width: 90px !important;
+    }
+
+    .btn-login {
+        line-height: 42px !important;
+        font-size: 14px !important;
+    }
+}
