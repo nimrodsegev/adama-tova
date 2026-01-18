@@ -70,7 +70,8 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
   "October 7 victim": "נפגעי טראומה 7.10 ומלחמת חרבות ברזל",
   "Shkulim parents": "הורים שכולים",
   "Shkulim Siblings": "אחים.ות שכולים",
-  "Family of october 7 victim": "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם",
+  "Family of october 7 victim":
+    "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם",
   "Rescue forces": "כוחות הצלה וחילוץ",
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",
@@ -163,26 +164,36 @@ export default function AdminHomePage() {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
+
+      // Default Base Config
       let newConfig = { radius: 0.09, x: 0.45, y: 0.1 };
 
-      if (width < 380) {
-        newConfig.radius = 0.06;
-        newConfig.x = 0.5;
-        newConfig.y = 0.25;
-      } else if (width > 600) {
-        newConfig.radius = 0.12;
-        newConfig.x = 0.5;
-        newConfig.y = 0.25;
-      }
-
+      // --- General Height Logic ---
       if (height < 800) newConfig.y = 0.11;
+
       if (height < 700) {
         newConfig.radius = Math.min(newConfig.radius, 0.06);
         newConfig.y = 0.25;
       }
-      if (height < 600) {
-        newConfig.radius = Math.min(newConfig.radius, 0.05);
-        newConfig.y = 0.17;
+
+      // --- Specific Device Viewports ---
+
+      // 1. Height 760px - 780px
+      if (height >= 760 && height <= 780) {
+        newConfig.y = 0.11;
+        newConfig.x = 0.45;
+      }
+
+      // 2. iPhone 12/13/14 PWA (790px - 810px)
+      if (height >= 790 && height <= 810) {
+        newConfig.y = 0.11;
+        newConfig.x = 0.45;
+      }
+
+      // 3. iPhone 14/15 Plus/Pro Max PWA (865px - 885px)
+      if (height >= 865 && height <= 885) {
+        newConfig.y = 0.09;
+        newConfig.x = 0.45;
       }
 
       setBgCircleConfig(newConfig);
@@ -245,11 +256,11 @@ export default function AdminHomePage() {
       // Send approval email
       const user = pendingUsers.find((u) => u.id === userId);
       if (user?.email) {
-        fetch('/api/send-approval-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        fetch("/api/send-approval-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: user.email, name: user.full_name }),
-        }).catch(err => console.error("Failed to send approval email:", err));
+        }).catch((err) => console.error("Failed to send approval email:", err));
       }
       fetchData();
     }

@@ -6,8 +6,8 @@
 /* Prevent zoom and ensure fixed viewport on mobile */
 html {
   /* Allow pull-to-refresh and back swipe navigation */
-  overscroll-behavior-x: auto; /* Allow horizontal overscroll for back swipe */
-  overscroll-behavior-y: contain; /* Allow pull-to-refresh at top */
+  overscroll-behavior-x: none; /* Allow horizontal overscroll for back swipe */
+  overscroll-behavior-y: none; /* Allow pull-to-refresh at top */
   /* Prevent pinch-to-zoom only */
   touch-action: pan-x pan-y;
   /* Prevent text size adjustment on orientation change */
@@ -26,6 +26,7 @@ body {
   /* Allow pull-to-refresh and back navigation */
   overscroll-behavior-x: auto;
   overscroll-behavior-y: contain;
+  background-color: var(--color-background);
   /* Allow pan gestures but prevent zoom */
   touch-action: pan-x pan-y;
 }

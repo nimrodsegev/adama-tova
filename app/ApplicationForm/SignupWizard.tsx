@@ -99,7 +99,7 @@ export default function SignupWizard({
   const defaultParams = useMemo(() => calculateShapeParams(null), []);
 
   // SEPARATE STATE FOR LAYER COUNT - starts at 1
-  const [layerCount, setLayerCount] = useState(1);
+  const [layerCount, setLayerCount] = useState(0);
 
   // CALCULATED PARAMS based on user selections (Step 2+)
   const [calculatedParams, setCalculatedParams] = useState(defaultParams);
@@ -151,7 +151,7 @@ export default function SignupWizard({
 
   // STEP 0-1: UPDATE LAYER COUNT based on filled fields
   useEffect(() => {
-    let layers = 1; // Start with 1 layer
+    let layers = 0; // Start with 0 layer
 
     // Add 1 layer for each valid filled field (Steps 0-1)
     if (fullName.trim() && isHebrewName(fullName.trim())) {
