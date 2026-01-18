@@ -333,22 +333,17 @@
    RESPONSIVE ADJUSTMENTS
    ============================================ */
 
-@media (max-width: 26rem) {
-  .modalContainer {
-    /* Slightly more padding on very small screens if needed */
+/* --- RESPONSIVENESS --- */
+@media (min-height: 760px) and (max-height: 780px) {
+  .bottomButtonsContainer {
+    bottom: 2rem;
   }
 }
 
-@media (max-height: 670px) {
-  .modalContainer {
-    padding-top: calc(var(--spacing-3xl) + env(safe-area-inset-top));
-  }
-  .bottomButtonsContainer {
-    padding-bottom: var(--spacing-xl);
-  }
-  .imageContainer {
-    height: 10rem;
-    margin-top: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-  }
+/* iPhone 12/13/14 PWA viewport (797px height) */
+@media (min-height: 790px) and (max-height: 810px) {
+}
+
+/* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
+@media (min-height: 865px) and (max-height: 885px) {
 }
