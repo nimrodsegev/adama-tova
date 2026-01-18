@@ -6,19 +6,21 @@ import Footer from "@/lib/components/Footer";
 import { AppProviders } from "@/app/providers/AppProviders";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+// Import the new GlobalSplash component
+import GlobalSplash from "@/lib/components/UI/GlobalSplash";
 
 export const metadata: Metadata = {
   title: "Adama Tova",
   description: "Activity registration and management for Adama Tova",
 };
 
-// ✅ Viewport configuration - Prevents zoom and ensures mobile-first experience
+// ✅ Viewport configuration
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  viewportFit: "cover", // For iPhone X+ notched screens
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({
@@ -52,18 +54,18 @@ export default async function RootLayout({
         <script src="https://accounts.google.com/gsi/client" async defer />
       </head>
       <body>
+        {/* 👇 Global Splash Screen 
+            This sits on top of the app. It checks sessionStorage internally 
+            and decides whether to show itself or not. 
+        */}
+        <GlobalSplash />
+
         {/* 👇 Hydrate client with server user */}
         <AppProviders initialUser={user}>
-          {/* Main application content. 
-              The pages (children) typically contain the .mobile-container 
-              wrapper which handles the fixed width and background.
-          */}
+          {/* Main application content */}
           {children}
 
-          {/* Footer is placed outside the standard flow.
-              Combined with 'left: 0; right: 0;' in CSS, this ensures 
-              the bar spans the absolute full width of the screen.
-          */}
+          {/* Footer */}
           <Footer />
         </AppProviders>
       </body>

@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image"; 
+import Image from "next/image";
 import { apiActivities } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./addNotification.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
-import CutInput from '@/lib/components/UI/CutInput';
-import UnifiedDropdown from '@/lib/components/UI/UnifiedDropdown';
+import CutInput from "@/lib/components/UI/CutInput";
+import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
 import Popup from "@/lib/components/UI/Popup"; // IMPORT POPUP
 
 // ... (Constants TARGET_OPTIONS, CIRCLE_OPTIONS, DAYS, MONTHS, YEARS remain unchanged) ...
@@ -29,32 +29,34 @@ const CIRCLE_OPTIONS = [
   { label: "מעגל שני או שלישי", value: "Second or third" },
 ];
 
-const DAYS = Array.from({ length: 31 }, (_, i) => ({ 
-  label: (i + 1).toString().padStart(2, '0'), 
-  value: (i + 1).toString().padStart(2, '0') 
+const DAYS = Array.from({ length: 31 }, (_, i) => ({
+  label: (i + 1).toString().padStart(2, "0"),
+  value: (i + 1).toString().padStart(2, "0"),
 }));
 
-const MONTHS = Array.from({ length: 12 }, (_, i) => ({ 
-  label: (i + 1).toString().padStart(2, '0'), 
-  value: (i + 1).toString().padStart(2, '0') 
+const MONTHS = Array.from({ length: 12 }, (_, i) => ({
+  label: (i + 1).toString().padStart(2, "0"),
+  value: (i + 1).toString().padStart(2, "0"),
 }));
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 3 }, (_, i) => ({ 
-  label: (CURRENT_YEAR + i).toString(), 
-  value: (CURRENT_YEAR + i).toString() 
+const YEARS = Array.from({ length: 3 }, (_, i) => ({
+  label: (CURRENT_YEAR + i).toString(),
+  value: (CURRENT_YEAR + i).toString(),
 }));
 
 export default function AddNotificationPage() {
   const router = useRouter();
   const { t } = useIvrita();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
+
   const [mounting, setMounting] = useState(true);
   const [closing, setClosing] = useState(false);
 
   // Form State
-  const [targetType, setTargetType] = useState<"" | "activity" | "date" | "circle">("");
+  const [targetType, setTargetType] = useState<
+    "" | "activity" | "date" | "circle"
+  >("");
   const [selectedActivityId, setSelectedActivityId] = useState("");
   const [selectedCircle, setSelectedCircle] = useState("");
   const [title, setTitle] = useState("");
@@ -82,7 +84,9 @@ export default function AddNotificationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => { setMounting(false); }, 50);
+    const timer = setTimeout(() => {
+      setMounting(false);
+    }, 50);
     return () => clearTimeout(timer);
   }, []);
 
@@ -97,12 +101,12 @@ export default function AddNotificationPage() {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest('[data-dropdown]')) {
+      if (!target.closest("[data-dropdown]")) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -122,23 +126,30 @@ export default function AddNotificationPage() {
     try {
       if (targetType === "activity") {
         if (!selectedActivityId) throw new Error("יש לבחור סדנא");
-        await apiActivities.notifyParticipants(selectedActivityId, title, message);
+        await apiActivities.notifyParticipants(
+          selectedActivityId,
+          title,
+          message
+        );
       } else if (targetType === "date") {
         if (!day || !month || !year) throw new Error("יש לבחור תאריך מלא");
-        await apiActivities.notifyByDate(`${year}-${month}-${day}`, title, message);
+        await apiActivities.notifyByDate(
+          `${year}-${month}-${day}`,
+          title,
+          message
+        );
       } else if (targetType === "circle") {
         if (!selectedCircle) throw new Error("יש לבחור מעגל");
         await apiActivities.notifyByCircle(selectedCircle, title, message);
       }
-      
+
       // Success Popup
       setPopupConfig({
         title: "הודעה נשלחה",
-        content: "ההודעה נשלחה בהצלחה לקהל היעד שנבחר.",
+        content: "ההודעה נשלחה בהצלחה לקהל היעד שנבחר",
         isSuccess: true,
       });
       setShowPopup(true);
-
     } catch (error: any) {
       console.error("Error sending notification:", error);
       // Error Popup
@@ -164,143 +175,154 @@ export default function AddNotificationPage() {
     setOpenDropdown(openDropdown === name ? null : name);
   };
 
-  const activityOptions = allActivities.map(act => ({
+  const activityOptions = allActivities.map((act) => ({
     label: `${act.title} (${act.date})`,
-    value: act.id
+    value: act.id,
   }));
 
   return (
     <SmoothPageWrapper isLoading={mounting || closing}>
-    <main className={`mobile-container ${styles.pageOverride}`}>
-      <button
-        className={styles.closeButton}
-        onClick={handleCloseWithAnimation}
-        aria-label="סגור"
-      >
-        <Image
-          src="/icons/close.svg"
-          alt="Close icon"
-          width={40}
-          height={40}
-        />
-      </button>
-
-      <div className={styles.header}>
-        <h1 className={styles.headerTitle}>יצירת הודעה חדשה</h1>
-      </div>
-
-      <div className={styles.scrollContainer} ref={scrollContainerRef}>
-        
-        {/* --- TARGET AUDIENCE --- */}
-        <div 
-          data-dropdown 
-          className={`${styles.dropdownContainer} ${openDropdown === 'target' ? styles.activeDropdownWrapper : ''}`}
+      <main className={`mobile-container ${styles.pageOverride}`}>
+        <button
+          className={styles.closeButton}
+          onClick={handleCloseWithAnimation}
+          aria-label="סגור"
         >
-          <UnifiedDropdown
-            label="קהל יעד"
-            placeholder="בחר/י אפשרות"
-            options={TARGET_OPTIONS}
-            value={targetType}
-            onChange={(val) => setTargetType(val as any)}
-            isOpen={openDropdown === 'target'}
-            onToggle={() => toggleDropdown('target')}
+          <Image
+            src="/icons/close.svg"
+            alt="Close icon"
+            width={40}
+            height={40}
           />
+        </button>
+
+        <div className={styles.header}>
+          <h1 className={styles.headerTitle}>יצירת הודעה חדשה</h1>
         </div>
 
-        {/* --- ACTIVITY SELECT --- */}
-        {targetType === "activity" && (
-          <div 
-            data-dropdown 
-            className={`${styles.dropdownContainer} ${openDropdown === 'activity' ? styles.activeDropdownWrapper : ''}`}
+        <div className={styles.scrollContainer} ref={scrollContainerRef}>
+          {/* --- TARGET AUDIENCE --- */}
+          <div
+            data-dropdown
+            className={`${styles.dropdownContainer} ${
+              openDropdown === "target" ? styles.activeDropdownWrapper : ""
+            }`}
           >
             <UnifiedDropdown
-              label="סדנא"
-              placeholder={loadingActivities ? "טוען..." : "בחר/י סדנא"}
-              options={activityOptions}
-              value={selectedActivityId}
-              onChange={setSelectedActivityId}
-              isOpen={openDropdown === 'activity'}
-              onToggle={() => toggleDropdown('activity')}
+              label="קהל יעד"
+              placeholder="בחר/י אפשרות"
+              options={TARGET_OPTIONS}
+              value={targetType}
+              onChange={(val) => setTargetType(val as any)}
+              isOpen={openDropdown === "target"}
+              onToggle={() => toggleDropdown("target")}
             />
           </div>
-        )}
 
-        {/* --- CIRCLE SELECT --- */}
-        {targetType === "circle" && (
-          <div 
-            data-dropdown 
-            className={`${styles.dropdownContainer} ${openDropdown === 'circle' ? styles.activeDropdownWrapper : ''}`}
-          >
-            <UnifiedDropdown
-              label="מעגל"
-              placeholder="בחר/י מעגל"
-              options={CIRCLE_OPTIONS}
-              value={selectedCircle}
-              onChange={setSelectedCircle}
-              isOpen={openDropdown === 'circle'}
-              onToggle={() => toggleDropdown('circle')}
-            />
-          </div>
-        )}
+          {/* --- ACTIVITY SELECT --- */}
+          {targetType === "activity" && (
+            <div
+              data-dropdown
+              className={`${styles.dropdownContainer} ${
+                openDropdown === "activity" ? styles.activeDropdownWrapper : ""
+              }`}
+            >
+              <UnifiedDropdown
+                label="סדנא"
+                placeholder={loadingActivities ? "טוען..." : "בחר/י סדנא"}
+                options={activityOptions}
+                value={selectedActivityId}
+                onChange={setSelectedActivityId}
+                isOpen={openDropdown === "activity"}
+                onToggle={() => toggleDropdown("activity")}
+              />
+            </div>
+          )}
 
-        {/* --- DATE SELECT --- */}
-        {targetType === "date" && (
-          <div className={styles.fieldGroup}>
-            <label className={styles.dateLabel}>תאריך</label>
-            <div className={styles.dateRow}>
-              <div 
-                data-dropdown 
-                className={`${styles.miniDropdownWrapper} ${openDropdown === 'year' ? styles.activeDropdownWrapper : ''}`}
-              >
-                <UnifiedDropdown
-                  label=""
-                  placeholder="שנה"
-                  options={YEARS}
-                  value={year}
-                  onChange={setYear}
-                  isOpen={openDropdown === 'year'}
-                  onToggle={() => toggleDropdown('year')}
-                  isMini={true}
-                />
-              </div>
-              
-              <div 
-                data-dropdown 
-                className={`${styles.miniDropdownWrapper} ${openDropdown === 'month' ? styles.activeDropdownWrapper : ''}`}
-              >
-                <UnifiedDropdown
-                  label=""
-                  placeholder="חודש"
-                  options={MONTHS}
-                  value={month}
-                  onChange={setMonth}
-                  isOpen={openDropdown === 'month'}
-                  onToggle={() => toggleDropdown('month')}
-                  isMini={true}
-                />
-              </div>
-              
-              <div 
-                data-dropdown 
-                className={`${styles.miniDropdownWrapper} ${openDropdown === 'day' ? styles.activeDropdownWrapper : ''}`}
-              >
-                <UnifiedDropdown
-                  label=""
-                  placeholder="יום"
-                  options={DAYS}
-                  value={day}
-                  onChange={setDay}
-                  isOpen={openDropdown === 'day'}
-                  onToggle={() => toggleDropdown('day')}
-                  isMini={true}
-                />
+          {/* --- CIRCLE SELECT --- */}
+          {targetType === "circle" && (
+            <div
+              data-dropdown
+              className={`${styles.dropdownContainer} ${
+                openDropdown === "circle" ? styles.activeDropdownWrapper : ""
+              }`}
+            >
+              <UnifiedDropdown
+                label="מעגל"
+                placeholder="בחר/י מעגל"
+                options={CIRCLE_OPTIONS}
+                value={selectedCircle}
+                onChange={setSelectedCircle}
+                isOpen={openDropdown === "circle"}
+                onToggle={() => toggleDropdown("circle")}
+              />
+            </div>
+          )}
+
+          {/* --- DATE SELECT --- */}
+          {targetType === "date" && (
+            <div className={styles.fieldGroup}>
+              <label className={styles.dateLabel}>תאריך</label>
+              <div className={styles.dateRow}>
+                <div
+                  data-dropdown
+                  className={`${styles.miniDropdownWrapper} ${
+                    openDropdown === "year" ? styles.activeDropdownWrapper : ""
+                  }`}
+                >
+                  <UnifiedDropdown
+                    label=""
+                    placeholder="שנה"
+                    options={YEARS}
+                    value={year}
+                    onChange={setYear}
+                    isOpen={openDropdown === "year"}
+                    onToggle={() => toggleDropdown("year")}
+                    isMini={true}
+                  />
+                </div>
+
+                <div
+                  data-dropdown
+                  className={`${styles.miniDropdownWrapper} ${
+                    openDropdown === "month" ? styles.activeDropdownWrapper : ""
+                  }`}
+                >
+                  <UnifiedDropdown
+                    label=""
+                    placeholder="חודש"
+                    options={MONTHS}
+                    value={month}
+                    onChange={setMonth}
+                    isOpen={openDropdown === "month"}
+                    onToggle={() => toggleDropdown("month")}
+                    isMini={true}
+                  />
+                </div>
+
+                <div
+                  data-dropdown
+                  className={`${styles.miniDropdownWrapper} ${
+                    openDropdown === "day" ? styles.activeDropdownWrapper : ""
+                  }`}
+                >
+                  <UnifiedDropdown
+                    label=""
+                    placeholder="יום"
+                    options={DAYS}
+                    value={day}
+                    onChange={setDay}
+                    isOpen={openDropdown === "day"}
+                    onToggle={() => toggleDropdown("day")}
+                    isMini={true}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* --- INPUTS --- */}
-        <CutInput
+          {/* --- INPUTS --- */}
+          <CutInput
             label="כותרת ההודעה"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -308,8 +330,8 @@ export default function AddNotificationPage() {
             type="text"
             dir="rtl"
             textAlign="right"
-        />      
-        <CutInput
+          />
+          <CutInput
             label="תוכן ההודעה"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -317,33 +339,33 @@ export default function AddNotificationPage() {
             type="text"
             dir="rtl"
             textAlign="right"
-        />    
-        <div className={styles.buttonContainer}>
-            <button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting || !targetType || !title || !message} 
-                className={styles.submitButton}
-            >
-                {isSubmitting ? "שולח..." : "שלח הודעה"}
-            </button>
-        </div>
-
-      </div>
-
-      {/* --- POPUP COMPONENT --- */}
-      {showPopup && (
-        <div className={styles.popupWrapper}>
-          <Popup
-            title={popupConfig.title}
-            content={popupConfig.content}
-            secondaryButtonText={popupConfig.isSuccess ? "חזרה לדף הבית" : "סגור"}
-            secondaryButtonAction={handlePopupClose}
-            onClose={handlePopupClose}
           />
+          <div className={styles.buttonContainer}>
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting || !targetType || !title || !message}
+              className={styles.submitButton}
+            >
+              {isSubmitting ? "שולח..." : "שלח הודעה"}
+            </button>
+          </div>
         </div>
-      )}
 
-    </main>
+        {/* --- POPUP COMPONENT --- */}
+        {showPopup && (
+          <div className={styles.popupWrapper}>
+            <Popup
+              title={popupConfig.title}
+              content={popupConfig.content}
+              secondaryButtonText={
+                popupConfig.isSuccess ? "חזרה לדף הבית" : "סגור"
+              }
+              secondaryButtonAction={handlePopupClose}
+              onClose={handlePopupClose}
+            />
+          </div>
+        )}
+      </main>
     </SmoothPageWrapper>
   );
 }

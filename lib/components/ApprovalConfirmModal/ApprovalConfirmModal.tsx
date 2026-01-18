@@ -31,15 +31,15 @@ export default function ApprovalConfirmModal({
     const areYouSure = t("האם את/ה בטוח/ה");
     if (action === "approve") {
       if (type === "initial") {
-        return `${areYouSure} שברצונך לאשר את בקשת ${userName} לאישור ראשוני?`;
+        return `${areYouSure} שברצונך לאשר את ההשתתפות של  ${userName}?`;
       } else {
-        return `${areYouSure} שברצונך לאשר את בקשת ${userName} להצטרפות לקבוצה?`;
+        return `${areYouSure} שברצונך לאשר את בקשת ${userName} להצטרף לקבוצה?`;
       }
     } else {
       if (type === "initial") {
-        return `${areYouSure} שברצונך לסרב לבקשת ${userName} לאישור ראשוני?`;
+        return `${areYouSure} שברצונך לסרב לבקשת ${userName} להשתתפות במרחב?`;
       } else {
-        return `${areYouSure} שברצונך לסרב לבקשת ${userName} להצטרפות לקבוצה?`;
+        return `${areYouSure} שברצונך לסרב לבקשת ${userName} להצטרף לקבוצה?`;
       }
     }
   };

@@ -105,7 +105,7 @@ export default function SignupWizard({
   const [calculatedParams, setCalculatedParams] = useState(defaultParams);
 
   // Responsive radius and position for very small screens (iPhone SE, etc.)
-  const [circleRadius, setCircleRadius] = useState(0.11);
+  const [circleRadius, setCircleRadius] = useState(0.09);
   const [circlePosition, setCirclePosition] = useState({ x: 0.3, y: 0.15 });
 
   useEffect(() => {
@@ -115,16 +115,16 @@ export default function SignupWizard({
 
       // PWA mode has larger viewport - adjust position to be more centered
       if (isPWA) {
-        setCircleRadius(0.09);
-        setCirclePosition({ x: 0.32, y: 0.12 }); // More centered for PWA
+        setCircleRadius(0.07);
+        setCirclePosition({ x: 0.32, y: 0.14 }); // More centered for PWA
       } else if (height <= 670) {
         // Very small screens (iPhone SE: 667px height, older SE: 568px)
-        setCircleRadius(0.08);
-        setCirclePosition({ x: 0.22, y: 0.12 });
+        setCircleRadius(0.07);
+        setCirclePosition({ x: 0.22, y: 0.14 });
       } else {
         // Larger screens
-        setCircleRadius(0.1);
-        setCirclePosition({ x: 0.32, y: 0.12 }); // More to the right
+        setCircleRadius(0.09);
+        setCirclePosition({ x: 0.32, y: 0.15 }); // More to the right
       }
     };
 
@@ -149,11 +149,11 @@ export default function SignupWizard({
     );
   }, [fullName, phone]);
 
-  // STEP 0: UPDATE LAYER COUNT based on filled fields (lines 109-125)
+  // STEP 0-1: UPDATE LAYER COUNT based on filled fields
   useEffect(() => {
     let layers = 1; // Start with 1 layer
 
-    // Add 1 layer for each valid filled field
+    // Add 1 layer for each valid filled field (Steps 0-1)
     if (fullName.trim() && isHebrewName(fullName.trim())) {
       layers++;
     }
@@ -166,15 +166,22 @@ export default function SignupWizard({
     if (branches.length > 0) {
       layers++;
     }
-    console.log(branches);
 
-    // Update the layer count state (max 4 layers)
-    setLayerCount(Math.min(layers, 5));
+    // ADD: Interests increase (Step 2)
+    layers += interests.length; // +1 per interest selected
 
-    console.log("Step 0 - Layer count updated to:", Math.min(layers, 4));
-  }, [fullName, phone, gender, branches]);
+    // ADD: Circle adjustments (Step 3)
+    if (circle === "מעגל שני ושלישי של משפחות השכול") {
+      layers = 10; // layersMax
+    } else if (circle === "תושבי העוטף ומפונים") {
+      layers += 1; // layersIncrease
+    }
 
-  // STEP 2+ (Interests & Circle): CALCULATE ALL PARAMS using calculator (lines 127-148)
+    // Update the layer count state (max 10 layers)
+    setLayerCount(Math.min(layers, 10));
+  }, [fullName, phone, gender, branches, interests, circle]);
+
+  // STEP 2+ (Interests & Circle): CALCULATE ALL PARAMS using calculator
   useEffect(() => {
     // Build user profile for calculator
     const userProfile = {
@@ -484,40 +491,36 @@ export default function SignupWizard({
     </svg>
   );
 
-  const activeCircleParams =
-    currentStep <= 1
-      ? {
-          layers: layerCount,
-          smoothness: defaultParams.smoothness,
-          complexity: defaultParams.complexity,
-          elongation: defaultParams.elongation,
-          opacity: 0.8,
-          strokeWidth: 1,
-        }
-      : calculatedParams;
+  // REMOVE the currentStep check - always use calculatedParams
+  const activeCircleParams = {
+    layers: layerCount, // Always from wizard
+    smoothness: calculatedParams.smoothness,
+    complexity: calculatedParams.complexity,
+    elongation: calculatedParams.elongation,
+    opacity: calculatedParams.opacity,
+    strokeWidth: calculatedParams.strokeWidth,
+  };
 
   return (
     <SmoothPageWrapper isLoading={loading}>
-      <div className={styles.wizardContainer}>
-        {/* Fixed Background Circles - stays in place during swipe */}
-        <div className={styles.backgroundCircles}>
-          <div className={styles.backgroundCircles}>
-            <OrganicCircles
-              key={`background-circles-step${currentStep}-layers${activeCircleParams.layers}-${activeCircleParams.complexity}-${activeCircleParams.opacity}-${activeCircleParams.smoothness}-${activeCircleParams.strokeWidth}-${activeCircleParams.elongation}`}
-              mode="static"
-              radius={circleRadius}
-              layers={activeCircleParams.layers}
-              smoothness={activeCircleParams.smoothness}
-              complexity={activeCircleParams.complexity}
-              elongation={activeCircleParams.elongation}
-              opacity={activeCircleParams.opacity}
-              strokeWidth={activeCircleParams.strokeWidth}
-              position={circlePosition}
-              baseColor="#FFFFFF"
-            />
-          </div>
-        </div>
+      {/* Fixed Background Circles - stays in place during swipe */}
 
+      <div className={styles.backgroundCircles}>
+        <OrganicCircles
+          key={`background-circles-layers${activeCircleParams.layers}-${activeCircleParams.complexity}-${activeCircleParams.opacity}-${activeCircleParams.smoothness}-${activeCircleParams.strokeWidth}-${activeCircleParams.elongation}`}
+          mode="static"
+          radius={circleRadius}
+          layers={activeCircleParams.layers}
+          smoothness={activeCircleParams.smoothness}
+          complexity={activeCircleParams.complexity}
+          elongation={activeCircleParams.elongation}
+          opacity={activeCircleParams.opacity}
+          strokeWidth={activeCircleParams.strokeWidth}
+          position={circlePosition}
+          baseColor="#FFFFFF"
+        />
+      </div>
+      <div className={styles.wizardContainer}>
         {/* Scroll Snap Container - locked until step 0 is valid */}
         <div
           ref={scrollContainerRef}
@@ -863,7 +866,7 @@ export default function SignupWizard({
                     onClick={handleSubmit}
                     disabled={loading}
                     customBgColor="#b37eb3"
-                    style={{ alignSelf: "center" }}
+                    style={{ alignSelf: "center", border: "none" }}
                   >
                     {loading ? "..." : "סיום"}
                   </Button>
