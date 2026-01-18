@@ -4,37 +4,98 @@
 .pageOverride {
   display: flex;
   flex-direction: column;
+
+  /* Center inner content (header/slider) horizontally */
   align-items: center;
-  position: fixed; 
-  inset: 0; 
+
+  /* Lock to viewport edges explicitly */
+  position: fixed;
+  inset: 0;
+
+  /* Force full width/height for background coverage */
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
-  max-width: none !important; 
+  max-width: none !important;
+
+  /* Prevent background scroll */
   overflow: hidden;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  padding: 2rem 0.2rem 1.5rem; /* 48px 4px 24px */
-  gap: 0.5rem; /* 8px */
+  overscroll-behavior: none;
+
+  /* Gradient Background */
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+
+  /* --- NEW STRUCTURE --- */
+  /* Padding: Top (+Safe Area), Right, Bottom (0), Left */
+  padding-top: calc(var(--spacing-4xl) + env(safe-area-inset-top));
+  padding-right: var(--spacing-2xl);
+  padding-bottom: 0;
+  padding-left: var(--spacing-2xl);
+
   z-index: 1;
 }
 
-/* Header */
+/* ============================================
+   CLOSE BUTTON 
+   ============================================ */
+.closeButton {
+  /* Remove absolute positioning to keep it in flow */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Align to the right side of the flex container */
+  align-self: flex-start;
+
+  /* Reset offsets */
+  top: auto;
+  right: auto;
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1201;
+  transition: transform var(--transition-normal);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
 .header {
+  width: 100%;
+  max-width: var(--container-max-width, 24.5625rem);
   text-align: center;
-  margin-top: 4.5rem; 
+
+  /* Spacing between Close Button and Title */
+  margin-top: var(--spacing-3xl);
+
+  /* Space between Title and Items */
   margin-bottom: 2rem;
+
   z-index: 10;
   flex-shrink: 0;
-  width: 100%;
-  max-width: var(--container-max-width, 24.5625rem); 
 }
 
 .headerTitle {
-  font-family: 'Arfilit', sans-serif;
+  font-family: var(--font-primary);
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-3xl);
   line-height: 2.125rem;
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -44,18 +105,28 @@
    ============================================ */
 .scrollContainer {
   flex: 1;
+  width: 100%;
+  max-width: var(--container-max-width, 24.5625rem);
+
+  /* Scroll behavior */
   overflow-y: auto;
   overflow-x: hidden;
-  width: 100%;
-  max-width: var(--container-max-width, 24.5625rem); 
-  padding: 0 1.5rem 6rem 1.5rem; 
+
+  /* Internal Spacing - Bottom for Safe Area */
+  padding-bottom: 6rem;
+  padding-top: var(--spacing-xs);
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  overflow: visible; 
+
+  /* Note: No side padding here, handled by .pageOverride */
 }
-.scrollContainer::-webkit-scrollbar { display: none; }
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
 
 /* ============================================
    DROPDOWN WRAPPERS
@@ -86,62 +157,33 @@
 /* ============================================
    DATE ROW
    ============================================ */
-.fieldGroup { 
-  width: 100%; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 0.5rem; 
-}
-
-.dateLabel { 
-  width: 100%; 
-  font-family: var(--font-secondary); 
-  font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); 
-  line-height: 19px;
-  text-align: right; 
-  color: #F9F9F9; 
-  margin: 0; 
-}
-
-.dateRow { 
-  display: flex; 
-  flex-direction: row; 
-  align-items: center; 
-  padding: 0.2rem; 
-  gap: 1.2rem; 
-  direction: rtl; 
-}
-/* ============================================
-   CLOSE BUTTON 
-   ============================================ */
-.closeButton {
-  position: absolute;
-  width: auto;
-  height: auto;
-  right: 1.3rem; /* 20px */
-  top: 2.3rem; /* 32px */
-  border: none;
-  outline: none;
-  box-shadow: none;
-  background: transparent;
+.fieldGroup {
+  width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dateLabel {
+  width: 100%;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md);
+  line-height: 19px;
+  text-align: right;
+  color: #f9f9f9;
+  margin: 0;
+}
+
+.dateRow {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  cursor: pointer;
-  z-index: 1201;
-  padding: var(--spacing-xs); /* 4px */
-  transition: transform var(--transition-normal);
-  -webkit-tap-highlight-color: transparent;
+  padding: 0.2rem;
+  gap: 1.2rem;
+  direction: rtl;
 }
 
-.closeButton:hover {
-  transform: scale(1.1);
-}
-
-.closeButton:active {
-  transform: scale(0.95);
-}
 /* ============================================
    BUTTONS
    ============================================ */
@@ -153,23 +195,44 @@
 }
 
 .submitButton {
-  background: #B37EB3; 
+  background: #b37eb3;
   color: rgba(247, 247, 247, 0.9);
-  border: none; 
-  border-radius: 0.3125rem; 
+  border: none;
+  border-radius: 0.3125rem;
   padding: 0.5rem 1rem;
-  width: auto; 
+  width: auto;
   min-width: 8rem;
   height: 2.75rem;
-  font-family: var(--font-secondary); 
-  font-size: 1.125rem; 
-  cursor: pointer; 
+  font-family: var(--font-secondary);
+  font-size: 1.125rem;
+  cursor: pointer;
   transition: opacity 0.2s;
 }
-.submitButton:hover { opacity: 0.9; }
-.submitButton:disabled { opacity: 0.6; cursor: not-allowed; background: #B37EB3; }
+.submitButton:hover {
+  opacity: 0.9;
+}
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #b37eb3;
+}
 
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
 @media (max-height: 700px) {
-  .header { margin-top: 3.5rem; margin-bottom: 1.5rem; }
-  .scrollContainer { gap: 1rem; }
+  .pageOverride {
+    /* Slightly less padding top on very small screens if needed, 
+       otherwise keeps 4xl logic */
+    padding-top: calc(var(--spacing-3xl) + env(safe-area-inset-top));
+  }
+
+  .header {
+    margin-top: var(--spacing-2xl);
+    margin-bottom: 1.5rem;
+  }
+
+  .scrollContainer {
+    gap: 1rem;
+  }
 }

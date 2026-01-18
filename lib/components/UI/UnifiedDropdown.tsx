@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import styles from './UnifiedDropdown.module.css';
+import React, { useState, useEffect } from "react";
+import styles from "./UnifiedDropdown.module.css";
 
 interface DropdownOption {
   label: string;
@@ -28,7 +28,7 @@ export default function UnifiedDropdown({
   onChange,
   isOpen,
   onToggle,
-  className = '',
+  className = "",
   isMini = false,
   error,
   onErrorExpire,
@@ -42,24 +42,24 @@ export default function UnifiedDropdown({
       const timer = setTimeout(() => {
         setShowError(false);
         onErrorExpire?.();
-      }, 6000);
+      }, 4000);
       return () => clearTimeout(timer);
     } else {
       setShowError(false);
     }
   }, [error, onErrorExpire]);
 
-  const displayLabel = (showError && error) ? error : label;
+  const displayLabel = showError && error ? error : label;
   const isError = showError && !!error;
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
 
   return (
     <div
       className={`
         ${styles.dropdownContainer}
-        ${isOpen ? styles.active : ''}
-        ${isMini ? styles.miniDropdown : ''}
-        ${isError ? styles.hasError : ''}
+        ${isOpen ? styles.active : ""}
+        ${isMini ? styles.miniDropdown : ""}
+        ${isError ? styles.hasError : ""}
         ${className}
       `}
     >
@@ -69,7 +69,9 @@ export default function UnifiedDropdown({
       {!isMini && (
         <fieldset
           aria-hidden="true"
-          className={`${styles.borderFieldset} ${isError ? styles.borderError : ''}`}
+          className={`${styles.borderFieldset} ${
+            isError ? styles.borderError : ""
+          }`}
         >
           <legend className={styles.borderLegend}>
             {/* Span adds breathing room for the cut */}
@@ -80,7 +82,11 @@ export default function UnifiedDropdown({
 
       {/* VISIBLE LABEL (Positioned over the gap) */}
       {!isMini && (
-        <span className={`${styles.dropdownLabel} ${isError ? styles.labelError : ''}`}>
+        <span
+          className={`${styles.dropdownLabel} ${
+            isError ? styles.labelError : ""
+          }`}
+        >
           {displayLabel}
         </span>
       )}
@@ -94,14 +100,20 @@ export default function UnifiedDropdown({
         <span className={!value ? styles.placeholder : styles.selectedValue}>
           {selectedOption?.label || placeholder}
         </span>
-        
+
         {/* CSS-Only Arrow (Matching SignupWizard) */}
-        <div className={`${styles.arrowIcon} ${isOpen ? styles.rotated : ''}`}>
-          <svg width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path 
-              d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5" 
-              stroke="#F9F9F9" 
-              strokeLinecap="round" 
+        <div className={`${styles.arrowIcon} ${isOpen ? styles.rotated : ""}`}>
+          <svg
+            width="18"
+            height="8"
+            viewBox="0 0 18 8"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0.500067 0.5L8.53964 6.53906L16.5792 0.5"
+              stroke="#F9F9F9"
+              strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
@@ -120,7 +132,7 @@ export default function UnifiedDropdown({
                 onToggle();
               }}
               className={`${styles.dropdownOption} ${
-                value === option.value ? styles.selected : ''
+                value === option.value ? styles.selected : ""
               }`}
             >
               {option.label}

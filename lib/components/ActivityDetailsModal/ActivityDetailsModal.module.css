@@ -1,4 +1,5 @@
 /* ActivityDetailsModal.module.css */
+
 /* ============================================
    OVERLAY & MODAL CONTAINER
    ============================================ */
@@ -15,23 +16,31 @@
   background-color: transparent;
 }
 
-/* Modal container - full screen */
+/* Modal container - Flex Column */
 .modalContainer {
+  /* Lock Layout */
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   width: 100%;
   max-width: 100vw;
   height: 100dvh;
   background: var(--color-background);
   z-index: var(--z-index-modal);
-  overflow: hidden;
-  direction: rtl;
-  margin: 0 auto;
+
+  /* Flex Layout */
   display: flex;
   flex-direction: column;
+  align-items: center;
+
+  /* Scrolling handled by contentContainer */
+  overflow: hidden;
+  direction: rtl;
+
+  /* Padding Structure: Top (+Safe Area) & Sides */
+  padding-top: calc(var(--spacing-4xl) + env(safe-area-inset-top));
+  padding-right: var(--spacing-2xl);
+  padding-bottom: 0;
+  padding-left: var(--spacing-2xl);
 }
 
 /* ============================================
@@ -39,20 +48,21 @@
    ============================================ */
 
 .closeButton {
-  position: absolute;
+  /* Flex positioning: RTL + flex-start = Right */
+  align-self: flex-start;
+  position: relative;
+
   width: auto;
   height: auto;
-  right: var(--spacing-2xl); /* 24px */
-  top: var(--spacing-4xl); /* 48px */
   border: none;
-  outline: none;
-  box-shadow: none;
   background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  padding: var(--spacing-xs); /* 4px */
+  z-index: 1201;
+  padding: var(--spacing-xs);
+  margin: 0;
   transition: transform var(--transition-normal);
   -webkit-tap-highlight-color: transparent;
 }
@@ -73,22 +83,24 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0 var(--spacing-2xl); /* 20px horizontal padding */
-  padding-top: var(--spacing-4xl);
-  padding-bottom: var(--spacing-xl); /* 20px bottom padding */
-  gap: var(--spacing-lg); /* 16px gap between sections */
   width: 100%;
   max-width: var(--container-max-width);
 
-  text-align: right;
+  /* Reset padding (handled by container) */
+  padding: 0;
+
+  /* Gap between sections */
+  gap: var(--spacing-lg);
+
+  /* Scroll behavior */
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-}
 
-/* Adjust top padding if there's an image */
-.contentContainer:has(.imageContainer) {
-  padding-top: 5rem; /* ⚠️ NO VARIABLE - 80px when image is present */
+  text-align: right;
+
+  /* Add padding bottom to clear the fixed buttons */
+  padding-bottom: 8rem;
 }
 
 /* ============================================
@@ -109,12 +121,12 @@
 
 .imageContainer {
   width: 100%;
-  height: 12rem; /* ⚠️ NO VARIABLE - 192px */
-  margin-top: var(--spacing-xl); /* 12px */
-  margin-bottom: var(--spacing-xl); /* 12px */
-  border-radius: var(--radius-md); /* 14px */
+  height: 12rem;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  border: 0.0625rem solid var(--color-text-secondary); /* ⚠️ 1px - NO VARIABLE */
+  border: 0.0625rem solid var(--color-text-secondary);
   flex-shrink: 0;
   align-self: stretch;
 }
@@ -134,83 +146,78 @@
   width: 100%;
 }
 
+/* If no image, add spacing to separate title from close button */
+.noImageSpacing {
+  margin-top: var(--spacing-3xl);
+}
+
 .titleText {
   font-family: var(--font-primary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-2xl); /* 24px */
-  line-height: var(--line-height-snug); /* 1.15 */
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-snug);
   color: var(--color-text-primary);
   margin: 0;
   text-align: right;
 }
 
 /* ============================================
-   PRIMARY INFO SECTION (Date & Time)
+   INFO SECTIONS
    ============================================ */
 
 .primaryInfoSection {
   width: 100%;
-  margin-bottom: var(--spacing-xs); /* 4px */
+  margin-bottom: var(--spacing-xs);
 }
 
 .dateTimeRow {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--spacing-sm); /* 8px gap between day, separator, and time */
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
 .primaryInfoText {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-xl); /* 20px */
-  font-weight: var(--font-weight-semibold); /* 600 */
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   margin: 0;
-  line-height: var(--line-height-snug); /* 1.15 */
+  line-height: var(--line-height-snug);
   text-align: right;
 }
 
 .primaryInfoSeparator {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-xl); /* 20px */
-  font-weight: var(--font-weight-semibold); /* 600 */
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   margin: 0;
   line-height: var(--line-height-snug);
 }
 
-/* ============================================
-   SECONDARY INFO SECTION (Location & Instructor)
-   ============================================ */
-
 .secondaryInfoSection {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs); /* 4px between lines */
-  margin-bottom: var(--spacing-xs); /* 4px */
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
 }
 
 .secondaryInfoText {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-xl); /* 20px */
-  font-weight: var(--font-weight-semibold); /* 600 */
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
   margin: 0;
-  line-height: var(--line-height-snug); /* 1.15 */
+  line-height: var(--line-height-snug);
   text-align: right;
 }
-
-/* ============================================
-   PARTICIPANTS SECTION
-   ============================================ */
 
 .participantsSection {
   width: 100%;
 }
-
-/* Uses .secondaryInfoText class for styling */
 
 /* ============================================
    DESCRIPTION SECTION
@@ -218,47 +225,46 @@
 
 .descriptionSection {
   width: 100%;
-  max-height: 12rem; /* ⚠️ NO VARIABLE - 192px */
+  max-height: 12rem;
   overflow-y: auto;
-  padding-right: var(--spacing-xs); /* 4px for scrollbar */
+  padding-right: var(--spacing-xs);
 }
 
 .descriptionText {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-md); /* 14px */
-  font-weight: var(--font-weight-normal); /* 400 */
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
   color: var(--color-text-secondary);
   margin: 0;
-  line-height: 1.4; /* ⚠️ NO VARIABLE */
+  line-height: 1.4;
   white-space: pre-wrap;
   text-align: right;
 }
 
 /* ============================================
-   ADMIN: PARTICIPANTS INFO & BUTTON
+   ADMIN CONTROLS
    ============================================ */
 
 .adminControlsContainer {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Aligns content to the right in RTL */
+  align-items: flex-start;
   gap: var(--spacing-sm);
 }
 
 .adminParticipantsText {
   font-family: var(--font-secondary);
-  font-size: var(--font-size-md); /* 20px */
-  font-weight: var(--font-weight-normal); /* 600 */
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-normal);
   color: var(--color-text-secondary);
   margin: 0;
-  line-height: var(--line-height-snug); /* 1.15 */
+  line-height: var(--line-height-snug);
   text-align: right;
 }
 
-/* Optional: if you need specific tweaks for the button itself */
 .adminRegistrationsButton {
-  padding-right: 0 !important; /* Ensures button text aligns perfectly with text above */
+  padding-right: 0 !important;
 }
 
 /* ============================================
@@ -267,29 +273,29 @@
 
 .bottomButtonsContainer {
   position: fixed;
-  bottom: 4rem; /* ⚠️ NO VARIABLE - nav height related */
+  bottom: 4rem;
   left: 0;
   right: 0;
   width: 100%;
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--spacing-xl); /* 20px */
-  padding-bottom: var(--spacing-2xl); /* 24px */
+  padding: var(--spacing-xl);
+  padding-bottom: var(--spacing-2xl);
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-md); /* 12px gap between buttons */
+  gap: var(--spacing-md);
 }
 
-/* Add shadow/gradient at top of button container for better separation */
+/* Gradient shadow for separation */
 .bottomButtonsContainer::before {
   content: "";
   position: absolute;
-  top: -2rem; /* ⚠️ NO VARIABLE */
+  top: -2rem;
   left: 0;
   right: 0;
-  height: 2rem; /* ⚠️ NO VARIABLE */
+  height: 2rem;
   pointer-events: none;
 }
 
@@ -298,7 +304,7 @@
    ============================================ */
 
 .contentContainer::-webkit-scrollbar {
-  width: 0.375rem; /* ⚠️ NO VARIABLE - 6px */
+  width: 0.375rem;
 }
 
 .contentContainer::-webkit-scrollbar-track {
@@ -311,7 +317,7 @@
 }
 
 .descriptionSection::-webkit-scrollbar {
-  width: 0.25rem; /* ⚠️ NO VARIABLE - 4px */
+  width: 0.25rem;
 }
 
 .descriptionSection::-webkit-scrollbar-track {
@@ -327,51 +333,22 @@
    RESPONSIVE ADJUSTMENTS
    ============================================ */
 
-/* Small phones */
 @media (max-width: 26rem) {
-  .closeButton {
-    top: 2.5rem; /* ⚠️ NO VARIABLE - 40px */
-    right: var(--spacing-xl); /* 20px */
-  }
-
-  .contentContainer {
-    padding-top: 6rem; /* ⚠️ NO VARIABLE - 96px */
+  .modalContainer {
+    /* Slightly more padding on very small screens if needed */
   }
 }
 
-/* Small height screens (iPhone SE, etc.) */
 @media (max-height: 670px) {
-  .closeButton {
-    top: 2.5rem; /* ⚠️ NO VARIABLE - 40px */
+  .modalContainer {
+    padding-top: calc(var(--spacing-3xl) + env(safe-area-inset-top));
   }
-
-  .contentContainer {
-    padding-top: 5rem; /* ⚠️ NO VARIABLE - 80px */
-  }
-
   .bottomButtonsContainer {
-    padding-bottom: var(--spacing-xl); /* 20px */
+    padding-bottom: var(--spacing-xl);
   }
-}
-
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
+  .imageContainer {
+    height: 10rem;
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
   }
 }

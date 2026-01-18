@@ -9,8 +9,10 @@ import styles from "./addNotification.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
+import Popup from "@/lib/components/UI/Popup";
 import Popup from "@/lib/components/UI/Popup"; 
 
+// --- Constants ---
 const TARGET_OPTIONS = [
   { label: "לפי פעילות", value: "activity" },
   { label: "לפי תאריך", value: "date" },
@@ -183,6 +185,8 @@ export default function AddNotificationPage() {
 
         setPopupConfig({
           title: "לא נמצאו נמענים",
+          content:
+            "לא נמצאו משתמשים התואמים את קהל היעד שנבחר. ההודעה לא נשלחה.",
           content: emptyMsg,
           isSuccess: false,
         });
@@ -193,11 +197,15 @@ export default function AddNotificationPage() {
           isSuccess: true, 
         });
       }
-      
-      setShowPopup(true);
 
+      setShowPopup(true);
     } catch (error: any) {
       console.error("Error sending notification:", error);
+      setPopupConfig({
+        title: "שגיאה",
+        content: error.message || "אירעה שגיאה בשליחת ההודעה",
+        isSuccess: false,
+      });
       
       const errMsg = typeof error === 'string' ? error : (error.message || "Unknown error");
 
@@ -242,8 +250,9 @@ export default function AddNotificationPage() {
   }));
 
   return (
-    <SmoothPageWrapper isLoading={mounting || closing}>
+    <SmoothPageWrapper isLoading={mounting}>
       <main className={`mobile-container ${styles.pageOverride}`}>
+        {/* 1. CLOSE BUTTON (Flex Item, Aligned End) */}
         <button
           className={styles.closeButton}
           onClick={handleCloseWithAnimation}
@@ -257,10 +266,12 @@ export default function AddNotificationPage() {
           />
         </button>
 
+        {/* 2. HEADER (Spacing via margin-top) */}
         <div className={styles.header}>
           <h1 className={styles.headerTitle}>יצירת הודעה חדשה</h1>
         </div>
 
+        {/* 3. CONTENT */}
         <div className={styles.scrollContainer} ref={scrollContainerRef}>
           {/* --- TARGET AUDIENCE --- */}
           <div
