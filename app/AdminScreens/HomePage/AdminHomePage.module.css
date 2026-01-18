@@ -164,12 +164,25 @@
 /* ============================================
    RESPONSIVE
    ============================================ */
-@media (max-width: 24.5rem) {
-  .pageContainer {
-    padding-left: var(--spacing-lg); /* 16px */
-    padding-right: var(--spacing-lg); /* 16px */
+@media (min-height: 760px) and (max-height: 780px) {
+  .fabButtonOpen {
+    bottom: 9rem;
   }
-  .fabButton {
-    right: var(--spacing-lg); /* 16px */
+  .actionButtons {
+    bottom: 5rem;
+  }
+}
+
+/* iPhone 12/13/14 PWA viewport (797px height) */
+@media (min-height: 790px) and (max-height: 810px) {
+  .actionButtons {
+    bottom: 4rem;
+  }
+}
+
+/* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
+@media (min-height: 865px) and (max-height: 885px) {
+  .actionButtons {
+    bottom: 4rem;
   }
 }
