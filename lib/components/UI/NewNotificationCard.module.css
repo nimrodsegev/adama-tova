@@ -10,8 +10,7 @@
 
   /* --- GLASS EFFECT --- */
   background: rgba(104, 31, 2, 0.05); /* ⚠️ NO VARIABLE */
-  backdrop-filter: var(--blur-md); /* 10px Blur */
-  -webkit-backdrop-filter: var(--blur-md);
+  /* backdrop-filter removed to prevent glow/shadow effect when scrolling */
 
   /* Outer border always visible on container */
   border: var(--border-width-thin) solid var(--color-text-secondary);
@@ -199,21 +198,18 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: var(--spacing-md);
-  max-height: 3em;
-  overflow: hidden;
 }
 
 .headerTextGroup {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: var(--spacing-xs);
 }
 
 .time,
-.pipe,
-.title {
+.pipe {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xl);
@@ -221,6 +217,18 @@
   text-align: right;
   color: var(--color-text-secondary);
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-compact);
+  text-align: right;
+  color: var(--color-text-secondary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .pipe {
