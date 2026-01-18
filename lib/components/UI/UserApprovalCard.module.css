@@ -5,7 +5,7 @@
   justify-content: flex-start;
   padding: var(--spacing-lg);
   width: 100%;
-  max-width: 21.5625rem;
+  max-width: 100%;
   min-height: 7.5625rem;
   height: auto;
   background: var(--button-bg-light);

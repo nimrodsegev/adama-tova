@@ -10,7 +10,6 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
   /* ---------------------------------------- */
-  margin: 0 auto;
   /* Admin Orange Gradient */
   background: var(--color-background);
   position: relative;
@@ -88,14 +87,16 @@
   overflow: visible;
   /* Cushion for the sticky button */
   padding-bottom: 5rem; /* ⚠️ NO VARIABLE - 80px */
-  padding-left: var(--spacing-xs); /* 4px */
-  padding-right: var(--spacing-xs); /* 4px */
+  align-items: stretch;
 }
 
 .notificationItem {
   width: 100%;
   flex-shrink: 0;
   overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 /* ============================================
@@ -141,9 +142,7 @@
    ============================================ */
 .bottomButton {
   position: fixed;
-  bottom: calc(
-    var(--spacing-6) + env(safe-area-inset-bottom)
-  ); /* 96px + safe area */
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
   right: var(--spacing-xl);
   z-index: 50;
 }

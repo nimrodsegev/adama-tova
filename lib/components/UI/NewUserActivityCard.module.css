@@ -6,7 +6,7 @@
   align-items: flex-start;
   padding: var(--spacing-lg);
   width: 100%;
-  max-width: var(--content-width-standard);
+  max-width: 100%;
   min-height: 6rem; /* ⚠️ NO VARIABLE - 96px */
   height: auto;
   background: var(--button-bg-light);
