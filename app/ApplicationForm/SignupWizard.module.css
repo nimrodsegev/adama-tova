@@ -9,9 +9,7 @@
   flex-direction: column;
   align-items: center;
   padding: 0;
-  padding-top: calc(
-    3vh + env(safe-area-inset-top, 0)
-  ); /* Safe area for notch */
+  padding-top: calc(3vh + env(safe-area-inset-top, 0));
   padding-bottom: calc(
     4rem + env(safe-area-inset-bottom, 0)
   ); /* Space for fixed navigation */
@@ -31,14 +29,15 @@
 /* Fixed Background Circles - stays in place during swipe */
 .backgroundCircles {
   position: fixed;
-  top: calc(4vh + env(safe-area-inset-top, 0));
+  /* top: calc(4vh + env(safe-area-inset-top, 0)); */
   left: 0;
   right: 0;
   width: min(60.5vw, 14.92rem);
-  height: min(60.5vw, 15.13rem);
+  height: min(69.5vw, 18.13rem);
   margin: 0 auto;
   pointer-events: none;
   z-index: 1;
+  overflow: visible;
 }
 
 /* Spacer to maintain layout where circles used to be */
@@ -310,7 +309,7 @@
 }
 
 .inputError {
-  border: 0.125rem solid #A70000 !important;
+  border: 0.125rem solid #a70000 !important;
 }
 
 /* Field error - replaces label */
@@ -343,7 +342,7 @@
   font-weight: var(--font-weight-normal);
   line-height: 1.1875rem; /* 19px */
   text-align: right;
-  color: #A70000;
+  color: #a70000;
 
   white-space: nowrap;
   z-index: 3;
@@ -673,13 +672,13 @@
   height: 2.9375rem; /* 47px */
   background: rgba(249, 249, 249, 0.3); /* Semi-transparent - unselected */
   border-radius: 0.5625rem; /* 9px */
-  border: 1px solid #F9F9F9; /* White border */
+  border: 1px solid #f9f9f9; /* White border */
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
   font-size: 1rem; /* 16px */
   line-height: 1.1875rem; /* 19px */
   text-align: right;
-  color: #F9F9F9; /* White text for unselected */
+  color: #f9f9f9; /* White text for unselected */
   cursor: pointer;
   transition: background 0.15s ease-out, border-color 0.15s ease-out;
   -webkit-tap-highlight-color: transparent;
@@ -809,11 +808,13 @@
 
 /* Slide-in + swipe hint animation for first page */
 .nextArrowSwipeHint {
-  animation: arrowSlideIn 0.6s ease-out forwards, arrowSwipeHint 1.2s ease-in-out 0.8s infinite;
+  animation: arrowSlideIn 0.6s ease-out forwards,
+    arrowSwipeHint 1.2s ease-in-out 0.8s infinite;
 }
 
 @keyframes arrowSwipeHint {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0) translateZ(0);
   }
   30% {
@@ -1093,7 +1094,9 @@
 @media (max-height: 700px) {
   .wizardContainer {
     padding-top: 2vh;
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0)); /* More room for dropdowns */
+    padding-bottom: calc(
+      6rem + env(safe-area-inset-bottom, 0)
+    ); /* More room for dropdowns */
   }
 
   .headerSection {
@@ -1369,7 +1372,9 @@
    ============================================ */
 @media (display-mode: standalone) {
   .wizardContainer {
-    padding-top: calc(1vh + env(safe-area-inset-top, 0)); /* Reduced to move content up */
+    padding-top: calc(
+      1vh + env(safe-area-inset-top, 0)
+    ); /* Reduced to move content up */
     padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0));
     overflow: visible;
   }
