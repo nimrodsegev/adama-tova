@@ -19,7 +19,7 @@ const TARGET_OPTIONS = [
 ];
 
 const CIRCLE_OPTIONS = [
-  { label: "שורדי נובה", value: "Nova Survivor" },
+  { label: "שורדי מסיבות", value: "Nova Survivor" },
   { label: "נפגעי ה-7 באוקטובר", value: "October 7 victim" },
   { label: "הורים שכולים", value: "Shkulim parents" },
   { label: "אחים שכולים", value: "Shkulim Siblings" },

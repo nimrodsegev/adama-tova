@@ -11,11 +11,11 @@ import { createClient } from '@/lib/supabase/client';
  * Maps Hebrew circle names to English database enum values
  */
 const CIRCLE_MAPPING: Record<string, string> = {
-  'שורדי ושורדות המסיבות': 'Nova Survivor',
+  'שורדי מסיבות': 'Nova Survivor',
   'נפגעי טראומה 7.10 ומלחמת חרבות ברזל': 'October 7 victim',
   'הורים שכולים': 'Shkulim parents',
   'אחים.ות שכולים': 'Shkulim Siblings',
-  'משפחות וקרובים של פצועים טראומה בגופם ובנפשם': 'Family of october 7 victim',
+  'קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם': 'Family of october 7 victim',
   'כוחות הצלה וחילוץ': 'Rescue forces',
   'תושבי העוטף ומפונים': 'Residence of Otef Aza',
   'מעגל שני ושלישי של משפחות השכול': 'Second or third',
