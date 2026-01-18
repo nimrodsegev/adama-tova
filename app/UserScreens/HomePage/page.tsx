@@ -122,7 +122,7 @@ export default function NewUserHomePage() {
       // 3. iPhone 14/15 Plus/Pro Max PWA (865px - 885px)
       if (height >= 865 && height <= 885) {
         newConfig.y = 0.09;
-        newConfig.x = 0.45;
+        newConfig.x = 0.43;
       }
 
       setBgCircleConfig(newConfig);
