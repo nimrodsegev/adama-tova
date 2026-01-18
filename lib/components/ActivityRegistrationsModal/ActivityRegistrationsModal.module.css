@@ -234,3 +234,9 @@
   width: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
   height: 2.25rem; /* ⚠️ NO VARIABLE - 36px */
 }
+
+@media (min-height: 865px) and (max-height: 885px) {
+  .clockIconWrapper {
+    left: 11.5rem;
+  }
+}
