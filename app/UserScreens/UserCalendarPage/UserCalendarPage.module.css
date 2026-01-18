@@ -85,8 +85,7 @@
   /* --- CHANGED: Removed max-height and overflow --- */
   /* The container now handles the scrolling */
   width: 100%;
-  padding: var(--spacing-sm);
-  padding-right: var(--spacing-xs);
+
   padding-bottom: var(--spacing-xs);
 }
 

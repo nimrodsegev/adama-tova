@@ -82,8 +82,6 @@
   /* The scrolling is now done by .pageContainer */
   overflow: visible;
   /* Cushion for the bottom of the scroll */
-  padding: var(--spacing-sm);
-  padding-right: var(--spacing-xs);
 }
 
 /* Individual Notification Item */

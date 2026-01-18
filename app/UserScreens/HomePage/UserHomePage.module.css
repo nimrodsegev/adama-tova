@@ -32,7 +32,7 @@
    ============================================ */
 .openHoursWrapper {
   width: 100%;
-  padding-top: 3.5rem; /* ⚠️ NO VARIABLE - closest is --spacing-4xl (3rem) */
+  padding-top: var(--spacing-3xl); /* 3.5rem / 56px */
   display: flex;
   justify-content: center;
 }
