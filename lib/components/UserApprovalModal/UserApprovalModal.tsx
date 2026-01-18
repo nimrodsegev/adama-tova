@@ -48,10 +48,15 @@ export default function UserApprovalModal({
       setClosing(false);
       loadUser();
       loadStats();
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
     }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen, userId]);
 
-  // Handle close with animation
   const handleCloseWithAnimation = () => {
     setClosing(true);
     setTimeout(() => {
@@ -80,8 +85,9 @@ export default function UserApprovalModal({
   const modalContent = (
     <>
       <div className={styles.overlay} onClick={handleCloseWithAnimation} />
+
       <div className={styles.modalContainer}>
-        {/* Close Button */}
+        {/* 1. CLOSE BUTTON (Flex Item - Aligned Start/Right) */}
         <button
           className={styles.closeButton}
           onClick={handleCloseWithAnimation}
@@ -96,37 +102,57 @@ export default function UserApprovalModal({
         </button>
 
         <div className={styles.contentFrame}>
-          {(loading || closing) ? (
+          {loading || closing ? (
             <div className={styles.loadingContainer}>
-              <OrganicCircles mode="loading" radius={0.15} baseColor="#FFFFFF" />
+              <OrganicCircles
+                mode="loading"
+                radius={0.15}
+                baseColor="#FFFFFF"
+              />
             </div>
           ) : !user ? (
             <p className={styles.errorText}>משתמש לא נמצא</p>
           ) : (
             <>
-              {/* Header with User Name */}
+              {/* 2. HEADER (Spacing via margin-top) */}
               <div className={styles.header}>
                 <h1 className={styles.userName}>{user.full_name}</h1>
               </div>
 
-              {/* Scrollable Content */}
+              {/* 3. SCROLLABLE CONTENT */}
               <div className={styles.scrollContainer}>
-                {/* Approval Section - White bordered box */}
+                {/* Approval Section */}
                 <div className={styles.approvalBox}>
                   <div className={styles.approvalContent}>
-                    {/* Status text on the right */}
                     <div className={styles.approvalStatusText}>
                       {type === "initial" ? (
-                        <>ממתין לאישור ראשוני{requestDate && <><br />מתאריך {requestDate}</>}</>
+                        <>
+                          ממתין לאישור ראשוני
+                          {requestDate && (
+                            <>
+                              <br />
+                              מתאריך {requestDate}
+                            </>
+                          )}
+                        </>
                       ) : (
                         <>
                           ממתין לאישור קבוצה
-                          {groupName && <><br />{groupName}</>}
-                          {requestDate && <><br />מתאריך {requestDate}</>}
+                          {groupName && (
+                            <>
+                              <br />
+                              {groupName}
+                            </>
+                          )}
+                          {requestDate && (
+                            <>
+                              <br />
+                              מתאריך {requestDate}
+                            </>
+                          )}
                         </>
                       )}
                     </div>
-                    {/* Buttons on the left */}
                     <div className={styles.actionButtons}>
                       <Button variant="reject" onClick={onReject}>
                         {t("סרב/י")}
@@ -164,10 +190,16 @@ export default function UserApprovalModal({
                   </div>
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>הסניף הקרוב אליי</span>
+                      <span className={styles.detailLabel}>
+                        הסניף הקרוב אליי
+                      </span>
                       <span className={styles.detailValue}>
                         {branches.length > 0
-                          ? branches.map((b: string) => b === "nahalal" ? "נהלל" : "סתריה").join(", ")
+                          ? branches
+                              .map((b: string) =>
+                                b === "nahalal" ? "נהלל" : "סתריה"
+                              )
+                              .join(", ")
                           : "לא צוין"}
                       </span>
                     </div>
@@ -188,7 +220,9 @@ export default function UserApprovalModal({
                     {quiz.free_text && (
                       <div className={styles.detailItem}>
                         <span className={styles.detailLabel}>הערות</span>
-                        <span className={styles.detailValue}>{quiz.free_text}</span>
+                        <span className={styles.detailValue}>
+                          {quiz.free_text}
+                        </span>
                       </div>
                     )}
                   </div>
