@@ -9,7 +9,7 @@ import styles from "./CreateNewAdmin.module.css";
 import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper"; 
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
-import Popup from "@/lib/components/UI/Popup"; // 1. Import Popup
+import Popup from "@/lib/components/UI/Popup"; 
 
 // --- Constants ---
 const GENDER_OPTIONS = [
@@ -36,12 +36,12 @@ export default function CreateNewAdmin() {
   // Animation State
   const [closing, setClosing] = useState(false);
 
-  // 2. Popup State
+  // Popup State
   const [popupConfig, setPopupConfig] = useState<{
     isOpen: boolean;
     title?: string;
     content: string;
-    isSuccess?: boolean; // To trigger navigation on close
+    isSuccess?: boolean; 
   }>({
     isOpen: false,
     content: "",
@@ -89,13 +89,38 @@ export default function CreateNewAdmin() {
     }
   };
 
+  const isValidEmail = (email: string) => {
+    // Basic email regex
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSubmit = async () => {
+    // 1. Check for Empty Fields
     if (!fullName || !email || !password || !phone || !gender) {
-      // Alert replaced with Popup
       setPopupConfig({
         isOpen: true,
         title: "שגיאה",
         content: "נא למלא את כל השדות",
+      });
+      return;
+    }
+
+    // 2. Validate Email Format
+    if (!isValidEmail(email)) {
+      setPopupConfig({
+        isOpen: true,
+        title: "שגיאה",
+        content: "פורמט האימייל אינו תקין",
+      });
+      return;
+    }
+
+    // 3. Validate Password Length
+    if (password.length < 6) {
+      setPopupConfig({
+        isOpen: true,
+        title: "שגיאה",
+        content: "הסיסמא חייבת להכיל לפחות 6 תווים",
       });
       return;
     }
@@ -110,22 +135,27 @@ export default function CreateNewAdmin() {
         phone,
         gender
       );
-      
       // Success Popup
       setPopupConfig({
         isOpen: true,
         title: "הצלחה",
         content: "מנהל נוסף בהצלחה!",
-        isSuccess: true, // Will trigger navigation on close
+        isSuccess: true, 
       });
 
     } catch (error: any) {
       console.error("Error creating admin:", error);
-      // Error Popup
+      
+      let errorMsg = "אירעה תקלה ביצירת המנהל";
+      // Check for specific error messages (e.g., duplicate email) if your API returns them
+      if (error.message?.includes("already in use") || error.message?.includes("exists")) {
+        errorMsg = "כתובת האימייל כבר קיימת במערכת";
+      }
+
       setPopupConfig({
         isOpen: true,
         title: "שגיאה",
-        content: "שגיאה ביצירת המנהל: " + (error.message || "אירעה תקלה"),
+        content: errorMsg,
       });
     } finally {
       setIsSubmitting(false);
@@ -136,7 +166,6 @@ export default function CreateNewAdmin() {
     <SmoothPageWrapper isLoading={closing}>
     <main className={`mobile-container ${styles.pageOverride}`}>
       
-      {/* NEW CLOSE BUTTON */}
       <button
         className={styles.closeButton}
         onClick={handleCloseWithAnimation}
@@ -166,7 +195,7 @@ export default function CreateNewAdmin() {
             textAlign="right"
         />
       
-        {/* Gender Selector - Wrapped to fix Z-Index */}
+        {/* Gender Selector */}
         <div 
           className={`${styles.dropdownContainer} ${genderDropdownOpen ? styles.activeDropdownWrapper : ''}`}
         >
@@ -209,7 +238,7 @@ export default function CreateNewAdmin() {
             value={password} 
             onChange={(e) => setPassword(e.target.value)} 
             className={styles.cutInput} 
-            type="text"
+            type="text" // Changed to text so admin can see what they type, or 'password' to hide
             dir="ltr"
             textAlign="right"
         />
@@ -226,7 +255,7 @@ export default function CreateNewAdmin() {
         </div>
       </div>
 
-      {/* 3. Render Popup */}
+      {/* Render Popup */}
       {popupConfig.isOpen && (
         <Popup
           title={popupConfig.title}

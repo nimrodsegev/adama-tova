@@ -513,7 +513,7 @@
   width: 100%;
   height: 13.0625rem; /* ⚠️ NO VARIABLE - 209px */
   background: #ab4016; /* ⚠️ NO VARIABLE */
-  margin-top: 135px; /* ⚠️ NO VARIABLE */
+  margin-top: 140px; /* ⚠️ NO VARIABLE */
   border: var(--border-width-thin) solid var(--color-text-secondary);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -747,7 +747,7 @@
   }
   .previewImageCard {
     height: 13.0625rem; /* ⚠️ NO VARIABLE - 161px */
-    margin-top: 165px;  /* ⚠️ NO VARIABLE */
+    margin-top: 170px;  /* ⚠️ NO VARIABLE */
   }
   .slideContent {
     gap: 0.75rem;
