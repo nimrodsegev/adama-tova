@@ -10,7 +10,6 @@ import SmoothPageWrapper from "@/lib/components/UI/SmoothPageWrapper";
 import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
 import Popup from "@/lib/components/UI/Popup";
-import Popup from "@/lib/components/UI/Popup"; 
 
 // --- Constants ---
 const TARGET_OPTIONS = [
@@ -187,7 +186,6 @@ export default function AddNotificationPage() {
           title: "לא נמצאו נמענים",
           content:
             "לא נמצאו משתמשים התואמים את קהל היעד שנבחר. ההודעה לא נשלחה.",
-          content: emptyMsg,
           isSuccess: false,
         });
       } else {
