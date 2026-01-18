@@ -69,9 +69,9 @@ const CIRCLE_ADJUSTMENTS: Record<
 function mapCircleToType(circle: string | undefined): string | null {
   if (!circle) return null;
   const map: Record<string, string> = {
-    "שורדי ושורדות המסיבות": "Nova Survivor",
+    "שורדי מסיבות": "Nova Survivor",
     "מעגל שני ושלישי של משפחות השכול": "Support Group",
-    "משפחות וקרובים של פצועים טראומה בגופם ובנפשם": "Support Group",
+    "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם": "Support Group",
     "כוחות הצלה וחילוץ": "Rescue Forces",
     "נפגעי טראומה 7.10 ומלחמת חרבות ברזל": "Area/Bereavement",
     "הורים שכולים": "Area/Bereavement",
