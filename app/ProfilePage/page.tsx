@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const { t } = useIvrita();
   const router = useRouter();
 
+  // Ref is now attached to the main container which handles scrolling
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // --- STATE ---
@@ -86,7 +87,7 @@ export default function ProfilePage() {
     };
   }, [isEditingPersonal, isEditingExtras]);
 
-  // --- LOGOUT HANDLERS ---
+  // --- HANDLERS ---
   const handleLogoutClick = () => {
     setShowLogoutPopup(true);
   };
@@ -155,14 +156,18 @@ export default function ProfilePage() {
   return (
     <ProtectedRoute>
       <SmoothPageWrapper isLoading={loading || mounting}>
-        <main className={styles.pageContainer}>
-          <div className={styles.scrollContainer} ref={scrollContainerRef}>
-            <div className={styles.header}>
-            <h1 className={styles.userName}>
+        {/* Main scrollable container matches AdminNotificationsPage structure */}
+        <main className={styles.pageContainer} ref={scrollContainerRef}>
+          {/* Header / Title */}
+          <div className={styles.titleContainer}>
+            <h1 className={styles.title}>
               {userProfile?.full_name || "אורח"}
+              {isAdmin && <span className={styles.adminLabel}>מנהלת</span>}
             </h1>
-            {isAdmin && <span className={styles.adminLabel}>מנהלת</span>}
           </div>
+
+          {/* Content Wrapper for Padding/Alignment */}
+          <div className={styles.contentContainer}>
             {/* --- SECTION 1: PERSONAL DETAILS --- */}
             <div className={styles.profileBox}>
               <div className={styles.boxHeader}>
@@ -296,14 +301,7 @@ export default function ProfilePage() {
                 </Button>
               </div>
             </div>
-            {isAdmin && (
-              <Button
-                className={styles.AddAdminButton}
-                onClick={handleToAddAdmin}
-              >
-                הוספת מנהל
-              </Button>
-            )}
+
             {isAdmin && (
               <button
                 style={{
@@ -323,7 +321,16 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* POPUPS WRAPPED IN CENTERED CONTAINER */}
+          {/* Sticky Add Admin Button (Outside content flow, fixed position) */}
+          {isAdmin && (
+            <div className={styles.bottomButton}>
+              <Button size="L" onClick={handleToAddAdmin}>
+                הוספת מנהל
+              </Button>
+            </div>
+          )}
+
+          {/* POPUPS */}
           {(showBranchError || showLogoutPopup) && (
             <div className={styles.popupWrapper}>
               {showBranchError && (

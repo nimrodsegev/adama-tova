@@ -1,57 +1,50 @@
 /* ============================================
-   PAGE LAYOUT (Matched to ADMIN HOME PAGE Logic)
+   PAGE LAYOUT (Matched to ADMIN NOTIFICATIONS)
    ============================================ */
 .pageContainer {
-  /* Positioning & Size */
-  position: fixed; /* Fixed to cover screen */
-  inset: 0;
   width: 100%;
-  max-width: 24.5625rem; /* 393px - Match reference */
-  height: 100dvh; 
-  margin: 0 auto; /* Center on larger screens */
+  max-width: var(--container-max-width);
+  /* Use scroll lock logic from reference */
+  height: calc(100dvh - var(--nav-height-bottom));
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 auto;
 
-  /* Background */
+  /* Gradient Background */
   background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
 
-  /* Flex Layout */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  
-  /* Reset padding here, handled by children to match reference flow */
-  padding: 0;
-  
-  overflow: hidden;
-  touch-action: none;
-  z-index: 1;
+  position: relative;
+  direction: rtl;
+  /* Use standard spacing variable */
+  padding: var(--spacing-2xl); /* 24px */
 }
 
 /* ============================================
-   HEADER
+   TITLE
    ============================================ */
-.header {
+.titleContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--spacing-3xl); /* 32px */
+  margin-top: var(--spacing-4xl); /* 48px */
   width: 100%;
-  text-align: center;
-  
-  /* Match reference spacing logic */
-  padding-top: 3.5rem; 
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  margin-bottom: 1rem;
-  
   flex-shrink: 0;
-  box-sizing: border-box;
-  z-index: 10;
 }
 
-.userName {
+.title {
   font-family: "Arfilit", sans-serif;
   font-weight: 400;
   font-size: 2rem;
   line-height: 2.5rem;
   color: rgba(249, 249, 249, 0.84);
+  text-align: center;
   margin: 0;
   letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .adminLabel {
@@ -59,60 +52,23 @@
   font-weight: 400;
   font-size: 1rem;
   color: #ffffff;
-  margin-left: 0.5rem;
 }
 
 /* ============================================
-   SCROLLABLE CONTENT
+   CONTENT
    ============================================ */
-.scrollContainer {
+.contentContainer {
   width: 100%;
-  flex: 1; /* Take remaining height */
-  
-  /* Scroll behavior */
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none; /* Hide scrollbar */
-  
-  /* Layout */
   display: flex;
   flex-direction: column;
   align-items: center;
-  
-  /* Padding Logic from Reference (1.5rem sides) + Bottom space */
-  padding: 0 1.5rem 6rem; 
-  gap: 0.75rem; /* Match reference cards gap */
-  
-  position: relative;
-  z-index: 10;
-}
-
-.scrollContainer::-webkit-scrollbar {
-  display: none;
+  gap: 0.75rem; /* Gap between cards */
+  /* Cushion for the sticky button */
+  padding-bottom: 5rem;
 }
 
 /* ============================================
-   TYPOGRAPHY HELPERS
-   ============================================ */
-.bodyL {
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1.25rem;
-  color: #f9f9f9;
-  margin: 0;
-  text-align: right;
-}
-.bodyS {
-  font-family: var(--font-secondary);
-  font-weight: 400;
-  font-size: 1rem;
-  color: rgba(247, 247, 247, 0.9);
-  margin: 0;
-  text-align: right;
-}
-
-/* ============================================
-   PROFILE BOX (View Mode)
+   PROFILE BOX STYLES
    ============================================ */
 .profileBox {
   width: 100%;
@@ -149,7 +105,7 @@
 }
 
 /* ============================================
-   EDIT MODE CONTAINER
+   EDIT MODE
    ============================================ */
 .editModeContainer {
   width: 100%;
@@ -212,7 +168,9 @@
   border-radius: 0.5625rem;
 }
 
-.optionToggle:hover { opacity: 0.9; }
+.optionToggle:hover {
+  opacity: 0.9;
+}
 
 .optionToggle.selected {
   background: rgba(249, 249, 249, 0.8);
@@ -250,8 +208,8 @@
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column; /* Stack vertically for alignment */
-  align-items: flex-end; /* Right align in RTL */
+  flex-direction: column;
+  align-items: flex-end;
   gap: 0.5rem;
   margin-top: 1rem;
 }
@@ -259,82 +217,57 @@
 .logOutButton {
   width: 100%;
   display: flex;
-  justify-content: flex-start; /* Left side */
+  justify-content: flex-start;
   color: var(--color-red-alert);
   margin-bottom: 1rem;
 }
 
-.usersList {
-  width: auto;
-  height: auto;
-  background: transparent;
+/* ============================================
+   STICKY BOTTOM BUTTON
+   ============================================ */
+.bottomButton {
+  position: fixed;
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
+  right: var(--spacing-xl);
+  z-index: 50;
+  align-items: center;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+.bodyL {
   font-family: var(--font-secondary);
   font-weight: 400;
-  font-size: 0.875rem;
-  color: rgba(247, 247, 247, 0.9);
+  font-size: 1.25rem;
+  color: #f9f9f9;
+  margin: 0;
   text-align: right;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
 }
-
-.AddAdminButton {
-  padding: 12px 32px;
-  gap: 8px;
-  background: #b37eb3;
-  border-radius: 5px;
-  min-width: auto !important;
+.bodyS {
   font-family: var(--font-secondary);
-  cursor: pointer;
-  align-self: center;
-  color: #FFF;
-  margin-top: auto;
-}
-
-.pressArrow {
-  display: inline-block;
-  width: 0.4375rem;
-  height: 0.4375rem;
-  margin-right: 0.5rem;
-  border-left: 0.0625rem solid #f9f9f9;
-  border-bottom: 0.0625rem solid #f9f9f9;
-  transform: rotate(45deg);
-  margin-left: 0.5rem;
-}
-
-.redPressArrow {
-  display: inline-block;
-  width: 0.4375rem;
-  height: 0.4375rem;
-  margin-right: 0.2rem;
-  border-left: 0.0625rem solid var(--color-red-alert);
-  border-bottom: 0.0625rem solid var(--color-red-alert);
-  transform: rotate(45deg);
-  margin-left: 0.5rem;
+  font-weight: 400;
+  font-size: 1rem;
+  color: rgba(247, 247, 247, 0.9);
+  margin: 0;
+  text-align: right;
 }
 
 /* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 24.5rem) {
-  .header {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .scrollContainer {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .pageContainer {
+    padding-left: var(--spacing-lg); /* 16px */
+    padding-right: var(--spacing-lg); /* 16px */
   }
 }
 
-@media (max-height: 700px) {
-  .header {
-    padding-top: 3rem;
+@media (max-height: 43.75rem) {
+  .titleContainer {
+    margin-top: 3rem;
   }
-  .profileBox {
-    padding: 0.75rem;
-  }
-  .profileBox .boxFooter {
-    bottom: 0.75rem;
-    left: 0.75rem;
+  .bottomButton {
+    bottom: 5rem;
   }
 }

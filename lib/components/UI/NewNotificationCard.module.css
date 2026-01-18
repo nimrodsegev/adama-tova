@@ -4,7 +4,7 @@
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--content-width-standard); /* 21.5625rem / ~345px */
+  max-width: 100%; /* 21.5625rem / ~345px */
   min-height: 6rem; /* ⚠️ NO VARIABLE - 96px, close to --spacing-6 but different context */
   height: auto;
 

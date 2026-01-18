@@ -10,13 +10,10 @@
   position: relative;
   /* 2. ENABLE scrolling on the main container */
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   direction: rtl;
-  padding: var(--spacing-xl); /* 20px */
-  /* 3. Add Safe Area to bottom padding so background covers the home bar */
-  padding-bottom: calc(
-    var(--spacing-xl) + env(safe-area-inset-bottom)
-  ); /* 20px + safe area */
+  padding: var(--spacing-2xl) var(--spacing-lg); /* 24px */
 }
 
 /* Centered Title Container */
@@ -79,8 +76,7 @@
   gap: var(--spacing-md); /* 12px */
   /* 4. Removed max-height & overflow-y -> The page scrolls now, not this div */
   width: 100%;
-  padding: var(--spacing-sm); /* 8px */
-  padding-right: var(--spacing-xs); /* 4px */
+
   /* 5. Extra padding at bottom to clear the fixed button */
   padding-bottom: calc(
     var(--spacing-6) + env(safe-area-inset-bottom)
@@ -128,9 +124,7 @@
 .bottomButton {
   position: fixed;
   /* 6. Lifted to respect the home bar safe area */
-  bottom: calc(
-    var(--spacing-6) + env(safe-area-inset-bottom)
-  ); /* 96px + safe area */
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
   right: var(--spacing-2xl);
   z-index: 50;
 }
