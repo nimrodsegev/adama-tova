@@ -109,12 +109,32 @@ export default function AddNotificationPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // --- UPDATED EFFECT: Filter for Future Activities ---
   useEffect(() => {
     if (targetType === "activity" && allActivities.length === 0) {
       const fetchActivities = async () => {
         setLoadingActivities(true);
         const [data, error] = await apiActivities.getAll();
-        if (!error && data) setAllActivities(data);
+        
+        if (!error && data) {
+          // 1. Get Today's date at 00:00:00 to compare
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // 2. Filter: Keep only activities where date >= today
+          const futureActivities = data.filter((act: any) => {
+            if (!act.date) return false;
+            const actDate = new Date(act.date);
+            return actDate >= today; 
+          });
+
+          // 3. Sort them by date (closest first)
+          futureActivities.sort((a: any, b: any) => 
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+
+          setAllActivities(futureActivities);
+        }
         setLoadingActivities(false);
       };
       fetchActivities();
@@ -155,6 +175,13 @@ export default function AddNotificationPage() {
       const recipientCount = res ? res.length : 0;
 
       if (recipientCount === 0) {
+        let emptyMsg = "לא נמצאו נמענים לשליחת ההודעה.";
+        if (targetType === "date") {
+            emptyMsg = "לא נמצאו פעילויות (או נרשמים) בתאריך שנבחר.";
+        } else if (targetType === "activity") {
+            emptyMsg = "לא נמצאו נרשמים לפעילות זו.";
+        }
+
         setPopupConfig({
           title: "לא נמצאו נמענים",
           content:
@@ -164,8 +191,8 @@ export default function AddNotificationPage() {
       } else {
         setPopupConfig({
           title: "הודעה נשלחה",
-          content: `ההודעה נשלחה בהצלחה ל-${recipientCount} משתמשים.`,
-          isSuccess: true,
+          content: `ההודעה נשלחה בהצלחה.`,
+          isSuccess: true, 
         });
       }
 
@@ -177,6 +204,27 @@ export default function AddNotificationPage() {
         content: error.message || "אירעה שגיאה בשליחת ההודעה",
         isSuccess: false,
       });
+      
+      const errMsg = typeof error === 'string' ? error : (error.message || "Unknown error");
+
+      if (
+        errMsg.includes("No activities found") || 
+        errMsg.includes("No participants found") || 
+        errMsg.includes("No users")
+      ) {
+        setPopupConfig({
+          title: "לא נמצאו נמענים",
+          content: "לא נמצאו נרשמים/פעילויות התואמים את הבחירה, ולכן ההודעה לא נשלחה.",
+          isSuccess: false, 
+        });
+      } else {
+        setPopupConfig({
+          title: "שגיאה",
+          content: errMsg,
+          isSuccess: false,
+        });
+      }
+      
       setShowPopup(true);
     } finally {
       setIsSubmitting(false);
