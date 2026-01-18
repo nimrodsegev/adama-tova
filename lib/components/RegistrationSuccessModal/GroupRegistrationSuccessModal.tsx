@@ -2,6 +2,9 @@
 import { createPortal } from "react-dom";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useUser } from "@/app/contexts/UserContext";
+import { calculateShapeParams } from "@/app/utils/motionParamsCalculator";
+import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 import styles from "./RegistrationSuccessModal.module.css";
 
 type GroupRegistrationSuccessModalProps = {
@@ -10,6 +13,8 @@ type GroupRegistrationSuccessModalProps = {
   activityTitle: string;
   startDate: string;
   startTime: string;
+  circleRadius?: number;
+  circlePosition?: { x: number; y: number };
 };
 
 export default function GroupRegistrationSuccessModal({
@@ -18,8 +23,16 @@ export default function GroupRegistrationSuccessModal({
   activityTitle,
   startDate,
   startTime,
+  circleRadius = 0.14,
+  circlePosition = { x: 0.5, y: 0.45 },
 }: GroupRegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { userProfile } = useUser();
+
+  const shapeParams =
+    userProfile?.role === "participant"
+      ? calculateShapeParams(userProfile)
+      : calculateShapeParams(null);
 
   useEffect(() => {
     setMounted(true);
@@ -44,6 +57,18 @@ export default function GroupRegistrationSuccessModal({
       {/* Overlay backdrop */}
       <div className={styles.overlay} onClick={onClose} />
 
+      {/* Organic Circles animation */}
+      <div className={styles.circlesContainer}>
+        <OrganicCircles
+          mode="breathing"
+          radius={circleRadius}
+          position={circlePosition}
+          // @ts-ignore
+          {...shapeParams}
+          baseColor="#FFFFFF"
+        />
+      </div>
+
       {/* Modal container with gradient background */}
       <div className={styles.groupModalContainer}>
         {/* Close button */}
@@ -62,16 +87,8 @@ export default function GroupRegistrationSuccessModal({
 
         {/* Content Frame */}
         <div className={styles.groupContentFrame}>
-          {/* Checkmark circle with V icon */}
+          {/* Checkmark icon */}
           <div className={styles.checkmarkContainer}>
-            <Image
-              src="/icons/checkmark_circle.svg"
-              alt=""
-              width={122}
-              height={124}
-              className={styles.checkmarkCircle}
-            />
-            {/* Checkmark V icon */}
             <svg
               className={styles.checkmarkIcon}
               viewBox="0 0 60 48"
@@ -95,15 +112,17 @@ export default function GroupRegistrationSuccessModal({
             </svg>
           </div>
 
-          {/* Message text */}
-          <p className={styles.groupMessageText}>
-            קיבלנו את בקשתך להצטרף למפגש {activityTitle}
-            <br />
-            בתאריך {startDate} בשעה {startTime}
-            <br />
-            <br />
-            <span className={styles.groupMessageTextLight}>נעדכן אותך בקרוב</span>
-          </p>
+          {/* Text Container */}
+          <div className={styles.textWrapper}>
+            <p className={styles.groupMessageText}>
+              קיבלנו את בקשתך להצטרף למפגש {activityTitle}
+              <br />
+              בתאריך {startDate} בשעה {startTime}
+              <br />
+              <br />
+              <span className={styles.groupMessageTextLight}>נעדכן אותך בקרוב</span>
+            </p>
+          </div>
         </div>
       </div>
     </>
