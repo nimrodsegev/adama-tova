@@ -113,10 +113,7 @@ export default function AdminCalendarPage() {
           <div className={styles.activitiesList}>
             {filteredActivities.length > 0
               ? filteredActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className={styles.activityItem}
-                  >
+                  <div key={activity.id} className={styles.activityItem}>
                     <NewUserActivityCard
                       id={activity.id}
                       title={activity.title}

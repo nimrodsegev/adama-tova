@@ -13,6 +13,7 @@
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.87.1",
     "browser-image-compression": "^2.0.2",
+    "framer-motion": "^12.26.2",
     "ivrita": "^1.0.1",
     "next": "^14.0.4",
     "nodemailer": "^6.9.5",
