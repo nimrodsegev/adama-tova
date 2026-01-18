@@ -52,7 +52,7 @@ const isActivityInFuture = (activity: Activity) => {
 const calculateRadius = (layers: number) => {
   const baseRadius = 0.07;
   if (layers <= 5) return baseRadius;
-  const reduction = (layers - 5) * 0.01;
+  const reduction = (layers - 5) * 0.005;
   return baseRadius - reduction;
 };
 
@@ -97,21 +97,48 @@ export default function NewUserHomePage() {
     return OPENING_HOURS[today] || null;
   })();
 
+  // --- 1. Circle Config Resize Logic ---
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // Start with the dynamic radius calculated from user layers
+      let newConfig = { radius: dynamicRadius, x: 0.45, y: 0.1 };
+
+      // --- Specific Device Viewports (Specific Overrides) ---
+
+      if (height >= 760 && height <= 780) {
+        newConfig.y = 0.12;
+        newConfig.x = 0.45;
+      }
+
+      // 2. iPhone 12/13/14 PWA (790px - 810px)
+      if (height >= 790 && height <= 810) {
+        newConfig.y = 0.1;
+        newConfig.x = 0.45;
+      }
+
+      // 3. iPhone 14/15 Plus/Pro Max PWA (865px - 885px)
+      if (height >= 865 && height <= 885) {
+        newConfig.y = 0.09;
+        newConfig.x = 0.45;
+      }
+
+      setBgCircleConfig(newConfig);
+    };
+
+    handleResize(); // Initial call
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [dynamicRadius]);
+
   useEffect(() => {
     if (user && !mountedRef.current) {
       mountedRef.current = true;
       fetchData();
     }
   }, [user]);
-
-  // Update radius when shapeParams change
-  useEffect(() => {
-    const newRadius = calculateRadius(shapeParams.layers);
-    setBgCircleConfig((prev) => ({
-      ...prev,
-      radius: newRadius,
-    }));
-  }, [shapeParams.layers]);
 
   const fetchData = async () => {
     try {
@@ -215,10 +242,8 @@ export default function NewUserHomePage() {
       isLoading={loading || isProcessing}
       mode={motionMode}
       coverNavigation={coverNav}
-      // ⭐ FIX: Use 'coverNav' instead of 'isProcessing'.
-      // This keeps the circle BIG (1.5) while it fades out, preventing the shrink/jump.
+      // Use coverNav for radius scale to prevent jump during fade out
       radiusScale={coverNav ? 1.5 : 1.0}
-      // ⭐ FIX: Keep it centered during the fade out too.
       customPosition={coverNav ? { x: 0.5, y: 0.45 } : undefined}
     >
       <div className={styles.pageContainer} dir="rtl">

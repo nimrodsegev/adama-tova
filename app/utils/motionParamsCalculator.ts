@@ -131,8 +131,8 @@ export function calculateShapeParams(
 
   return {
     layers: layersMax
-      ? 10
-      : Math.max(4, Math.min(10, DEFAULTS.layers + layersInc)),
+      ? 7
+      : Math.max(4, Math.min(7, DEFAULTS.layers + layersInc)),
     smoothness: Math.max(0, Math.min(1, avg(vals.smoothness))),
     complexity: Math.max(0, Math.min(5, avg(vals.complexity))),
     elongation: Math.max(0.5, Math.min(3, avg(vals.elongation))),
