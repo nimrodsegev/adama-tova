@@ -542,7 +542,7 @@ export default function AddActivityPage() {
   };
 
   return (
-    <SmoothPageWrapper isLoading={mounting || closing}>
+    <SmoothPageWrapper isLoading={mounting}>
       <main className={`mobile-container ${styles.pageOverride}`}>
         {/* CLOSE BUTTON - Flex item aligned to end */}
         <button

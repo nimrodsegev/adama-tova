@@ -200,7 +200,7 @@ export default function AddNotificationPage() {
   }));
 
   return (
-    <SmoothPageWrapper isLoading={mounting || closing}>
+    <SmoothPageWrapper isLoading={mounting}>
       <main className={`mobile-container ${styles.pageOverride}`}>
         {/* 1. CLOSE BUTTON (Flex Item, Aligned End) */}
         <button
