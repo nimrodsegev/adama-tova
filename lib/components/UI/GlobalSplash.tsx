@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import OrganicCircles from "@/lib/components/OrganicCircles/OrganicCircles";
 
 // ⏱️ CONTROL SETTINGS
-const TEXT_APPEAR_DELAY = 2600;
+const TEXT_APPEAR_DELAY = 3200;
 const EXTRA_HOLD_TIME = 1000;
 
 export default function GlobalSplash() {
