@@ -215,7 +215,8 @@
 /* Ensure placeholder is also centered if present */
 .dropdownContainer.miniDropdown .placeholder {
   width: auto;
-    transform: translateY(0.1rem);
+    font-family: var(--font-secondary);
+    font-weight: var(--font-weight-light);
 }
 .dropdownContainer.miniDropdown .arrowIcon {
   transform: translateY(0.15rem);
