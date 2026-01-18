@@ -73,7 +73,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0 var(--spacing-xl); /* 20px horizontal padding */
+  padding: 0 var(--spacing-2xl); /* 20px horizontal padding */
   padding-top: 10rem; /* ⚠️ NO VARIABLE - 120px - space for close button */
   padding-bottom: var(--spacing-xl); /* 20px bottom padding */
   gap: var(--spacing-lg); /* 16px gap between sections */
