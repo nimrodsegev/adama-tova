@@ -862,7 +862,7 @@ export default function AddActivityPage() {
                   </div>
                 </div>
                 <div className={styles.previewDescription}>
-                  {formData.description || "תיאור הפעילות יופיע כאן..."}
+                  {formData.description || ""}
                 </div>
                 <div className={styles.submitButtonContainer}>
                   <button
