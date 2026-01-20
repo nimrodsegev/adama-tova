@@ -1212,7 +1212,7 @@ export const apiRegistrations = {
     // 4. Send in-app notification to user
     await supabase.from("notifications").insert({
       user_id: reg.user_id,
-      title: "בקשתך אושרה! 🎉",
+      title: "בקשתך אושרה!",
       message: `בקשתך להצטרף ל"${
         reg.activities?.title || "פעילות"
       }" אושרה. נתראה!`,
