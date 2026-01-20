@@ -312,6 +312,14 @@
     gap: 0.75rem; /* Tighter gap between cards */
   }
 }
+@media (min-height: 740px) and (max-height: 760px) {
+  .contentFrame {
+    padding: 0 var(--spacing-lg);
+  }
+  .statsContainer {
+    padding: 0 var(--spacing-lg);
+  }
+}
 
 /* 2. Medium-Small Screens (760px - 780px) */
 @media (min-height: 760px) and (max-height: 780px) {
