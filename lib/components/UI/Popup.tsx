@@ -17,6 +17,7 @@ interface PopupProps {
   secondaryButtonAction?: () => void;
   secondaryButtonHref?: string;
   loading?: boolean;
+  loadingOnSecondary?: boolean;
   onClose?: () => void;
   preview?: boolean;
 }
@@ -34,6 +35,7 @@ export default function Popup({
   secondaryButtonAction,
   secondaryButtonHref,
   loading = false,
+  loadingOnSecondary = false,
   onClose,
   preview = false,
 }: PopupProps) {
@@ -98,8 +100,12 @@ export default function Popup({
       {(primaryButtonText || secondaryButtonText) && (
         <div className={styles.buttons}>
           {secondaryButtonText && (
-            <Button variant="reject" onClick={handleSecondaryClick}>
-              {secondaryButtonText}
+            <Button
+              variant="reject"
+              onClick={handleSecondaryClick}
+              disabled={loading && loadingOnSecondary}
+            >
+              {loading && loadingOnSecondary ? "טוען..." : secondaryButtonText}
             </Button>
           )}
 
@@ -107,10 +113,10 @@ export default function Popup({
             <Button
               variant="approve"
               onClick={handlePrimaryClick}
-              disabled={loading}
+              disabled={loading && !loadingOnSecondary}
               customBorderColor={"var(--color-white-pure)"}
             >
-              {loading ? "טוען..." : primaryButtonText}
+              {loading && !loadingOnSecondary ? "טוען..." : primaryButtonText}
             </Button>
           )}
         </div>
