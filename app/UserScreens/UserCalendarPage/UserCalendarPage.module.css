@@ -138,3 +138,9 @@
   }
   /* Removed .activitiesList max-height override since it's no longer used */
 }
+
+@media (min-height: 600px) and (max-height: 670px) {
+  .loadingOverlay {
+    top: 4rem;
+  }
+}
