@@ -24,7 +24,7 @@ export default function GroupRegistrationSuccessModal({
   startDate,
   startTime,
   circleRadius = 0.14,
-  circlePosition = { x: 0.5, y: 0.45 },
+  circlePosition = { x: 0.5, y: 0.44 },
 }: GroupRegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
   const { userProfile } = useUser();
@@ -115,12 +115,15 @@ export default function GroupRegistrationSuccessModal({
           {/* Text Container */}
           <div className={styles.textWrapper}>
             <p className={styles.groupMessageText}>
-              קיבלנו את בקשתך להצטרף למפגש {activityTitle}
+              קיבלנו את בקשתך להצטרף
+              <br />ל{activityTitle}
               <br />
               בתאריך {startDate} בשעה {startTime}
               <br />
               <br />
-              <span className={styles.groupMessageTextLight}>נעדכן אותך בקרוב</span>
+              <span className={styles.groupMessageTextLight}>
+                נעדכן אותך בקרוב
+              </span>
             </p>
           </div>
         </div>
