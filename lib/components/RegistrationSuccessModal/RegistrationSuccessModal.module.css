@@ -115,10 +115,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: 90%;
   max-width: 24rem; /* ⚠️ NO VARIABLE - wide enough for long titles */
   /* Control Text Vertical Position */
-  transform: translateY(10rem); /* ⚠️ NO VARIABLE */
+  transform: translateY(9rem); /* ⚠️ NO VARIABLE */
 }
 
 /* ⭐ 1. "REGISTERED SUCCESSFULLY" TITLE */
@@ -150,8 +150,8 @@
   width: 100%;
   font-family: var(--font-secondary);
   font-style: normal;
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold); /* Bold */
+  font-size: var(--font-size-2xl); /* Bigger size */
   line-height: var(--spacing-2xl);
   text-align: center;
   color: var(--color-text-primary);

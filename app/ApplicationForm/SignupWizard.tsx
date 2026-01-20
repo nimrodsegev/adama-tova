@@ -120,7 +120,7 @@ export default function SignupWizard({
       } else if (height <= 670) {
         // Very small screens (iPhone SE: 667px height, older SE: 568px)
         setCircleRadius(0.07);
-        setCirclePosition({ x: 0.22, y: 0.14 });
+        setCirclePosition({ x: 0.17, y: 0.14 });
       } else {
         // Larger screens
         setCircleRadius(0.09);

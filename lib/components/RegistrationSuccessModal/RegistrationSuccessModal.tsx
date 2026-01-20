@@ -30,7 +30,7 @@ export default function RegistrationSuccessModal({
   isWaitlist = false,
   waitlistPosition = null,
   circleRadius = 0.14,
-  circlePosition = { x: 0.5, y: 0.45 },
+  circlePosition = { x: 0.5, y: 0.44 },
 }: RegistrationSuccessModalProps) {
   const [mounted, setMounted] = useState(false);
   const { userProfile } = useUser();
@@ -117,10 +117,10 @@ export default function RegistrationSuccessModal({
           <div className={styles.textWrapper}>
             {isWaitlist ? (
               <p className={styles.groupMessageText}>
-                הפעילות מלאה - נרשמת לרשימת ההמתנה
+                הפעילות מלאה - נרשמת לרשימת ההמתנה{" "}
+                {isGroup ? `לקבוצת` : `לפעילות`} {activityTitle}
                 <br />
-                מקום #{waitlistPosition} {isGroup ? `לקבוצת` : `לפעילות`}{" "}
-                {activityTitle}
+                מיקומך: {waitlistPosition}
                 <br />
                 <br />
                 <span className={styles.groupMessageTextLight}>

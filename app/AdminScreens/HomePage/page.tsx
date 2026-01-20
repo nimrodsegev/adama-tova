@@ -172,8 +172,8 @@ export default function AdminHomePage() {
       if (height < 800) newConfig.y = 0.11;
 
       if (height < 700) {
-        newConfig.radius = Math.min(newConfig.radius, 0.06);
-        newConfig.y = 0.25;
+        newConfig.radius = 0.09;
+        newConfig.y = 0.11;
       }
 
       // --- Specific Device Viewports ---

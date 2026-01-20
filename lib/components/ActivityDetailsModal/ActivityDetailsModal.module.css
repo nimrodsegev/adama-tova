@@ -336,7 +336,31 @@
 /* --- RESPONSIVENESS --- */
 @media (min-height: 760px) and (max-height: 780px) {
   .bottomButtonsContainer {
-    bottom: 1rem;
+    bottom: 0.5rem;
+  }
+
+  .titleText {
+    font-size: var(--font-size-xl);
+  }
+
+  .primaryInfoText {
+    font-size: var(--font-size-lg);
+  }
+
+  .primaryInfoSeparator {
+    font-size: var(--font-size-lg);
+  }
+
+  .secondaryInfoText {
+    font-size: var(--font-size-lg);
+  }
+
+  .descriptionText {
+    font-size: var(--font-size-md);
+  }
+
+  .adminParticipantsText {
+    font-size: var(--font-size-md);
   }
 }
 
