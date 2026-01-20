@@ -511,7 +511,18 @@ export const apiActivities = {
         );
     }
 
-    // --- STEP 3: Delete Activity ---
+    // --- STEP 3: Delete Related Notifications ---
+    // Delete all notifications that link to this activity (so "לפעילות" buttons don't lead to deleted activity)
+    const { error: deleteNotifsError } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("linked_activity_id", activityId);
+
+    if (deleteNotifsError) {
+      console.error("Warning: Failed to delete related notifications", deleteNotifsError);
+    }
+
+    // --- STEP 4: Delete Activity ---
     // Note: If your DB Foreign Keys are set to 'ON DELETE CASCADE', this single line
     // deletes the activity AND the registrations automatically.
     // If not, this might fail unless we manually delete registrations first.

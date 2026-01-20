@@ -237,11 +237,10 @@ export default function ActivityDetailsModal({
     setLoading(true);
     const [_, error] = await apiActivities.delete(activityId);
     if (error) {
-      alert("שגיאה במחיקה: " + error);
+      console.error("שגיאה במחיקה:", error);
       setLoading(false);
       setIsDeleteModalOpen(false);
     } else {
-      alert("הפעילות נמחקה בהצלחה");
       setIsDeleteModalOpen(false);
       onClose();
       onRegistrationChange?.();
@@ -462,6 +461,7 @@ export default function ActivityDetailsModal({
           secondaryButtonText={t("כן אני בטוח/ה")}
           secondaryButtonAction={handleDeleteConfirm}
           loading={loading}
+          loadingOnSecondary={true}
           onClose={() => setIsDeleteModalOpen(false)}
         />
       )}
