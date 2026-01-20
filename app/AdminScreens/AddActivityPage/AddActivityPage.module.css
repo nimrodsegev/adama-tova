@@ -877,6 +877,9 @@
   .nextArrow {
     bottom: 6rem;
   }
+  .previewImageCard {
+    margin-top: var(--spacing-3xl);
+  }
 }
 
 @media (min-height: 790px) and (max-height: 810px) {
