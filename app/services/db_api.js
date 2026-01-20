@@ -107,7 +107,7 @@ export const apiActivities = {
         return {
           ...activity,
           current_participants: confirmedCount,
-          waitlist_count: waitlistCount
+          waitlist_count: waitlistCount,
         };
       })
     );
@@ -144,32 +144,41 @@ export const apiActivities = {
     let fileToUpload = file;
     try {
       const compressionOptions = {
-        maxSizeMB: 0.5,           // Target max ~500KB after compression
-        maxWidthOrHeight: 1920,   // Good for web display
+        maxSizeMB: 0.5, // Target max ~500KB after compression
+        maxWidthOrHeight: 1920, // Good for web display
         useWebWorker: true,
       };
       fileToUpload = await imageCompression(file, compressionOptions);
-      console.log(`Image compressed: ${(file.size / 1024).toFixed(1)}KB → ${(fileToUpload.size / 1024).toFixed(1)}KB`);
+      console.log(
+        `Image compressed: ${(file.size / 1024).toFixed(1)}KB → ${(
+          fileToUpload.size / 1024
+        ).toFixed(1)}KB`
+      );
     } catch (compressionError) {
-      console.warn("Image compression failed, uploading original:", compressionError);
+      console.warn(
+        "Image compression failed, uploading original:",
+        compressionError
+      );
       // Continue with original file if compression fails
     }
 
     // 2. Generate unique file name
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}.${fileExt}`;
     const filePath = `${fileName}`;
 
     // 3. Upload to 'activity_images' bucket
     const { error: uploadError } = await supabase.storage
-      .from('activity_images')
+      .from("activity_images")
       .upload(filePath, fileToUpload);
 
     if (uploadError) return [null, uploadError.message];
 
     // 4. Get Public URL
     const { data } = supabase.storage
-      .from('activity_images')
+      .from("activity_images")
       .getPublicUrl(filePath);
 
     return [data.publicUrl, null];
@@ -180,13 +189,13 @@ export const apiActivities = {
     if (!activityData.date) return [null, "Date is required"];
 
     // 2. Extract Group Logic Params
-    const { 
-      weeks = 1, 
+    const {
+      weeks = 1,
       requires_approval = false,
       whatsapp_group_url = null,
       is_group = false,
-      circle = null, 
-      ...baseData 
+      circle = null,
+      ...baseData
     } = activityData;
 
     // 3. Prepare Rows
@@ -198,18 +207,18 @@ export const apiActivities = {
     for (let i = 0; i < weeks; i++) {
       // Calculate date: Start Date + (i * 7 days)
       const sessionDate = new Date(startDate);
-      sessionDate.setDate(startDate.getDate() + (i * 7));
+      sessionDate.setDate(startDate.getDate() + i * 7);
 
       rowsToInsert.push({
         id: crypto.randomUUID(), // Generate unique ID for each session
         title: baseData.title,
         description: baseData.description,
-        date: sessionDate.toISOString().split('T')[0], // Format YYYY-MM-DD
+        date: sessionDate.toISOString().split("T")[0], // Format YYYY-MM-DD
         start_time: baseData.start_time,
         end_time: baseData.end_time,
         max_participants: baseData.max_participants,
         status: baseData.status,
-        category: is_group ? null : baseData.category, 
+        category: is_group ? null : baseData.category,
         circle: is_group ? circle : null,
         location: baseData.location,
         instructor: baseData.instructor,
@@ -218,16 +227,13 @@ export const apiActivities = {
         series_id: seriesId,
         is_group: is_group,
         requires_approval: requires_approval,
-        whatapp_group_url: whatsapp_group_url
+        whatapp_group_url: whatsapp_group_url,
       });
     }
 
     // 4. Batch Insert
     return safeRequest(
-      supabase
-        .from("activities")
-        .insert(rowsToInsert)
-        .select() // Returns all created rows
+      supabase.from("activities").insert(rowsToInsert).select() // Returns all created rows
     );
   },
   async getByDate(dateString) {
@@ -251,7 +257,7 @@ export const apiActivities = {
         return {
           ...activity,
           current_participants: confirmedCount,
-          waitlist_count: waitlistCount
+          waitlist_count: waitlistCount,
         };
       })
     );
@@ -280,9 +286,11 @@ export const apiActivities = {
   async update(activityId, updates) {
     // --- STEP 1: Fetch Info (Title, Old max_participants, requires_approval, series_id & Participants) ---
     const { data: activity } = await supabase
-      .from('activities')
-      .select('title, max_participants, requires_approval, series_id, registrations(user_id)')
-      .eq('id', activityId)
+      .from("activities")
+      .select(
+        "title, max_participants, requires_approval, series_id, registrations(user_id)"
+      )
+      .eq("id", activityId)
       .single();
 
     const oldMaxParticipants = activity?.max_participants || 0;
@@ -296,18 +304,18 @@ export const apiActivities = {
         .from("activities")
         .select("id")
         .eq("series_id", seriesId);
-      if (seriesActs) idsToUpdate = seriesActs.map(a => a.id);
+      if (seriesActs) idsToUpdate = seriesActs.map((a) => a.id);
     }
 
     // --- STEP 3: Perform the Update ---
     // For series: separate updates into shared fields (apply to all) and unique fields (apply only to this activity)
     // Fields like 'date' are unique per activity in a series
-    const uniqueFields = ['date'];
+    const uniqueFields = ["date"];
     const sharedUpdates = { ...updates };
     const uniqueUpdates = {};
 
     // Extract unique fields from shared updates
-    uniqueFields.forEach(field => {
+    uniqueFields.forEach((field) => {
       if (field in sharedUpdates) {
         uniqueUpdates[field] = sharedUpdates[field];
         delete sharedUpdates[field];
@@ -320,33 +328,30 @@ export const apiActivities = {
       // For series: update shared fields on all activities
       if (Object.keys(sharedUpdates).length > 0) {
         await supabase
-          .from('activities')
+          .from("activities")
           .update(sharedUpdates)
-          .in('id', idsToUpdate);
+          .in("id", idsToUpdate);
       }
 
       // Update unique fields only on the specific activity being edited
       if (Object.keys(uniqueUpdates).length > 0) {
         await supabase
-          .from('activities')
+          .from("activities")
           .update(uniqueUpdates)
-          .eq('id', activityId);
+          .eq("id", activityId);
       }
 
       // Fetch the updated activities for the result
       updateResult = await safeRequest(
-        supabase
-          .from('activities')
-          .select()
-          .in('id', idsToUpdate)
+        supabase.from("activities").select().in("id", idsToUpdate)
       );
     } else {
       // For single activity: update all fields
       updateResult = await safeRequest(
         supabase
-          .from('activities')
+          .from("activities")
           .update(updates)
-          .eq('id', activityId)
+          .eq("id", activityId)
           .select()
       );
     }
@@ -377,7 +382,9 @@ export const apiActivities = {
             .limit(availableSlots);
 
           if (waitlistUsers && waitlistUsers.length > 0) {
-            console.log(`Auto-promoting ${waitlistUsers.length} users from waitlist for activity ${id}...`);
+            console.log(
+              `Auto-promoting ${waitlistUsers.length} users from waitlist for activity ${id}...`
+            );
 
             for (const waitlistUser of waitlistUsers) {
               // Promote user - if requires_approval, set status to pending for admin review
@@ -386,22 +393,25 @@ export const apiActivities = {
                 .update({
                   if_confirmed: true,
                   wait_list_place: null,
-                  status: needsApproval ? 'pending' : 'approved'
+                  status: needsApproval ? "pending" : "approved",
                 })
                 .eq("id", waitlistUser.id);
 
               // Increment participant count (they now have a reserved spot)
               const { data: freshAct } = await supabase
-                .from('activities')
-                .select('current_participants')
-                .eq('id', id)
+                .from("activities")
+                .select("current_participants")
+                .eq("id", id)
                 .single();
 
               if (freshAct) {
                 await supabase
                   .from("activities")
-                  .update({ current_participants: (freshAct.current_participants || 0) + 1 })
-                  .eq('id', id);
+                  .update({
+                    current_participants:
+                      (freshAct.current_participants || 0) + 1,
+                  })
+                  .eq("id", id);
               }
 
               // Only send notification/email once per user (not for each session in series)
@@ -410,30 +420,36 @@ export const apiActivities = {
 
                 // Send in-app notification
                 const notificationMessage = needsApproval
-                  ? `התפנה מקום בפעילות "${activity?.title || 'פעילות'}". בקשתך ממתינה לאישור המנהל.`
-                  : `התפנה מקום בפעילות "${activity?.title || 'פעילות'}". נרשמת אוטומטית!`;
+                  ? `התפנה מקום בפעילות "${
+                      activity?.title || "פעילות"
+                    }". בקשתך ממתינה לאישור המנהל.`
+                  : `התפנה מקום בפעילות "${
+                      activity?.title || "פעילות"
+                    }". נרשמת אוטומטית!`;
 
-                await supabase.from('notifications').insert({
+                await supabase.from("notifications").insert({
                   user_id: waitlistUser.user_id,
                   title: "התפנה מקום בפעילות!",
                   message: notificationMessage,
                   is_read: false,
                   created_at: new Date().toISOString(),
-                  linked_activity_id: id
+                  linked_activity_id: id,
                 });
 
                 // Send email (fire-and-forget)
                 if (waitlistUser.users?.email) {
-                  fetch('/api/send-waitlist-promotion-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                  fetch("/api/send-waitlist-promotion-email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                       email: waitlistUser.users.email,
                       name: waitlistUser.users.full_name,
-                      activityTitle: activity?.title || 'פעילות',
-                      needsApproval: needsApproval
-                    })
-                  }).catch(err => console.error("Failed to send promotion email:", err));
+                      activityTitle: activity?.title || "פעילות",
+                      needsApproval: needsApproval,
+                    }),
+                  }).catch((err) =>
+                    console.error("Failed to send promotion email:", err)
+                  );
                 }
               }
             }
@@ -446,24 +462,30 @@ export const apiActivities = {
     }
 
     // --- STEP 5: Notify Participants about activity changes ---
-    if (activity && activity.registrations && activity.registrations.length > 0) {
-      console.log(`Notify ${activity.registrations.length} users about update...`);
+    if (
+      activity &&
+      activity.registrations &&
+      activity.registrations.length > 0
+    ) {
+      console.log(
+        `Notify ${activity.registrations.length} users about update...`
+      );
 
       // Get admin IDs to also receive this notification
       const adminIds = await getAllAdminIds();
-      const participantIds = activity.registrations.map(reg => reg.user_id);
+      const participantIds = activity.registrations.map((reg) => reg.user_id);
       const allRecipientIds = [...new Set([...participantIds, ...adminIds])];
 
-      const alerts = allRecipientIds.map(userId => ({
+      const alerts = allRecipientIds.map((userId) => ({
         user_id: userId,
         title: "פרטי הפעילות שונו ",
         message: `פרטי הפעילות "${activity.title}" עודכנו על ידי המנחה.`,
         is_read: false,
         created_at: new Date().toISOString(),
-        linked_activity_id: activityId
+        linked_activity_id: activityId,
       }));
 
-      await supabase.from('notifications').insert(alerts);
+      await supabase.from("notifications").insert(alerts);
     }
 
     return updateResult;
@@ -485,15 +507,19 @@ export const apiActivities = {
     // --- STEP 2: Notify Participants ---
     // Get admin IDs to also receive this notification
     const adminIds = await getAllAdminIds();
-    const participantIds = registrations ? registrations.map(reg => reg.user_id) : [];
+    const participantIds = registrations
+      ? registrations.map((reg) => reg.user_id)
+      : [];
     const allRecipientIds = [...new Set([...participantIds, ...adminIds])];
 
     if (allRecipientIds.length > 0) {
-      console.log(`Notify ${allRecipientIds.length} users about cancellation...`);
+      console.log(
+        `Notify ${allRecipientIds.length} users about cancellation...`
+      );
 
       const alerts = allRecipientIds.map((userId) => ({
         user_id: userId,
-        title: "הפעילות בוטלה ⚠️",
+        title: "הפעילות בוטלה",
         message: `הפעילות "${title}" בוטלה על ידי המנחה.`,
         is_read: false,
         created_at: new Date().toISOString(),
@@ -519,7 +545,10 @@ export const apiActivities = {
       .eq("linked_activity_id", activityId);
 
     if (deleteNotifsError) {
-      console.error("Warning: Failed to delete related notifications", deleteNotifsError);
+      console.error(
+        "Warning: Failed to delete related notifications",
+        deleteNotifsError
+      );
     }
 
     // --- STEP 4: Delete Activity ---
@@ -553,11 +582,7 @@ export const apiActivities = {
   },
   async getById(id) {
     const [activity, error] = await safeRequest(
-      supabase
-        .from("activities")
-        .select("*")
-        .eq("id", id)
-        .single()
+      supabase.from("activities").select("*").eq("id", id).single()
     );
 
     if (error || !activity) {
@@ -568,11 +593,14 @@ export const apiActivities = {
     const confirmedCount = await getConfirmedCount(id);
     const waitlistCount = await getWaitlistCount(id);
 
-    return [{
-      ...activity,
-      current_participants: confirmedCount,
-      waitlist_count: waitlistCount
-    }, null];
+    return [
+      {
+        ...activity,
+        current_participants: confirmedCount,
+        waitlist_count: waitlistCount,
+      },
+      null,
+    ];
   },
   /**
    * 📢 NOTIFY PARTICIPANTS
@@ -652,7 +680,9 @@ export const apiActivities = {
       return [null, "No users to notify for this date."];
     }
 
-    console.log(`Sending to ${allRecipientIds.length} unique users for date ${dateString}`);
+    console.log(
+      `Sending to ${allRecipientIds.length} unique users for date ${dateString}`
+    );
 
     // 5. Prepare ONE notification per user
     const notifications = allRecipientIds.map((userId) => ({
@@ -687,7 +717,9 @@ export const apiActivities = {
     const circleUserIds = users.map((u) => u.id);
     const allRecipientIds = [...new Set([...circleUserIds, ...adminIds])];
 
-    console.log(`Sending to ${allRecipientIds.length} users (${users.length} in circle + admins)`);
+    console.log(
+      `Sending to ${allRecipientIds.length} users (${users.length} in circle + admins)`
+    );
 
     // 4. Prepare Notification Objects
     const notifications = allRecipientIds.map((userId) => ({
@@ -704,41 +736,47 @@ export const apiActivities = {
   async getByUserPreferences(userId) {
     // 1. Define the Mapping
     const INTRESTS_MAPPING = {
-      'מיינדפולנס': 'mindfulness',
-      'גוף ותנועה': 'body_motion',
-      'מוזיקה': 'music_sound',
-      'יצירה וחומר': 'creation_material',
+      מיינדפולנס: "mindfulness",
+      "גוף ותנועה": "body_motion",
+      מוזיקה: "music_sound",
+      "יצירה וחומר": "creation_material",
     };
 
     // 2. Get User's Interests (Hebrew) from the 'quiz' JSON column
     const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('quiz')
-      .eq('id', userId)
+      .from("users")
+      .select("quiz")
+      .eq("id", userId)
       .single();
 
     // Check if user exists and has interests
-    if (userError || !user || !user.quiz || !user.quiz.interests || user.quiz.interests.length === 0) {
+    if (
+      userError ||
+      !user ||
+      !user.quiz ||
+      !user.quiz.interests ||
+      user.quiz.interests.length === 0
+    ) {
       console.log("No interests found for user.");
-      return [[], null]; 
+      return [[], null];
     }
 
-    const hebrewInterests = user.quiz.interests; 
+    const hebrewInterests = user.quiz.interests;
 
     // 3. Convert to English Categories
     // We map the Hebrew terms to English. If a term isn't found in the map, we keep the original (fallback).
-    const englishCategories = hebrewInterests.map(interest => 
-      INTRESTS_MAPPING[interest] || interest
+    const englishCategories = hebrewInterests.map(
+      (interest) => INTRESTS_MAPPING[interest] || interest
     );
 
     // 4. Fetch Activities matching the English categories
     return safeRequest(
       supabase
-        .from('activities')
-        .select('*')
-        .in('category', englishCategories) // 👈 Queries
-        .gte('date', new Date().toISOString())
-        .order('date', { ascending: true })
+        .from("activities")
+        .select("*")
+        .in("category", englishCategories) // 👈 Queries
+        .gte("date", new Date().toISOString())
+        .order("date", { ascending: true })
     );
   },
 };
@@ -761,10 +799,13 @@ export const apiRegistrations = {
       .maybeSingle();
 
     if (!data) return [null, null]; // Not registered
-    return [{
-      status: data.if_confirmed ? "confirmed" : "waitlist",
-      wait_list_place: data.wait_list_place
-    }, null];
+    return [
+      {
+        status: data.if_confirmed ? "confirmed" : "waitlist",
+        wait_list_place: data.wait_list_place,
+      },
+      null,
+    ];
   },
 
   /**
@@ -774,7 +815,9 @@ export const apiRegistrations = {
     // 1. Fetch Activity Details
     const { data: activity } = await supabase
       .from("activities")
-      .select("id, series_id, requires_approval, max_participants, current_participants, title")
+      .select(
+        "id, series_id, requires_approval, max_participants, current_participants, title"
+      )
       .eq("id", activityId)
       .single();
 
@@ -788,7 +831,7 @@ export const apiRegistrations = {
         .select("id")
         .eq("series_id", activity.series_id);
 
-      if (seriesActs) idsToRegister = seriesActs.map(a => a.id);
+      if (seriesActs) idsToRegister = seriesActs.map((a) => a.id);
     }
 
     // 3. Check for existing registration
@@ -809,10 +852,10 @@ export const apiRegistrations = {
     // 5. Determine Status
     // Status is either 'approved' (regular activities) or 'pending' (groups needing approval)
     const isApprovalNeeded = activity.requires_approval === true;
-    let initialStatus = isApprovalNeeded ? 'pending' : 'approved';
+    let initialStatus = isApprovalNeeded ? "pending" : "approved";
     let initialConfirmed = true;
     let waitListPlace = null;
-    let message = "Successfully registered! ✅";
+    let message = "Successfully registered!";
 
     if (isFull) {
       // Activity is full - add to waiting list
@@ -829,9 +872,10 @@ export const apiRegistrations = {
         .limit(1);
 
       // Next position is max + 1, or 1 if no waitlist entries exist
-      waitListPlace = (waitlistEntries && waitlistEntries.length > 0)
-        ? (waitlistEntries[0].wait_list_place + 1)
-        : 1;
+      waitListPlace =
+        waitlistEntries && waitlistEntries.length > 0
+          ? waitlistEntries[0].wait_list_place + 1
+          : 1;
 
       if (isApprovalNeeded) {
         // Group on waitlist - will need approval when promoted (admin doesn't see yet because if_confirmed=false)
@@ -847,7 +891,7 @@ export const apiRegistrations = {
     // else: Regular activity with space - immediate confirmation (status='approved')
 
     // 6. Insert Registrations
-    const registrationsToInsert = idsToRegister.map(id => ({
+    const registrationsToInsert = idsToRegister.map((id) => ({
       user_id: userId,
       activity_id: id,
       if_confirmed: initialConfirmed,
@@ -867,26 +911,31 @@ export const apiRegistrations = {
     if (initialConfirmed) {
       for (const id of idsToRegister) {
         const { data: freshAct } = await supabase
-          .from('activities')
-          .select('current_participants')
-          .eq('id', id)
+          .from("activities")
+          .select("current_participants")
+          .eq("id", id)
           .single();
 
         if (freshAct) {
           await supabase
             .from("activities")
-            .update({ current_participants: (freshAct.current_participants || 0) + 1 })
-            .eq('id', id);
+            .update({
+              current_participants: (freshAct.current_participants || 0) + 1,
+            })
+            .eq("id", id);
         }
       }
     }
 
-    return [{
-      success: true,
-      if_confirmed: initialConfirmed,
-      wait_list_place: waitListPlace,
-      status: initialStatus
-    }, { message }];
+    return [
+      {
+        success: true,
+        if_confirmed: initialConfirmed,
+        wait_list_place: waitListPlace,
+        status: initialStatus,
+      },
+      { message },
+    ];
   },
   /**
    * ❌ CANCEL (With Waitlist Promotion)
@@ -913,7 +962,7 @@ export const apiRegistrations = {
         .select("id")
         .eq("series_id", regData.activities.series_id);
 
-      if (seriesActs) idsToDelete = seriesActs.map(a => a.id);
+      if (seriesActs) idsToDelete = seriesActs.map((a) => a.id);
     }
 
     // 3. Delete Registrations
@@ -931,17 +980,17 @@ export const apiRegistrations = {
       for (const id of idsToDelete) {
         // Decrement participant count
         const { data: act } = await supabase
-          .from('activities')
-          .select('current_participants')
-          .eq('id', id)
+          .from("activities")
+          .select("current_participants")
+          .eq("id", id)
           .single();
 
         if (act) {
           const newCount = Math.max(0, (act.current_participants || 0) - 1);
           await supabase
-            .from('activities')
+            .from("activities")
             .update({ current_participants: newCount })
-            .eq('id', id);
+            .eq("id", id);
         }
 
         // Find first person on waitlist for this activity
@@ -971,50 +1020,58 @@ export const apiRegistrations = {
             .update({
               if_confirmed: true,
               wait_list_place: null,
-              status: needsApproval ? 'pending' : 'approved'
+              status: needsApproval ? "pending" : "approved",
             })
             .eq("id", firstInWaitlist.id);
 
           // Always increment participant count when promoting (they now have a reserved spot)
           const { data: freshAct } = await supabase
-            .from('activities')
-            .select('current_participants')
-            .eq('id', id)
+            .from("activities")
+            .select("current_participants")
+            .eq("id", id)
             .single();
 
           if (freshAct) {
             await supabase
               .from("activities")
-              .update({ current_participants: (freshAct.current_participants || 0) + 1 })
-              .eq('id', id);
+              .update({
+                current_participants: (freshAct.current_participants || 0) + 1,
+              })
+              .eq("id", id);
           }
 
           // Send in-app notification to promoted user
           const notificationMessage = needsApproval
-            ? `התפנה מקום בפעילות "${regData.activities?.title || 'פעילות'}". בקשתך ממתינה לאישור המנהל.`
-            : `התפנה מקום בפעילות "${regData.activities?.title || 'פעילות'}". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`;
+            ? `התפנה מקום בפעילות "${
+                regData.activities?.title || "פעילות"
+              }". בקשתך ממתינה לאישור המנהל.`
+            : `התפנה מקום בפעילות "${
+                regData.activities?.title || "פעילות"
+              }". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`;
 
-          await supabase.from('notifications').insert({
+          await supabase.from("notifications").insert({
             user_id: firstInWaitlist.user_id,
-            title: "התפנה מקום בפעילות! 🎉",
+            title: "התפנה מקום בפעילות!",
             message: notificationMessage,
             is_read: false,
             created_at: new Date().toISOString(),
-            linked_activity_id: id
+            linked_activity_id: id,
           });
 
           // Send email notification (fire-and-forget - don't block main flow)
           if (firstInWaitlist.users?.email) {
-            fetch('/api/send-waitlist-promotion-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            fetch("/api/send-waitlist-promotion-email", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 email: firstInWaitlist.users.email,
                 name: firstInWaitlist.users.full_name,
-                activityTitle: regData.activities?.title || 'פעילות',
-                needsApproval: needsApproval
-              })
-            }).catch(err => console.error("Failed to send waitlist promotion email:", err));
+                activityTitle: regData.activities?.title || "פעילות",
+                needsApproval: needsApproval,
+              }),
+            }).catch((err) =>
+              console.error("Failed to send waitlist promotion email:", err)
+            );
           }
 
           // Reorder remaining waitlist for this activity
@@ -1068,14 +1125,16 @@ export const apiRegistrations = {
     // Waitlist users (if_confirmed=false) are NOT shown until promoted
     const { data, error } = await supabase
       .from("registrations")
-      .select(`
+      .select(
+        `
         id,
         created_at,
         status,
         user_id,
         users (id, full_name, email, phone, circle, quiz),
         activities (id, title, start_time, date, series_id)
-      `)
+      `
+      )
       .eq("status", "pending")
       .eq("if_confirmed", true)
       .order("created_at", { ascending: true });
@@ -1087,7 +1146,7 @@ export const apiRegistrations = {
     // If a user registered for a Series (Group), we only want to show 1 request card,
     // not 4 or 10. We use a Set to track unique "User + Series" combinations.
     const uniqueRequests = [];
-    const seenSeriesMap = new Set(); 
+    const seenSeriesMap = new Set();
 
     data.forEach((reg) => {
       const seriesId = reg.activities?.series_id;
@@ -1096,7 +1155,7 @@ export const apiRegistrations = {
       if (seriesId) {
         // It's a Group/Series
         const uniqueKey = `${userId}_${seriesId}`;
-        
+
         if (!seenSeriesMap.has(uniqueKey)) {
           seenSeriesMap.add(uniqueKey);
           uniqueRequests.push(reg); // Add only the first occurrence
@@ -1119,7 +1178,9 @@ export const apiRegistrations = {
     // 1. Get details of the request including user info and activity title
     const { data: reg } = await supabase
       .from("registrations")
-      .select("user_id, activity_id, users(email, full_name), activities(title, series_id)")
+      .select(
+        "user_id, activity_id, users(email, full_name), activities(title, series_id)"
+      )
       .eq("id", registrationId)
       .single();
 
@@ -1129,46 +1190,50 @@ export const apiRegistrations = {
     let idsToApprove = [reg.activity_id];
 
     if (reg.activities?.series_id) {
-       const { data: seriesActs } = await supabase
+      const { data: seriesActs } = await supabase
         .from("activities")
         .select("id")
         .eq("series_id", reg.activities.series_id);
 
-       if (seriesActs) idsToApprove = seriesActs.map(a => a.id);
+      if (seriesActs) idsToApprove = seriesActs.map((a) => a.id);
     }
 
     // 3. Update Registration Status (Approve User)
     // Note: if_confirmed is already true (set when registering or promoted from waitlist)
     // We just change status from 'pending' to 'approved'
     const { error: updateError } = await supabase
-        .from("registrations")
-        .update({ status: 'approved' })
-        .eq("user_id", reg.user_id)
-        .in("activity_id", idsToApprove);
+      .from("registrations")
+      .update({ status: "approved" })
+      .eq("user_id", reg.user_id)
+      .in("activity_id", idsToApprove);
 
     if (updateError) return [null, updateError.message];
 
     // 4. Send in-app notification to user
-    await supabase.from('notifications').insert({
+    await supabase.from("notifications").insert({
       user_id: reg.user_id,
       title: "בקשתך אושרה! 🎉",
-      message: `בקשתך להצטרף ל"${reg.activities?.title || 'פעילות'}" אושרה. נתראה!`,
+      message: `בקשתך להצטרף ל"${
+        reg.activities?.title || "פעילות"
+      }" אושרה. נתראה!`,
       is_read: false,
       created_at: new Date().toISOString(),
-      linked_activity_id: reg.activity_id
+      linked_activity_id: reg.activity_id,
     });
 
     // 5. Send email notification (fire-and-forget)
     if (reg.users?.email) {
-      fetch('/api/send-registration-approval-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      fetch("/api/send-registration-approval-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: reg.users.email,
           name: reg.users.full_name,
-          activityTitle: reg.activities?.title || 'פעילות'
-        })
-      }).catch(err => console.error("Failed to send registration approval email:", err));
+          activityTitle: reg.activities?.title || "פעילות",
+        }),
+      }).catch((err) =>
+        console.error("Failed to send registration approval email:", err)
+      );
     }
 
     return [{ success: true }, null];
@@ -1182,7 +1247,9 @@ export const apiRegistrations = {
     // 1. Get registration info to check if we need to decrement count
     const { data: reg } = await supabase
       .from("registrations")
-      .select("if_confirmed, user_id, activity_id, activities(series_id, title, requires_approval)")
+      .select(
+        "if_confirmed, user_id, activity_id, activities(series_id, title, requires_approval)"
+      )
       .eq("id", registrationId)
       .single();
 
@@ -1197,7 +1264,7 @@ export const apiRegistrations = {
         .from("activities")
         .select("id")
         .eq("series_id", reg.activities.series_id);
-      if (seriesActs) idsToUpdate = seriesActs.map(a => a.id);
+      if (seriesActs) idsToUpdate = seriesActs.map((a) => a.id);
     }
 
     // 3. Delete all registrations for this user in the series
@@ -1223,7 +1290,10 @@ export const apiRegistrations = {
           .single();
 
         if (activity) {
-          const newCount = Math.max(0, (activity.current_participants || 0) - 1);
+          const newCount = Math.max(
+            0,
+            (activity.current_participants || 0) - 1
+          );
           await supabase
             .from("activities")
             .update({ current_participants: newCount })
@@ -1248,22 +1318,24 @@ export const apiRegistrations = {
             .update({
               if_confirmed: true,
               wait_list_place: null,
-              status: needsApproval ? 'pending' : 'approved'
+              status: needsApproval ? "pending" : "approved",
             })
             .eq("id", firstInWaitlist.id);
 
           // Increment participant count (they now have a reserved spot)
           const { data: freshAct } = await supabase
-            .from('activities')
-            .select('current_participants')
-            .eq('id', id)
+            .from("activities")
+            .select("current_participants")
+            .eq("id", id)
             .single();
 
           if (freshAct) {
             await supabase
               .from("activities")
-              .update({ current_participants: (freshAct.current_participants || 0) + 1 })
-              .eq('id', id);
+              .update({
+                current_participants: (freshAct.current_participants || 0) + 1,
+              })
+              .eq("id", id);
           }
 
           // Only send notification/email once per user (not for each session in series)
@@ -1272,30 +1344,36 @@ export const apiRegistrations = {
 
             // Send in-app notification to promoted user
             const notificationMessage = needsApproval
-              ? `התפנה מקום בפעילות "${reg.activities?.title || 'פעילות'}". בקשתך ממתינה לאישור המנהל.`
-              : `התפנה מקום בפעילות "${reg.activities?.title || 'פעילות'}". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`;
+              ? `התפנה מקום בפעילות "${
+                  reg.activities?.title || "פעילות"
+                }". בקשתך ממתינה לאישור המנהל.`
+              : `התפנה מקום בפעילות "${
+                  reg.activities?.title || "פעילות"
+                }". נרשמת אוטומטית! אם אינך מעוניין/ת להשתתף, אנא בטל/י את ההרשמה.`;
 
-            await supabase.from('notifications').insert({
+            await supabase.from("notifications").insert({
               user_id: firstInWaitlist.user_id,
-              title: "התפנה מקום בפעילות! 🎉",
+              title: "התפנה מקום בפעילות!",
               message: notificationMessage,
               is_read: false,
               created_at: new Date().toISOString(),
-              linked_activity_id: id
+              linked_activity_id: id,
             });
 
             // Send email notification (fire-and-forget)
             if (firstInWaitlist.users?.email) {
-              fetch('/api/send-waitlist-promotion-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+              fetch("/api/send-waitlist-promotion-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   email: firstInWaitlist.users.email,
                   name: firstInWaitlist.users.full_name,
-                  activityTitle: reg.activities?.title || 'פעילות',
-                  needsApproval: needsApproval
-                })
-              }).catch(err => console.error("Failed to send waitlist promotion email:", err));
+                  activityTitle: reg.activities?.title || "פעילות",
+                  needsApproval: needsApproval,
+                }),
+              }).catch((err) =>
+                console.error("Failed to send waitlist promotion email:", err)
+              );
             }
           }
 
@@ -1540,7 +1618,7 @@ export const apiUser = {
       free_text: null,
       interests: [],
       proximity: null,
-      completed_at: new Date().toISOString()
+      completed_at: new Date().toISOString(),
     };
 
     // 2. Insert into 'users' table with ADMIN role
@@ -1553,7 +1631,7 @@ export const apiUser = {
         role: "admin",
         gender: gender,
         is_approved: true,
-        quiz: adminQuiz
+        quiz: adminQuiz,
       },
     ]);
 
@@ -1659,17 +1737,18 @@ export const apiUser = {
    */
   async getUserBranches(userId) {
     const { data, error } = await supabase
-      .from('users')
-      .select('branches')
-      .eq('id', userId)
+      .from("users")
+      .select("branches")
+      .eq("id", userId)
       .single();
 
     if (error) return [null, error.message];
 
     // Default to BOTH if null or empty array
-    const branches = (data?.branches && data.branches.length > 0) 
-      ? data.branches 
-      : ['nahalal', 'satria'];
+    const branches =
+      data?.branches && data.branches.length > 0
+        ? data.branches
+        : ["nahalal", "satria"];
 
     return [branches, null];
   },
@@ -1680,17 +1759,14 @@ export const apiUser = {
   async updateUserBranches(userId, branchesArray) {
     return safeRequest(
       supabase
-        .from('users')
+        .from("users")
         .update({ branches: branchesArray })
-        .eq('id', userId)
+        .eq("id", userId)
     );
   },
   async updateUserPhone(userId, newPhone) {
     return safeRequest(
-      supabase
-        .from('users')
-        .update({ phone: newPhone })
-        .eq('id', userId)
+      supabase.from("users").update({ phone: newPhone }).eq("id", userId)
     );
   },
 
@@ -1731,6 +1807,9 @@ export const apiUser = {
       }
     });
 
-    return [{ groups: uniqueGroupSeriesIds.size, workshops: workshopCount }, null];
+    return [
+      { groups: uniqueGroupSeriesIds.size, workshops: workshopCount },
+      null,
+    ];
   },
 };

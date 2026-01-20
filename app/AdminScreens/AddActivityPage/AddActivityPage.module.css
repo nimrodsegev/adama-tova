@@ -557,12 +557,12 @@
   width: 100%;
   height: 13.0625rem;
   background: #ab4016;
-  margin-top: 6rem;
+  margin-top: var(--spacing-2xl);
   border: var(--border-width-thin) solid var(--color-text-secondary);
   border-radius: var(--radius-md);
   overflow: hidden;
   position: relative;
-  margin-bottom: var(--spacing-3xl);
+  margin-bottom: var(--spacing-1xl);
 }
 .previewImage {
   width: 100%;
@@ -589,7 +589,7 @@
   letter-spacing: 0.02em;
   color: var(--color-text-primary);
   margin: 0;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-דצ);
 }
 .previewInfoBlock {
   display: flex;
