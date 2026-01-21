@@ -340,7 +340,6 @@ export default function ActivityDetailsModal({
                     }`}
                   >
                     <h2 className={styles.titleText}>
-                      {isGroup ? "קבוצת " : "סדנת "}
                       {activity?.title || ""}
                     </h2>
                   </div>

@@ -146,6 +146,12 @@
   z-index: 1000 !important; /* Must be higher than siblings */
 }
 
+/* Override the default cutInput height for the message box */
+.tallInput {
+  width: 100%;
+  height: 8rem !important; /* Taller height for the text area */
+}
+
 /* ============================================
    CUT INPUT OVERRIDES
    ============================================ */
