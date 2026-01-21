@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { apiActivities } from "@/app/services/db_api";
+import { apiActivities, apiNotifications } from "@/app/services/db_api";
 import { useIvrita } from "@/app/contexts/IvritaContext";
 import { useRouter } from "next/navigation";
 import styles from "./addNotification.module.css";
@@ -11,11 +11,11 @@ import CutInput from "@/lib/components/UI/CutInput";
 import UnifiedDropdown from "@/lib/components/UI/UnifiedDropdown";
 import Popup from "@/lib/components/UI/Popup";
 
-// --- Constants ---
+// --- CHANGED: Updated Options ---
 const TARGET_OPTIONS = [
   { label: "לפי פעילות", value: "activity" },
-  { label: "לפי תאריך", value: "date" },
   { label: "לפי מעגל", value: "circle" },
+  { label: "לכל משתמשי המרחב", value: "all" }, // Changed 'date' to 'all'
 ];
 
 const CIRCLE_OPTIONS = [
@@ -29,22 +29,6 @@ const CIRCLE_OPTIONS = [
   { label: "מעגל שני או שלישי", value: "Second or third" },
 ];
 
-const DAYS = Array.from({ length: 31 }, (_, i) => ({
-  label: (i + 1).toString().padStart(2, "0"),
-  value: (i + 1).toString().padStart(2, "0"),
-}));
-
-const MONTHS = Array.from({ length: 12 }, (_, i) => ({
-  label: (i + 1).toString().padStart(2, "0"),
-  value: (i + 1).toString().padStart(2, "0"),
-}));
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 3 }, (_, i) => ({
-  label: (CURRENT_YEAR + i).toString(),
-  value: (CURRENT_YEAR + i).toString(),
-}));
-
 export default function AddNotificationPage() {
   const router = useRouter();
   const { t } = useIvrita();
@@ -55,17 +39,12 @@ export default function AddNotificationPage() {
 
   // Form State
   const [targetType, setTargetType] = useState<
-    "" | "activity" | "date" | "circle"
+    "" | "activity" | "all" | "circle" // Changed type definition
   >("");
   const [selectedActivityId, setSelectedActivityId] = useState("");
   const [selectedCircle, setSelectedCircle] = useState("");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-
-  // Date State
-  const [day, setDay] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
 
   // UI State
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -109,7 +88,6 @@ export default function AddNotificationPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- UPDATED EFFECT: Filter for Future Activities ---
   useEffect(() => {
     if (targetType === "activity" && allActivities.length === 0) {
       const fetchActivities = async () => {
@@ -117,18 +95,15 @@ export default function AddNotificationPage() {
         const [data, error] = await apiActivities.getAll();
         
         if (!error && data) {
-          // 1. Get Today's date at 00:00:00 to compare
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-          // 2. Filter: Keep only activities where date >= today
           const futureActivities = data.filter((act: any) => {
             if (!act.date) return false;
             const actDate = new Date(act.date);
             return actDate >= today; 
           });
 
-          // 3. Sort them by date (closest first)
           futureActivities.sort((a: any, b: any) => 
             new Date(a.date).getTime() - new Date(b.date).getTime()
           );
@@ -154,17 +129,16 @@ export default function AddNotificationPage() {
           title,
           message
         );
-      } else if (targetType === "date") {
-        if (!day || !month || !year) throw new Error("יש לבחור תאריך מלא");
-        [res, err] = await apiActivities.notifyByDate(
-          `${year}-${month}-${day}`,
-          title,
-          message
-        );
       } else if (targetType === "circle") {
         if (!selectedCircle) throw new Error("יש לבחור מעגל");
         [res, err] = await apiActivities.notifyByCircle(
           selectedCircle,
+          title,
+          message
+        );
+      } else if (targetType === "all") {
+        // --- NEW LOGIC: Send to All ---
+        [res, err] = await apiNotifications.notifyAllUsers(
           title,
           message
         );
@@ -176,34 +150,27 @@ export default function AddNotificationPage() {
 
       if (recipientCount === 0) {
         let emptyMsg = "לא נמצאו נמענים לשליחת ההודעה.";
-        if (targetType === "date") {
-            emptyMsg = "לא נמצאו פעילויות (או נרשמים) בתאריך שנבחר.";
-        } else if (targetType === "activity") {
+        if (targetType === "activity") {
             emptyMsg = "לא נמצאו נרשמים לפעילות זו.";
         }
 
         setPopupConfig({
           title: "לא נמצאו נמענים",
-          content:
-            "לא נמצאו משתמשים התואמים את קהל היעד שנבחר. ההודעה לא נשלחה.",
+          content: emptyMsg,
           isSuccess: false,
         });
       } else {
         setPopupConfig({
           title: "הודעה נשלחה",
-          content: `ההודעה נשלחה בהצלחה.`,
+          content: `ההודעה נשלחה בהצלחה`,
           isSuccess: true, 
         });
       }
-
+      
       setShowPopup(true);
+
     } catch (error: any) {
       console.error("Error sending notification:", error);
-      setPopupConfig({
-        title: "שגיאה",
-        content: error.message || "אירעה שגיאה בשליחת ההודעה",
-        isSuccess: false,
-      });
       
       const errMsg = typeof error === 'string' ? error : (error.message || "Unknown error");
 
@@ -214,7 +181,7 @@ export default function AddNotificationPage() {
       ) {
         setPopupConfig({
           title: "לא נמצאו נמענים",
-          content: "לא נמצאו נרשמים/פעילויות התואמים את הבחירה, ולכן ההודעה לא נשלחה.",
+          content: "לא נמצאו נמענים מתאימים, ולכן ההודעה לא נשלחה.",
           isSuccess: false, 
         });
       } else {
@@ -248,9 +215,8 @@ export default function AddNotificationPage() {
   }));
 
   return (
-    <SmoothPageWrapper isLoading={mounting}>
+    <SmoothPageWrapper isLoading={mounting || closing}>
       <main className={`mobile-container ${styles.pageOverride}`}>
-        {/* 1. CLOSE BUTTON (Flex Item, Aligned End) */}
         <button
           className={styles.closeButton}
           onClick={handleCloseWithAnimation}
@@ -264,12 +230,10 @@ export default function AddNotificationPage() {
           />
         </button>
 
-        {/* 2. HEADER (Spacing via margin-top) */}
         <div className={styles.header}>
           <h1 className={styles.headerTitle}>יצירת הודעה חדשה</h1>
         </div>
 
-        {/* 3. CONTENT */}
         <div className={styles.scrollContainer} ref={scrollContainerRef}>
           {/* --- TARGET AUDIENCE --- */}
           <div
@@ -329,67 +293,7 @@ export default function AddNotificationPage() {
             </div>
           )}
 
-          {/* --- DATE SELECT --- */}
-          {targetType === "date" && (
-            <div className={styles.fieldGroup}>
-              <label className={styles.dateLabel}>תאריך</label>
-              <div className={styles.dateRow}>
-                <div
-                  data-dropdown
-                  className={`${styles.miniDropdownWrapper} ${
-                    openDropdown === "year" ? styles.activeDropdownWrapper : ""
-                  }`}
-                >
-                  <UnifiedDropdown
-                    label=""
-                    placeholder="שנה"
-                    options={YEARS}
-                    value={year}
-                    onChange={setYear}
-                    isOpen={openDropdown === "year"}
-                    onToggle={() => toggleDropdown("year")}
-                    isMini={true}
-                  />
-                </div>
-
-                <div
-                  data-dropdown
-                  className={`${styles.miniDropdownWrapper} ${
-                    openDropdown === "month" ? styles.activeDropdownWrapper : ""
-                  }`}
-                >
-                  <UnifiedDropdown
-                    label=""
-                    placeholder="חודש"
-                    options={MONTHS}
-                    value={month}
-                    onChange={setMonth}
-                    isOpen={openDropdown === "month"}
-                    onToggle={() => toggleDropdown("month")}
-                    isMini={true}
-                  />
-                </div>
-
-                <div
-                  data-dropdown
-                  className={`${styles.miniDropdownWrapper} ${
-                    openDropdown === "day" ? styles.activeDropdownWrapper : ""
-                  }`}
-                >
-                  <UnifiedDropdown
-                    label=""
-                    placeholder="יום"
-                    options={DAYS}
-                    value={day}
-                    onChange={setDay}
-                    isOpen={openDropdown === "day"}
-                    onToggle={() => toggleDropdown("day")}
-                    isMini={true}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          {/* NO EXTRA FIELDS NEEDED FOR "ALL" - Just the Inputs below */}
 
           {/* --- INPUTS --- */}
           <CutInput

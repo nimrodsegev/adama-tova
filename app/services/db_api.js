@@ -635,7 +635,7 @@ export const apiActivities = {
     }));
 
     // 5. Send all at once
-    return safeRequest(supabase.from("notifications").insert(notifications));
+    return safeRequest(supabase.from("notifications").insert(notifications).select());
   },
   /**
    * ⭕ NOTIFY BY CIRCLE
@@ -731,7 +731,7 @@ export const apiActivities = {
     }));
 
     // 5. Batch Insert
-    return safeRequest(supabase.from("notifications").insert(notifications));
+    return safeRequest(supabase.from("notifications").insert(notifications).select());
   },
   async getByUserPreferences(userId) {
     // 1. Define the Mapping
@@ -1540,6 +1540,34 @@ export const apiNotifications = {
         (payload) => onNewNotification(payload.new)
       )
       .subscribe();
+  },
+  /**
+   * 📢 NOTIFY ALL USERS
+   * Sends a notification to every user in the database (including admins).
+   */
+  async notifyAllUsers(title, message) {
+    // 1. Get all user IDs
+    const { data: users, error } = await supabase
+      .from("users")
+      .select("id");
+
+    if (error) return [null, error.message];
+    if (!users || users.length === 0)
+      return [null, "No users found in the system."];
+
+    // 2. Prepare Notification Objects
+    const notifications = users.map((user) => ({
+      user_id: user.id,
+      title: title,
+      message: message,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    }));
+
+    console.log(`Sending broadcast to ${users.length} users.`);
+
+    // 3. Batch Insert
+    return safeRequest(supabase.from("notifications").insert(notifications).select());
   },
 };
 
