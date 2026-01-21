@@ -5,16 +5,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed; 
-  inset: 0; 
+  position: fixed;
+  inset: 0;
   width: 100%;
   height: 100dvh;
   min-height: 0 !important;
-  max-width: none !important; 
-  
+  max-width: none !important;
+
   /* Gradient Background */
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+
   padding: 2rem 0.2rem 1.5rem; /* 48px 4px 24px */
   gap: 0.5rem; /* 8px */
   z-index: 1;
@@ -23,20 +23,20 @@
 /* Header */
 .header {
   text-align: center;
-  margin-top: 3rem; 
+  margin-top: 3rem;
   margin-bottom: 1.5rem;
   z-index: 10;
   flex-shrink: 0;
   width: 100%;
-  max-width: var(--container-max-width, 24.5625rem); 
+  max-width: var(--container-max-width, 24.5625rem);
 }
 
 .headerTitle {
-  font-family: 'Arfilit', sans-serif;
+  font-family: "Arfilit", sans-serif;
   font-weight: var(--font-weight-normal);
   font-size: var(--font-size-3xl);
   line-height: 2.125rem;
-  color: #FFFFFF;
+  color: #ffffff;
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -49,15 +49,17 @@
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-  max-width: var(--container-max-width, 24.5625rem); 
-  padding: 0 1.5rem 6rem 1.5rem; 
+  max-width: var(--container-max-width, 24.5625rem);
+  padding: 0 1.5rem 6rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem; /* Gap between form elements */
-  overflow: visible; 
+  overflow: visible;
 }
-.scrollContainer::-webkit-scrollbar { display: none; }
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
 
 /* ============================================
    CUT INPUT OVERRIDES
@@ -83,16 +85,16 @@
 .inputField {
   box-sizing: border-box;
   width: 100%;
-  height: 3.75rem; 
+  height: 3.75rem;
   background: transparent;
-  border: 0.0625rem solid #F9F9F9;
-  border-radius: 0.5625rem; 
+  border: 0.0625rem solid #f9f9f9;
+  border-radius: 0.5625rem;
   padding: 0.5rem 1.625rem;
-  
+
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 1rem;
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: right;
   direction: rtl;
   outline: none;
@@ -112,15 +114,20 @@
   top: -0.5rem;
   right: 1.5rem;
   /* Masking for standard inputs */
-  background-image: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
+  background-image: linear-gradient(
+    180deg,
+    #e74e1c 0%,
+    #de6930 53%,
+    #e79267 87%
+  );
   background-repeat: no-repeat;
-  background-size: 100vw var(--vh, 100dvh); 
+  background-size: 100vw var(--vh, 100dvh);
   background-position: center var(--bg-y, 0px);
   padding: 0 0.25rem;
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 0.9rem;
-  color: #F9F9F9;
+  color: #f9f9f9;
   pointer-events: none;
   z-index: 2;
 }
@@ -133,35 +140,42 @@
   width: 100%;
   z-index: 50;
 }
-.activeDropdownContainer { z-index: 100 !important; }
+.activeDropdownContainer {
+  z-index: 100 !important;
+}
 
 .dropdownToggle {
   box-sizing: border-box;
   width: 100%;
-  height: 3.75rem; 
+  height: 3.75rem;
   padding: 0 1.625rem;
   background: transparent;
-  border: 0.0625rem solid #F9F9F9;
+  border: 0.0625rem solid #f9f9f9;
   border-radius: 0.5625rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
   font-family: var(--font-secondary);
   font-weight: 400;
   font-size: 1rem;
-  color: #FFFFFF;
-  
+  color: #ffffff;
+
   direction: rtl;
   cursor: pointer;
 }
-.dropdownToggle.open { border-radius: 0.5625rem 0.5625rem 0 0; border-bottom: none; }
+.dropdownToggle.open {
+  border-radius: 0.5625rem 0.5625rem 0 0;
+  border-bottom: none;
+}
 
 .dropdownMenu {
   position: absolute;
-  top: 100%; left: 0; right: 0;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  border: 0.0625rem solid #F9F9F9;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  border: 0.0625rem solid #f9f9f9;
   border-top: none;
   border-radius: 0 0 0.5625rem 0.5625rem;
   z-index: 100;
@@ -181,88 +195,154 @@
   color: #ffffff;
   cursor: pointer;
 }
-.dropdownOption:hover { background: rgba(255, 255, 255, 0.1); }
+.dropdownOption:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
 
 .dropdownArrow {
   display: inline-block;
-  width: 0; height: 0;
+  width: 0;
+  height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 5px solid #fff;
   transition: transform 0.2s;
 }
-.dropdownArrow.open { transform: rotate(180deg); }
+.dropdownArrow.open {
+  transform: rotate(180deg);
+}
 
 /* ============================================
    DATE ROW
    ============================================ */
-.fieldGroup { width: 100%; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-.dateLabel { width: 100%; font-family: var(--font-secondary); font-weight: var(--font-weight-normal); font-size: var(--font-size-md); text-align: right; color: #F9F9F9; margin: 0; }
-.dateRow { display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 0; gap: 8px; width: 100%; direction: rtl; }
+.fieldGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.dateLabel {
+  width: 100%;
+  font-family: var(--font-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-md);
+  text-align: right;
+  color: #f9f9f9;
+  margin: 0;
+}
+.dateRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  gap: 8px;
+  width: 100%;
+  direction: rtl;
+}
 
 .miniDropdownContainer {
   position: relative;
-  width: 94px; 
-  height: 28px; 
+  width: 94px;
+  height: 28px;
   z-index: 1;
 }
-.activeMiniDropdown { z-index: 100 !important; }
+.activeMiniDropdown {
+  z-index: 100 !important;
+}
 
 .miniDropdownToggle {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   background: transparent;
-  border: 1px solid #F9F9F9; 
-  border-radius: 3.5px; 
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 9px; 
+  border: 1px solid #f9f9f9;
+  border-radius: 3.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 9px;
   font-family: var(--font-secondary);
   font-weight: 300;
   font-size: 1rem;
-  color: #F9F9F9;
+  color: #f9f9f9;
   direction: rtl;
   cursor: pointer;
 }
-.miniDropdownToggle span { font-size: 16px; color: rgba(247, 247, 247, 0.7); }
-.miniDropdownToggle.open { border-radius: 3.5px 3.5px 0 0; border-bottom: none; }
+.miniDropdownToggle span {
+  font-size: 16px;
+  color: rgba(247, 247, 247, 0.7);
+}
+.miniDropdownToggle.open {
+  border-radius: 3.5px 3.5px 0 0;
+  border-bottom: none;
+}
 
 .miniDropdownMenu {
-  position: absolute; top: 100%; left: 0; right: 0;
-  background: linear-gradient(180deg, #E74E1C 0%, #DE6930 53%, #E79267 87%);
-  border: 1px solid #F9F9F9; border-top: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #e74e1c 0%, #de6930 53%, #e79267 87%);
+  border: 1px solid #f9f9f9;
+  border-top: none;
   border-radius: 0 0 3.5px 3.5px;
-  z-index: 100; max-height: 10rem; overflow-y: auto;
+  z-index: 100;
+  max-height: 10rem;
+  overflow-y: auto;
 }
 .miniDropdownOption {
-  width: 100%; padding: 0.5rem; background: transparent; border: none;
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
   border-bottom: 1px solid rgba(249, 249, 249, 0.2);
-  color: #fff; font-family: var(--font-secondary); font-size: 0.9rem; text-align: center; cursor: pointer;
+  color: #fff;
+  font-family: var(--font-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
 }
 
 /* ============================================
    IMAGE UPLOAD (MATCHING CUT INPUT)
    ============================================ */
 .uploadBox {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   height: 3.75rem; /* 60px - Matches CutInput */
   padding: 0.6875rem 1.875rem;
-  background: transparent; 
-  border: 0.0625rem solid #F9F9F9; /* Match CutInput border */
-  border-radius: 0.5625rem; 
+  background: transparent;
+  border: 0.0625rem solid #f9f9f9; /* Match CutInput border */
+  border-radius: 0.5625rem;
   cursor: pointer;
 }
-.paperclipWrapper { width: 1.125rem; height: 1.125rem; display: flex; align-items: center; justify-content: center; }
+.paperclipWrapper {
+  width: 1.125rem;
+  height: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .uploadText {
-  flex: 1; text-align: right; color: rgba(247, 247, 247, 0.7);
-  font-family: var(--font-secondary); font-size: 1rem; font-weight: 300;
+  flex: 1;
+  text-align: right;
+  color: rgba(247, 247, 247, 0.7);
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  font-weight: 300;
   margin-right: 1rem;
 }
 .filePreviewBox {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   height: 3.75rem; /* 60px */
   padding: 0 1rem;
-  background: rgba(255, 255, 255, 0.1); 
+
   border: 0.0625rem solid #fff;
   border-radius: 0.5625rem;
 }
@@ -270,8 +350,19 @@
   width: 100%;
   height: 8rem !important; /* Taller height for the text area */
 }
-.fileName { color: #fff; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; }
-.previewLabel { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin: 0 5px; }
+.fileName {
+  color: #fff;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+}
+.previewLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  margin: 0 5px;
+}
 /* ============================================
    BUTTONS
    ============================================ */
@@ -283,21 +374,26 @@
 }
 
 .saveButton {
-  background: #B37EB3; 
+  background: #b37eb3;
   color: rgba(247, 247, 247, 0.9);
-  border: none; 
-  border-radius: 0.3125rem; 
+  border: none;
+  border-radius: 0.3125rem;
   padding: 0.5rem 1rem;
-  width: auto; 
+  width: auto;
   min-width: 8rem;
   height: 2.75rem;
-  font-family: var(--font-secondary); 
-  font-size: 1.125rem; 
-  cursor: pointer; 
+  font-family: var(--font-secondary);
+  font-size: 1.125rem;
+  cursor: pointer;
   transition: opacity 0.2s;
 }
-.saveButton:hover { opacity: 0.9; }
-.saveButton:disabled { opacity: 0.6; cursor: not-allowed; }
+.saveButton:hover {
+  opacity: 0.9;
+}
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ============================================
    IMAGE UPLOAD (SVG BORDER STYLE)
@@ -321,7 +417,7 @@
 }
 
 .imageBorderPath {
-  stroke: #F9F9F9;
+  stroke: #f9f9f9;
   stroke-width: 1;
 }
 
@@ -334,7 +430,7 @@
   font-weight: 400;
   font-size: 1rem;
   line-height: 1.1875rem;
-  color: #F9F9F9;
+  color: #f9f9f9;
   padding: 0 0.25rem;
   pointer-events: none;
   z-index: 2;
@@ -342,42 +438,71 @@
 
 /* The Clickable Area (No CSS Border) */
 .uploadBox {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   height: 100%; /* Fill wrapper */
   padding: 0.6875rem 1.875rem;
   background: transparent;
   /* Border removed - SVG handles it */
-  border: none; 
+  border: none;
   border-radius: 0.5625rem;
   cursor: pointer;
   position: relative;
   z-index: 5;
 }
 
-.paperclipWrapper { width: 1.125rem; height: 1.125rem; display: flex; align-items: center; justify-content: center; }
+.paperclipWrapper {
+  width: 1.125rem;
+  height: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .uploadText {
-  flex: 1; text-align: right; color: rgba(247, 247, 247, 0.7);
-  font-family: var(--font-secondary); font-size: 1rem; font-weight: 300;
+  flex: 1;
+  text-align: right;
+  color: rgba(247, 247, 247, 0.7);
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  font-weight: 300;
   margin-right: 1rem;
 }
 
 /* Preview Box (No CSS Border) */
 .filePreviewBox {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   height: 100%; /* Fill wrapper */
   padding: 0 1rem;
-  background: rgba(255, 255, 255, 0.1); 
+
   /* Border removed - SVG handles it */
   border: none;
   border-radius: 0.5625rem;
   position: relative;
   z-index: 5;
 }
-.fileName { color: #fff; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; }
-.previewLabel { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin: 0 5px; }
-.optionalText { font-size: 0.8rem; opacity: 0.8; margin-right: 4px; }
+.fileName {
+  color: #fff;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+}
+.previewLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  margin: 0 5px;
+}
+.optionalText {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-right: 4px;
+}
 
 /* ============================================
    CUSTOM TIME PICKER
@@ -389,11 +514,11 @@
   align-items: center;
   gap: 6rem; /* Large gap */
   width: 100%;
-  height: 9rem; 
-  border: 0.0625rem solid #F9F9F9;
-  border-radius: 0.5625rem; 
+  height: 9rem;
+  border: 0.0625rem solid #f9f9f9;
+  border-radius: 0.5625rem;
   background: transparent;
-  direction: ltr; 
+  direction: ltr;
 }
 
 .timeColumn {
@@ -401,7 +526,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem; 
+  gap: 0.75rem;
 }
 
 .timeButton {
@@ -425,14 +550,14 @@
 */
 .arrowUp {
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); 
+  font-size: var(--font-size-md);
   transform: rotate(90deg);
   filter: brightness(0) invert(1);
 }
 
 .arrowDown {
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); 
+  font-size: var(--font-size-md);
   transform: rotate(-90deg);
   stroke-width: 3px;
   filter: brightness(0) invert(1);
@@ -441,8 +566,8 @@
 .timeValue {
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-normal);
-  font-size: var(--font-size-md); 
-  color: #FFFFFF;
+  font-size: var(--font-size-md);
+  color: #ffffff;
   min-width: 2.5rem;
   text-align: center;
 }
@@ -482,7 +607,12 @@
    RESPONSIVE
    ============================================ */
 @media (max-height: 700px) {
-  .header { margin-top: 3.5rem; margin-bottom: 1.5rem; }
+  .header {
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
   /* Don't shrink cutInput height here! */
-  .scrollContainer { gap: 1rem; }
+  .scrollContainer {
+    gap: 1rem;
+  }
 }
