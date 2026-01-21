@@ -309,10 +309,11 @@ export default function AddNotificationPage() {
             label="תוכן ההודעה"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className={styles.cutInput}
+            className={styles.tallInput} 
             type="text"
             dir="rtl"
             textAlign="right"
+            tall={true} 
           />
           <div className={styles.buttonContainer}>
             <button
