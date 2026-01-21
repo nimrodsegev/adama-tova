@@ -59,7 +59,7 @@
 
 .pageContainer {
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: 100%;
   height: calc(100dvh - var(--nav-height-bottom));
   overflow-y: auto;
   overflow-x: hidden;

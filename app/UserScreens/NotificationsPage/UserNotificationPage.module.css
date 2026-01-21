@@ -1,7 +1,7 @@
 /* UserNotificationPage.module.css */
 .pageContainer {
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: 100%;
   z-index: var(--z-index-page);
   /* --- COPIED FROM ADMIN SETTINGS --- */
   /* Fix height to viewport minus nav bar, and scroll internally */
