@@ -201,15 +201,15 @@
 }
 
 .headerTextGroup {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  /* ⭐ CHANGED: Switched from Flex to Block to allow text wrapping */
+  display: block;
+  width: 100%;
 }
 
 .time,
 .pipe {
+  /* ⭐ CHANGED: Inline allows them to sit on the same line as the title text */
+  display: inline;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xl);
@@ -217,10 +217,11 @@
   text-align: right;
   color: var(--color-text-secondary);
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .title {
+  /* ⭐ CHANGED: Inline allows the text to wrap continuously from the time/pipe */
+  display: inline;
   font-family: var(--font-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xl);
@@ -232,18 +233,21 @@
 }
 
 .pipe {
-  margin: 0 var(--spacing-xs);
+  /* ⭐ ADDED: Margins to replace the flex 'gap' */
+  margin: 0 var(--spacing-sm);
 }
 
 .unreadDot {
-  width: 0.6875rem; /* ⚠️ NO VARIABLE - 11px */
-  height: 0.6875rem; /* ⚠️ NO VARIABLE - 11px */
+  width: 0.6875rem;
+  height: 0.6875rem;
   background: var(--color-bordo);
   border-radius: var(--radius-full);
-  flex: none;
-  order: -1;
   box-shadow: var(--shadow-sm);
-  margin-top: 0.4rem; /* ⚠️ NO VARIABLE */
+
+  /* ⭐ CHANGED: float handles the positioning in RTL since 'order' doesn't work in block display */
+  float: right;
+  margin-top: 0.4rem;
+  margin-left: var(--spacing-xs); /* Added spacing between dot and time */
 }
 
 .readText {

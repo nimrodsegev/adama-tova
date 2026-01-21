@@ -19,7 +19,7 @@ interface NewUserActivityCardProps {
   id: string;
   title: string;
   instructor: string;
-  date: string;
+  date?: string; // <--- Changed to optional
   startTime: string;
   currentParticipants?: number;
   maxParticipants?: number;
@@ -32,7 +32,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   id,
   title,
   instructor,
-  date,
+  date, // <--- No default value here, we handle it below
   startTime,
   currentParticipants,
   maxParticipants,
@@ -62,14 +62,24 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
   const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] =
     useState(false);
 
-  const formatTime = (time: string) => time.slice(0, 5);
-  const dateObj = new Date(date);
-  const dayName = dateObj.toLocaleDateString("he-IL", { weekday: "long" });
-  const dayMonth = `${dateObj.getDate().toString().padStart(2, "0")}.${(
-    dateObj.getMonth() + 1
-  )
-    .toString()
-    .padStart(2, "0")}`;
+  // --- Date & Time Parsing Logic ---
+  const formatTime = (time: string) => (time ? time.slice(0, 5) : "");
+
+  // Safe Date parsing
+  const dateObj = date ? new Date(date) : null;
+  const isValidDate = dateObj && !isNaN(dateObj.getTime());
+
+  const dayName = isValidDate
+    ? dateObj!.toLocaleDateString("he-IL", { weekday: "long" })
+    : "";
+
+  const dayMonth = isValidDate
+    ? `${dateObj!.getDate().toString().padStart(2, "0")}.${(
+        dateObj!.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}`
+    : "";
 
   useEffect(() => {
     if (user && id && !isAdmin) {
@@ -122,7 +132,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     e.stopPropagation();
     if (!user || loading) return;
 
-    // ⭐ For admin, open registrations modal
     if (isAdmin) {
       setIsRegistrationsModalOpen(true);
       return;
@@ -205,25 +214,15 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
     return "להרשמה";
   };
 
-  // ⭐ Updated Clock Logic
   const shouldShowClockIcon = () => {
-    // 0. Base case: User is personally on the waitlist
     if (regStatus === "waitlist") return true;
-
     const hasWaitlist = (waitlistCount || 0) > 0;
-
-    // 1 & 3. User is Unregistered
     if (regStatus === "none") {
-      // Show if Full OR if it's a Group
       return isFull || isGroup;
     }
-
-    // 2 & 4. User is Registered
     if (regStatus === "confirmed") {
-      // Show if there is a waitlist (others are waiting)
       return hasWaitlist;
     }
-
     return false;
   };
 
@@ -262,8 +261,11 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
 
             <div className={styles.detailsGroup}>
               <p className={styles.instructorText}>{instructor}</p>
+
+              {/* --- Conditional Date Rendering --- */}
               <p className={styles.dateTimeText}>
-                {dayName} {dayMonth} בשעה {formatTime(startTime)}
+                {isValidDate ? `${dayName} ${dayMonth}` : ""} בשעה{" "}
+                {formatTime(startTime)}
               </p>
 
               {isAdmin && participantsStatus && (
@@ -315,7 +317,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         </div>
       </div>
 
-      {/* Activity Details Modal - Only for regular users or when clicking card body */}
       <ActivityDetailsModal
         activityId={id}
         isOpen={isModalOpen}
@@ -327,7 +328,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         onMotionChange={onMotionChange}
       />
 
-      {/* ⭐ Activity Registrations Modal - For admin when clicking button */}
       {isAdmin && (
         <ActivityRegistrationsModal
           activityId={id}
@@ -337,12 +337,11 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         />
       )}
 
-      {/* Cancel Confirmation Popup - Only for regular users */}
       {!isAdmin && isCancelModalOpen && (
         <Popup
-          content={`${t(
-            "את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה"
-          )} ל${title} ב${dayName} ${dayMonth} בשעה ${formatTime(startTime)}?`}
+          content={`${t("את/ה בטוח/ה שאת/ה רוצה לבטל את ההרשמה")} ל${title}${
+            isValidDate ? ` ב${dayName} ${dayMonth}` : ""
+          } בשעה ${formatTime(startTime)}?`}
           primaryButtonText="כן, לבטל"
           primaryButtonAction={handleCancelConfirm}
           secondaryButtonText="לא"
@@ -352,7 +351,6 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
         />
       )}
 
-      {/* Success Modals - Only for regular users */}
       {!isAdmin &&
         isSuccessModalOpen &&
         (registrationBackendStatus === "pending" && regStatus !== "waitlist" ? (
@@ -360,7 +358,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
             activityTitle={title}
-            startDate={dayMonth}
+            startDate={dayMonth} // Will be empty string if date is missing
             startTime={formatTime(startTime)}
           />
         ) : (
@@ -368,7 +366,7 @@ const NewUserActivityCard: React.FC<NewUserActivityCardProps> = ({
             isOpen={isSuccessModalOpen}
             onClose={handleSuccessModalClose}
             activityTitle={title}
-            activityDate={dayMonth}
+            activityDate={dayMonth} // Will be empty string if date is missing
             activityTime={formatTime(startTime)}
             isGroup={isGroup}
             isWaitlist={regStatus === "waitlist"}
