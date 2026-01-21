@@ -366,12 +366,14 @@ export default function ActivityDetailsModal({
                     </p>
                   </div>
 
-                  <div className={styles.participantsSection}>
-                    <p className={styles.secondaryInfoText}>
-                      משתתפים: {registrationCount.confirmed}/
-                      {registrationCount.total} {participantsText}
-                    </p>
-                  </div>
+                  {!isAdmin && (
+                    <div className={styles.participantsSection}>
+                      <p className={styles.secondaryInfoText}>
+                        משתתפים: {registrationCount.confirmed}/
+                        {registrationCount.total} {participantsText}
+                      </p>
+                    </div>
+                  )}
 
                   <div className={styles.descriptionSection}>
                     <p className={styles.descriptionText}>{description}</p>
