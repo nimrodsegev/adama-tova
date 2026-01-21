@@ -15,7 +15,7 @@ const CIRCLE_MAPPING: Record<string, string> = {
   'נפגעי טראומה 7.10 ומלחמת חרבות ברזל': 'October 7 victim',
   'הורים שכולים': 'Shkulim parents',
   'אחים.ות שכולים': 'Shkulim Siblings',
-  'קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם': 'Family of october 7 victim',
+  'קרובים של נפגעי טראומה בגופם ובנפשם': 'Family of october 7 victim',
   'כוחות הצלה וחילוץ': 'Rescue forces',
   'תושבי העוטף ומפונים': 'Residence of Otef Aza',
   'מעגל שני ושלישי של משפחות השכול': 'Second or third',

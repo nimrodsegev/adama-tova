@@ -71,7 +71,7 @@ function mapCircleToType(circle: string | undefined): string | null {
   const map: Record<string, string> = {
     "שורדי מסיבות": "Nova Survivor",
     "מעגל שני ושלישי של משפחות השכול": "Support Group",
-    "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם": "Support Group",
+    "קרובים של נפגעי טראומה בגופם ובנפשם": "Support Group",
     "כוחות הצלה וחילוץ": "Rescue Forces",
     "נפגעי טראומה 7.10 ומלחמת חרבות ברזל": "Area/Bereavement",
     "הורים שכולים": "Area/Bereavement",

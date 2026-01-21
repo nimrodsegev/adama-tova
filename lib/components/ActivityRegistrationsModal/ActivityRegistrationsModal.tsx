@@ -42,7 +42,7 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
   "Shkulim parents": "הורים שכולים",
   "Shkulim Siblings": "אחים.ות שכולים",
   "Family of october 7 victim":
-    "קרובים של נפגעי טראומה בגופם ובנפשם בגופם ובנפשם",
+    "קרובים של נפגעי טראומה בגופם ובנפשם",
   "Rescue forces": "כוחות הצלה וחילוץ",
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",

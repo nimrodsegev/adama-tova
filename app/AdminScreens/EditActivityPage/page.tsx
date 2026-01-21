@@ -457,10 +457,11 @@ export default function EditActivityPage() {
             label="תיאור"
             value={formData.description}
             onChange={(e) => setFormValue('description', e.target.value)}
-            className={styles.cutInput}
+            className={styles.tallInput}
             type="text"
             dir="rtl"
             textAlign="right"
+            tall={true}
         />  
           
           <div className={styles.saveButtonContainer}>
