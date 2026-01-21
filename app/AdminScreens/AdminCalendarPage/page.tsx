@@ -118,7 +118,6 @@ export default function AdminCalendarPage() {
                       id={activity.id}
                       title={activity.title}
                       instructor={activity.instructor || "לא צוין"}
-                      date={activity.date}
                       startTime={activity.start_time}
                       currentParticipants={activity.current_participants || 0}
                       maxParticipants={activity.max_participants || 0}
