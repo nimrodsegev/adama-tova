@@ -28,6 +28,10 @@ const UserApprovalCard: React.FC<UserApprovalCardProps> = ({
 }) => {
   const { t } = useIvrita();
 
+  // ⭐ LOGIC: Select icon based on card type
+  const iconSrc =
+    type === "group" ? "/icons/calendar_active.svg" : "/icons/figure_active.svg";
+
   return (
     <div
       className={styles.cardContainer}
@@ -36,10 +40,9 @@ const UserApprovalCard: React.FC<UserApprovalCardProps> = ({
     >
       {/* ⭐ User name takes full width at the top */}
       <div className={styles.userHeader}>
-        {/* ⭐ NEW: Using SVG icon */}
         <div className={styles.userIcon}>
           <Image
-            src="/icons/figure_active.svg"
+            src={iconSrc} // 👈 Updated to use dynamic source
             alt=""
             width={13}
             height={15}
