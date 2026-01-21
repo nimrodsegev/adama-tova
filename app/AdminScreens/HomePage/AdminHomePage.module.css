@@ -157,7 +157,7 @@
 }
 
 .fabButtonOpen {
-  bottom: 10.5rem; /* ⚠️ NO VARIABLE - 168px */
+  bottom: 9rem; /* ⚠️ NO VARIABLE - 168px */
   transform: rotate(45deg);
 }
 
