@@ -70,8 +70,7 @@ const CIRCLE_TO_HEBREW: Record<string, string> = {
   "October 7 victim": "נפגעי טראומה 7.10 ומלחמת חרבות ברזל",
   "Shkulim parents": "הורים שכולים",
   "Shkulim Siblings": "אחים.ות שכולים",
-  "Family of october 7 victim":
-    "קרובים של נפגעי טראומה בגופם ובנפשם",
+  "Family of october 7 victim": "קרובים של נפגעי טראומה בגופם ובנפשם",
   "Rescue forces": "כוחות הצלה וחילוץ",
   "Residence of Otef Aza": "תושבי העוטף ומפונים",
   "Second or third": "מעגל שני ושלישי של משפחות השכול",
@@ -464,7 +463,6 @@ export default function AdminHomePage() {
                     type="initial"
                     userName={pendingUser.full_name || "משתמש"}
                     requestDate={formatDate(pendingUser.created_at)}
-                    circle={getCircleHebrew(pendingUser)}
                     onApprove={() =>
                       openConfirmForUser(
                         pendingUser.id,

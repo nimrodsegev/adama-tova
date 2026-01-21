@@ -57,7 +57,6 @@ const UserApprovalCard: React.FC<UserApprovalCardProps> = ({
             {type === "initial" ? "ממתין לאישור ראשוני" : "ממתין לאישור קבוצה"}
           </p>
           <p className={styles.statusLine}>מתאריך {requestDate}</p>
-          <p className={styles.circleLine}>{circle || "לא מצויין מעגל"}</p>
         </div>
 
         {/* Action Buttons */}
