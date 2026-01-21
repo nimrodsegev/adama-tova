@@ -892,6 +892,9 @@
   .nextArrow {
     bottom: 8rem;
   }
+  .previewImageCard {
+    margin-top: var(--spacing-4xl);
+  }
 }
 
 /* ============================================

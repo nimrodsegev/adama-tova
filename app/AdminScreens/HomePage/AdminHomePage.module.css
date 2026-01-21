@@ -157,7 +157,7 @@
 }
 
 .fabButtonOpen {
-  bottom: 9rem; /* ⚠️ NO VARIABLE - 168px */
+  bottom: 9.5rem; /* ⚠️ NO VARIABLE - 168px */
   transform: rotate(45deg);
 }
 
@@ -166,24 +166,33 @@
    ============================================ */
 @media (min-height: 760px) and (max-height: 780px) {
   .fabButtonOpen {
-    bottom: 9rem;
+    bottom: 9.5rem;
   }
   .actionButtons {
-    bottom: 5rem;
+    bottom: 5.5rem;
   }
 }
 
 /* iPhone 12/13/14 PWA viewport (797px height) */
 @media (min-height: 790px) and (max-height: 810px) {
   .actionButtons {
-    bottom: 5rem;
+    bottom: 5.5rem;
+  }
+}
+
+@media (min-height: 811px) and (max-height: 830px) {
+  .actionButtons {
+    bottom: 5.5rem;
+  }
+  .fabButtonOpen {
+    bottom: 9.5rem;
   }
 }
 
 /* iPhone 14/15 Plus/Pro Max PWA viewport (873px height) */
 @media (min-height: 865px) and (max-height: 885px) {
   .actionButtons {
-    bottom: 5rem;
+    bottom: 5.5rem;
   }
 }
 
