@@ -1,7 +1,7 @@
 /* AdminCalendarPage.module.css */
 .pageContainer {
   width: 100%;
-  max-width: var(--container-max-width); /* 24.5625rem / 393px */
+  max-width: 100%; /* 24.5625rem / 393px */
   /* 1. Use 100dvh so it fits the mobile screen exactly */
   height: calc(100dvh - var(--nav-height-bottom)); /* 100dvh - 72px */
   margin: 0 auto;

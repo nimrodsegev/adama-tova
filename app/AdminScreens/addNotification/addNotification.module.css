@@ -150,6 +150,7 @@
 .tallInput {
   width: 100%;
   height: 8rem !important; /* Taller height for the text area */
+  line-height: 1.78125rem;
 }
 
 /* ============================================

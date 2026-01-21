@@ -1,7 +1,7 @@
 /* UserCalendarPage.module.css */
 .pageContainer {
   width: 100%;
-  max-width: var(--container-max-width);
+  max-width: 100%;
   /* --- CHANGED: Scroll logic moved here --- */
   /* Fix height to viewport minus Bottom Nav (4.5rem) */
   height: calc(100dvh - 4.5rem); /* ⚠️ 4.5rem repeated */

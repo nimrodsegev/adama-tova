@@ -7,7 +7,7 @@
 .pageContainer {
   position: relative;
   width: 100%;
-  max-width: var(--container-max-width); /* 24.5625rem / 393px */
+  max-width: 100%; /* 24.5625rem / 393px */
   height: calc(
     100dvh - var(--nav-height-bottom)
   ); /* Fixed height forces internal scrolling */
