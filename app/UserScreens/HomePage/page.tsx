@@ -25,6 +25,7 @@ interface Activity {
   series_id?: string;
   is_group?: boolean;
   instructor?: string;
+  circle?: string;
 }
 
 const INTERESTS_MAPPING: Record<string, string> = {
@@ -32,6 +33,18 @@ const INTERESTS_MAPPING: Record<string, string> = {
   "גוף ותנועה": "body_motion",
   מוזיקה: "music_sound",
   "יצירה וחומר": "creation_material",
+};
+
+// Maps Hebrew circle names to English (for comparing with activity.circle)
+const CIRCLE_MAPPING: Record<string, string> = {
+  "שורדי מסיבות": "Nova Survivor",
+  "נפגעי טראומה 7.10 ומלחמת חרבות ברזל": "October 7 victim",
+  "הורים שכולים": "Shkulim parents",
+  "אחים.ות שכולים": "Shkulim Siblings",
+  "קרובים של נפגעי טראומה בגופם ובנפשם": "Family of october 7 victim",
+  "כוחות הצלה וחילוץ": "Rescue forces",
+  "תושבי העוטף ומפונים": "Residence of Otef Aza",
+  "מעגל שני ושלישי של משפחות השכול": "Second or third",
 };
 
 const OPENING_HOURS = {
@@ -134,11 +147,11 @@ export default function NewUserHomePage() {
   }, [dynamicRadius]);
 
   useEffect(() => {
-    if (user && !mountedRef.current) {
+    if (user && userProfile && !mountedRef.current) {
       mountedRef.current = true;
       fetchData();
     }
-  }, [user]);
+  }, [user, userProfile]);
 
   const fetchData = async () => {
     try {
@@ -189,14 +202,33 @@ export default function NewUserHomePage() {
         const suggList = processList(candidates);
 
         let finalSuggestions = suggList;
+
+        // Filter by interests (for WORKSHOPS only - groups don't have categories)
         if (userProfile?.quiz?.interests?.length) {
           const myInterestsEnglish = userProfile.quiz.interests.map(
             (i: string) => INTERESTS_MAPPING[i] || i
           );
-          finalSuggestions = suggList.filter((act: Activity) =>
-            myInterestsEnglish.includes(act.category)
-          );
+          finalSuggestions = suggList.filter((act: Activity) => {
+            const isGroup = act.is_group || !!act.series_id;
+            // Groups pass through interests filter (they use circles, not categories)
+            if (isGroup) return true;
+            // Workshops are filtered by interests
+            return myInterestsEnglish.includes(act.category);
+          });
         }
+
+        // Filter groups by user's circle:
+        // - Users with no circle: don't see any groups
+        // - Users with a circle: only see groups matching their circle
+        const userCircleHebrew = userProfile?.quiz?.circle;
+        const userCircleEnglish = userCircleHebrew ? CIRCLE_MAPPING[userCircleHebrew] : null;
+
+        finalSuggestions = finalSuggestions.filter((act: Activity) => {
+          const isGroup = act.is_group || !!act.series_id;
+          if (!isGroup) return true; // Workshops pass through
+          if (!userCircleEnglish) return false; // No user circle = no groups
+          return act.circle === userCircleEnglish; // Only matching circle
+        });
 
         setRegisteredActivities(regList);
         setSuggestedActivities(finalSuggestions);
